@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "886351472574",
+    "project_id": "takhotel-b0a4a",
+    "storage_bucket": "takhotel-b0a4a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:886351472574:android:e5e71d0560b6d96f4a7bef",
+        "android_client_info": {
+          "package_name": "com.Takhotel.takapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "886351472574-nj8fqi0rsntrq40n8c06ebn0enevrurn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDprTxRpc81YPKIPwkCcGew9Q6wYrBuLOI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "886351472574-nj8fqi0rsntrq40n8c06ebn0enevrurn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "886351472574-166pnjuv76oolbq6pelu4agjipo1tr9s.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Takhotel.takapp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:886351472574:android:3a84a2d2fabdfea84a7bef",
+        "android_client_info": {
+          "package_name": "com.takhotel.takapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "886351472574-nj8fqi0rsntrq40n8c06ebn0enevrurn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDprTxRpc81YPKIPwkCcGew9Q6wYrBuLOI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "886351472574-nj8fqi0rsntrq40n8c06ebn0enevrurn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "886351472574-166pnjuv76oolbq6pelu4agjipo1tr9s.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.Takhotel.takapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
