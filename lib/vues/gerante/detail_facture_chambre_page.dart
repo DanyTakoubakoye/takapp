@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:takapp/config/emcf_config.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/fiscalization_controller.dart';
 import 'package:takapp/modeles/emcf_invoice_item_model.dart';
@@ -15,7 +15,7 @@ import 'package:takapp/services/room_invoice_service.dart';
 
 class DetailFactureChambrePage extends StatefulWidget {
   final RoomInvoiceModel invoice;
-  final establishmentId;
+  final String establishmentId;
 
   const DetailFactureChambrePage({
     super.key,
@@ -30,6 +30,9 @@ class DetailFactureChambrePage extends StatefulWidget {
 
 class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
   final RoomInvoiceService _service = RoomInvoiceService();
+  String _sellerIfu = '';
+  String _sellerName = "";
+  String get establishmentId => widget.establishmentId.trim();
 
   late RoomInvoiceModel currentInvoice;
   bool isRefreshing = false;
@@ -38,6 +41,8 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
   void initState() {
     super.initState();
     currentInvoice = widget.invoice;
+    _loadSellerIfu();
+    _loadSellerName();
   }
 
   String formatDate(DateTime? date) {
@@ -53,6 +58,22 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
   String _establishmentId(BuildContext context) {
     final user = context.read<AuthController>().currentUser;
     return user?.establishmentId.trim() ?? '';
+  }
+
+  Future<void> _loadSellerIfu() async {
+    final doc = await FirebaseFirestore.instance
+        .collection('establishments')
+        .doc(establishmentId) // adapter au nom exact de la variable dans la vue
+        .get();
+    _sellerIfu = (doc.data()?['ifu'] ?? '').toString().trim();
+  }
+
+  Future<void> _loadSellerName() async {
+    final doc = await FirebaseFirestore.instance
+        .collection('establishments')
+        .doc(establishmentId) // adapter au nom exact de la variable dans la vue
+        .get();
+    _sellerName = (doc.data()?['name'] ?? '').toString().trim();
   }
 
   Future<void> _reloadInvoice(BuildContext context) async {
@@ -131,8 +152,8 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
     final printer = context.read<PrinterService>();
 
     final bytes = await pdfService.buildFiscalizedRoomInvoicePdf(
-      sellerName: 'TAKHOTEL',
-      sellerIfu: EmcfConfig.sellerIfu,
+      sellerName: _sellerName,
+      sellerIfu: _sellerIfu,
       clientName: currentInvoice.clientName,
       clientIfu: currentInvoice.clientIfu,
       clientAddress: currentInvoice.clientAddress,
@@ -221,7 +242,7 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
     ];
 
     return EmcfInvoiceRequestModel(
-      ifu: EmcfConfig.sellerIfu,
+      ifu: _sellerIfu,
       aib: mapAibType(currentInvoice.aibType),
       type: currentInvoice.fiscalInvoiceType.isNotEmpty
           ? currentInvoice.fiscalInvoiceType
@@ -277,11 +298,11 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
 
     final fiscalController = context.read<FiscalizationController>();
 
-    //await fiscalController.fiscalizeInvoice(
-      //establishmentId: establishmentId,
-      //invoiceId: currentInvoice.id,
-      //request: request,
-    //);
+    await fiscalController.fiscalizeInvoice(
+      establishmentId: establishmentId,
+      invoiceId: currentInvoice.id,
+      request: request,
+    );
 
     if (!mounted) return;
 

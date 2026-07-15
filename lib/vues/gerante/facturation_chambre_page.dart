@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:takapp/config/emcf_config.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/fiscalization_controller.dart';
 import 'package:takapp/modeles/emcf_invoice_item_model.dart';
@@ -17,7 +17,11 @@ import 'package:takapp/services/room_invoice_service.dart';
 import 'package:takapp/vues/gerante/recherche_facture_chambre_page.dart';
 
 class FacturationChambrePage extends StatefulWidget {
-  const FacturationChambrePage({super.key});
+  final String establishmentId;
+
+  const FacturationChambrePage({super.key,
+   required this.establishmentId});
+  
 
   @override
   State<FacturationChambrePage> createState() => _FacturationChambrePageState();
@@ -28,6 +32,9 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   final RoomConsumptionService _consumptionService = RoomConsumptionService();
 
   String? currentInvoiceId;
+  String _sellerIfu = '';
+  String _sellerName = "";
+  String get establishmentId => widget.establishmentId.trim();
 
   final TextEditingController clientController = TextEditingController();
   final TextEditingController clientIfuController = TextEditingController();
@@ -157,8 +164,8 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
     final printer = context.read<PrinterService>();
 
     final bytes = await pdfService.buildFiscalizedRoomInvoicePdf(
-      sellerName: 'TAKHOTEL',
-      sellerIfu: EmcfConfig.sellerIfu,
+      sellerName: _sellerName,
+      sellerIfu: _sellerIfu,
       clientName: invoice.clientName,
       clientIfu: invoice.clientIfu,
       clientAddress: invoice.clientAddress,
@@ -530,7 +537,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
     ];
 
     return EmcfInvoiceRequestModel(
-      ifu: EmcfConfig.sellerIfu,
+      ifu: _sellerIfu,
       aib: mapAibType(aibType),
       type: 'FV',
       items: items,
@@ -735,6 +742,12 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _loadSellerIfu();
+    _loadSellerName();
+  }
+  @override
   void dispose() {
     clientController.dispose();
     clientIfuController.dispose();
@@ -789,6 +802,22 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
       ),
     );
   }
+  Future<void> _loadSellerIfu() async {
+    final doc = await FirebaseFirestore.instance
+        .collection('establishments')
+        .doc(establishmentId) // adapter au nom exact de la variable dans la vue
+        .get();
+    _sellerIfu = (doc.data()?['ifu'] ?? '').toString().trim();
+  }
+
+  Future<void> _loadSellerName() async {
+    final doc = await FirebaseFirestore.instance
+        .collection('establishments')
+        .doc(establishmentId) // adapter au nom exact de la variable dans la vue
+        .get();
+    _sellerName = (doc.data()?['name'] ?? '').toString().trim();
+  }
+
 
   Widget _buildDesktopLayout({required String establishmentId}) {
     return Padding(

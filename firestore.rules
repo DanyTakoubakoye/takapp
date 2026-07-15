@@ -225,14 +225,6 @@ service cloud.firestore {
         allow delete: if sameEstablishment(establishmentId) &&
           (isAdminOrOwner() || isGerante());
       }
-      
-      match /roomExtras/{extraId} {
-        allow read, create, update: if sameEstablishment(establishmentId) && (
-          isServeur() || isGerante() || isAccounting() || isAdminOrOwner()
-        );
-        allow delete: if sameEstablishment(establishmentId) &&
-          (isAdminOrOwner() || isGerante());
-      }
 
       match /stock_items/{itemId} {
         allow read: if sameEstablishment(establishmentId);

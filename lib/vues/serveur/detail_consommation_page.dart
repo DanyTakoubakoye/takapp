@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:takapp/config/emcf_config.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/fiscalization_controller.dart';
 import 'package:takapp/controllers/payment_controller.dart';
@@ -31,6 +30,8 @@ class DetailConsommationPage extends StatefulWidget {
 
 class _DetailConsommationPageState extends State<DetailConsommationPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  String _sellerIfu = '';
+  String _sellerName = "";
 
   final TextEditingController clientNameController = TextEditingController();
 
@@ -58,6 +59,22 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
     if (date == null) return '-';
 
     return DateFormat('dd/MM/yyyy HH:mm').format(date);
+  }
+
+  Future<void> _loadSellerIfu() async {
+    final doc = await _firestore
+        .collection('establishments')
+        .doc(establishmentId)
+        .get();
+    _sellerIfu = (doc.data()?['ifu'] ?? '').toString().trim();
+  }
+
+  Future<void> _loadSellerName() async {
+    final doc = await _firestore
+        .collection('establishments')
+        .doc(establishmentId)
+        .get();
+    _sellerName = (doc.data()?['name'] ?? '').toString().trim();
   }
 
   String _clientLabel(OrderModel order) {
@@ -281,7 +298,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
     }).toList();
 
     return EmcfInvoiceRequestModel(
-      ifu: EmcfConfig.sellerIfu,
+      ifu: _sellerIfu, // ← au lieu de EmcfConfig.sellerIfu
       type: 'FV',
       items: emcfItems,
       client: {
@@ -334,6 +351,17 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
           const SnackBar(content: Text('Utilisateur introuvable.')),
         );
 
+        return;
+      }
+
+      if (_sellerIfu.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              "Renseignez d'abord l'IFU de l'établissement (console admin).",
+            ),
+          ),
+        );
         return;
       }
 
@@ -417,8 +445,8 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
       final printer = context.read<PrinterService>();
 
       final bytes = await pdfService.buildFiscalizedConsumptionInvoicePdf(
-        sellerName: 'TAKHOTEL',
-        sellerIfu: EmcfConfig.sellerIfu,
+        sellerName: _sellerName,
+        sellerIfu: _sellerIfu,
         clientName: clientNameController.text.trim().isEmpty
             ? _clientLabel(widget.order)
             : clientNameController.text.trim(),
@@ -500,6 +528,13 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
         ),
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSellerIfu();
+    _loadSellerName();
   }
 
   @override

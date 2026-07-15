@@ -235,7 +235,7 @@ class _GeranteModulesGrid extends StatelessWidget {
           _GeranteAction(
             title: 'Facturation chambres',
             icon: Icons.hotel,
-            pageBuilder: (_) => const FacturationChambrePage(),
+            pageBuilder: (_) => FacturationChambrePage(establishmentId: establishmentId),
           ),
           _GeranteAction(
             title: 'Liste des factures',

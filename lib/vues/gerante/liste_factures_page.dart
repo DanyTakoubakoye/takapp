@@ -1,9 +1,10 @@
 import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:takapp/config/emcf_config.dart';
+
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/fiscalization_controller.dart';
 import 'package:takapp/modeles/emcf_invoice_item_model.dart';
@@ -29,9 +30,18 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
   String statusFilter = 'all';
 
   String get establishmentId => widget.establishmentId.trim();
+  String _sellerIfu = '';
+  String _sellerName = "";
 
   bool _isSmallScreen(BuildContext context) =>
       MediaQuery.of(context).size.width < 800;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSellerIfu();
+    _loadSellerName();
+  }
 
   @override
   void dispose() {
@@ -66,6 +76,22 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
     await printer.printPdf(Uint8List.fromList(bytes));
   }
 
+  Future<void> _loadSellerIfu() async {
+    final doc = await FirebaseFirestore.instance
+        .collection('establishments')
+        .doc(establishmentId) // adapter au nom exact de la variable dans la vue
+        .get();
+    _sellerIfu = (doc.data()?['ifu'] ?? '').toString().trim();
+  }
+
+  Future<void> _loadSellerName() async {
+    final doc = await FirebaseFirestore.instance
+        .collection('establishments')
+        .doc(establishmentId) // adapter au nom exact de la variable dans la vue
+        .get();
+    _sellerName = (doc.data()?['name'] ?? '').toString().trim();
+  }
+
   Future<void> _printFiscalizedInvoice(RoomInvoiceModel item) async {
     if (item.startDate == null || item.endDate == null) {
       _showSnack('Les dates de la facture sont invalides.');
@@ -83,8 +109,8 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
     final printer = context.read<PrinterService>();
 
     final bytes = await pdfService.buildFiscalizedRoomInvoicePdf(
-      sellerName: 'TAKHOTEL',
-      sellerIfu: EmcfConfig.sellerIfu,
+      sellerName: _sellerName,
+      sellerIfu: _sellerIfu,
       clientName: item.clientName,
       clientIfu: item.clientIfu,
       clientAddress: item.clientAddress,
@@ -174,7 +200,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
     ];
 
     return EmcfInvoiceRequestModel(
-      ifu: EmcfConfig.sellerIfu,
+      ifu: _sellerIfu,
       aib: mapAibType(item.aibType),
       type: item.fiscalInvoiceType.isNotEmpty ? item.fiscalInvoiceType : 'FV',
       items: items,
@@ -200,15 +226,10 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
       return;
     }
 
-    if (EmcfConfig.sellerIfu.trim().isEmpty ||
-        EmcfConfig.sellerIfu == 'METS_ICI_IFU_ETABLISSEMENT') {
-      _showSnack('Veuillez d’abord renseigner EmcfConfig.sellerIfu.');
-      return;
-    }
-
-    if (EmcfConfig.bearerToken.trim().isEmpty ||
-        EmcfConfig.bearerToken == 'METS_ICI_TOKEN_JWT_DGI') {
-      _showSnack('Veuillez d’abord renseigner EmcfConfig.bearerToken.');
+    if (_sellerIfu.isEmpty) {
+      _showSnack(
+        "Renseignez d'abord l'IFU de l'établissement (console admin).",
+      );
       return;
     }
 
