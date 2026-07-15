@@ -5,9 +5,14 @@ import 'package:takapp/services/stock_request_service.dart';
 import 'package:takapp/vues/gerante/stock_delivery_page.dart';
 
 class StockRequestListPage extends StatefulWidget {
+  final String establishmentId;
   final String? storeFilter;
 
-  const StockRequestListPage({super.key, this.storeFilter});
+  const StockRequestListPage({
+    super.key,
+    required this.establishmentId,
+    this.storeFilter,
+  });
 
   @override
   State<StockRequestListPage> createState() => _StockRequestListPageState();
@@ -15,6 +20,8 @@ class StockRequestListPage extends StatefulWidget {
 
 class _StockRequestListPageState extends State<StockRequestListPage> {
   String statusFilter = 'pending';
+
+  String get establishmentId => widget.establishmentId.trim();
 
   Color _storeColor(String store) {
     switch (store) {
@@ -70,15 +77,26 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
 
   Stream<List<StockRequestModel>> _buildStream(StockRequestService service) {
     if (widget.storeFilter != null && widget.storeFilter!.trim().isNotEmpty) {
-      return service.streamRequestsForStore(widget.storeFilter!);
+      return service.streamRequestsForStore(
+        establishmentId: establishmentId,
+        store: widget.storeFilter!,
+      );
     }
-    return service.streamAllRequests();
+
+    return service.streamAllRequests(establishmentId: establishmentId);
   }
 
   @override
   Widget build(BuildContext context) {
     final service = StockRequestService();
+
     final isSmall = MediaQuery.of(context).size.width < 800;
+
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -122,7 +140,10 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                               ),
                             ],
                             onChanged: (value) {
-                              if (value == null) return;
+                              if (value == null) {
+                                return;
+                              }
+
                               setState(() {
                                 statusFilter = value;
                               });
@@ -164,7 +185,10 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                                 ),
                               ],
                               onChanged: (value) {
-                                if (value == null) return;
+                                if (value == null) {
+                                  return;
+                                }
+
                                 setState(() {
                                   statusFilter = value;
                                 });
@@ -191,7 +215,10 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                   final allItems = snapshot.data ?? [];
 
                   final items = allItems.where((item) {
-                    if (statusFilter == 'all') return true;
+                    if (statusFilter == 'all') {
+                      return true;
+                    }
+
                     return item.status == statusFilter;
                   }).toList();
 
@@ -204,7 +231,9 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                     separatorBuilder: (_, __) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       final item = items[index];
+
                       final storeColor = _storeColor(item.store);
+
                       final statusColor = _statusColor(item.status);
 
                       return Card(
@@ -286,6 +315,7 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (_) => StockDeliveryPage(
+                                              establishmentId: establishmentId,
                                               request: item,
                                             ),
                                           ),

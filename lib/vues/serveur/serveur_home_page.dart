@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/services/server_notification_service.dart';
+import 'package:takapp/services/notification_service.dart';
 import 'package:takapp/vues/serveur/encaissement_page.dart';
 import 'package:takapp/vues/serveur/facture_consommation_chambre_page.dart';
 import 'package:takapp/vues/serveur/menu_presentation_page.dart';
@@ -12,7 +13,8 @@ import 'package:takapp/vues/serveur/suivi_cuisine_page.dart';
 import 'package:takapp/vues/serveur/versement_gerante_page.dart';
 
 class ServeurHomePage extends StatefulWidget {
-  const ServeurHomePage({super.key});
+  final String establishmentId;
+  const ServeurHomePage({super.key, required this.establishmentId});
 
   @override
   State<ServeurHomePage> createState() => _ServeurHomePageState();
@@ -22,9 +24,55 @@ class _ServeurHomePageState extends State<ServeurHomePage> {
   final ServerNotificationService notificationService =
       ServerNotificationService();
 
-  Future<void> _openNotifications(String serveurId) async {
+  String? _listeningUserId;
+  String _getEstablishmentName(Map<String, dynamic>? data) {
+    if (data == null) return 'TAKHOTEL';
+
+    final name = (data['name'] ?? '').toString().trim();
+
+    if (name.isNotEmpty) return name;
+
+    return 'Hotel';
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final auth = context.read<AuthController>();
+    final user = auth.currentUser;
+
+    if (user != null && _listeningUserId != user.uid) {
+      _listeningUserId = user.uid;
+
+      NotificationService().registerTokenForCurrentUser();
+
+      if (user.establishmentId.trim().isNotEmpty) {
+        NotificationService().startServerNotificationListener(
+          establishmentId: user.establishmentId.trim(),
+          serveurId: user.uid,
+        );
+      }
+
+      debugPrint('Notification mobile listener lancé pour serveur=${user.uid}');
+    }
+  }
+
+  @override
+  void dispose() {
+    NotificationService().stopServerNotificationListener();
+    super.dispose();
+  }
+
+  Future<void> _openNotifications({
+    required String establishmentId,
+    required String serveurId,
+  }) async {
     try {
-      await notificationService.markAllAsReadForServer(serveurId);
+      await notificationService.markAllAsReadForServer(
+        establishmentId: establishmentId,
+        serveurId: serveurId,
+      );
     } catch (e) {
       debugPrint('Erreur markAllAsReadForServer: $e');
     }
@@ -34,7 +82,10 @@ class _ServeurHomePageState extends State<ServeurHomePage> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ServeurNotificationsPage(serverId: serveurId),
+        builder: (_) => ServeurNotificationsPage(
+          establishmentId: establishmentId,
+          serveurId: serveurId,
+        ),
       ),
     );
   }
@@ -48,87 +99,128 @@ class _ServeurHomePageState extends State<ServeurHomePage> {
     final isMobile = width < 700;
     final isTablet = width >= 700 && width < 1100;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('TAKHOTEL - Serveur'),
-        actions: [
-          if (user != null)
-            StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: notificationService.streamNotificationsForServer(
-                user.uid,
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text('Utilisateur introuvable')),
+      );
+    }
+
+    final establishmentId = user.establishmentId.trim();
+
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance
+          .collection('establishments')
+          .doc(establishmentId)
+          .snapshots(),
+      builder: (context, establishmentSnapshot) {
+        final establishmentData = establishmentSnapshot.data?.data();
+        final establishmentName = _getEstablishmentName(establishmentData);
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(
+              'Espace serveur - $establishmentName',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
-              builder: (context, snapshot) {
-                int unreadCount = 0;
+            ),
+            actions: [
+              StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+                stream: notificationService.streamNotificationsForServer(
+                  establishmentId: establishmentId,
+                  serveurId: user.uid,
+                ),
+                builder: (context, snapshot) {
+                  int unreadCount = 0;
 
-                if (snapshot.hasData) {
-                  unreadCount = snapshot.data!.docs.where((doc) {
-                    final data = doc.data();
-                    return data['isRead'] != true;
-                  }).length;
-                }
+                  if (snapshot.hasData) {
+                    unreadCount = snapshot.data!.docs.where((doc) {
+                      final data = doc.data();
+                      return data['isRead'] != true;
+                    }).length;
+                  }
 
-                return Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    IconButton(
-                      onPressed: () => _openNotifications(user.uid),
-                      tooltip: 'Notifications',
-                      icon: const Icon(Icons.notifications),
-                    ),
-                    if (unreadCount > 0)
-                      Positioned(
-                        right: 8,
-                        top: 8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 20,
-                            minHeight: 20,
-                          ),
-                          child: Text(
-                            unreadCount > 99 ? '99+' : '$unreadCount',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      IconButton(
+                        onPressed: () => _openNotifications(
+                          establishmentId: establishmentId,
+                          serveurId: user.uid,
+                        ),
+                        tooltip: 'Notifications',
+                        icon: const Icon(Icons.notifications),
+                      ),
+                      if (unreadCount > 0)
+                        Positioned(
+                          right: 8,
+                          top: 8,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            constraints: const BoxConstraints(
+                              minWidth: 20,
+                              minHeight: 20,
+                            ),
+                            child: Text(
+                              unreadCount > 99 ? '99+' : '$unreadCount',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                  ],
-                );
-              },
-            ),
-          IconButton(
-            onPressed: () => context.read<AuthController>().logout(),
-            tooltip: 'Déconnexion',
-            icon: const Icon(Icons.logout),
+                    ],
+                  );
+                },
+              ),
+              IconButton(
+                onPressed: () => context.read<AuthController>().logout(),
+                tooltip: 'Déconnexion',
+                icon: const Icon(Icons.logout),
+              ),
+            ],
           ),
-        ],
-      ),
-      body: user == null
-          ? const Center(child: Text('Utilisateur introuvable'))
-          : SafeArea(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(isMobile ? 12 : 18),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _ServeurWelcomeCard(name: user.name, isMobile: isMobile),
-                    const SizedBox(height: 16),
-                    _ServeurModulesGrid(isMobile: isMobile, isTablet: isTablet),
-                  ],
-                ),
+          body: SafeArea(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(isMobile ? 12 : 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _ServeurWelcomeCard(
+                    name: user.name,
+                    establishmentName: establishmentName,
+                    isMobile: isMobile,
+                  ),
+                  const SizedBox(height: 16),
+                  _ServeurModulesGrid(
+                    establishmentId: establishmentId,
+                    isMobile: isMobile,
+                    isTablet: isTablet,
+                  ),
+                ],
               ),
             ),
+          ),
+        );
+      },
     );
   }
 }
@@ -136,8 +228,13 @@ class _ServeurHomePageState extends State<ServeurHomePage> {
 class _ServeurWelcomeCard extends StatelessWidget {
   final String name;
   final bool isMobile;
+  final establishmentName;
 
-  const _ServeurWelcomeCard({required this.name, required this.isMobile});
+  const _ServeurWelcomeCard({
+    required this.name,
+    required this.establishmentName,
+    required this.isMobile,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -176,10 +273,15 @@ class _ServeurWelcomeCard extends StatelessWidget {
 }
 
 class _ServeurModulesGrid extends StatelessWidget {
+  final String establishmentId;
   final bool isMobile;
   final bool isTablet;
 
-  const _ServeurModulesGrid({required this.isMobile, required this.isTablet});
+  const _ServeurModulesGrid({
+    required this.establishmentId,
+    required this.isMobile,
+    required this.isTablet,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -220,7 +322,7 @@ class _ServeurModulesGrid extends StatelessWidget {
             title: 'Versement à la gérante',
             subtitle: 'Remettre les encaissements à la gérante',
             icon: Icons.account_balance_wallet_outlined,
-            page: const VersementGerantePage(),
+            page: VersementGerantePage(establishmentId: establishmentId),
           ),
         ],
       ),
@@ -234,13 +336,13 @@ class _ServeurModulesGrid extends StatelessWidget {
             title: 'Suivi bar',
             subtitle: 'Voir l’état des commandes envoyées au bar',
             icon: Icons.local_bar,
-            page: const SuiviBarPage(),
+            page: SuiviBarPage(establishmentId: establishmentId),
           ),
           _ServeurAction(
             title: 'Suivi cuisine',
             subtitle: 'Voir l’état des commandes envoyées en cuisine',
             icon: Icons.restaurant,
-            page: const SuiviCuisinePage(),
+            page: SuiviCuisinePage(establishmentId: establishmentId),
           ),
         ],
       ),

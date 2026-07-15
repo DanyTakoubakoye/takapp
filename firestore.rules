@@ -3,6 +3,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ─────────────── HELPERS ───────────────
     function isSignedIn() {
       return request.auth != null;
     }
@@ -17,12 +18,23 @@ service cloud.firestore {
         : '';
     }
 
+    function userEstablishmentId() {
+      return isSignedIn() && userDoc().data.establishmentId != null
+        ? userDoc().data.establishmentId
+        : '';
+    }
+
     function hasAnyRole(roles) {
       return isSignedIn() && userRole() in roles;
     }
 
+    function isSuperAdmin() {
+      return userRole() == 'super_admin' || userRole() == 'global_admin';
+    }
+
+    // proprietaire + super_admin/global_admin = "admin" côté serveur
     function isAdminOrOwner() {
-      return hasAnyRole(['admin', 'proprietaire']);
+      return hasAnyRole(['proprietaire', 'super_admin', 'global_admin']);
     }
 
     function isGerante() {
@@ -42,280 +54,328 @@ service cloud.firestore {
     }
 
     function isServiceHygiene() {
-      return hasAnyRole(['service_hygiene', 'hygiene', 'majordhomme']);
+      return hasAnyRole(['service_hygiene', 'majordhomme']);
     }
 
     function isAccounting() {
-      return hasAnyRole(['comptable', 'accounting']);
+      return userRole() == 'comptable';
+    }
+
+    function sameEstablishment(establishmentId) {
+      return isSignedIn() && (
+        isSuperAdmin() ||
+        userEstablishmentId() == establishmentId
+      );
     }
 
     function validStore(store) {
       return store in ['restaurant', 'hotel', 'bar', 'divers'];
     }
 
-function canReadStore(store) {
-  return isSignedIn() && (
-    isAdminOrOwner() ||
-    isGerante() ||
-    isServeur() ||
-    (store == 'restaurant' && isChefCuisine()) ||
-    (store == 'bar' && isBarman()) ||
-    (store == 'hotel' && isServiceHygiene())
-  );
-}
-
-function canManageStore(store) {
-  return isSignedIn() && (
-    isAdminOrOwner() ||
-    isGerante() ||
-
-    // IMPORTANT POUR LES COMMANDES SERVEUR
-    (isServeur() && store in ['restaurant', 'bar', 'hotel']) ||
-
-    (store == 'restaurant' && isChefCuisine()) ||
-    (store == 'bar' && isBarman()) ||
-    (store == 'hotel' && isServiceHygiene())
-  );
-}
-    match /users/{userId} {
-      allow read: if isSignedIn() && request.auth.uid == userId;
-      allow create, update: if isSignedIn() && (
-        request.auth.uid == userId || isAdminOrOwner() || isGerante()
+    function canReadStore(store) {
+      return isSignedIn() && (
+        isAdminOrOwner() ||
+        isGerante() ||
+        isServeur() ||
+        (store == 'restaurant' && isChefCuisine()) ||
+        (store == 'bar' && isBarman()) ||
+        (store == 'hotel' && isServiceHygiene())
       );
-      allow delete: if isAdminOrOwner();
     }
 
-    match /menuItems/{itemId} {
-      allow read: if isSignedIn();
-
-      allow create, delete: if isAdminOrOwner() || isGerante();
-
-      allow update: if isAdminOrOwner()
-        || isGerante()
-        || (
-          isChefCuisine()
-          && request.resource.data.diff(resource.data).changedKeys()
-            .hasOnly(['ingredients', 'updatedAt'])
-        );
+    function canManageStore(store) {
+      return isSignedIn() && (
+        isAdminOrOwner() ||
+        isGerante() ||
+        (isServeur() && store in ['restaurant', 'bar', 'hotel']) ||
+        (store == 'restaurant' && isChefCuisine()) ||
+        (store == 'bar' && isBarman()) ||
+        (store == 'hotel' && isServiceHygiene())
+      );
     }
 
-    match /orders/{orderId} {
-      allow read: if isSignedIn();
+    // ─────────────── users (RACINE — pivot sécurité) ───────────────
+    match /users/{userId} {
+      allow read: if isSignedIn() && (
+        request.auth.uid == userId ||
+        isSuperAdmin() ||
+        (
+          (isAdminOrOwner() || isGerante()) &&
+          resource.data.establishmentId == userEstablishmentId()
+        )
+      );
 
       allow create: if isSignedIn() && (
-        isServeur() || isGerante() || isAdminOrOwner()
+        isSuperAdmin() ||
+        (
+          (isAdminOrOwner() || isGerante()) &&
+          request.resource.data.establishmentId == userEstablishmentId()
+        )
       );
 
       allow update: if isSignedIn() && (
-        isServeur() ||
-        isGerante() ||
-        isChefCuisine() ||
-        isBarman() ||
-        isAdminOrOwner()
+        request.auth.uid == userId ||
+        isSuperAdmin() ||
+        (
+          (isAdminOrOwner() || isGerante()) &&
+          resource.data.establishmentId == userEstablishmentId() &&
+          request.resource.data.establishmentId == resource.data.establishmentId
+        )
       );
 
-      allow delete: if isAdminOrOwner() || isGerante();
+      allow delete: if isSuperAdmin() || (
+        isAdminOrOwner() &&
+        resource.data.establishmentId == userEstablishmentId()
+      );
+    }
 
-      match /items/{itemId} {
-        allow read: if isSignedIn();
+    // ─────────────── modules (RACINE — catalogue global, lecture seule) ───────────────
+    match /modules/{moduleId} {
+      allow read: if isSignedIn();
+      allow write: if isSuperAdmin();
+    }
 
-        allow create: if isSignedIn() && (
+    // ─────────────── establishments + sous-collections ───────────────
+    match /establishments/{establishmentId} {
+      allow read: if sameEstablishment(establishmentId);
+      allow create: if isSuperAdmin() || isAdminOrOwner();
+      allow update: if sameEstablishment(establishmentId) && (
+        isSuperAdmin() || isAdminOrOwner() || isGerante()
+      );
+      allow delete: if isSuperAdmin();
+
+      match /certilink_config/{docId} {
+        allow read: if sameEstablishment(establishmentId);
+        allow write: if sameEstablishment(establishmentId) &&
+          (isAdminOrOwner() || isGerante());
+      }
+
+      match /menuItems/{itemId} {
+        allow read: if sameEstablishment(establishmentId);
+        allow create, delete: if sameEstablishment(establishmentId) &&
+          (isAdminOrOwner() || isGerante());
+        allow update: if sameEstablishment(establishmentId) && (
+          isAdminOrOwner() ||
+          isGerante() ||
+          (
+            isChefCuisine() &&
+            request.resource.data.diff(resource.data).changedKeys()
+              .hasOnly(['ingredients', 'updatedAt', 'pendingSync', 'syncError'])
+          )
+        );
+      }
+
+      match /orders/{orderId} {
+        allow read: if sameEstablishment(establishmentId);
+        allow create: if sameEstablishment(establishmentId) && (
           isServeur() || isGerante() || isAdminOrOwner()
         );
+        allow update: if sameEstablishment(establishmentId) && (
+          isServeur() || isGerante() || isChefCuisine() || isBarman() || isAdminOrOwner()
+        );
+        allow delete: if sameEstablishment(establishmentId) &&
+          (isAdminOrOwner() || isGerante());
 
-        allow update: if isSignedIn() && (
-          isServeur() ||
+        match /items/{itemId} {
+          allow read: if sameEstablishment(establishmentId);
+          allow create: if sameEstablishment(establishmentId) && (
+            isServeur() || isGerante() || isAdminOrOwner()
+          );
+          allow update: if sameEstablishment(establishmentId) && (
+            isServeur() || isGerante() || isChefCuisine() || isBarman() || isAdminOrOwner()
+          );
+          allow delete: if sameEstablishment(establishmentId) &&
+            (isAdminOrOwner() || isGerante());
+        }
+      }
+
+      match /payments/{paymentId} {
+        allow read: if sameEstablishment(establishmentId);
+        allow create, update: if sameEstablishment(establishmentId) && (
+          isServeur() || isGerante() || isAdminOrOwner()
+        );
+        allow delete: if sameEstablishment(establishmentId) &&
+          (isAdminOrOwner() || isGerante());
+      }
+
+      match /serverHandovers/{handoverId} {
+        allow read: if sameEstablishment(establishmentId);
+        allow create: if sameEstablishment(establishmentId) && (
+          isServeur() || isGerante() || isAdminOrOwner()
+        );
+        allow update: if sameEstablishment(establishmentId) && (
+          isGerante() || isAccounting() || isAdminOrOwner()
+        );
+        allow delete: if sameEstablishment(establishmentId) &&
+          (isAdminOrOwner() || isGerante());
+      }
+
+      match /managerToAccountingTransfers/{transferId} {
+        allow read: if sameEstablishment(establishmentId);
+        allow create, update: if sameEstablishment(establishmentId) && (
+          isGerante() || isAccounting() || isAdminOrOwner()
+        );
+        allow delete: if sameEstablishment(establishmentId) && isAdminOrOwner();
+      }
+
+      match /roomInvoices/{id} {
+        allow read, create, update: if sameEstablishment(establishmentId) && (
+          isServeur() || isGerante() || isAccounting() || isAdminOrOwner()
+        );
+        allow delete: if sameEstablishment(establishmentId) &&
+          (isAdminOrOwner() || isGerante());
+      }
+      
+      match /roomExtras/{extraId} {
+        allow read, create, update: if sameEstablishment(establishmentId) && (
+          isServeur() || isGerante() || isAccounting() || isAdminOrOwner()
+        );
+        allow delete: if sameEstablishment(establishmentId) &&
+          (isAdminOrOwner() || isGerante());
+      }
+
+      match /stock_items/{itemId} {
+        allow read: if sameEstablishment(establishmentId);
+        allow create: if sameEstablishment(establishmentId)
+          && validStore(request.resource.data.store)
+          && canManageStore(request.resource.data.store);
+        allow update: if sameEstablishment(establishmentId)
+          && validStore(request.resource.data.store)
+          && resource.data.store == request.resource.data.store
+          && canManageStore(resource.data.store);
+        allow delete: if sameEstablishment(establishmentId) &&
+          (isAdminOrOwner() || isGerante());
+      }
+
+      match /store_stocks/{stockId} {
+        allow read: if sameEstablishment(establishmentId) &&
+          canReadStore(resource.data.store);
+        allow create: if sameEstablishment(establishmentId)
+          && validStore(request.resource.data.store)
+          && canManageStore(request.resource.data.store);
+        allow update: if sameEstablishment(establishmentId)
+          && validStore(request.resource.data.store)
+          && resource.data.store == request.resource.data.store
+          && canManageStore(resource.data.store);
+        allow delete: if sameEstablishment(establishmentId) &&
+          (isAdminOrOwner() || isGerante());
+      }
+
+      match /stock_movements/{movementId} {
+        allow read: if sameEstablishment(establishmentId) &&
+          canReadStore(resource.data.store);
+        allow create: if sameEstablishment(establishmentId)
+          && validStore(request.resource.data.store)
+          && canManageStore(request.resource.data.store);
+        allow update, delete: if sameEstablishment(establishmentId) &&
+          (isAdminOrOwner() || isGerante());
+      }
+
+      match /stock_requests/{requestId} {
+        allow read: if sameEstablishment(establishmentId) &&
+          canReadStore(resource.data.store);
+        allow create: if sameEstablishment(establishmentId)
+          && validStore(request.resource.data.store)
+          && canManageStore(request.resource.data.store);
+        allow update: if sameEstablishment(establishmentId) && (
+          canManageStore(resource.data.store) || isGerante() || isAdminOrOwner()
+        );
+        allow delete: if sameEstablishment(establishmentId) &&
+          (isAdminOrOwner() || isGerante());
+
+        match /items/{itemId} {
+          allow read: if sameEstablishment(establishmentId);
+          allow create, update: if sameEstablishment(establishmentId) && (
+            isGerante() || isAdminOrOwner() ||
+            canManageStore(
+              get(/databases/$(database)/documents/establishments/$(establishmentId)/stock_requests/$(requestId)).data.store
+            )
+          );
+          allow delete: if sameEstablishment(establishmentId) &&
+            (isAdminOrOwner() || isGerante());
+        }
+      }
+
+      match /hygiene_daily_entries/{entryId} {
+        allow read, create: if sameEstablishment(establishmentId) && (
+          isGerante() || isServiceHygiene() || isAdminOrOwner()
+        );
+        allow update, delete: if sameEstablishment(establishmentId) && (
+          isGerante() || isAdminOrOwner()
+        );
+
+        match /items/{itemId} {
+          allow read, create: if sameEstablishment(establishmentId) && (
+            isGerante() || isServiceHygiene() || isAdminOrOwner()
+          );
+          allow update, delete: if sameEstablishment(establishmentId) && (
+            isGerante() || isAdminOrOwner()
+          );
+        }
+      }
+
+      match /serverNotifications/{notificationId} {
+        allow read: if sameEstablishment(establishmentId) && (
+          isAdminOrOwner() ||
           isGerante() ||
-          isChefCuisine() ||
           isBarman() ||
-          isAdminOrOwner()
+          isChefCuisine() ||
+          (
+            isServeur() &&
+            resource.data.serveurId == request.auth.uid
+          )
         );
-
-        allow delete: if isAdminOrOwner() || isGerante();
-      }
-    }
-
-    match /payments/{paymentId} {
-      allow read: if isSignedIn();
-
-      allow create: if isSignedIn() && (
-        isServeur() || isGerante() || isAdminOrOwner()
-      );
-
-      allow update: if isSignedIn() && (
-        isServeur() || isGerante() || isAdminOrOwner()
-      );
-
-      allow delete: if isAdminOrOwner() || isGerante();
-    }
-
-    match /serverHandovers/{handoverId} {
-      allow read: if isSignedIn();
-      allow create: if isSignedIn() && (
-        isServeur() || isGerante() || isAdminOrOwner()
-      );
-      allow update: if isSignedIn() && (
-        isGerante() || isAccounting() || isAdminOrOwner()
-      );
-      allow delete: if isAdminOrOwner() || isGerante();
-    }
-
-    match /managerToAccountingTransfers/{transferId} {
-      allow read: if isSignedIn();
-      allow create, update: if isSignedIn() && (
-        isGerante() || isAccounting() || isAdminOrOwner()
-      );
-      allow delete: if isAdminOrOwner();
-    }
-
-    match /roomInvoices/{id} {
-      allow read, create, update: if isSignedIn() && (
-        isServeur() || isGerante() || isAdminOrOwner()
-      );
-      allow delete: if isAdminOrOwner() || isGerante();
-    }
-
-    match /stock_items/{itemId} {
-      allow read: if isSignedIn();
-
-      allow create: if isSignedIn()
-        && validStore(request.resource.data.store)
-        && canManageStore(request.resource.data.store);
-
-      allow update: if isSignedIn()
-        && validStore(request.resource.data.store)
-        && resource.data.store == request.resource.data.store
-        && canManageStore(resource.data.store);
-
-      allow delete: if isAdminOrOwner() || isGerante();
-    }
-
-    match /store_stocks/{stockId} {
-      allow read: if isSignedIn() && canReadStore(resource.data.store);
-
-      allow create: if isSignedIn()
-        && validStore(request.resource.data.store)
-        && canManageStore(request.resource.data.store);
-
-      allow update: if isSignedIn()
-        && validStore(request.resource.data.store)
-        && resource.data.store == request.resource.data.store
-        && canManageStore(resource.data.store);
-
-      allow delete: if isAdminOrOwner() || isGerante();
-    }
-
-    match /stock_movements/{movementId} {
-      allow read: if isSignedIn() && canReadStore(resource.data.store);
-
-      allow create: if isSignedIn()
-        && validStore(request.resource.data.store)
-        && canManageStore(request.resource.data.store);
-
-      allow update, delete: if isAdminOrOwner() || isGerante();
-    }
-
-    match /stock_requests/{requestId} {
-      allow read: if isSignedIn() && canReadStore(resource.data.store);
-
-      allow create: if isSignedIn()
-        && validStore(request.resource.data.store)
-        && canManageStore(request.resource.data.store);
-
-      allow update: if isSignedIn() && (
-        canManageStore(resource.data.store) || isGerante() || isAdminOrOwner()
-      );
-
-      allow delete: if isAdminOrOwner() || isGerante();
-
-      match /items/{itemId} {
-        allow read: if isSignedIn()
-          && canReadStore(
-            get(/databases/$(database)/documents/stock_requests/$(requestId)).data.store
-          );
-
-        allow create, update: if isSignedIn()
-          && canManageStore(
-            get(/databases/$(database)/documents/stock_requests/$(requestId)).data.store
-          );
-
-        allow delete: if isAdminOrOwner() || isGerante();
-      }
-    }
-
-    match /hygiene_daily_entries/{entryId} {
-      allow read: if isSignedIn() && (
-        isGerante() || isServiceHygiene() || isAdminOrOwner()
-      );
-
-      allow create: if isSignedIn() && (
-        isGerante() || isServiceHygiene() || isAdminOrOwner()
-      );
-
-      allow update, delete: if isGerante() || isAdminOrOwner();
-
-      match /items/{itemId} {
-        allow read: if isSignedIn() && (
-          isGerante() || isServiceHygiene() || isAdminOrOwner()
+        allow create: if sameEstablishment(establishmentId) && (
+          isAdminOrOwner() || isGerante() || isBarman() || isChefCuisine()
         );
-
-        allow create: if isSignedIn() && (
-          isGerante() || isServiceHygiene() || isAdminOrOwner()
+        allow update: if sameEstablishment(establishmentId) && (
+          isAdminOrOwner() ||
+          isGerante() ||
+          (
+            isServeur() &&
+            resource.data.serveurId == request.auth.uid &&
+            request.resource.data.serveurId == resource.data.serveurId &&
+            request.resource.data.diff(resource.data).changedKeys()
+              .hasOnly(['isRead', 'readAt', 'updatedAt'])
+          )
         );
-
-        allow update, delete: if isGerante() || isAdminOrOwner();
+        allow delete: if sameEstablishment(establishmentId) &&
+          (isAdminOrOwner() || isGerante());
       }
-    }
 
-    match /accountOpeningBalances/{balanceId} {
-      allow read, create, update: if isSignedIn() && (
-        isGerante() || isAccounting() || isAdminOrOwner()
-      );
-      allow delete: if isAdminOrOwner();
-    }
+      match /accountOpeningBalances/{balanceId} {
+        allow read, create, update: if sameEstablishment(establishmentId) && (
+          isGerante() || isAccounting() || isAdminOrOwner()
+        );
+        allow delete: if sameEstablishment(establishmentId) && isAdminOrOwner();
+      }
 
-    match /accountClosures/{closureId} {
-      allow read, create, update: if isSignedIn() && (
-        isGerante() || isAccounting() || isAdminOrOwner()
-      );
-      allow delete: if isAdminOrOwner();
-    }
+      match /accountClosures/{closureId} {
+        allow read, create, update: if sameEstablishment(establishmentId) && (
+          isGerante() || isAccounting() || isAdminOrOwner()
+        );
+        allow delete: if sameEstablishment(establishmentId) && isAdminOrOwner();
+      }
 
-    match /expenses/{expenseId} {
-      allow read, create, update: if isSignedIn() && (
-        isGerante() || isAccounting() || isAdminOrOwner()
-      );
-      allow delete: if isAdminOrOwner();
+      match /expenses/{expenseId} {
+        allow read, create, update: if sameEstablishment(establishmentId) && (
+          isGerante() || isAccounting() || isAdminOrOwner()
+        );
+        allow delete: if sameEstablishment(establishmentId) && isAdminOrOwner();
+      }
+
+      // Filet interne : toute sous-collection non listée reste
+      // protégée par l'appartenance au tenant (jamais ouverte par défaut).
+      // Filet interne : lecture seule pour les membres du tenant.
+      // Toute ÉCRITURE doit passer par une règle explicite ci-dessus.
+      match /{document=**} {
+        allow read: if sameEstablishment(establishmentId);
+      }
+
+    // ─────────────── FILET FINAL : tout le reste refusé ───────────────
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
-  match /serverNotifications/{notificationId} {
-  allow read: if isSignedIn() && (
-    isAdminOrOwner() ||
-    isGerante() ||
-    (
-      isServeur() &&
-      resource.data.serveurId == request.auth.uid
-    )
-  );
-
-  allow create: if isSignedIn() && (
-    isAdminOrOwner() ||
-    isGerante() ||
-    isChefCuisine() ||
-    isBarman()
-  );
-
-  allow update: if isSignedIn() && (
-    isAdminOrOwner() ||
-    isGerante() ||
-    (
-      isServeur() &&
-      resource.data.serveurId == request.auth.uid &&
-      request.resource.data.diff(resource.data).changedKeys()
-        .hasOnly(['isRead', 'readAt'])
-    )
-  );
-
-  allow delete: if isAdminOrOwner() || isGerante();
-}
-}
+  }
+  }

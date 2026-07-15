@@ -15,7 +15,9 @@ import 'package:takapp/vues/cuisine/stock_item_form_page.dart';
 import 'package:takapp/vues/cuisine/menu_item_ingredients_form_page.dart';
 
 class CuisineHomePage extends StatelessWidget {
-  const CuisineHomePage({super.key});
+  final String establishmentId;
+  const CuisineHomePage({super.key,
+  required this.establishmentId});
 
   String _clientLabel(KitchenOrderModel order) {
     switch (order.clientType) {
@@ -65,6 +67,20 @@ class CuisineHomePage extends StatelessWidget {
     final user = auth.currentUser;
     final isSmallScreen = MediaQuery.of(context).size.width < 900;
 
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text('Utilisateur introuvable.')),
+      );
+    }
+
+    final establishmentId = user.establishmentId.trim();
+
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('TAKHOTEL - Cuisine'),
@@ -78,7 +94,9 @@ class CuisineHomePage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: StreamBuilder<List<KitchenOrderModel>>(
-          stream: cuisineService.streamKitchenOrders(),
+          stream: cuisineService.streamKitchenOrders(
+            establishmentId: establishmentId,
+          ),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -114,11 +132,12 @@ class CuisineHomePage extends StatelessWidget {
               return SingleChildScrollView(
                 child: Column(
                   children: [
-                    _WelcomeCard(userName: user?.name ?? ''),
+                    _WelcomeCard(userName: user.name),
                     const SizedBox(height: 12),
-                    const _KitchenStockActionsCard(),
+                    _KitchenStockActionsCard(establishmentId: establishmentId),
                     const SizedBox(height: 12),
                     _KitchenSection(
+                      establishmentId: establishmentId,
                       title: 'En attente',
                       orders: pendingOrders,
                       cuisineService: cuisineService,
@@ -129,6 +148,7 @@ class CuisineHomePage extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     _KitchenSection(
+                      establishmentId: establishmentId,
                       title: 'En préparation',
                       orders: preparingOrders,
                       cuisineService: cuisineService,
@@ -139,6 +159,7 @@ class CuisineHomePage extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     _KitchenSection(
+                      establishmentId: establishmentId,
                       title: 'Prêtes',
                       orders: readyOrders,
                       cuisineService: cuisineService,
@@ -154,9 +175,9 @@ class CuisineHomePage extends StatelessWidget {
 
             return Column(
               children: [
-                _WelcomeCard(userName: user?.name ?? ''),
+                _WelcomeCard(userName: user.name),
                 const SizedBox(height: 12),
-                const _KitchenStockActionsCard(),
+                _KitchenStockActionsCard(establishmentId: establishmentId),
                 const SizedBox(height: 12),
                 Expanded(
                   child: Row(
@@ -164,6 +185,7 @@ class CuisineHomePage extends StatelessWidget {
                     children: [
                       Expanded(
                         child: _KitchenSection(
+                          establishmentId: establishmentId,
                           title: 'En attente',
                           orders: pendingOrders,
                           cuisineService: cuisineService,
@@ -176,6 +198,7 @@ class CuisineHomePage extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _KitchenSection(
+                          establishmentId: establishmentId,
                           title: 'En préparation',
                           orders: preparingOrders,
                           cuisineService: cuisineService,
@@ -188,6 +211,7 @@ class CuisineHomePage extends StatelessWidget {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _KitchenSection(
+                          establishmentId: establishmentId,
                           title: 'Prêtes',
                           orders: readyOrders,
                           cuisineService: cuisineService,
@@ -249,7 +273,9 @@ class _WelcomeCard extends StatelessWidget {
 }
 
 class _KitchenStockActionsCard extends StatelessWidget {
-  const _KitchenStockActionsCard();
+  final String establishmentId;
+
+  const _KitchenStockActionsCard({required this.establishmentId});
 
   @override
   Widget build(BuildContext context) {
@@ -301,7 +327,9 @@ class _KitchenStockActionsCard extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const KitchenStockManagementPage(),
+                          builder: (_) => KitchenStockManagementPage(
+                            establishmentId: establishmentId,
+                          ),
                         ),
                       );
                     },
@@ -317,7 +345,9 @@ class _KitchenStockActionsCard extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const KitchenStockConsultationPage(),
+                          builder: (_) => KitchenStockConsultationPage(
+                            establishmentId: establishmentId,
+                          ),
                         ),
                       );
                     },
@@ -338,7 +368,9 @@ class _KitchenStockActionsCard extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const KitchenStockManagementPage(),
+                            builder: (_) => KitchenStockManagementPage(
+                              establishmentId: establishmentId,
+                            ),
                           ),
                         );
                       },
@@ -356,8 +388,9 @@ class _KitchenStockActionsCard extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) =>
-                                const KitchenStockConsultationPage(),
+                            builder: (_) => KitchenStockConsultationPage(
+                              establishmentId: establishmentId,
+                            ),
                           ),
                         );
                       },
@@ -434,6 +467,7 @@ class _KitchenMainActionButton extends StatelessWidget {
 }
 
 class _KitchenSection extends StatelessWidget {
+  final String establishmentId;
   final String title;
   final List<KitchenOrderModel> orders;
   final CuisineService cuisineService;
@@ -443,6 +477,7 @@ class _KitchenSection extends StatelessWidget {
   final bool isMobile;
 
   const _KitchenSection({
+    required this.establishmentId,
     required this.title,
     required this.orders,
     required this.cuisineService,
@@ -491,7 +526,9 @@ class _KitchenSection extends StatelessWidget {
                       separatorBuilder: (_, __) => const SizedBox(height: 10),
                       itemBuilder: (context, index) {
                         final order = orders[index];
+
                         return _KitchenOrderCard(
+                          establishmentId: establishmentId,
                           order: order,
                           cuisineService: cuisineService,
                           statusColor: statusColor,
@@ -509,7 +546,9 @@ class _KitchenSection extends StatelessWidget {
                         separatorBuilder: (_, __) => const SizedBox(height: 10),
                         itemBuilder: (context, index) {
                           final order = orders[index];
+
                           return _KitchenOrderCard(
+                            establishmentId: establishmentId,
                             order: order,
                             cuisineService: cuisineService,
                             statusColor: statusColor,
@@ -527,7 +566,9 @@ class _KitchenSection extends StatelessWidget {
 }
 
 class KitchenStockManagementPage extends StatelessWidget {
-  const KitchenStockManagementPage({super.key});
+  final String establishmentId;
+
+  const KitchenStockManagementPage({super.key, required this.establishmentId});
 
   @override
   Widget build(BuildContext context) {
@@ -542,7 +583,9 @@ class KitchenStockManagementPage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => const MenuItemIngredientsFormPage(),
+                builder: (_) => MenuItemIngredientsFormPage(
+                  establishmentId: establishmentId,
+                ),
               ),
             );
           },
@@ -553,7 +596,10 @@ class KitchenStockManagementPage extends StatelessWidget {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const StockItemFormPage()),
+              MaterialPageRoute(
+                builder: (_) =>
+                    StockItemFormPage(establishmentId: establishmentId),
+              ),
             );
           },
         ),
@@ -564,7 +610,8 @@ class KitchenStockManagementPage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => const StockOutPage(
+                builder: (_) => StockOutPage(
+                  establishmentId: establishmentId,
                   store: 'restaurant',
                   title: 'Sortie de stock - Restaurant',
                   defaultReason: 'Préparation cuisine',
@@ -580,7 +627,8 @@ class KitchenStockManagementPage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => const CreateStockRequestPage(
+                builder: (_) => CreateStockRequestPage(
+                  establishmentId: establishmentId,
                   store: 'restaurant',
                   requestedByRole: 'chef_cuisine',
                   title: 'Demande approvisionnement - Restaurant',
@@ -595,7 +643,12 @@ class KitchenStockManagementPage extends StatelessWidget {
 }
 
 class KitchenStockConsultationPage extends StatelessWidget {
-  const KitchenStockConsultationPage({super.key});
+  final String establishmentId;
+
+  const KitchenStockConsultationPage({
+    super.key,
+    required this.establishmentId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -610,7 +663,8 @@ class KitchenStockConsultationPage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => const StoreStockPage(
+                builder: (_) => StoreStockPage(
+                  establishmentId: establishmentId,
                   store: 'restaurant',
                   title: 'Stock Restaurant',
                 ),
@@ -625,7 +679,8 @@ class KitchenStockConsultationPage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => const StoreRequestHistoryPage(
+                builder: (_) => StoreRequestHistoryPage(
+                  establishmentId: establishmentId,
                   store: 'restaurant',
                   title: 'Réceptions à confirmer - Restaurant',
                 ),
@@ -640,7 +695,8 @@ class KitchenStockConsultationPage extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => const StockMovementHistoryPage(
+                builder: (_) => StockMovementHistoryPage(
+                  establishmentId: establishmentId,
                   store: 'restaurant',
                   title: 'Historique mouvements - Restaurant',
                 ),
@@ -740,6 +796,7 @@ class _KitchenStockMenuPage extends StatelessWidget {
 }
 
 class _KitchenOrderCard extends StatelessWidget {
+  final String establishmentId;
   final KitchenOrderModel order;
   final CuisineService cuisineService;
   final Color Function(String status) statusColor;
@@ -747,16 +804,23 @@ class _KitchenOrderCard extends StatelessWidget {
   final String Function(KitchenOrderModel order) clientLabel;
 
   const _KitchenOrderCard({
+    required this.establishmentId,
     required this.order,
     required this.cuisineService,
     required this.statusColor,
     required this.statusLabel,
     required this.clientLabel,
   });
+
   Future<void> _createKitchenReadyNotification() async {
     final firestore = FirebaseFirestore.instance;
 
-    final orderDoc = await firestore.collection('orders').doc(order.id).get();
+    final orderDoc = await firestore
+        .collection('establishments')
+        .doc(establishmentId)
+        .collection('orders')
+        .doc(order.id)
+        .get();
 
     final data = orderDoc.data();
 
@@ -782,9 +846,12 @@ class _KitchenOrderCard extends StatelessWidget {
     }
 
     await firestore
+        .collection('establishments')
+        .doc(establishmentId)
         .collection('serverNotifications')
         .doc('kitchen_${order.id}_ready')
         .set({
+          'establishmentId': establishmentId,
           'title': 'Commande cuisine prête',
           'body': 'La commande de $clientLabel est prête en cuisine.',
           'createdAt': FieldValue.serverTimestamp(),
@@ -830,7 +897,10 @@ class _KitchenOrderCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             FutureBuilder<List<OrderItemModel>>(
-              future: cuisineService.getKitchenItemsForOrder(order.id),
+              future: cuisineService.getKitchenItemsForOrder(
+                establishmentId: establishmentId,
+                orderId: order.id,
+              ),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Padding(
@@ -899,6 +969,7 @@ class _KitchenOrderCard extends StatelessWidget {
                   ElevatedButton.icon(
                     onPressed: () async {
                       await cuisineService.updateKitchenStatus(
+                        establishmentId: establishmentId,
                         orderId: order.id,
                         newKitchenStatus: 'preparing',
                       );
@@ -910,7 +981,9 @@ class _KitchenOrderCard extends StatelessWidget {
                   ElevatedButton.icon(
                     onPressed: () async {
                       await _createKitchenReadyNotification();
+
                       await cuisineService.updateKitchenStatus(
+                        establishmentId: establishmentId,
                         orderId: order.id,
                         newKitchenStatus: 'ready',
                       );
@@ -918,11 +991,11 @@ class _KitchenOrderCard extends StatelessWidget {
                     icon: const Icon(Icons.check_circle_outline),
                     label: const Text('Marquer prête'),
                   ),
-
                 if (order.kitchenStatus == 'ready')
                   OutlinedButton.icon(
                     onPressed: () async {
                       await cuisineService.updateKitchenStatus(
+                        establishmentId: establishmentId,
                         orderId: order.id,
                         newKitchenStatus: 'preparing',
                       );
@@ -934,6 +1007,7 @@ class _KitchenOrderCard extends StatelessWidget {
                   ElevatedButton.icon(
                     onPressed: () async {
                       await cuisineService.updateKitchenStatus(
+                        establishmentId: establishmentId,
                         orderId: order.id,
                         newKitchenStatus: 'served',
                       );

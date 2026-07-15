@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class HotelStockItemFormPage extends StatefulWidget {
-  const HotelStockItemFormPage({super.key});
+  final String establishmentId;
+
+  const HotelStockItemFormPage({super.key, required this.establishmentId});
 
   @override
   State<HotelStockItemFormPage> createState() => _HotelStockItemFormPageState();
@@ -20,6 +22,15 @@ class _HotelStockItemFormPageState extends State<HotelStockItemFormPage> {
   bool _isSaving = false;
   bool _isActive = true;
 
+  String get establishmentId => widget.establishmentId.trim();
+
+  CollectionReference<Map<String, dynamic>> get _stockItemsCol {
+    return _firestore
+        .collection('establishments')
+        .doc(establishmentId)
+        .collection('stock_items');
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -29,18 +40,25 @@ class _HotelStockItemFormPageState extends State<HotelStockItemFormPage> {
   }
 
   Future<void> _saveHotelItem() async {
+    if (establishmentId.isEmpty) {
+      _showMessage('Établissement introuvable.');
+      return;
+    }
+
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isSaving = true);
 
     try {
-      await _firestore.collection('stock_items').add({
+      await _stockItemsCol.add({
+        'establishmentId': establishmentId,
         'name': _nameController.text.trim(),
         'category': _categoryController.text.trim(),
         'unit': _unitController.text.trim(),
         'store': 'hotel',
         'isActive': _isActive,
         'createdAt': Timestamp.now(),
+        'updatedAt': Timestamp.now(),
       });
 
       _nameController.clear();
@@ -49,18 +67,20 @@ class _HotelStockItemFormPageState extends State<HotelStockItemFormPage> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Article hôtel enregistré avec succès.')),
-      );
+      _showMessage('Article hôtel enregistré avec succès.');
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de l’enregistrement : $e')),
-      );
+      _showMessage('Erreur lors de l’enregistrement : $e');
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
+  }
+
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Widget _buildField({
@@ -87,6 +107,12 @@ class _HotelStockItemFormPageState extends State<HotelStockItemFormPage> {
   @override
   Widget build(BuildContext context) {
     final isSmall = MediaQuery.of(context).size.width < 700;
+
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Articles de stock - Hôtel')),
@@ -117,7 +143,6 @@ class _HotelStockItemFormPageState extends State<HotelStockItemFormPage> {
                         style: TextStyle(fontWeight: FontWeight.w500),
                       ),
                       const SizedBox(height: 20),
-
                       if (isSmall) ...[
                         _buildField(
                           controller: _nameController,
@@ -165,20 +190,18 @@ class _HotelStockItemFormPageState extends State<HotelStockItemFormPage> {
                           ],
                         ),
                       ],
-
                       const SizedBox(height: 12),
-
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
                         title: const Text('Article actif'),
                         value: _isActive,
-                        onChanged: (value) {
-                          setState(() => _isActive = value);
-                        },
+                        onChanged: _isSaving
+                            ? null
+                            : (value) {
+                                setState(() => _isActive = value);
+                              },
                       ),
-
                       const SizedBox(height: 20),
-
                       Align(
                         alignment: Alignment.centerRight,
                         child: ElevatedButton.icon(

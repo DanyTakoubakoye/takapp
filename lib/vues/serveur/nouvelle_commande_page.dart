@@ -16,7 +16,9 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
   final MenuService _menuService = MenuService();
 
   String clientType = 'restaurant';
+
   final TextEditingController tableController = TextEditingController();
+
   final TextEditingController roomController = TextEditingController();
 
   @override
@@ -26,17 +28,32 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
     super.dispose();
   }
 
-  Future<void> _submitOrder() async {
+  Future<void> _submitOrder(String establishmentId) async {
     final auth = context.read<AuthController>();
+
     final orderController = context.read<OrderController>();
 
     final user = auth.currentUser;
-    if (user == null) return;
+
+    if (user == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
+      return;
+    }
+
+    if (establishmentId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Établissement introuvable.')),
+      );
+      return;
+    }
 
     final success = await orderController.submitOrder(
+      establishmentId: establishmentId,
       clientType: clientType,
-      tableNumber: tableController.text,
-      roomNumber: roomController.text,
+      tableNumber: tableController.text.trim(),
+      roomNumber: roomController.text.trim(),
       createdBy: user.uid,
       createdByName: user.name,
     );
@@ -50,6 +67,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
 
       tableController.clear();
       roomController.clear();
+
       setState(() {
         clientType = 'restaurant';
       });
@@ -62,6 +80,24 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthController>();
+
+    final user = auth.currentUser;
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text('Utilisateur introuvable.')),
+      );
+    }
+
+    final establishmentId = user.establishmentId.trim();
+
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
     final orderController = context.watch<OrderController>();
 
     return Scaffold(
@@ -75,9 +111,19 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
               padding: const EdgeInsets.all(12),
               child: Column(
                 children: [
-                  _buildMobilePanierCard(context, orderController),
+                  _buildMobilePanierCard(
+                    context,
+                    orderController,
+                    establishmentId,
+                  ),
                   const SizedBox(height: 12),
-                  Expanded(child: _buildArticlesCard(context, isMobile: true)),
+                  Expanded(
+                    child: _buildArticlesCard(
+                      context,
+                      establishmentId: establishmentId,
+                      isMobile: true,
+                    ),
+                  ),
                 ],
               ),
             );
@@ -89,14 +135,22 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
                 flex: 3,
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: _buildArticlesCard(context, isMobile: false),
+                  child: _buildArticlesCard(
+                    context,
+                    establishmentId: establishmentId,
+                    isMobile: false,
+                  ),
                 ),
               ),
               Expanded(
                 flex: 2,
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(0, 16, 16, 16),
-                  child: _buildDesktopPanierCard(context, orderController),
+                  child: _buildDesktopPanierCard(
+                    context,
+                    orderController,
+                    establishmentId,
+                  ),
                 ),
               ),
             ],
@@ -106,7 +160,11 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
     );
   }
 
-  Widget _buildArticlesCard(BuildContext context, {required bool isMobile}) {
+  Widget _buildArticlesCard(
+    BuildContext context, {
+    required String establishmentId,
+    required bool isMobile,
+  }) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -128,6 +186,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
               ],
               onChanged: (value) {
                 if (value == null) return;
+
                 setState(() {
                   clientType = value;
                 });
@@ -153,7 +212,9 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
             const SizedBox(height: 16),
             Expanded(
               child: StreamBuilder<List<MenuItemModel>>(
-                stream: _menuService.getAvailableMenuItems(),
+                stream: _menuService.getAvailableMenuItems(
+                  establishmentId: establishmentId,
+                ),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -168,12 +229,6 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
                       (a, b) =>
                           a.name.toLowerCase().compareTo(b.name.toLowerCase()),
                     );
-
-                  if (items.isEmpty) {
-                    return const Center(
-                      child: Text('Aucun article disponible.'),
-                    );
-                  }
 
                   if (items.isEmpty) {
                     return const Center(
@@ -270,6 +325,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
   Widget _buildMobilePanierCard(
     BuildContext context,
     OrderController orderController,
+    String establishmentId,
   ) {
     return Card(
       child: Padding(
@@ -343,7 +399,9 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: orderController.isSubmitting ? null : _submitOrder,
+                onPressed: orderController.isSubmitting
+                    ? null
+                    : () => _submitOrder(establishmentId),
                 child: orderController.isSubmitting
                     ? const SizedBox(
                         height: 22,
@@ -365,6 +423,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
   Widget _buildDesktopPanierCard(
     BuildContext context,
     OrderController orderController,
+    String establishmentId,
   ) {
     return Card(
       child: Padding(
@@ -381,6 +440,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
                       separatorBuilder: (_, __) => const Divider(height: 16),
                       itemBuilder: (context, index) {
                         final item = orderController.items[index];
+
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -443,7 +503,9 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: orderController.isSubmitting ? null : _submitOrder,
+                onPressed: orderController.isSubmitting
+                    ? null
+                    : () => _submitOrder(establishmentId),
                 child: orderController.isSubmitting
                     ? const SizedBox(
                         height: 22,

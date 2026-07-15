@@ -15,8 +15,13 @@ import 'package:takapp/services/room_invoice_service.dart';
 
 class DetailFactureChambrePage extends StatefulWidget {
   final RoomInvoiceModel invoice;
+  final establishmentId;
 
-  const DetailFactureChambrePage({super.key, required this.invoice});
+  const DetailFactureChambrePage({
+    super.key,
+    required this.establishmentId,
+    required this.invoice,
+  });
 
   @override
   State<DetailFactureChambrePage> createState() =>
@@ -45,13 +50,31 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
       currentInvoice.fiscalStatus == 'success' &&
       currentInvoice.fiscalMecefCode.trim().isNotEmpty;
 
-  Future<void> _reloadInvoice() async {
+  String _establishmentId(BuildContext context) {
+    final user = context.read<AuthController>().currentUser;
+    return user?.establishmentId.trim() ?? '';
+  }
+
+  Future<void> _reloadInvoice(BuildContext context) async {
+    final establishmentId = _establishmentId(context);
+
+    if (establishmentId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Établissement introuvable.')),
+      );
+      return;
+    }
+
     setState(() {
       isRefreshing = true;
     });
 
     try {
-      final updated = await _service.getInvoiceById(currentInvoice.id);
+      final updated = await _service.getInvoiceById(
+        establishmentId: establishmentId,
+        invoiceId: currentInvoice.id,
+      );
+
       if (!mounted) return;
 
       if (updated != null) {
@@ -91,7 +114,7 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
     if (!isFiscalized) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Cette facture n’est pas encore fiscalisée.'),
+          content: Text('Cette facture n’est pas encore certifiée.'),
         ),
       );
       return;
@@ -136,7 +159,6 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
   }
 
   EmcfInvoiceRequestModel _buildEmcfRequest(
-    BuildContext context,
     String sellerName,
     String operatorId,
   ) {
@@ -222,58 +244,57 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
   }
 
   Future<void> _fiscalizeInvoice(BuildContext context) async {
-    if (EmcfConfig.sellerIfu.trim().isEmpty ||
-        EmcfConfig.sellerIfu == 'METS_ICI_IFU_ETABLISSEMENT') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez d’abord renseigner EmcfConfig.sellerIfu.'),
-        ),
-      );
+    final auth = context.read<AuthController>();
+    final user = auth.currentUser;
+
+    if (user == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
       return;
     }
 
-    if (EmcfConfig.bearerToken.trim().isEmpty ||
-        EmcfConfig.bearerToken == 'METS_ICI_TOKEN_JWT_DGI') {
+    final establishmentId = user.establishmentId.trim();
+
+    if (establishmentId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez d’abord renseigner EmcfConfig.bearerToken.'),
-        ),
+        const SnackBar(content: Text('Établissement introuvable.')),
       );
       return;
     }
 
     if (isFiscalized) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cette facture est déjà fiscalisée.')),
+        const SnackBar(content: Text('Cette facture est déjà certifiée.')),
       );
       return;
     }
 
-    final auth = context.read<AuthController>();
-    final user = auth.currentUser;
-    final sellerName = user?.name ?? 'Operateur';
-    final operatorId = user?.uid ?? '';
+    final sellerName = user.name.isNotEmpty ? user.name : 'Operateur';
+    final operatorId = user.uid;
 
-    final request = _buildEmcfRequest(context, sellerName, operatorId);
+    final request = _buildEmcfRequest(sellerName, operatorId);
+
     final fiscalController = context.read<FiscalizationController>();
 
-    await fiscalController.fiscalizeInvoice(
-      invoiceId: currentInvoice.id,
-      request: request,
-    );
+    //await fiscalController.fiscalizeInvoice(
+      //establishmentId: establishmentId,
+      //invoiceId: currentInvoice.id,
+      //request: request,
+    //);
 
     if (!mounted) return;
 
     if (fiscalController.confirmResult != null &&
         !fiscalController.confirmResult!.hasError) {
-      await _reloadInvoice();
+      await _reloadInvoice(context);
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Facture fiscalisée. Code MECeF : ${fiscalController.confirmResult!.codeMECeFDGI}',
+            'Facture certifiée avec Certilink Code MECeF : ${fiscalController.confirmResult!.codeMECeFDGI}',
           ),
         ),
       );
@@ -334,13 +355,27 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
   @override
   Widget build(BuildContext context) {
     final fiscalController = context.watch<FiscalizationController>();
+    final auth = context.watch<AuthController>();
+    final user = auth.currentUser;
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text('Utilisateur introuvable.')),
+      );
+    }
+
+    if (user.establishmentId.trim().isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Détail facture chambre'),
         actions: [
           IconButton(
-            onPressed: isRefreshing ? null : _reloadInvoice,
+            onPressed: isRefreshing ? null : () => _reloadInvoice(context),
             icon: isRefreshing
                 ? const SizedBox(
                     width: 18,
@@ -417,11 +452,9 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
                 row('Statut paiement', currentInvoice.status),
                 row(
                   'Statut fiscal',
-                  isFiscalized ? 'Fiscalisée' : 'Non fiscalisée',
+                  isFiscalized ? 'Certifiée' : 'Non certifiée',
                 ),
-
                 const SizedBox(height: 10),
-
                 Wrap(
                   spacing: 10,
                   runSpacing: 10,
@@ -433,12 +466,11 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
                           : Colors.orange,
                     ),
                     _buildStatusChip(
-                      isFiscalized ? 'Fiscalisée' : 'Non fiscalisée',
+                      isFiscalized ? 'Certifiée' : 'Non certifiée',
                       isFiscalized ? Colors.blue : Colors.red,
                     ),
                   ],
                 ),
-
                 if (isFiscalized) ...[
                   const SizedBox(height: 16),
                   const Divider(),
@@ -452,9 +484,7 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
                         : currentInvoice.fiscalMachineDateTime,
                   ),
                 ],
-
                 const SizedBox(height: 20),
-
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
@@ -464,7 +494,6 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
                   ),
                 ),
                 const SizedBox(height: 10),
-
                 if (isFiscalized)
                   SizedBox(
                     width: double.infinity,
@@ -474,7 +503,6 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
                       label: const Text('Imprimer en mode normalisé'),
                     ),
                   ),
-
                 if (!isFiscalized) ...[
                   const SizedBox(height: 10),
                   SizedBox(
@@ -490,7 +518,7 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : const Icon(Icons.verified),
-                      label: const Text('Fiscaliser (DGI)'),
+                      label: const Text('Fiscaliser avec Certilink'),
                     ),
                   ),
                 ],

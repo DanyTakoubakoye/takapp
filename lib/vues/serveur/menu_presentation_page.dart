@@ -13,8 +13,6 @@ class MenuPresentationPage extends StatefulWidget {
 }
 
 class _MenuPresentationPageState extends State<MenuPresentationPage> {
-  final MenuService _menuService = MenuService();
-
   final TextEditingController searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
@@ -22,19 +20,13 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
     'menu_presentation_list',
   );
 
-  late final Stream<List<MenuItemModel>> _menuItemsStream;
+  Stream<List<MenuItemModel>>? _menuItemsStream;
 
   String searchText = '';
   String selectedCategory = 'Toutes';
   String? activeItemId;
 
   final Map<String, int> selectedQuantities = {};
-
-  @override
-  void initState() {
-    super.initState();
-    _menuItemsStream = _menuService.getAvailableMenuItems();
-  }
 
   @override
   void dispose() {
@@ -45,19 +37,14 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
 
   void _toggleItem(MenuItemModel item) {
     setState(() {
-      if (selectedQuantities.containsKey(item.id)) {
-        activeItemId = item.id;
-      } else {
-        selectedQuantities[item.id] = 1;
-        activeItemId = item.id;
-      }
+      selectedQuantities.putIfAbsent(item.id, () => 1);
+      activeItemId = item.id;
     });
   }
 
   void _increaseQuantity(MenuItemModel item) {
     setState(() {
-      final current = selectedQuantities[item.id] ?? 0;
-      selectedQuantities[item.id] = current + 1;
+      selectedQuantities[item.id] = (selectedQuantities[item.id] ?? 0) + 1;
       activeItemId = item.id;
     });
   }
@@ -65,11 +52,10 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
   void _decreaseQuantity(MenuItemModel item) {
     setState(() {
       final current = selectedQuantities[item.id] ?? 0;
+
       if (current <= 1) {
         selectedQuantities.remove(item.id);
-        if (activeItemId == item.id) {
-          activeItemId = null;
-        }
+        if (activeItemId == item.id) activeItemId = null;
       } else {
         selectedQuantities[item.id] = current - 1;
         activeItemId = item.id;
@@ -77,46 +63,61 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
     });
   }
 
-  int _quantityOf(MenuItemModel item) {
-    return selectedQuantities[item.id] ?? 0;
-  }
+  int _quantityOf(MenuItemModel item) => selectedQuantities[item.id] ?? 0;
 
-  bool _isSelected(MenuItemModel item) {
-    return selectedQuantities.containsKey(item.id);
-  }
+  bool _isSelected(MenuItemModel item) =>
+      selectedQuantities.containsKey(item.id);
 
   double _totalAmount(List<MenuItemModel> allItems) {
     double total = 0;
+
     for (final item in allItems) {
       final qty = selectedQuantities[item.id] ?? 0;
-      if (qty > 0) {
-        total += item.price * qty;
-      }
+      if (qty > 0) total += item.price * qty;
     }
+
     return total;
   }
 
   List<_SelectedMenuLine> _buildSelectedLines(List<MenuItemModel> allItems) {
-    final lines = <_SelectedMenuLine>[];
-
-    for (final item in allItems) {
-      final qty = selectedQuantities[item.id] ?? 0;
-      if (qty > 0) {
-        lines.add(_SelectedMenuLine(item: item, quantity: qty));
-      }
-    }
-
-    return lines;
+    return allItems
+        .where((item) => (selectedQuantities[item.id] ?? 0) > 0)
+        .map(
+          (item) => _SelectedMenuLine(
+            item: item,
+            quantity: selectedQuantities[item.id]!,
+          ),
+        )
+        .toList();
   }
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthController>();
+    final user = auth.currentUser;
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text('Utilisateur introuvable.')),
+      );
+    }
+
+    final establishmentId = user.establishmentId.trim();
+
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
+    _menuItemsStream ??= MenuService().getAvailableMenuItems(
+      establishmentId: establishmentId,
+    );
+
     return GestureDetector(
       onTap: () {
         if (activeItemId != null) {
-          setState(() {
-            activeItemId = null;
-          });
+          setState(() => activeItemId = null);
         }
       },
       behavior: HitTestBehavior.deferToChild,
@@ -159,7 +160,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                 );
               }
 
-              final rawItems = (snapshot.data ?? [])
+              final rawItems = List<MenuItemModel>.from(snapshot.data ?? [])
                 ..sort(
                   (a, b) =>
                       a.name.toLowerCase().compareTo(b.name.toLowerCase()),
@@ -168,7 +169,9 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
               final availableCategories =
                   <String>{
                     'Toutes',
-                    ...rawItems.map((e) => e.category.trim()),
+                    ...rawItems
+                        .map((e) => e.category.trim())
+                        .where((category) => category.isNotEmpty),
                   }.toList()..sort((a, b) {
                     if (a == 'Toutes') return -1;
                     if (b == 'Toutes') return 1;
@@ -198,13 +201,11 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
 
               final filteredItems =
                   rawItems.where((item) {
+                    final query = searchText.toLowerCase();
+
                     final matchesSearch =
-                        item.name.toLowerCase().contains(
-                          searchText.toLowerCase(),
-                        ) ||
-                        item.category.toLowerCase().contains(
-                          searchText.toLowerCase(),
-                        );
+                        item.name.toLowerCase().contains(query) ||
+                        item.category.toLowerCase().contains(query);
 
                     final matchesCategory =
                         selectedCategory == 'Toutes' ||
@@ -245,7 +246,10 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                             left: 16,
                             right: 16,
                             bottom: 16,
-                            child: _buildRecapButton(rawItems),
+                            child: _buildRecapButton(
+                              establishmentId: establishmentId,
+                              allItems: rawItems,
+                            ),
                           ),
                       ],
                     ),
@@ -265,11 +269,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
       color: const Color(0xFF3E2723),
       child: TextField(
         controller: searchController,
-        onChanged: (value) {
-          setState(() {
-            searchText = value;
-          });
-        },
+        onChanged: (value) => setState(() => searchText = value),
         decoration: InputDecoration(
           hintText: 'Rechercher un article ou une catégorie...',
           filled: true,
@@ -309,19 +309,15 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
           value: selectedCategory,
           isExpanded: true,
           icon: const Icon(Icons.keyboard_arrow_down),
-          items: categories
-              .map(
-                (category) => DropdownMenuItem<String>(
-                  value: category,
-                  child: Text(category),
-                ),
-              )
-              .toList(),
+          items: categories.map((category) {
+            return DropdownMenuItem<String>(
+              value: category,
+              child: Text(category),
+            );
+          }).toList(),
           onChanged: (value) {
             if (value == null) return;
-            setState(() {
-              selectedCategory = value;
-            });
+            setState(() => selectedCategory = value);
           },
         ),
       ),
@@ -330,15 +326,17 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
 
   Map<String, List<MenuItemModel>> _groupByCategory(List<MenuItemModel> items) {
     final map = <String, List<MenuItemModel>>{};
+
     for (final item in items) {
       map.putIfAbsent(item.category, () => []).add(item);
     }
+
     return map;
   }
 
   Widget _buildCategorySection(String category, List<MenuItemModel> items) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final bool isMobile = screenWidth < 700;
+    final isMobile = screenWidth < 700;
 
     final crossAxisCount = isMobile
         ? 1
@@ -381,8 +379,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
             childAspectRatio: childAspectRatio,
           ),
           itemBuilder: (context, index) {
-            final item = items[index];
-            return _buildItemCard(item);
+            return _buildItemCard(items[index]);
           },
         ),
       ],
@@ -390,7 +387,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
   }
 
   Widget _buildMenuImage(MenuItemModel item, bool isMobile) {
-    final String adresse = (item.adresse ?? '').trim();
+    final adresse = (item.adresse ?? '').trim();
 
     if (adresse.isEmpty) {
       return const Center(child: Icon(Icons.image_outlined, size: 38));
@@ -400,7 +397,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
       return Image.asset(
         adresse,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
+        errorBuilder: (_, __, ___) {
           return const Center(child: Icon(Icons.image_outlined, size: 38));
         },
       );
@@ -410,7 +407,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
       return Image.network(
         adresse,
         fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
+        errorBuilder: (_, __, ___) {
           return const Center(child: Icon(Icons.image_outlined, size: 38));
         },
         loadingBuilder: (context, child, loadingProgress) {
@@ -423,7 +420,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
     return Image.asset(
       adresse,
       fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) {
+      errorBuilder: (_, __, ___) {
         return const Center(child: Icon(Icons.image_outlined, size: 38));
       },
     );
@@ -433,10 +430,10 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
     final selected = _isSelected(item);
     final showQuantityBox = activeItemId == item.id;
     final screenWidth = MediaQuery.of(context).size.width;
-    final bool isMobile = screenWidth < 700;
+    final isMobile = screenWidth < 700;
 
-    final String composition = item.composition.trim();
-    final bool hasComposition = composition.isNotEmpty;
+    final composition = item.composition.trim();
+    final hasComposition = composition.isNotEmpty;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 220),
@@ -462,9 +459,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
           Expanded(
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () {
-                _toggleItem(item);
-              },
+              onTap: () => _toggleItem(item),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -586,7 +581,10 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
     );
   }
 
-  Widget _buildRecapButton(List<MenuItemModel> allItems) {
+  Widget _buildRecapButton({
+    required String establishmentId,
+    required List<MenuItemModel> allItems,
+  }) {
     final totalSelected = selectedQuantities.values.fold<int>(
       0,
       (sum, qty) => sum + qty,
@@ -605,9 +603,12 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
       onPressed: () async {
         final lines = _buildSelectedLines(allItems);
 
-        final bool? orderConfirmed = await Navigator.push<bool>(
+        final orderConfirmed = await Navigator.push<bool>(
           context,
-          MaterialPageRoute(builder: (_) => _OrderRecapPage(lines: lines)),
+          MaterialPageRoute(
+            builder: (_) =>
+                _OrderRecapPage(establishmentId: establishmentId, lines: lines),
+          ),
         );
 
         if (orderConfirmed == true && mounted) {
@@ -626,9 +627,10 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
 }
 
 class _OrderRecapPage extends StatefulWidget {
+  final String establishmentId;
   final List<_SelectedMenuLine> lines;
 
-  const _OrderRecapPage({required this.lines});
+  const _OrderRecapPage({required this.establishmentId, required this.lines});
 
   @override
   State<_OrderRecapPage> createState() => _OrderRecapPageState();
@@ -636,8 +638,11 @@ class _OrderRecapPage extends StatefulWidget {
 
 class _OrderRecapPageState extends State<_OrderRecapPage> {
   String clientType = 'restaurant';
+
   final TextEditingController tableController = TextEditingController();
   final TextEditingController roomController = TextEditingController();
+
+  String get establishmentId => widget.establishmentId.trim();
 
   @override
   void dispose() {
@@ -653,9 +658,21 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
   Future<void> _confirmOrder() async {
     final auth = context.read<AuthController>();
     final orderController = context.read<OrderController>();
-
     final user = auth.currentUser;
-    if (user == null) return;
+
+    if (user == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
+      return;
+    }
+
+    if (establishmentId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Établissement introuvable.')),
+      );
+      return;
+    }
 
     if (clientType == 'restaurant' && tableController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -676,6 +693,7 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
     }
 
     final existingItems = List.of(orderController.items);
+
     for (final item in existingItems) {
       for (int i = 0; i < item.quantity; i++) {
         orderController.decrementItem(item.menuItemId);
@@ -689,6 +707,7 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
     }
 
     final success = await orderController.submitOrder(
+      establishmentId: establishmentId,
       clientType: clientType,
       tableNumber: tableController.text.trim(),
       roomNumber: roomController.text.trim(),
@@ -702,6 +721,7 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Commande envoyée avec succès.')),
       );
+
       Navigator.pop(context, true);
     } else if (orderController.errorMessage != null) {
       ScaffoldMessenger.of(
@@ -713,6 +733,12 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
   @override
   Widget build(BuildContext context) {
     final orderController = context.watch<OrderController>();
+
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Récapitulatif de la commande')),
@@ -740,17 +766,18 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
                       child: Text('Client Hôtel'),
                     ),
                   ],
-                  onChanged: (value) {
-                    if (value == null) return;
-                    setState(() {
-                      clientType = value;
-                    });
-                  },
+                  onChanged: orderController.isSubmitting
+                      ? null
+                      : (value) {
+                          if (value == null) return;
+                          setState(() => clientType = value);
+                        },
                 ),
                 const SizedBox(height: 12),
                 if (clientType == 'restaurant')
                   TextField(
                     controller: tableController,
+                    enabled: !orderController.isSubmitting,
                     decoration: const InputDecoration(
                       labelText: 'Numéro de table',
                       border: OutlineInputBorder(),
@@ -759,6 +786,7 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
                 if (clientType == 'hotel')
                   TextField(
                     controller: roomController,
+                    enabled: !orderController.isSubmitting,
                     decoration: const InputDecoration(
                       labelText: 'Numéro de chambre',
                       border: OutlineInputBorder(),
@@ -771,6 +799,7 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
                     separatorBuilder: (_, __) => const Divider(),
                     itemBuilder: (context, index) {
                       final line = widget.lines[index];
+
                       return ListTile(
                         title: Text(
                           line.item.name,

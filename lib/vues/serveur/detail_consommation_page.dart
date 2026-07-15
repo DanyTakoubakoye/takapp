@@ -16,9 +16,14 @@ import 'package:takapp/services/pdf_service.dart';
 import 'package:takapp/services/printer_service.dart';
 
 class DetailConsommationPage extends StatefulWidget {
+  final String establishmentId;
   final OrderModel order;
 
-  const DetailConsommationPage({super.key, required this.order});
+  const DetailConsommationPage({
+    super.key,
+    required this.establishmentId,
+    required this.order,
+  });
 
   @override
   State<DetailConsommationPage> createState() => _DetailConsommationPageState();
@@ -28,16 +33,30 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   final TextEditingController clientNameController = TextEditingController();
+
   final TextEditingController clientAddressController = TextEditingController();
+
   final TextEditingController clientIfuController = TextEditingController();
 
   String selectedPaymentMethod = AppPaymentMethods.cash;
+
   bool isPrintingOrPaying = false;
 
   bool get _isSmall => MediaQuery.of(context).size.width < 800;
 
+  String get establishmentId => widget.establishmentId.trim();
+
+  DocumentReference<Map<String, dynamic>> get _orderRef {
+    return _firestore
+        .collection('establishments')
+        .doc(establishmentId)
+        .collection('orders')
+        .doc(widget.order.id);
+  }
+
   String _formatDate(DateTime? date) {
     if (date == null) return '-';
+
     return DateFormat('dd/MM/yyyy HH:mm').format(date);
   }
 
@@ -45,10 +64,13 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
     switch (order.clientType) {
       case 'restaurant':
         return 'Table ${order.tableNumber ?? "-"}';
+
       case 'hotel':
         return 'Chambre ${order.roomNumber ?? "-"}';
+
       case 'bar':
         return 'Client Bar';
+
       default:
         return order.clientType;
     }
@@ -57,11 +79,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
   Future<List<Map<String, dynamic>>> _loadItems({
     bool includeCancelled = true,
   }) async {
-    final snapshot = await _firestore
-        .collection('orders')
-        .doc(widget.order.id)
-        .collection('items')
-        .get();
+    final snapshot = await _orderRef.collection('items').get();
 
     return snapshot.docs
         .map((doc) {
@@ -69,21 +87,32 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
 
           double toDouble(dynamic value) {
             if (value == null) return 0;
-            if (value is num) return value.toDouble();
+
+            if (value is num) {
+              return value.toDouble();
+            }
+
             return double.tryParse(value.toString()) ?? 0;
           }
 
           int toInt(dynamic value) {
             if (value == null) return 0;
+
             if (value is int) return value;
-            if (value is num) return value.toInt();
+
+            if (value is num) {
+              return value.toInt();
+            }
+
             return int.tryParse(value.toString()) ?? 0;
           }
 
           final quantity = toInt(data['quantity']);
+
           final unitPrice = toDouble(
             data['unitPrice'] ?? data['price'] ?? data['prix'],
           );
+
           final total = data['totalPrice'] != null
               ? toDouble(data['totalPrice'])
               : data['total'] != null
@@ -108,23 +137,23 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
   }
 
   Future<Map<String, dynamic>?> _getOrderDoc() async {
-    final doc = await _firestore
-        .collection('orders')
-        .doc(widget.order.id)
-        .get();
+    final doc = await _orderRef.get();
+
     return doc.data();
   }
 
   Future<void> _saveClientInfo() async {
-    await _firestore.collection('orders').doc(widget.order.id).update({
+    await _orderRef.update({
       'invoiceClientName': clientNameController.text.trim(),
       'invoiceClientAddress': clientAddressController.text.trim(),
       'invoiceClientIfu': clientIfuController.text.trim(),
+      'establishmentId': establishmentId,
     });
   }
 
   Future<bool> _ensurePaymentRegistered() async {
     final orderDoc = await _getOrderDoc();
+
     final paymentStatus = orderDoc?['paymentStatus']?.toString() ?? '';
 
     if (paymentStatus == 'paid') {
@@ -132,18 +161,23 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
     }
 
     final auth = context.read<AuthController>();
+
     final paymentController = context.read<PaymentController>();
+
     final user = auth.currentUser;
 
     if (user == null) {
       if (!mounted) return false;
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
+
       return false;
     }
 
     final success = await paymentController.registerPayment(
+      establishmentId: establishmentId,
       orderId: widget.order.id,
       orderNumber: widget.order.orderNumber,
       receivedBy: user.uid,
@@ -175,25 +209,26 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
       await _saveClientInfo();
 
       final paid = await _ensurePaymentRegistered();
+
       if (!paid) return;
 
       final pdfService = context.read<PdfService>();
+
       final printer = context.read<PrinterService>();
 
       final bytes = await pdfService.buildConsumptionInvoicePdf(
-        order: widget.order,
-        items: items,
-        clientName: clientNameController.text.trim(),
-        clientAddress: clientAddressController.text.trim(),
-        clientIfu: clientIfuController.text.trim(),
-        paymentMethodLabel:
-            AppPaymentMethods.labels[selectedPaymentMethod] ??
-            selectedPaymentMethod,
+        clientName: clientNameController.text.trim().isEmpty
+            ? _clientLabel(widget.order)
+            : clientNameController.text.trim(),
+        roomNumber: widget.order.roomNumber ?? widget.order.tableNumber ?? '-',
+        lines: items,
+        total: widget.order.total,
       );
 
       await printer.printPdf(Uint8List.fromList(bytes));
 
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Facture simple imprimée et encaissement enregistré.'),
@@ -217,14 +252,19 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
       switch (value) {
         case AppPaymentMethods.mobileMoney:
           return 'MOBILEMONEY';
+
         case AppPaymentMethods.bankTransfer:
           return 'VIREMENT';
+
         case AppPaymentMethods.card:
           return 'CARTEBANCAIRE';
+
         case AppPaymentMethods.credit:
           return 'CREDIT';
+
         case AppPaymentMethods.beninResto:
           return 'BENIN_RESTO';
+
         default:
           return 'ESPECES';
       }
@@ -264,34 +304,15 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
     List<Map<String, dynamic>> items,
     Map<String, dynamic>? orderDoc,
   ) async {
-    if (EmcfConfig.sellerIfu.trim().isEmpty ||
-        EmcfConfig.sellerIfu == 'METS_ICI_IFU_ETABLISSEMENT') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez renseigner EmcfConfig.sellerIfu.'),
-        ),
-      );
-      return;
-    }
-
-    if (EmcfConfig.bearerToken.trim().isEmpty ||
-        EmcfConfig.bearerToken == 'METS_ICI_TOKEN_JWT_DGI') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez renseigner EmcfConfig.bearerToken.'),
-        ),
-      );
-      return;
-    }
-
     final isFiscalized =
         orderDoc?['isFiscalized'] == true &&
         (orderDoc?['fiscalStatus']?.toString() == 'success');
 
     if (isFiscalized) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cette facture est déjà fiscalisée.')),
+        const SnackBar(content: Text('Cette facture est déjà certifiée.')),
       );
+
       return;
     }
 
@@ -303,19 +324,23 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
       await _saveClientInfo();
 
       final auth = context.read<AuthController>();
+
       final fiscalController = context.read<FiscalizationController>();
+
       final user = auth.currentUser;
 
       if (user == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Utilisateur introuvable.')),
         );
+
         return;
       }
 
       final request = _buildEmcfRequest(items, user.name, user.uid);
 
       await fiscalController.fiscalizeInvoice(
+        establishmentId: establishmentId,
         invoiceId: widget.order.id,
         request: request,
       );
@@ -324,7 +349,8 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
 
       if (fiscalController.confirmResult != null &&
           !fiscalController.confirmResult!.hasError) {
-        await _firestore.collection('orders').doc(widget.order.id).update({
+        await _orderRef.update({
+          'establishmentId': establishmentId,
           'isFiscalized': true,
           'fiscalStatus': 'success',
           'fiscalMecefCode': fiscalController.confirmResult!.codeMECeFDGI,
@@ -337,7 +363,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Facture fiscalisée. Code MECeF : ${fiscalController.confirmResult!.codeMECeFDGI}',
+              'Facture fiscalisée avec certilink. Code MECeF : ${fiscalController.confirmResult!.codeMECeFDGI}',
             ),
           ),
         );
@@ -345,7 +371,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              fiscalController.errorMessage ?? 'Échec de fiscalisation',
+              fiscalController.errorMessage ?? 'Échec de certification',
             ),
           ),
         );
@@ -371,6 +397,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Fiscalisez d’abord la facture.')),
       );
+
       return;
     }
 
@@ -382,32 +409,41 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
       await _saveClientInfo();
 
       final paid = await _ensurePaymentRegistered();
+
       if (!paid) return;
 
       final pdfService = context.read<PdfService>();
+
       final printer = context.read<PrinterService>();
 
       final bytes = await pdfService.buildFiscalizedConsumptionInvoicePdf(
-        order: widget.order,
-        items: items,
-        clientName: clientNameController.text.trim(),
-        clientAddress: clientAddressController.text.trim(),
+        sellerName: 'TAKHOTEL',
+        sellerIfu: EmcfConfig.sellerIfu,
+        clientName: clientNameController.text.trim().isEmpty
+            ? _clientLabel(widget.order)
+            : clientNameController.text.trim(),
         clientIfu: clientIfuController.text.trim(),
+        clientAddress: clientAddressController.text.trim(),
+        clientPhone: '',
+        roomNumber: widget.order.roomNumber ?? widget.order.tableNumber ?? '-',
+        lines: items,
+        total: widget.order.total,
         paymentMethodLabel:
             AppPaymentMethods.labels[selectedPaymentMethod] ??
             selectedPaymentMethod,
-        sellerName: 'TAKHOTEL',
-        sellerIfu: EmcfConfig.sellerIfu,
+        invoiceTypeLabel: 'FV',
         codeMECeFDGI: orderDoc?['fiscalMecefCode']?.toString() ?? '',
         qrCode: orderDoc?['fiscalQrCode']?.toString() ?? '',
         nim: orderDoc?['fiscalNim']?.toString() ?? '',
         counters: orderDoc?['fiscalCounter']?.toString() ?? '',
         fiscalDateTime: orderDoc?['fiscalMachineDateTime']?.toString() ?? '',
+        fiscalStatusLabel: orderDoc?['fiscalStatus']?.toString() ?? 'success',
       );
 
       await printer.printPdf(Uint8List.fromList(bytes));
 
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
@@ -466,110 +502,6 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
     );
   }
 
-  Widget _buildItemsTable(List<Map<String, dynamic>> items) {
-    if (_isSmall) {
-      return Column(
-        children: items.map((item) {
-          final quantity = (item['quantity'] ?? 0) as int;
-          final unitPrice = (item['unitPrice'] ?? 0) as double;
-          final total = (item['total'] ?? 0) as double;
-
-          return Card(
-            margin: const EdgeInsets.only(bottom: 10),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    item['name']?.toString() ?? '',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 6),
-                  Text('Qté : $quantity'),
-                  Text('P.U : ${unitPrice.toStringAsFixed(0)} FCFA'),
-                  Text(
-                    'Total : ${total.toStringAsFixed(0)} FCFA',
-                    style: const TextStyle(fontWeight: FontWeight.w700),
-                  ),
-                  if ((item['note']?.toString() ?? '').trim().isNotEmpty) ...[
-                    const SizedBox(height: 4),
-                    Text('Note : ${item['note']}'),
-                  ],
-                ],
-              ),
-            ),
-          );
-        }).toList(),
-      );
-    }
-
-    return Table(
-      border: TableBorder.all(color: Colors.grey.shade300),
-      columnWidths: const {
-        0: FlexColumnWidth(4),
-        1: FlexColumnWidth(1),
-        2: FlexColumnWidth(2),
-        3: FlexColumnWidth(2),
-      },
-      children: [
-        TableRow(
-          decoration: BoxDecoration(color: Colors.grey.shade200),
-          children: const [
-            Padding(
-              padding: EdgeInsets.all(8),
-              child: Text(
-                'Article',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(8),
-              child: Text('Qté', style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-            Padding(
-              padding: EdgeInsets.all(8),
-              child: Text('P.U', style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-            Padding(
-              padding: EdgeInsets.all(8),
-              child: Text(
-                'Total',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-        ...items.map((item) {
-          final quantity = (item['quantity'] ?? 0) as int;
-          final unitPrice = (item['unitPrice'] ?? 0) as double;
-          final total = (item['total'] ?? 0) as double;
-
-          return TableRow(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Text(item['name']?.toString() ?? ''),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Text('$quantity'),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Text('${unitPrice.toStringAsFixed(0)} FCFA'),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: Text('${total.toStringAsFixed(0)} FCFA'),
-              ),
-            ],
-          );
-        }),
-      ],
-    );
-  }
-
   @override
   void dispose() {
     clientNameController.dispose();
@@ -580,41 +512,22 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
 
   @override
   Widget build(BuildContext context) {
-    final paymentController = context.watch<PaymentController>();
-    final fiscalController = context.watch<FiscalizationController>();
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Détails de la Consommation')),
       body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        stream: _firestore
-            .collection('orders')
-            .doc(widget.order.id)
-            .snapshots(),
+        stream: _orderRef.snapshots(),
         builder: (context, orderSnapshot) {
           final orderDoc = orderSnapshot.data?.data();
+
           final isFiscalized =
               orderDoc?['isFiscalized'] == true &&
               (orderDoc?['fiscalStatus']?.toString() == 'success');
-
-          if (clientNameController.text.isEmpty &&
-              (orderDoc?['invoiceClientName']?.toString().isNotEmpty ??
-                  false)) {
-            clientNameController.text =
-                orderDoc?['invoiceClientName']?.toString() ?? '';
-          }
-
-          if (clientAddressController.text.isEmpty &&
-              (orderDoc?['invoiceClientAddress']?.toString().isNotEmpty ??
-                  false)) {
-            clientAddressController.text =
-                orderDoc?['invoiceClientAddress']?.toString() ?? '';
-          }
-
-          if (clientIfuController.text.isEmpty &&
-              (orderDoc?['invoiceClientIfu']?.toString().isNotEmpty ?? false)) {
-            clientIfuController.text =
-                orderDoc?['invoiceClientIfu']?.toString() ?? '';
-          }
 
           return FutureBuilder<List<Map<String, dynamic>>>(
             future: _loadItems(),
@@ -624,20 +537,10 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              if (itemSnapshot.hasError) {
-                return Center(
-                  child: Text(
-                    'Erreur chargement articles : ${itemSnapshot.error}',
-                  ),
-                );
-              }
-
               final items = itemSnapshot.data ?? [];
+
               final activeItems = items
                   .where((item) => item['isCancelled'] != true)
-                  .toList();
-              final cancelledItems = items
-                  .where((item) => item['isCancelled'] == true)
                   .toList();
 
               return SingleChildScrollView(
@@ -656,13 +559,13 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                           border: Border.all(color: Colors.green),
                         ),
                         child: const Text(
-                          'FACTURE FISCALISÉE',
+                          'FACTURE CERTIFIEE',
+                          textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.green,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
-                          textAlign: TextAlign.center,
                         ),
                       ),
 
@@ -706,27 +609,34 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _sectionTitle('Informations client (facultatives)'),
+
                             TextField(
                               controller: clientNameController,
                               decoration: const InputDecoration(
                                 labelText: 'Nom du client',
                               ),
                             ),
+
                             const SizedBox(height: 12),
+
                             TextField(
                               controller: clientAddressController,
                               decoration: const InputDecoration(
                                 labelText: 'Adresse du client',
                               ),
                             ),
+
                             const SizedBox(height: 12),
+
                             TextField(
                               controller: clientIfuController,
                               decoration: const InputDecoration(
                                 labelText: 'IFU du client',
                               ),
                             ),
+
                             const SizedBox(height: 12),
+
                             DropdownButtonFormField<String>(
                               value: selectedPaymentMethod,
                               decoration: const InputDecoration(
@@ -741,7 +651,10 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                                   )
                                   .toList(),
                               onChanged: (value) {
-                                if (value == null) return;
+                                if (value == null) {
+                                  return;
+                                }
+
                                 setState(() {
                                   selectedPaymentMethod = value;
                                 });
@@ -761,94 +674,73 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _sectionTitle('Articles consommés'),
-                            if (activeItems.isEmpty)
-                              const Text('Aucun article actif trouvé.')
-                            else
-                              _buildItemsTable(activeItems),
 
-                            if (cancelledItems.isNotEmpty) ...[
-                              const SizedBox(height: 16),
-                              _sectionTitle('Articles annulés'),
-                              ...cancelledItems.map(
-                                (item) => Card(
-                                  color: Colors.red.withOpacity(0.06),
-                                  child: ListTile(
-                                    leading: const Icon(
-                                      Icons.block,
-                                      color: Colors.red,
-                                    ),
-                                    title: Text(
-                                      item['name']?.toString() ?? '',
-                                      style: const TextStyle(
-                                        decoration: TextDecoration.lineThrough,
+                            ...activeItems.map((item) {
+                              final quantity = (item['quantity'] ?? 0) as int;
+
+                              final unitPrice =
+                                  (item['unitPrice'] ?? 0) as double;
+
+                              final total = (item['total'] ?? 0) as double;
+
+                              return Card(
+                                margin: const EdgeInsets.only(bottom: 10),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item['name']?.toString() ?? '',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                    subtitle: Text(
-                                      'Qté : ${item['quantity']} • Total retiré : ${((item['total'] ?? 0) as double).toStringAsFixed(0)} FCFA'
-                                      '${(item['cancellationReason']?.toString() ?? '').trim().isNotEmpty ? '\nMotif : ${item['cancellationReason']}' : ''}',
-                                    ),
+
+                                      const SizedBox(height: 6),
+
+                                      Text('Qté : $quantity'),
+
+                                      Text(
+                                        'P.U : ${unitPrice.toStringAsFixed(0)} FCFA',
+                                      ),
+
+                                      Text(
+                                        'Total : ${total.toStringAsFixed(0)} FCFA',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ),
-                            ],
+                              );
+                            }),
                           ],
                         ),
                       ),
                     ),
 
-                    if (isFiscalized) ...[
-                      const SizedBox(height: 12),
-                      Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _sectionTitle('Éléments fiscaux'),
-                              _infoRow(
-                                'Code MECeF',
-                                orderDoc?['fiscalMecefCode']?.toString() ?? '-',
-                              ),
-                              _infoRow(
-                                'NIM',
-                                orderDoc?['fiscalNim']?.toString() ?? '-',
-                              ),
-                              _infoRow(
-                                'Compteurs',
-                                orderDoc?['fiscalCounter']?.toString() ?? '-',
-                              ),
-                              _infoRow(
-                                'Date fiscale',
-                                orderDoc?['fiscalMachineDateTime']
-                                        ?.toString() ??
-                                    '-',
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-
                     const SizedBox(height: 16),
 
-                    if (_isSmall) ...[
+                    if (_isSmall)
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
-                          onPressed:
-                              (isPrintingOrPaying ||
-                                  paymentController.isSubmitting ||
-                                  fiscalController.isLoading)
+                          onPressed: (isPrintingOrPaying)
                               ? null
                               : () {
                                   if (isFiscalized) {
-                                    _printNormalInvoice(activeItems, orderDoc);
+                                    _printFiscalizedInvoice(
+                                      activeItems,
+                                      orderDoc,
+                                    );
                                   } else {
                                     _fiscalize(activeItems, orderDoc);
                                   }
                                 },
-                          icon:
-                              (isPrintingOrPaying || fiscalController.isLoading)
+                          icon: isPrintingOrPaying
                               ? const SizedBox(
                                   width: 18,
                                   height: 18,
@@ -867,39 +759,13 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                                 : 'Fiscaliser',
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          onPressed:
-                              (isPrintingOrPaying ||
-                                  paymentController.isSubmitting)
-                              ? null
-                              : () => _printNormalInvoice(activeItems, orderDoc),
-                          icon:
-                              (isPrintingOrPaying ||
-                                  paymentController.isSubmitting)
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : const Icon(Icons.print_outlined),
-                          label: const Text('Imprimer facture simple'),
-                        ),
-                      ),
-                    ] else
+                      )
+                    else
                       Row(
                         children: [
                           Expanded(
                             child: ElevatedButton.icon(
-                              onPressed:
-                                  (isPrintingOrPaying ||
-                                      paymentController.isSubmitting ||
-                                      fiscalController.isLoading)
+                              onPressed: (isPrintingOrPaying)
                                   ? null
                                   : () {
                                       if (isFiscalized) {
@@ -911,9 +777,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                                         _fiscalize(activeItems, orderDoc);
                                       }
                                     },
-                              icon:
-                                  (isPrintingOrPaying ||
-                                      fiscalController.isLoading)
+                              icon: isPrintingOrPaying
                                   ? const SizedBox(
                                       width: 18,
                                       height: 18,
@@ -933,18 +797,18 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                               ),
                             ),
                           ),
+
                           const SizedBox(width: 12),
+
                           Expanded(
                             child: OutlinedButton.icon(
-                              onPressed:
-                                  (isPrintingOrPaying ||
-                                      paymentController.isSubmitting)
+                              onPressed: (isPrintingOrPaying)
                                   ? null
                                   : () => _printNormalInvoice(
-                                      activeItems, orderDoc),
-                              icon:
-                                  (isPrintingOrPaying ||
-                                      paymentController.isSubmitting)
+                                      activeItems,
+                                      orderDoc,
+                                    ),
+                              icon: isPrintingOrPaying
                                   ? const SizedBox(
                                       width: 18,
                                       height: 18,

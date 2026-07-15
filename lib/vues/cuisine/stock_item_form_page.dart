@@ -8,7 +8,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class StockItemFormPage extends StatefulWidget {
-  const StockItemFormPage({super.key});
+  final String establishmentId;
+
+  const StockItemFormPage({super.key, required this.establishmentId});
 
   @override
   State<StockItemFormPage> createState() => _StockItemFormPageState();
@@ -32,6 +34,15 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
   bool _isImporting = false;
   String? _importMessage;
 
+  String get establishmentId => widget.establishmentId.trim();
+
+  CollectionReference<Map<String, dynamic>> get _stockItemsCol {
+    return _firestore
+        .collection('establishments')
+        .doc(establishmentId)
+        .collection('stock_items');
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -41,16 +52,23 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
   }
 
   Future<void> _saveSingleItem() async {
+    if (establishmentId.isEmpty) {
+      _showMessage('Établissement introuvable.');
+      return;
+    }
+
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isSaving = true);
 
     try {
-      await _firestore.collection('stock_items').add({
+      await _stockItemsCol.add({
+        'establishmentId': establishmentId,
         'name': _nameController.text.trim(),
         'category': _categoryController.text.trim(),
         'isActive': _isActive,
         'createdAt': Timestamp.now(),
+        'updatedAt': Timestamp.now(),
         'store': _selectedStore,
         'unit': _unitController.text.trim(),
       });
@@ -60,14 +78,10 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
       _unitController.clear();
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Article enregistré avec succès.')),
-      );
+      _showMessage('Article enregistré avec succès.');
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de l’enregistrement : $e')),
-      );
+      _showMessage('Erreur lors de l’enregistrement : $e');
     } finally {
       if (mounted) {
         setState(() => _isSaving = false);
@@ -76,6 +90,11 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
   }
 
   Future<void> _importFromExcel() async {
+    if (establishmentId.isEmpty) {
+      _showMessage('Établissement introuvable.');
+      return;
+    }
+
     setState(() {
       _isImporting = true;
       _importMessage = null;
@@ -102,7 +121,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
 
       if (bytes == null || bytes.isEmpty) {
         throw Exception(
-          'Impossible de lire le fichier. Active withData:true ou sélectionne un fichier valide.',
+          'Impossible de lire le fichier. Sélectionne un fichier valide.',
         );
       }
 
@@ -136,12 +155,15 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
       final now = Timestamp.now();
 
       for (final row in cleanedRows) {
-        final docRef = _firestore.collection('stock_items').doc();
+        final docRef = _stockItemsCol.doc();
+
         batch.set(docRef, {
+          'establishmentId': establishmentId,
           'name': row['name'],
           'category': row['category'],
           'isActive': row['isActive'],
           'createdAt': now,
+          'updatedAt': now,
           'store': row['store'],
           'unit': row['unit'],
         });
@@ -155,18 +177,14 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
       });
 
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(_importMessage!)));
+      _showMessage(_importMessage!);
     } catch (e) {
       setState(() {
         _importMessage = 'Erreur import : $e';
       });
 
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(_importMessage!)));
+      _showMessage(_importMessage!);
     } finally {
       if (mounted) {
         setState(() => _isImporting = false);
@@ -223,10 +241,12 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
 
     return rawRows.map((e) {
       final normalized = <String, dynamic>{};
+
       e.forEach((key, value) {
         normalized[_normalizeHeader(key.toString())] =
             value?.toString().trim() ?? '';
       });
+
       return normalized;
     }).toList();
   }
@@ -243,6 +263,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
     }
 
     final normalizedStore = _normalizeStore(store);
+
     if (normalizedStore == null) {
       return null;
     }
@@ -259,10 +280,12 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
   String _pickFirst(Map<String, dynamic> row, List<String> keys) {
     for (final key in keys) {
       final value = row[key];
+
       if (value != null && value.toString().trim().isNotEmpty) {
         return value.toString().trim();
       }
     }
+
     return '';
   }
 
@@ -308,6 +331,12 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
     return defaultValue;
   }
 
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   Widget _buildTextField({
     required TextEditingController controller,
     required String label,
@@ -324,6 +353,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
         if (value == null || value.trim().isEmpty) {
           return 'Champ obligatoire';
         }
+
         return null;
       },
     );
@@ -332,11 +362,11 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
   Widget _buildImportInfoCard() {
     return Card(
       color: Colors.blue.shade50,
-      child: Padding(
-        padding: const EdgeInsets.all(14),
+      child: const Padding(
+        padding: EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text(
               'Format Excel attendu',
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -358,6 +388,12 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
   @override
   Widget build(BuildContext context) {
     final isSmall = MediaQuery.of(context).size.width < 700;
+
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Gestion des articles de stock')),
@@ -446,7 +482,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
                                   ),
                                   items: _stores
                                       .map(
-                                        (store) => DropdownMenuItem(
+                                        (store) => DropdownMenuItem<String>(
                                           value: store,
                                           child: Text(store),
                                         ),
@@ -482,10 +518,11 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
                                         ),
                                         items: _stores
                                             .map(
-                                              (store) => DropdownMenuItem(
-                                                value: store,
-                                                child: Text(store),
-                                              ),
+                                              (store) =>
+                                                  DropdownMenuItem<String>(
+                                                    value: store,
+                                                    child: Text(store),
+                                                  ),
                                             )
                                             .toList(),
                                         onChanged: (value) {
@@ -556,7 +593,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
                         const SizedBox(height: 8),
                         const Text(
                           'Le fichier peut être en .xlsx ou .xls. '
-                          'Chaque ligne valide sera ajoutée dans la collection stock_items avec un id Firestore automatique.',
+                          'Chaque ligne valide sera ajoutée dans stock_items de cet établissement avec un id Firestore automatique.',
                         ),
                         const SizedBox(height: 16),
                         Wrap(

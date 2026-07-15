@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
+
 import '../config/emcf_config.dart';
 import '../modeles/emcf_invoice_create_response_model.dart';
 import '../modeles/emcf_invoice_request_model.dart';
@@ -8,7 +10,9 @@ import '../modeles/emcf_status_model.dart';
 
 class EmcfInvoiceService {
   final String invoiceBaseUrl;
+
   final String infoBaseUrl;
+
   final String bearerToken;
 
   EmcfInvoiceService({
@@ -19,74 +23,93 @@ class EmcfInvoiceService {
        infoBaseUrl = infoBaseUrl ?? EmcfConfig.infoBaseUrl,
        bearerToken = bearerToken ?? EmcfConfig.bearerToken;
 
+  /// =========================
+  /// HEADERS
+  /// =========================
+
   Map<String, String> get _headers => {
     'Content-Type': 'application/json',
+
     'Accept': 'application/json',
+
     'Authorization': 'Bearer $bearerToken',
   };
 
-  Future<EmcfStatusModel> getStatus() async {
+  /// =========================
+  /// STATUS
+  /// =========================
+
+  Future<EmcfStatusModel> getStatus({required String establishmentId}) async {
+    print(
+      '[EMCF][$establishmentId] '
+      'getStatus()',
+    );
+
     final response = await http.get(
       Uri.parse(invoiceBaseUrl),
       headers: _headers,
     );
 
-    if (response.statusCode == 401) {
-      throw Exception('Token JWT invalide ou expiré');
-    }
+    _checkUnauthorized(response);
 
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception(
-        'Erreur getStatus [${response.statusCode}] : ${response.body}',
-      );
-    }
+    _checkHttpError(response: response, operation: 'getStatus');
 
-    final data = jsonDecode(response.body);
-    if (data is! Map<String, dynamic>) {
-      throw Exception('Réponse invalide de getStatus');
-    }
+    final data = _decodeMap(response.body, operation: 'getStatus');
 
     return EmcfStatusModel.fromMap(data);
   }
 
-  Future<EmcfInvoiceCreateResponseModel> createInvoice(
-    EmcfInvoiceRequestModel request,
-  ) async {
+  /// =========================
+  /// CREATE INVOICE
+  /// =========================
+
+  Future<EmcfInvoiceCreateResponseModel> createInvoice({
+    required String establishmentId,
+    required EmcfInvoiceRequestModel request,
+  }) async {
+    print(
+      '[EMCF][$establishmentId] '
+      'createInvoice()',
+    );
+
+    final body = request.toMap();
+
     final response = await http.post(
       Uri.parse(invoiceBaseUrl),
       headers: _headers,
-      body: jsonEncode(request.toMap()),
+      body: jsonEncode(body),
     );
 
-    if (response.statusCode == 401) {
-      throw Exception('Token JWT invalide ou expiré');
-    }
+    _checkUnauthorized(response);
 
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception(
-        'Erreur createInvoice [${response.statusCode}] : ${response.body}',
-      );
-    }
+    _checkHttpError(response: response, operation: 'createInvoice');
 
-    final data = jsonDecode(response.body);
-    if (data is! Map<String, dynamic>) {
-      throw Exception('Réponse invalide de createInvoice');
-    }
+    final data = _decodeMap(response.body, operation: 'createInvoice');
 
     return EmcfInvoiceCreateResponseModel.fromMap(data);
   }
 
-  Future<EmcfSecurityElementModel> confirmInvoice(String uid) async {
+  /// =========================
+  /// CONFIRM INVOICE
+  /// =========================
+
+  Future<EmcfSecurityElementModel> confirmInvoice({
+    required String establishmentId,
+    required String uid,
+  }) async {
+    print(
+      '[EMCF][$establishmentId] '
+      'confirmInvoice($uid)',
+    );
+
     final putResponse = await http.put(
       Uri.parse('$invoiceBaseUrl/$uid/confirm'),
       headers: _headers,
     );
 
-    if (putResponse.statusCode >= 200 && putResponse.statusCode < 300) {
-      final data = jsonDecode(putResponse.body);
-      if (data is! Map<String, dynamic>) {
-        throw Exception('Réponse invalide de confirmInvoice');
-      }
+    if (_isSuccess(putResponse)) {
+      final data = _decodeMap(putResponse.body, operation: 'confirmInvoice');
+
       return EmcfSecurityElementModel.fromMap(data);
     }
 
@@ -95,35 +118,40 @@ class EmcfInvoiceService {
       headers: _headers,
     );
 
-    if (postResponse.statusCode == 401) {
-      throw Exception('Token JWT invalide ou expiré');
-    }
+    _checkUnauthorized(postResponse);
 
-    if (postResponse.statusCode < 200 || postResponse.statusCode >= 300) {
-      throw Exception(
-        'Erreur confirmInvoice [PUT=${putResponse.statusCode}, POST=${postResponse.statusCode}] : ${postResponse.body}',
-      );
-    }
+    _checkHttpError(
+      response: postResponse,
+      operation: 'confirmInvoice',
+      extra: 'PUT=${putResponse.statusCode}',
+    );
 
-    final data = jsonDecode(postResponse.body);
-    if (data is! Map<String, dynamic>) {
-      throw Exception('Réponse invalide de confirmInvoice');
-    }
+    final data = _decodeMap(postResponse.body, operation: 'confirmInvoice');
 
     return EmcfSecurityElementModel.fromMap(data);
   }
 
-  Future<EmcfSecurityElementModel> cancelInvoice(String uid) async {
+  /// =========================
+  /// CANCEL INVOICE
+  /// =========================
+
+  Future<EmcfSecurityElementModel> cancelInvoice({
+    required String establishmentId,
+    required String uid,
+  }) async {
+    print(
+      '[EMCF][$establishmentId] '
+      'cancelInvoice($uid)',
+    );
+
     final putResponse = await http.put(
       Uri.parse('$invoiceBaseUrl/$uid/cancel'),
       headers: _headers,
     );
 
-    if (putResponse.statusCode >= 200 && putResponse.statusCode < 300) {
-      final data = jsonDecode(putResponse.body);
-      if (data is! Map<String, dynamic>) {
-        throw Exception('Réponse invalide de cancelInvoice');
-      }
+    if (_isSuccess(putResponse)) {
+      final data = _decodeMap(putResponse.body, operation: 'cancelInvoice');
+
       return EmcfSecurityElementModel.fromMap(data);
     }
 
@@ -132,43 +160,78 @@ class EmcfInvoiceService {
       headers: _headers,
     );
 
-    if (postResponse.statusCode == 401) {
-      throw Exception('Token JWT invalide ou expiré');
-    }
+    _checkUnauthorized(postResponse);
 
-    if (postResponse.statusCode < 200 || postResponse.statusCode >= 300) {
-      throw Exception(
-        'Erreur cancelInvoice [PUT=${putResponse.statusCode}, POST=${postResponse.statusCode}] : ${postResponse.body}',
-      );
-    }
+    _checkHttpError(
+      response: postResponse,
+      operation: 'cancelInvoice',
+      extra: 'PUT=${putResponse.statusCode}',
+    );
 
-    final data = jsonDecode(postResponse.body);
-    if (data is! Map<String, dynamic>) {
-      throw Exception('Réponse invalide de cancelInvoice');
-    }
+    final data = _decodeMap(postResponse.body, operation: 'cancelInvoice');
 
     return EmcfSecurityElementModel.fromMap(data);
   }
 
-  Future<Map<String, dynamic>> getPendingInvoiceDetails(String uid) async {
+  /// =========================
+  /// GET PENDING INVOICE
+  /// =========================
+
+  Future<Map<String, dynamic>> getPendingInvoiceDetails({
+    required String establishmentId,
+    required String uid,
+  }) async {
+    print(
+      '[EMCF][$establishmentId] '
+      'getPendingInvoiceDetails($uid)',
+    );
+
     final response = await http.get(
       Uri.parse('$invoiceBaseUrl/$uid'),
       headers: _headers,
     );
 
+    _checkUnauthorized(response);
+
+    _checkHttpError(response: response, operation: 'getPendingInvoiceDetails');
+
+    return _decodeMap(response.body, operation: 'getPendingInvoiceDetails');
+  }
+
+  /// =========================
+  /// HELPERS
+  /// =========================
+
+  bool _isSuccess(http.Response response) {
+    return response.statusCode >= 200 && response.statusCode < 300;
+  }
+
+  void _checkUnauthorized(http.Response response) {
     if (response.statusCode == 401) {
       throw Exception('Token JWT invalide ou expiré');
     }
+  }
 
-    if (response.statusCode < 200 || response.statusCode >= 300) {
+  void _checkHttpError({
+    required http.Response response,
+    required String operation,
+    String extra = '',
+  }) {
+    if (!_isSuccess(response)) {
       throw Exception(
-        'Erreur getPendingInvoiceDetails [${response.statusCode}] : ${response.body}',
+        'Erreur $operation '
+        '$extra '
+        '[${response.statusCode}] '
+        ': ${response.body}',
       );
     }
+  }
 
-    final data = jsonDecode(response.body);
+  Map<String, dynamic> _decodeMap(String body, {required String operation}) {
+    final data = jsonDecode(body);
+
     if (data is! Map<String, dynamic>) {
-      throw Exception('Réponse invalide de getPendingInvoiceDetails');
+      throw Exception('Réponse invalide de $operation');
     }
 
     return data;

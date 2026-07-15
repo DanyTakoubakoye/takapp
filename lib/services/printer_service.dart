@@ -1,20 +1,83 @@
 import 'dart:typed_data';
+
 import 'package:printing/printing.dart';
 
 class PrinterService {
+  /// =========================
+  /// PRINT PDF
+  /// =========================
+
   Future<void> printPdf(Uint8List bytes) async {
-    await Printing.layoutPdf(onLayout: (format) async => bytes);
+    if (bytes.isEmpty) {
+      throw Exception('Document PDF vide.');
+    }
+
+    await Printing.layoutPdf(
+      onLayout: (format) async => bytes,
+      name: 'takapp_document',
+    );
   }
+
+  /// =========================
+  /// SHARE PDF
+  /// =========================
 
   Future<void> sharePdf(Uint8List bytes, String filename) async {
-    await Printing.sharePdf(bytes: bytes, filename: filename);
+    if (bytes.isEmpty) {
+      throw Exception('Document PDF vide.');
+    }
+
+    final safeFilename = filename.trim().isEmpty
+        ? 'takapp_document.pdf'
+        : filename;
+
+    await Printing.sharePdf(bytes: bytes, filename: safeFilename);
   }
+
+  /// =========================
+  /// PREVIEW PDF
+  /// =========================
 
   Future<void> previewPdf(Uint8List bytes) async {
-    await Printing.layoutPdf(onLayout: (format) async => bytes);
+    if (bytes.isEmpty) {
+      throw Exception('Document PDF vide.');
+    }
+
+    await Printing.layoutPdf(
+      onLayout: (format) async => bytes,
+      name: 'takapp_preview',
+    );
   }
 
+  /// =========================
+  /// AVAILABLE PRINTERS
+  /// =========================
+
   Future<List<Printer>> getAvailablePrinters() async {
-    return await Printing.listPrinters();
+    try {
+      return await Printing.listPrinters();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /// =========================
+  /// PRINT DIRECTLY TO PRINTER
+  /// =========================
+
+  Future<void> printToPrinter({
+    required Printer printer,
+    required Uint8List bytes,
+    String documentName = 'takapp_document',
+  }) async {
+    if (bytes.isEmpty) {
+      throw Exception('Document PDF vide.');
+    }
+
+    await Printing.directPrintPdf(
+      printer: printer,
+      name: documentName,
+      onLayout: (format) async => bytes,
+    );
   }
 }

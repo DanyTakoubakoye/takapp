@@ -7,11 +7,13 @@ import 'package:takapp/modeles/stock_request_model.dart';
 import 'package:takapp/services/stock_request_service.dart';
 
 class StoreRequestHistoryPage extends StatelessWidget {
+  final String establishmentId;
   final String store;
   final String title;
 
   const StoreRequestHistoryPage({
     super.key,
+    required this.establishmentId,
     required this.store,
     required this.title,
   });
@@ -41,7 +43,10 @@ class StoreRequestHistoryPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: StreamBuilder<List<StockRequestModel>>(
-        stream: service.streamRequestsForReceiver(store),
+        stream: service.streamRequestsForReceiver(
+          establishmentId: establishmentId,
+          store: store,
+        ),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -82,6 +87,7 @@ class StoreRequestHistoryPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       Text('Rôle : ${item.requestedByRole}'),
+                      Text('Magasin : ${item.store}'),
                       Text(
                         'Demandé le : ${item.createdAt == null ? "-" : DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt!)}',
                       ),
@@ -106,6 +112,7 @@ class StoreRequestHistoryPage extends StatelessWidget {
                               : () async {
                                   final success = await controller
                                       .confirmReception(
+                                        establishmentId: establishmentId,
                                         requestId: item.id,
                                         receivedBy: user.uid,
                                         receivedByName: user.name,

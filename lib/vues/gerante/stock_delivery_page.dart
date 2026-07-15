@@ -7,9 +7,14 @@ import 'package:takapp/modeles/stock_request_model.dart';
 import 'package:takapp/services/stock_request_service.dart';
 
 class StockDeliveryPage extends StatefulWidget {
+  final String establishmentId;
   final StockRequestModel request;
 
-  const StockDeliveryPage({super.key, required this.request});
+  const StockDeliveryPage({
+    super.key,
+    required this.establishmentId,
+    required this.request,
+  });
 
   @override
   State<StockDeliveryPage> createState() => _StockDeliveryPageState();
@@ -20,6 +25,8 @@ class _StockDeliveryPageState extends State<StockDeliveryPage> {
 
   List<_DeliveryLineInput> _lines = [];
   bool _isLoadingItems = true;
+
+  String get establishmentId => widget.establishmentId.trim();
 
   Color _storeColor() {
     switch (widget.request.store) {
@@ -61,32 +68,46 @@ class _StockDeliveryPageState extends State<StockDeliveryPage> {
   }
 
   Future<void> _loadItems() async {
-    final items = await _service.getRequestItems(widget.request.id);
+    if (establishmentId.isEmpty) {
+      setState(() => _isLoadingItems = false);
+      return;
+    }
+
+    final items = await _service.getRequestItems(
+      establishmentId: establishmentId,
+      requestId: widget.request.id,
+    );
 
     if (!mounted) return;
 
     setState(() {
-      _lines = items
-          .map(
-            (item) => _DeliveryLineInput(
-              item: item,
-              controller: TextEditingController(
-                text: item.quantityDelivered > 0
-                    ? item.quantityDelivered.toStringAsFixed(
-                        item.quantityDelivered % 1 == 0 ? 0 : 2,
-                      )
-                    : item.quantityRequested.toStringAsFixed(
-                        item.quantityRequested % 1 == 0 ? 0 : 2,
-                      ),
-              ),
-            ),
-          )
-          .toList();
+      _lines = items.map((item) {
+        return _DeliveryLineInput(
+          item: item,
+          controller: TextEditingController(
+            text: item.quantityDelivered > 0
+                ? item.quantityDelivered.toStringAsFixed(
+                    item.quantityDelivered % 1 == 0 ? 0 : 2,
+                  )
+                : item.quantityRequested.toStringAsFixed(
+                    item.quantityRequested % 1 == 0 ? 0 : 2,
+                  ),
+          ),
+        );
+      }).toList();
+
       _isLoadingItems = false;
     });
   }
 
   Future<void> _submitDelivery() async {
+    if (establishmentId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Établissement introuvable.')),
+      );
+      return;
+    }
+
     if (widget.request.status != 'pending') {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Cette demande a déjà été traitée.')),
@@ -105,7 +126,7 @@ class _StockDeliveryPageState extends State<StockDeliveryPage> {
       return;
     }
 
-    final List<StockRequestItemModel> deliveredItems = [];
+    final deliveredItems = <StockRequestItemModel>[];
 
     for (int i = 0; i < _lines.length; i++) {
       final line = _lines[i];
@@ -123,16 +144,21 @@ class _StockDeliveryPageState extends State<StockDeliveryPage> {
       deliveredItems.add(
         StockRequestItemModel(
           id: line.item.id,
+          establishmentId: establishmentId,
           itemId: line.item.itemId,
           itemName: line.item.itemName,
           unit: line.item.unit,
           quantityRequested: line.item.quantityRequested,
           quantityDelivered: quantity,
+          status: quantity > 0 ? 'delivered' : 'pending',
+          pendingSync: false,
+          syncError: false,
         ),
       );
     }
 
     final success = await controller.deliverRequest(
+      establishmentId: establishmentId,
       requestId: widget.request.id,
       deliveredBy: user.uid,
       deliveredByName: user.name,
@@ -173,6 +199,12 @@ class _StockDeliveryPageState extends State<StockDeliveryPage> {
     final requestController = context.watch<StockRequestController>();
     final color = _storeColor();
     final isSmall = MediaQuery.of(context).size.width < 800;
+
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Livraison / Approvisionnement')),

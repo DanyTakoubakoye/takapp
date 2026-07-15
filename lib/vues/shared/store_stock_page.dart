@@ -4,10 +4,16 @@ import 'package:takapp/modeles/store_stock_model.dart';
 import 'package:takapp/services/store_stock_service.dart';
 
 class StoreStockPage extends StatelessWidget {
+  final String establishmentId;
   final String store;
   final String title;
 
-  const StoreStockPage({super.key, required this.store, required this.title});
+  const StoreStockPage({
+    super.key,
+    required this.establishmentId,
+    required this.store,
+    required this.title,
+  });
 
   Color _storeColor() {
     switch (store) {
@@ -44,7 +50,10 @@ class StoreStockPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: StreamBuilder<List<StoreStockModel>>(
-        stream: service.streamStocksForStore(store),
+        stream: service.streamStocksForStore(
+          establishmentId: establishmentId,
+          store: store,
+        ),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -79,6 +88,7 @@ class StoreStockPage extends StatelessWidget {
               separatorBuilder: (_, __) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
                 final item = stocks[index];
+
                 return Card(
                   child: ListTile(
                     leading: CircleAvatar(
@@ -90,6 +100,7 @@ class StoreStockPage extends StatelessWidget {
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     subtitle: Text(
+                      'Magasin : ${item.store}\n'
                       'Unité : ${item.unit}\n'
                       'Mis à jour : ${item.updatedAt == null ? "-" : DateFormat('dd/MM/yyyy HH:mm').format(item.updatedAt!)}',
                     ),
@@ -119,6 +130,7 @@ class StoreStockPage extends StatelessWidget {
                   columnSpacing: 20,
                   columns: const [
                     DataColumn(label: Text('Article')),
+                    DataColumn(label: Text('Magasin')),
                     DataColumn(label: Text('Unité')),
                     DataColumn(label: Text('Quantité')),
                     DataColumn(label: Text('Dernière mise à jour')),
@@ -127,6 +139,7 @@ class StoreStockPage extends StatelessWidget {
                     return DataRow(
                       cells: [
                         DataCell(Text(item.itemName)),
+                        DataCell(Text(item.store)),
                         DataCell(Text(item.unit)),
                         DataCell(
                           Text(

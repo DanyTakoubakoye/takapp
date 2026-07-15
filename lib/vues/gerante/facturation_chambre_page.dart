@@ -63,6 +63,17 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   bool _isSmallScreen(BuildContext context) =>
       MediaQuery.of(context).size.width < 900;
 
+  String _establishmentId(BuildContext context) {
+    final user = context.read<AuthController>().currentUser;
+    return user?.establishmentId.trim() ?? '';
+  }
+
+  void _showSnack(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   void _invalidateCurrentInvoice() {
     if (currentInvoiceId != null || isCurrentInvoiceFiscalized) {
       setState(() {
@@ -104,43 +115,41 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   }
 
   Future<void> _printFiscalizedInvoice() async {
-    if (currentInvoiceId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez d’abord enregistrer la facture.'),
-        ),
-      );
+    final establishmentId = _establishmentId(context);
+
+    if (establishmentId.isEmpty) {
+      _showSnack('Établissement introuvable.');
       return;
     }
 
-    final invoice = await _service.getInvoiceById(currentInvoiceId!);
+    if (currentInvoiceId == null) {
+      _showSnack('Veuillez d’abord enregistrer la facture.');
+      return;
+    }
+
+    final invoice = await _service.getInvoiceById(
+      establishmentId: establishmentId,
+      invoiceId: currentInvoiceId!,
+    );
 
     if (!mounted) return;
 
     if (invoice == null) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Facture introuvable.')));
+      _showSnack('Facture introuvable.');
       return;
     }
 
     if (!invoice.isFiscalized ||
         invoice.fiscalMecefCode.trim().isEmpty ||
         invoice.fiscalQrCode.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Cette facture n’est pas encore fiscalisée. Fiscalisez-la d’abord.',
-          ),
-        ),
+      _showSnack(
+        'Cette facture n’est pas encore fiscalisée. Fiscalisez-la d’abord.',
       );
       return;
     }
 
     if (invoice.startDate == null || invoice.endDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Dates de facture invalides.')),
-      );
+      _showSnack('Dates de facture invalides.');
       return;
     }
 
@@ -176,7 +185,10 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   }
 
   Future<void> _loadConsumptionTotal() async {
-    if (roomController.text.trim().isEmpty ||
+    final establishmentId = _establishmentId(context);
+
+    if (establishmentId.isEmpty ||
+        roomController.text.trim().isEmpty ||
         startDate == null ||
         endDate == null) {
       setState(() {
@@ -187,6 +199,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
 
     try {
       final invoice = await _consumptionService.getConsumption(
+        establishmentId: establishmentId,
         roomNumber: roomController.text.trim(),
         startDate: startDate!,
         endDate: endDate!,
@@ -204,25 +217,22 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
         consumptionTotal = 0;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erreur lors du chargement des consommations : $e'),
-        ),
-      );
+      _showSnack('Erreur lors du chargement des consommations : $e');
     }
   }
 
   Future<void> _showConsumptionDetails() async {
+    final establishmentId = _establishmentId(context);
+
+    if (establishmentId.isEmpty) {
+      _showSnack('Établissement introuvable.');
+      return;
+    }
+
     if (roomController.text.trim().isEmpty ||
         startDate == null ||
         endDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Veuillez d’abord renseigner la chambre et la période.',
-          ),
-        ),
-      );
+      _showSnack('Veuillez d’abord renseigner la chambre et la période.');
       return;
     }
 
@@ -238,6 +248,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
             width: isSmall ? double.maxFinite : 700,
             child: FutureBuilder<RoomConsumptionInvoiceModel>(
               future: _consumptionService.getConsumption(
+                establishmentId: establishmentId,
                 roomNumber: roomController.text.trim(),
                 startDate: startDate!,
                 endDate: endDate!,
@@ -337,32 +348,31 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   }
 
   Future<void> _saveInvoice() async {
+    final establishmentId = _establishmentId(context);
+
+    if (establishmentId.isEmpty) {
+      _showSnack('Établissement introuvable.');
+      return;
+    }
+
     if (clientController.text.trim().isEmpty ||
         roomController.text.trim().isEmpty ||
         startDate == null ||
         endDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Champs obligatoires manquants')),
-      );
+      _showSnack('Champs obligatoires manquants');
       return;
     }
 
     if (startDate!.isAfter(endDate!)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'La date d’entrée doit être antérieure ou égale à la date de sortie.',
-          ),
-        ),
+      _showSnack(
+        'La date d’entrée doit être antérieure ou égale à la date de sortie.',
       );
       return;
     }
 
     final pricePerNight = double.tryParse(priceController.text.trim());
     if (pricePerNight == null || pricePerNight <= 0) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Prix de nuitée invalide')));
+      _showSnack('Prix de nuitée invalide');
       return;
     }
 
@@ -370,6 +380,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
 
     try {
       final alreadyExists = await _service.invoiceExists(
+        establishmentId: establishmentId,
         roomNumber: roomController.text.trim(),
         startDate: startDate!,
         endDate: endDate!,
@@ -377,19 +388,24 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
 
       if (alreadyExists) {
         if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Une facture existe déjà pour cette chambre et cette période.',
-            ),
-          ),
+        _showSnack(
+          'Une facture existe déjà pour cette chambre et cette période.',
         );
         return;
       }
 
+      final user = context.read<AuthController>().currentUser;
+
+      if (user == null) {
+        _showSnack('Utilisateur introuvable.');
+        return;
+      }
+
+      final now = DateTime.now();
+
       final invoice = RoomInvoiceModel(
         id: '',
+        establishmentId: establishmentId,
         clientName: clientController.text.trim(),
         clientIfu: clientIfuController.text.trim(),
         clientAddress: clientAddressController.text.trim(),
@@ -420,9 +436,18 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
         fiscalRequestSnapshot: null,
         startDate: startDate,
         endDate: endDate,
+        pendingSync: false,
+        syncError: false,
+        createdBy: user.uid,
+        createdByName: user.name,
+        createdAt: now,
+        updatedAt: now,
       );
 
-      final docRef = await _service.createInvoice(invoice);
+      final docRef = await _service.createInvoice(
+        establishmentId: establishmentId,
+        invoice: invoice,
+      );
 
       if (!mounted) return;
 
@@ -431,21 +456,12 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
         isCurrentInvoiceFiscalized = false;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Facture créée avec succès. Vous pouvez maintenant l’encaisser ou la fiscaliser.',
-          ),
-        ),
+      _showSnack(
+        'Facture créée avec succès. Vous pouvez maintenant l’encaisser ou la fiscaliser.',
       );
     } catch (e) {
       if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erreur lors de l’enregistrement de la facture : $e'),
-        ),
-      );
+      _showSnack('Erreur lors de l’enregistrement de la facture : $e');
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
@@ -535,50 +551,38 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   }
 
   Future<void> _fiscalizeInvoice() async {
-    if (EmcfConfig.sellerIfu.trim().isEmpty ||
-        EmcfConfig.sellerIfu == 'METS_ICI_IFU_ETABLISSEMENT') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez d’abord renseigner EmcfConfig.sellerIfu.'),
-        ),
-      );
+    final auth = context.read<AuthController>();
+    final user = auth.currentUser;
+
+    if (user == null) {
+      _showSnack('Utilisateur introuvable.');
       return;
     }
 
-    if (EmcfConfig.bearerToken.trim().isEmpty ||
-        EmcfConfig.bearerToken == 'METS_ICI_TOKEN_JWT_DGI') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez d’abord renseigner EmcfConfig.bearerToken.'),
-        ),
-      );
+    final establishmentId = user.establishmentId.trim();
+
+    if (establishmentId.isEmpty) {
+      _showSnack('Établissement introuvable.');
       return;
     }
 
     if (currentInvoiceId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez d’abord enregistrer la facture.'),
-        ),
-      );
+      _showSnack('Veuillez d’abord enregistrer la facture.');
       return;
     }
 
     if (isCurrentInvoiceFiscalized) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cette facture est déjà fiscalisée.')),
-      );
+      _showSnack('Cette facture est déjà fiscalisée.');
       return;
     }
 
-    final auth = context.read<AuthController>();
-    final user = auth.currentUser;
-    final sellerName = user?.name ?? 'Operateur';
+    final sellerName = user.name.isNotEmpty ? user.name : 'Operateur';
 
     final request = _buildEmcfRequest(sellerName);
     final fiscalController = context.read<FiscalizationController>();
 
     await fiscalController.fiscalizeInvoice(
+      establishmentId: establishmentId,
       invoiceId: currentInvoiceId!,
       request: request,
     );
@@ -591,21 +595,11 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
         isCurrentInvoiceFiscalized = true;
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Facture fiscalisée. Code MECeF : ${fiscalController.confirmResult!.codeMECeFDGI}',
-          ),
-        ),
+      _showSnack(
+        'Facture fiscalisée avec Certilink. Code MECeF : ${fiscalController.confirmResult!.codeMECeFDGI}',
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            fiscalController.errorMessage ?? 'Échec de fiscalisation',
-          ),
-        ),
-      );
+      _showSnack(fiscalController.errorMessage ?? 'Échec de fiscalisation');
     }
   }
 
@@ -636,11 +630,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
 
   Future<void> _printInvoice() async {
     if (startDate == null || endDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez d’abord renseigner la facture.'),
-        ),
-      );
+      _showSnack('Veuillez d’abord renseigner la facture.');
       return;
     }
 
@@ -690,9 +680,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
                   DropdownMenuItem(value: 'cheque', child: Text('Chèque')),
                 ],
                 onChanged: (v) {
-                  if (v != null) {
-                    method = v;
-                  }
+                  if (v != null) method = v;
                 },
               ),
             ],
@@ -705,9 +693,23 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
             ElevatedButton(
               onPressed: () async {
                 final user = context.read<AuthController>().currentUser;
-                if (user == null) return;
+
+                if (user == null) {
+                  Navigator.pop(context);
+                  _showSnack('Utilisateur introuvable.');
+                  return;
+                }
+
+                final establishmentId = user.establishmentId.trim();
+
+                if (establishmentId.isEmpty) {
+                  Navigator.pop(context);
+                  _showSnack('Établissement introuvable.');
+                  return;
+                }
 
                 await _service.payInvoice(
+                  establishmentId: establishmentId,
                   invoiceId: invoiceId,
                   amount: total,
                   method: method,
@@ -722,10 +724,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
                 });
 
                 Navigator.pop(context);
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Paiement enregistré')),
-                );
+                _showSnack('Paiement enregistré');
               },
               child: const Text('Valider'),
             ),
@@ -749,21 +748,40 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthController>();
+    final user = auth.currentUser;
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text('Utilisateur introuvable.')),
+      );
+    }
+
+    final establishmentId = user.establishmentId.trim();
+
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
     final isSmall = _isSmallScreen(context);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Facturation Chambre')),
-      body: isSmall ? _buildMobileLayout() : _buildDesktopLayout(),
+      body: isSmall
+          ? _buildMobileLayout(establishmentId: establishmentId)
+          : _buildDesktopLayout(establishmentId: establishmentId),
     );
   }
 
-  Widget _buildMobileLayout() {
+  Widget _buildMobileLayout({required String establishmentId}) {
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            _buildForm(isMobile: true),
+            _buildForm(isMobile: true, establishmentId: establishmentId),
             const SizedBox(height: 12),
             _buildSummary(isMobile: true),
           ],
@@ -772,12 +790,18 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
     );
   }
 
-  Widget _buildDesktopLayout() {
+  Widget _buildDesktopLayout({required String establishmentId}) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          Expanded(flex: 2, child: _buildForm(isMobile: false)),
+          Expanded(
+            flex: 2,
+            child: _buildForm(
+              isMobile: false,
+              establishmentId: establishmentId,
+            ),
+          ),
           const SizedBox(width: 16),
           Expanded(flex: 3, child: _buildSummary(isMobile: false)),
         ],
@@ -785,7 +809,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
     );
   }
 
-  Widget _buildForm({required bool isMobile}) {
+  Widget _buildForm({required bool isMobile, required String establishmentId}) {
     return Card(
       child: Padding(
         padding: EdgeInsets.all(isMobile ? 12 : 16),
@@ -957,7 +981,9 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const RechercheFactureChambrePage(),
+                      builder: (_) => RechercheFactureChambrePage(
+                        establishmentId: establishmentId,
+                      ),
                     ),
                   );
                 },
@@ -1026,19 +1052,12 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
               isBold: true,
             ),
             const SizedBox(height: 16),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: () {
                   if (currentInvoiceId == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Veuillez d’abord enregistrer la facture.',
-                        ),
-                      ),
-                    );
+                    _showSnack('Veuillez d’abord enregistrer la facture.');
                     return;
                   }
 
@@ -1049,7 +1068,6 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
               ),
             ),
             SizedBox(height: actionSpacing),
-
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
@@ -1059,7 +1077,6 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
               ),
             ),
             SizedBox(height: actionSpacing),
-
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
@@ -1069,7 +1086,6 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
               ),
             ),
             SizedBox(height: actionSpacing),
-
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
@@ -1079,7 +1095,6 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
               ),
             ),
             SizedBox(height: actionSpacing),
-
             Consumer<FiscalizationController>(
               builder: (context, fiscalController, _) {
                 return SizedBox(
@@ -1098,13 +1113,12 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
                     label: Text(
                       isCurrentInvoiceFiscalized
                           ? 'Facture déjà fiscalisée'
-                          : 'Fiscaliser (DGI)',
+                          : 'Fiscaliser avec Certilink',
                     ),
                   ),
                 );
               },
             ),
-
             const SizedBox(height: 12),
             if (currentInvoiceId != null)
               Container(

@@ -6,12 +6,14 @@ import 'package:takapp/modeles/store_stock_model.dart';
 import 'package:takapp/services/store_stock_service.dart';
 
 class StockOutPage extends StatefulWidget {
+  final String establishmentId;
   final String store;
   final String title;
   final String defaultReason;
 
   const StockOutPage({
     super.key,
+    required this.establishmentId,
     required this.store,
     required this.title,
     required this.defaultReason,
@@ -23,7 +25,6 @@ class StockOutPage extends StatefulWidget {
 
 class _StockOutPageState extends State<StockOutPage> {
   final TextEditingController _reasonController = TextEditingController();
-
   final List<_StockOutLineInput> _lines = [_StockOutLineInput()];
 
   Color _storeColor() {
@@ -56,6 +57,8 @@ class _StockOutPageState extends State<StockOutPage> {
       ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
       return;
     }
+
+    bool hasValidLine = false;
 
     for (int i = 0; i < _lines.length; i++) {
       final line = _lines[i];
@@ -97,7 +100,10 @@ class _StockOutPageState extends State<StockOutPage> {
         return;
       }
 
+      hasValidLine = true;
+
       final success = await controller.removeStock(
+        establishmentId: widget.establishmentId,
         store: widget.store,
         itemId: selected.itemId,
         itemName: selected.itemName,
@@ -112,6 +118,7 @@ class _StockOutPageState extends State<StockOutPage> {
 
       if (!success) {
         if (!mounted) return;
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(controller.errorMessage ?? 'Erreur inconnue.'),
@@ -119,6 +126,13 @@ class _StockOutPageState extends State<StockOutPage> {
         );
         return;
       }
+    }
+
+    if (!hasValidLine) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Ajoute au moins une sortie de stock.')),
+      );
+      return;
     }
 
     if (!mounted) return;
@@ -148,7 +162,10 @@ class _StockOutPageState extends State<StockOutPage> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: StreamBuilder<List<StoreStockModel>>(
-        stream: stockService.streamStocksForStore(widget.store),
+        stream: stockService.streamStocksForStore(
+          establishmentId: widget.establishmentId,
+          store: widget.store,
+        ),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -205,6 +222,7 @@ class _StockOutPageState extends State<StockOutPage> {
                 const SizedBox(height: 14),
                 ...List.generate(_lines.length, (index) {
                   final line = _lines[index];
+
                   return Card(
                     margin: const EdgeInsets.only(bottom: 10),
                     child: Padding(
@@ -242,6 +260,7 @@ class _StockOutPageState extends State<StockOutPage> {
                             items: stocks.map((item) {
                               final label =
                                   '${item.itemName} (${item.unit}) - stock: ${item.quantity.toStringAsFixed(item.quantity % 1 == 0 ? 0 : 2)}';
+
                               return DropdownMenuItem<String>(
                                 value: item.itemId,
                                 child: Text(label),

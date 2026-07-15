@@ -5,44 +5,82 @@ import 'package:takapp/modeles/order_item_model.dart';
 
 class CuisineService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   final FirebaseFunctions _functions = FirebaseFunctions.instanceFor(
     region: 'us-central1',
   );
 
-  Stream<List<KitchenOrderModel>> streamKitchenOrders() {
+  /// =========================
+  /// HELPERS
+  /// =========================
+
+  CollectionReference<Map<String, dynamic>> _ordersRef({
+    required String establishmentId,
+  }) {
     return _firestore
-        .collection('orders')
-        .orderBy('createdAt', descending: false)
+        .collection('establishments')
+        .doc(establishmentId)
+        .collection('orders');
+  }
+
+  /// =========================
+  /// STREAM COMMANDES CUISINE
+  /// =========================
+
+  Stream<List<KitchenOrderModel>> streamKitchenOrders({
+    required String establishmentId,
+  }) {
+    return _ordersRef(establishmentId: establishmentId)
+        .where('isForKitchen', isEqualTo: true)
+        .orderBy('createdAt', descending: true)
         .limit(100)
         .snapshots()
         .map((snapshot) {
           return snapshot.docs
               .map((doc) => KitchenOrderModel.fromMap(doc.data(), doc.id))
-              .where((order) => order.isForKitchen)
+              .where((order) {
+                return order.kitchenStatus != 'cancelled' &&
+                    order.kitchenStatus != 'served';
+              })
               .toList();
         });
   }
 
-  Future<List<OrderItemModel>> getKitchenItemsForOrder(String orderId) async {
-    final snapshot = await _firestore
-        .collection('orders')
+  /// =========================
+  /// ITEMS D’UNE COMMANDE
+  /// =========================
+
+  Future<List<OrderItemModel>> getKitchenItemsForOrder({
+    required String establishmentId,
+    required String orderId,
+  }) async {
+    final snapshot = await _ordersRef(establishmentId: establishmentId)
         .doc(orderId)
         .collection('items')
-        .where('targetDepartment', isEqualTo: 'kitchen')
+        .where('targetDepartment', whereIn: ['kitchen', 'cuisine'])
         .get();
 
-    return snapshot.docs
-        .map((doc) => OrderItemModel.fromMap(doc.data()))
-        .toList();
+    return snapshot.docs.map((doc) {
+      return OrderItemModel.fromMap(doc.data(), id: doc.id);
+    }).toList();
   }
 
+  /// =========================
+  /// UPDATE STATUS CUISINE
+  /// =========================
+
   Future<void> updateKitchenStatus({
+    required String establishmentId,
     required String orderId,
     required String newKitchenStatus,
   }) async {
-    final orderRef = _firestore.collection('orders').doc(orderId);
+    final orderRef = _ordersRef(establishmentId: establishmentId).doc(orderId);
 
-    final updates = <String, dynamic>{'kitchenStatus': newKitchenStatus};
+    final updates = <String, dynamic>{
+      'kitchenStatus': newKitchenStatus,
+
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
 
     if (newKitchenStatus == 'ready') {
       updates['status'] = 'ready';
@@ -56,10 +94,24 @@ class CuisineService {
 
     await orderRef.update(updates);
 
+    /// =========================
+    /// NOTIFICATION CUISINE
+    /// =========================
+
     if (newKitchenStatus == 'ready') {
-      print('APPEL notifyKitchenReady pour orderId=$orderId');
+      print(
+        'APPEL notifyKitchenReady '
+        'pour orderId=$orderId '
+        'establishmentId=$establishmentId',
+      );
+
       final callable = _functions.httpsCallable('notifyKitchenReady');
-      await callable.call({'orderId': orderId});
+
+      await callable.call({
+        'orderId': orderId,
+
+        'establishmentId': establishmentId,
+      });
     }
   }
 }

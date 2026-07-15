@@ -3,7 +3,9 @@ import 'package:takapp/modeles/stock_item_model.dart';
 import 'package:takapp/services/stock_item_service.dart';
 
 class StockItemRegistryPage extends StatefulWidget {
-  const StockItemRegistryPage({super.key});
+  final String establishmentId;
+
+  const StockItemRegistryPage({super.key, required this.establishmentId});
 
   @override
   State<StockItemRegistryPage> createState() => _StockItemRegistryPageState();
@@ -42,6 +44,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
 
     try {
       await _service.createItem(
+        establishmentId: widget.establishmentId,
         name: _nameController.text.trim(),
         category: _selectedCategory,
         unit: _unitController.text.trim(),
@@ -50,17 +53,20 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
 
       _nameController.clear();
       _unitController.clear();
+
       setState(() {
         _selectedCategory = 'Céréales';
         _selectedStore = 'restaurant';
       });
 
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Article enregistré avec succès.')),
       );
     } catch (e) {
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erreur lors de l’enregistrement : $e')),
       );
@@ -176,7 +182,9 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
         color: const Color(0xfff5f7fb),
         child: SafeArea(
           child: StreamBuilder<List<StockItemModel>>(
-            stream: _service.streamItems(),
+            stream: _service.streamItems(
+              establishmentId: widget.establishmentId,
+            ),
             builder: (context, snapshot) {
               final items = snapshot.data ?? [];
 

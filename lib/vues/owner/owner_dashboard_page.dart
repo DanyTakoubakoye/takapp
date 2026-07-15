@@ -1,6 +1,8 @@
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/services/owner_dashboard_service.dart';
@@ -9,7 +11,8 @@ import 'package:takapp/services/printer_service.dart';
 import 'package:takapp/vues/comptabilite/soldes_precedents_page.dart';
 
 class OwnerDashboardPage extends StatefulWidget {
-  const OwnerDashboardPage({super.key});
+  final String establishmentId;
+  const OwnerDashboardPage({super.key, required this.establishmentId});
 
   @override
   State<OwnerDashboardPage> createState() => _OwnerDashboardPageState();
@@ -19,19 +22,51 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
   final OwnerDashboardService service = OwnerDashboardService();
 
   String selectedPeriod = '7d';
+
   late DateTime startDate;
   late DateTime endDate;
 
   bool isLoading = true;
+
   String? errorMessage;
+
   Map<String, double> balancesByType = {};
 
   final Map<String, TextEditingController> physicalControllers = {};
+  final FirebaseFunctions _functions = FirebaseFunctions.instanceFor(
+    region: 'us-central1',
+  );
+
+  String establishmentId = '';
 
   @override
   void initState() {
     super.initState();
-    _applyPeriod('7d');
+
+    final now = DateTime.now();
+    final from = now.subtract(const Duration(days: 7));
+
+    selectedPeriod = '7d';
+    startDate = DateTime(from.year, from.month, from.day, 0, 0, 0);
+    endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      final auth = context.read<AuthController>();
+      final user = auth.currentUser;
+
+      if (user == null || user.establishmentId.trim().isEmpty) {
+        setState(() {
+          isLoading = false;
+          errorMessage = 'Établissement introuvable.';
+        });
+        return;
+      }
+
+      establishmentId = user.establishmentId.trim();
+      _load();
+    });
   }
 
   @override
@@ -39,6 +74,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     for (final c in physicalControllers.values) {
       c.dispose();
     }
+
     super.dispose();
   }
 
@@ -49,18 +85,72 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
 
     if (period == 'today') {
       startDate = DateTime(now.year, now.month, now.day, 0, 0, 0);
+
       endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
     } else if (period == '7d') {
       final from = now.subtract(const Duration(days: 7));
+
       startDate = DateTime(from.year, from.month, from.day, 0, 0, 0);
+
       endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
     } else {
       final from = now.subtract(const Duration(days: 30));
+
       startDate = DateTime(from.year, from.month, from.day, 0, 0, 0);
+
       endDate = DateTime(now.year, now.month, now.day, 23, 59, 59);
     }
 
     _load();
+  }
+
+  Future<void> _openCreateUserDialog() async {
+    final auth = context.read<AuthController>();
+    final user = auth.currentUser;
+
+    if (user == null || user.establishmentId.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Établissement introuvable.')),
+      );
+      return;
+    }
+
+    await showDialog<void>(
+      context: context,
+      builder: (_) => _CreateTenantUserDialog(onSubmit: _createTenantUser),
+    );
+  }
+
+  Future<void> _createTenantUser({
+    required String name,
+    required String email,
+    required String password,
+    required String phone,
+    required String role,
+  }) async {
+    try {
+      await _functions.httpsCallable('createTenantUser').call({
+        'name': name,
+        'email': email,
+        'password': password,
+        'phone': phone,
+        'role': role,
+      });
+
+      if (!mounted) return;
+
+      Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Utilisateur créé avec succès.')),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur création utilisateur : $e')),
+      );
+    }
   }
 
   Future<void> _pickCustomPeriod() async {
@@ -74,6 +164,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     if (picked != null) {
       setState(() {
         selectedPeriod = 'custom';
+
         startDate = DateTime(
           picked.start.year,
           picked.start.month,
@@ -82,6 +173,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
           0,
           0,
         );
+
         endDate = DateTime(
           picked.end.year,
           picked.end.month,
@@ -97,6 +189,14 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
   }
 
   Future<void> _load() async {
+    if (establishmentId.trim().isEmpty) {
+      setState(() {
+        isLoading = false;
+        errorMessage = 'Établissement introuvable.';
+      });
+      return;
+    }
+
     setState(() {
       isLoading = true;
       errorMessage = null;
@@ -104,6 +204,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
 
     try {
       final result = await service.getTheoreticalBalancesByType(
+        establishmentId: establishmentId,
         startDate: startDate,
         endDate: endDate,
       );
@@ -111,6 +212,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
       for (final key in result.keys) {
         physicalControllers.putIfAbsent(key, () => TextEditingController());
       }
+
       physicalControllers.putIfAbsent(
         '__total__',
         () => TextEditingController(),
@@ -124,9 +226,11 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
         errorMessage = e.toString();
       });
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -139,17 +243,21 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     required double physical,
   }) async {
     final auth = context.read<AuthController>();
+
     final user = auth.currentUser;
+
     if (user == null) return;
 
     if (theoretical != physical) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Montants non équivalents.')),
       );
+
       return;
     }
 
     await service.validateAccountBalance(
+      establishmentId: establishmentId,
       accountType: accountType,
       theoreticalAmount: theoretical,
       physicalAmount: physical,
@@ -158,9 +266,12 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     );
 
     final pdfService = context.read<PdfService>();
+
     final printerService = context.read<PrinterService>();
 
     final bytes = await pdfService.buildQuitusPdf(
+      establishmentName: user.establishmentName,
+      establishmentId: user.establishmentId,
       accountType: accountType,
       theoreticalAmount: theoretical,
       physicalAmount: physical,
@@ -171,6 +282,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     await printerService.printPdf(Uint8List.fromList(bytes));
 
     if (!mounted) return;
+
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(const SnackBar(content: Text('Quitus généré.')));
@@ -179,17 +291,45 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthController>();
+
     final formatter = DateFormat('dd/MM/yyyy');
+
+    final user = auth.currentUser;
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text('Utilisateur introuvable.')),
+      );
+    }
+
+    establishmentId = user.establishmentId.trim();
+
+    if (establishmentId.isEmpty) {
+      return Scaffold(
+        body: Center(
+          child: Text(
+            '${user.establishmentName.isNotEmpty == true ? user.establishmentName : 'TAKHOTEL'} - Propriétaire',
+          ),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TAKHOTEL - Propriétaire'),
+        title: Text(
+          '${user.establishmentName.isNotEmpty == true ? user.establishmentName : 'TAKHOTEL'} - Propriétaire',
+        ),
         actions: [
           IconButton(
             onPressed: () => context.read<AuthController>().logout(),
             icon: const Icon(Icons.logout),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _openCreateUserDialog,
+        icon: const Icon(Icons.person_add_alt_1),
+        label: const Text('Créer utilisateur'),
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -296,7 +436,9 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const SoldesPrecedentsPage(),
+                              builder: (_) => SoldesPrecedentsPage(
+                                establishmentId: establishmentId,
+                              ),
                             ),
                           );
                         },
@@ -355,7 +497,9 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const SoldesPrecedentsPage(),
+                          builder: (_) => SoldesPrecedentsPage(
+                            establishmentId: establishmentId,
+                          ),
                         ),
                       );
                     },
@@ -608,6 +752,159 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
               ),
             ],
           ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CreateTenantUserDialog extends StatefulWidget {
+  final Future<void> Function({
+    required String name,
+    required String email,
+    required String password,
+    required String phone,
+    required String role,
+  })
+  onSubmit;
+
+  const _CreateTenantUserDialog({required this.onSubmit});
+
+  @override
+  State<_CreateTenantUserDialog> createState() =>
+      _CreateTenantUserDialogState();
+}
+
+class _CreateTenantUserDialogState extends State<_CreateTenantUserDialog> {
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  bool isSaving = false;
+
+  String selectedRole = 'serveur';
+
+  final List<Map<String, String>> roles = const [
+    {'value': 'gerante', 'label': 'Gérante'},
+    {'value': 'comptable', 'label': 'Comptable'},
+    {'value': 'serveur', 'label': 'Serveur'},
+    {'value': 'barman', 'label': 'Barman'},
+    {'value': 'chef_cuisine', 'label': 'Chef cuisine'},
+    {'value': 'service_hygiene', 'label': 'Service hygiène'},
+    {'value': 'majordhomme', 'label': 'Majordhomme'},
+  ];
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final name = nameController.text.trim();
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final phone = phoneController.text.trim();
+
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Nom, email et mot de passe temporaire obligatoires.'),
+        ),
+      );
+      return;
+    }
+
+    setState(() => isSaving = true);
+
+    await widget.onSubmit(
+      name: name,
+      email: email,
+      password: password,
+      phone: phone,
+      role: selectedRole,
+    );
+
+    if (mounted) {
+      setState(() => isSaving = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Créer un utilisateur'),
+      insetPadding: const EdgeInsets.all(16),
+      content: SizedBox(
+        width: 560,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'Nom complet *'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(labelText: 'Email *'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: phoneController,
+                keyboardType: TextInputType.phone,
+                decoration: const InputDecoration(labelText: 'Téléphone'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Mot de passe temporaire *',
+                ),
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                value: selectedRole,
+                decoration: const InputDecoration(labelText: 'Rôle'),
+                items: roles.map((role) {
+                  return DropdownMenuItem<String>(
+                    value: role['value'],
+                    child: Text(role['label']!),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value == null) return;
+
+                  setState(() {
+                    selectedRole = value;
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: isSaving ? null : () => Navigator.pop(context),
+          child: const Text('Annuler'),
+        ),
+        ElevatedButton.icon(
+          onPressed: isSaving ? null : _submit,
+          icon: isSaving
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.person_add_alt_1),
+          label: const Text('Créer'),
         ),
       ],
     );

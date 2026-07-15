@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import '../../controllers/auth_controller.dart';
 import '../../controllers/serveur_controller.dart';
 
 class EnregistrerServeurPage extends StatefulWidget {
@@ -13,7 +15,9 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _nomController = TextEditingController();
+
   final TextEditingController _telephoneController = TextEditingController();
+
   final TextEditingController _emailController = TextEditingController();
 
   @override
@@ -25,14 +29,36 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
+    final auth = context.read<AuthController>();
     final controller = context.read<ServeurController>();
 
+    final user = auth.currentUser;
+
+    if (user == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
+      return;
+    }
+
+    final establishmentId = user.establishmentId.trim();
+
+    if (establishmentId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Établissement introuvable.')),
+      );
+      return;
+    }
+
     final error = await controller.enregistrerServeur(
-      nomComplet: _nomController.text,
-      telephone: _telephoneController.text,
-      email: _emailController.text,
+      establishmentId: establishmentId,
+      nomComplet: _nomController.text.trim(),
+      telephone: _telephoneController.text.trim(),
+      email: _emailController.text.trim(),
     );
 
     if (!mounted) return;
@@ -55,6 +81,21 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthController>();
+    final user = auth.currentUser;
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text('Utilisateur introuvable.')),
+      );
+    }
+
+    if (user.establishmentId.trim().isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
     return Consumer<ServeurController>(
       builder: (context, controller, child) {
         return Scaffold(
@@ -87,7 +128,6 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
                             ),
                           ),
                           const SizedBox(height: 20),
-
                           TextFormField(
                             controller: _nomController,
                             decoration: const InputDecoration(
@@ -98,11 +138,11 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
                               if (value == null || value.trim().isEmpty) {
                                 return "Veuillez renseigner le nom complet";
                               }
+
                               return null;
                             },
                           ),
                           const SizedBox(height: 16),
-
                           TextFormField(
                             controller: _telephoneController,
                             keyboardType: TextInputType.phone,
@@ -114,14 +154,15 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
                               if (value == null || value.trim().isEmpty) {
                                 return "Veuillez renseigner le téléphone";
                               }
+
                               if (value.trim().length < 8) {
                                 return "Numéro trop court";
                               }
+
                               return null;
                             },
                           ),
                           const SizedBox(height: 16),
-
                           TextFormField(
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
@@ -133,17 +174,19 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
                               if (value == null || value.trim().isEmpty) {
                                 return "Veuillez renseigner l'email";
                               }
+
                               final emailRegex = RegExp(
                                 r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
                               );
+
                               if (!emailRegex.hasMatch(value.trim())) {
                                 return "Email invalide";
                               }
+
                               return null;
                             },
                           ),
                           const SizedBox(height: 24),
-
                           SizedBox(
                             height: 50,
                             child: ElevatedButton(

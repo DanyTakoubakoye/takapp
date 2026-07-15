@@ -8,16 +8,19 @@ class HandoverController extends ChangeNotifier {
   HandoverController(this._handoverService);
 
   final List<PaymentModel> _selectedPayments = [];
+
   bool _isSubmitting = false;
   String? _errorMessage;
 
-  List<PaymentModel> get selectedPayments =>
-      List.unmodifiable(_selectedPayments);
+  List<PaymentModel> get selectedPayments {
+    return List.unmodifiable(_selectedPayments);
+  }
+
   bool get isSubmitting => _isSubmitting;
   String? get errorMessage => _errorMessage;
 
   double get selectedTotal {
-    return _selectedPayments.fold(0, (sum, item) => sum + item.amount);
+    return _selectedPayments.fold<double>(0, (sum, item) => sum + item.amount);
   }
 
   bool isSelected(String paymentId) {
@@ -43,9 +46,16 @@ class HandoverController extends ChangeNotifier {
   }
 
   Future<bool> submitHandover({
+    required String establishmentId,
     required String serveurId,
     required String serveurName,
   }) async {
+    if (establishmentId.trim().isEmpty) {
+      _errorMessage = 'Établissement introuvable.';
+      notifyListeners();
+      return false;
+    }
+
     if (_selectedPayments.isEmpty) {
       _errorMessage = 'Veuillez sélectionner au moins un paiement.';
       notifyListeners();
@@ -58,6 +68,7 @@ class HandoverController extends ChangeNotifier {
 
     try {
       await _handoverService.createHandover(
+        establishmentId: establishmentId,
         serveurId: serveurId,
         serveurName: serveurName,
         declaredAmount: selectedTotal,

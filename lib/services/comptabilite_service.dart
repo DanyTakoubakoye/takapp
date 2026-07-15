@@ -6,9 +6,23 @@ import 'package:takapp/modeles/manager_transfer_model.dart';
 class ComptabiliteService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Stream<List<ManagerTransferModel>> streamPendingTransfers() {
+  CollectionReference<Map<String, dynamic>> _collectionRef({
+    required String establishmentId,
+    required String collectionName,
+  }) {
     return _firestore
-        .collection('managerToAccountingTransfers')
+        .collection('establishments')
+        .doc(establishmentId)
+        .collection(collectionName);
+  }
+
+  Stream<List<ManagerTransferModel>> streamPendingTransfers({
+    required String establishmentId,
+  }) {
+    return _collectionRef(
+          establishmentId: establishmentId,
+          collectionName: 'managerToAccountingTransfers',
+        )
         .where('status', isEqualTo: 'pending')
         .orderBy('createdAt', descending: true)
         .snapshots()
@@ -19,9 +33,13 @@ class ComptabiliteService {
         );
   }
 
-  Stream<List<ManagerTransferModel>> streamReceivedTransfers() {
-    return _firestore
-        .collection('managerToAccountingTransfers')
+  Stream<List<ManagerTransferModel>> streamReceivedTransfers({
+    required String establishmentId,
+  }) {
+    return _collectionRef(
+          establishmentId: establishmentId,
+          collectionName: 'managerToAccountingTransfers',
+        )
         .where('status', isEqualTo: 'received')
         .orderBy('receivedAt', descending: true)
         .snapshots()
@@ -32,9 +50,11 @@ class ComptabiliteService {
         );
   }
 
-  Stream<List<ExpenseModel>> streamExpenses() {
-    return _firestore
-        .collection('expenses')
+  Stream<List<ExpenseModel>> streamExpenses({required String establishmentId}) {
+    return _collectionRef(
+          establishmentId: establishmentId,
+          collectionName: 'expenses',
+        )
         .orderBy('createdAt', descending: true)
         .limit(100)
         .snapshots()
@@ -45,9 +65,13 @@ class ComptabiliteService {
         );
   }
 
-  Stream<List<AccountBalanceModel>> streamOpeningBalances() {
-    return _firestore
-        .collection('accountOpeningBalances')
+  Stream<List<AccountBalanceModel>> streamOpeningBalances({
+    required String establishmentId,
+  }) {
+    return _collectionRef(
+          establishmentId: establishmentId,
+          collectionName: 'accountOpeningBalances',
+        )
         .orderBy('type')
         .snapshots()
         .map(
@@ -57,37 +81,49 @@ class ComptabiliteService {
         );
   }
 
-  Stream<QuerySnapshot> streamManagerTransfers() {
-    return _firestore
-        .collection('managerToAccountingTransfers')
-        .where('status', isEqualTo: 'pending')
-        .snapshots();
+  Stream<QuerySnapshot<Map<String, dynamic>>> streamManagerTransfers({
+    required String establishmentId,
+  }) {
+    return _collectionRef(
+      establishmentId: establishmentId,
+      collectionName: 'managerToAccountingTransfers',
+    ).where('status', isEqualTo: 'pending').snapshots();
   }
 
-  Future<void> confirmManagerTransfer(String id) async {
-    await _firestore.collection('managerToAccountingTransfers').doc(id).update({
+  Future<void> confirmManagerTransfer({
+    required String establishmentId,
+    required String id,
+  }) async {
+    await _collectionRef(
+      establishmentId: establishmentId,
+      collectionName: 'managerToAccountingTransfers',
+    ).doc(id).update({
       'status': 'received',
       'receivedAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
     });
   }
 
   Future<void> confirmTransferReception({
+    required String establishmentId,
     required String transferId,
     required String accountingId,
     required String accountingName,
   }) async {
-    await _firestore
-        .collection('managerToAccountingTransfers')
-        .doc(transferId)
-        .update({
-          'status': 'received',
-          'receivedByAccountingId': accountingId,
-          'receivedByAccountingName': accountingName,
-          'receivedAt': FieldValue.serverTimestamp(),
-        });
+    await _collectionRef(
+      establishmentId: establishmentId,
+      collectionName: 'managerToAccountingTransfers',
+    ).doc(transferId).update({
+      'status': 'received',
+      'receivedByAccountingId': accountingId,
+      'receivedByAccountingName': accountingName,
+      'receivedAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
   }
 
   Future<void> createExpense({
+    required String establishmentId,
     required String label,
     required String category,
     required String accountType,
@@ -95,34 +131,51 @@ class ComptabiliteService {
     required String createdBy,
     required String createdByName,
   }) async {
-    await _firestore.collection('expenses').add({
+    await _collectionRef(
+      establishmentId: establishmentId,
+      collectionName: 'expenses',
+    ).add({
+      'establishmentId': establishmentId,
       'label': label,
       'category': category,
       'accountType': accountType,
       'amount': amount,
       'createdBy': createdBy,
       'createdByName': createdByName,
+      'pendingSync': false,
+      'syncError': false,
       'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
     });
   }
 
   Future<void> setOpeningBalance({
+    required String establishmentId,
     required String type,
     required double amount,
     required DateTime date,
     required String createdBy,
     required String createdByName,
   }) async {
-    await _firestore.collection('accountOpeningBalances').doc(type).set({
+    await _collectionRef(
+      establishmentId: establishmentId,
+      collectionName: 'accountOpeningBalances',
+    ).doc(type).set({
+      'establishmentId': establishmentId,
       'type': type,
       'amount': amount,
       'date': Timestamp.fromDate(date),
       'createdBy': createdBy,
       'createdByName': createdByName,
-    });
+      'pendingSync': false,
+      'syncError': false,
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 
   Future<Map<String, dynamic>> getWeeklySummary({
+    required String establishmentId,
     required DateTime startDate,
     required DateTime endDate,
   }) async {
@@ -137,29 +190,41 @@ class ComptabiliteService {
 
     final end = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
 
-    final managerTransfersSnapshot = await _firestore
-        .collection('managerToAccountingTransfers')
-        .where('status', isEqualTo: 'received')
-        .where('receivedAt', isGreaterThanOrEqualTo: start)
-        .where('receivedAt', isLessThanOrEqualTo: end)
-        .get();
+    final managerTransfersSnapshot =
+        await _collectionRef(
+              establishmentId: establishmentId,
+              collectionName: 'managerToAccountingTransfers',
+            )
+            .where('status', isEqualTo: 'received')
+            .where(
+              'receivedAt',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(start),
+            )
+            .where('receivedAt', isLessThanOrEqualTo: Timestamp.fromDate(end))
+            .get();
 
-    final expensesSnapshot = await _firestore
-        .collection('expenses')
-        .where('createdAt', isGreaterThanOrEqualTo: start)
-        .where('createdAt', isLessThanOrEqualTo: end)
-        .get();
+    final expensesSnapshot =
+        await _collectionRef(
+              establishmentId: establishmentId,
+              collectionName: 'expenses',
+            )
+            .where(
+              'createdAt',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(start),
+            )
+            .where('createdAt', isLessThanOrEqualTo: Timestamp.fromDate(end))
+            .get();
 
-    final balancesSnapshot = await _firestore
-        .collection('accountOpeningBalances')
-        .get();
+    final balancesSnapshot = await _collectionRef(
+      establishmentId: establishmentId,
+      collectionName: 'accountOpeningBalances',
+    ).get();
 
     final double totalEntries = managerTransfersSnapshot.docs.fold<double>(0, (
       sum,
       doc,
     ) {
       final data = doc.data();
-      if (data.isEmpty) return sum;
       final amount = ((data['amount'] ?? 0) as num).toDouble();
       return sum + amount;
     });
@@ -169,7 +234,6 @@ class ComptabiliteService {
       doc,
     ) {
       final data = doc.data();
-      if (data.isEmpty) return sum;
       final amount = ((data['amount'] ?? 0) as num).toDouble();
       return sum + amount;
     });
@@ -179,12 +243,12 @@ class ComptabiliteService {
       doc,
     ) {
       final data = doc.data();
-      if (data.isEmpty) return sum;
       final amount = ((data['amount'] ?? 0) as num).toDouble();
       return sum + amount;
     });
 
     return {
+      'establishmentId': establishmentId,
       'entries': totalEntries,
       'expenses': totalExpenses,
       'openingBalances': totalOpeningBalances,

@@ -12,22 +12,36 @@ class OwnerDashboardController extends ChangeNotifier {
   Map<String, double> _balancesByType = {};
 
   bool get isLoading => _isLoading;
-  String? get errorMessage => _errorMessage;
-  Map<String, double> get balancesByType => _balancesByType;
 
-  double get totalBalance =>
-      _balancesByType.values.fold(0, (sum, item) => sum + item);
+  String? get errorMessage => _errorMessage;
+
+  Map<String, double> get balancesByType {
+    return _balancesByType;
+  }
+
+  double get totalBalance {
+    return _balancesByType.values.fold<double>(0, (sum, item) => sum + item);
+  }
 
   Future<void> loadBalances({
+    required String establishmentId,
     required DateTime startDate,
     required DateTime endDate,
   }) async {
+    if (establishmentId.trim().isEmpty) {
+      _errorMessage = 'Établissement introuvable.';
+      notifyListeners();
+      return;
+    }
+
     _isLoading = true;
     _errorMessage = null;
+
     notifyListeners();
 
     try {
       final result = await _service.getTheoreticalBalancesByType(
+        establishmentId: establishmentId,
         startDate: startDate,
         endDate: endDate,
       );
@@ -39,5 +53,10 @@ class OwnerDashboardController extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void clearBalances() {
+    _balancesByType = {};
+    notifyListeners();
   }
 }

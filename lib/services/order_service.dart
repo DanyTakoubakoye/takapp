@@ -7,7 +7,24 @@ class OrderService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final StoreStockService _storeStockService = StoreStockService();
 
+  CollectionReference<Map<String, dynamic>> _ordersRef(String establishmentId) {
+    return _firestore
+        .collection('establishments')
+        .doc(establishmentId)
+        .collection('orders');
+  }
+
+  CollectionReference<Map<String, dynamic>> _menuItemsRef(
+    String establishmentId,
+  ) {
+    return _firestore
+        .collection('establishments')
+        .doc(establishmentId)
+        .collection('menuItems');
+  }
+
   Future<void> createOrder({
+    required String establishmentId,
     required String clientType,
     required String? tableNumber,
     required String? roomNumber,
@@ -19,10 +36,11 @@ class OrderService {
     required List<OrderItemModel> items,
   }) async {
     final now = DateTime.now();
+
     final orderNumber =
         'CMD-${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}-${now.millisecondsSinceEpoch}';
 
-    final docRef = _firestore.collection('orders').doc();
+    final docRef = _ordersRef(establishmentId).doc();
     final batch = _firestore.batch();
 
     bool isForKitchen = false;
@@ -38,22 +56,14 @@ class OrderService {
           .toLowerCase();
 
       final isItemForKitchen =
-          itemMap['isForKitchen'] == true ||
-          targetDepartment == 'kitchen' ||
-          targetDepartment == 'cuisine';
+          targetDepartment == 'kitchen' || targetDepartment == 'cuisine';
 
-      final isItemForBar =
-          itemMap['isForBar'] == true || targetDepartment == 'bar';
+      final isItemForBar = targetDepartment == 'bar';
 
-      if (isItemForKitchen) {
-        isForKitchen = true;
-      }
-      if (isItemForBar) {
-        isForBar = true;
-      }
+      if (isItemForKitchen) isForKitchen = true;
+      if (isItemForBar) isForBar = true;
 
-      final menuItemId = (itemMap['menuItemId'] ?? itemMap['itemId'] ?? '')
-          .toString();
+      final menuItemId = (itemMap['menuItemId'] ?? '').toString();
 
       if (menuItemId.isEmpty) {
         throw Exception(
@@ -61,10 +71,9 @@ class OrderService {
         );
       }
 
-      final menuSnap = await _firestore
-          .collection('menuItems')
-          .doc(menuItemId)
-          .get();
+      final menuSnap = await _menuItemsRef(
+        establishmentId,
+      ).doc(menuItemId).get();
 
       if (!menuSnap.exists || menuSnap.data() == null) {
         throw Exception('Article menu introuvable : $menuItemId');
@@ -90,6 +99,7 @@ class OrderService {
 
         if (!aggregatedDeductions.containsKey(key)) {
           aggregatedDeductions[key] = {
+            'establishmentId': establishmentId,
             'store': ingredient.store,
             'itemId': ingredient.itemId,
             'itemName': ingredient.itemName,
@@ -105,6 +115,7 @@ class OrderService {
     }
 
     batch.set(docRef, {
+      'establishmentId': establishmentId,
       'orderNumber': orderNumber,
       'clientType': clientType,
       'tableNumber': tableNumber,
@@ -123,17 +134,24 @@ class OrderService {
       'barStatus': isForBar ? 'pending' : 'ready',
       'stockDeducted': false,
       'stockRestored': false,
+      'hasCancelledItems': false,
+      'pendingSync': false,
+      'syncError': false,
     });
 
     for (final item in items) {
-      final itemRef = docRef.collection('items').doc();
-      batch.set(itemRef, item.toMap());
+      final itemRef = docRef.collection('items').doc(item.id);
+      batch.set(
+        itemRef,
+        item.copyWith(establishmentId: establishmentId).toMap(),
+      );
     }
 
     await batch.commit();
 
     try {
       await _storeStockService.removeStockForOrder(
+        establishmentId: establishmentId,
         orderId: docRef.id,
         orderNumber: orderNumber,
         performedBy: createdBy,
@@ -151,12 +169,15 @@ class OrderService {
         'stockDeducted': false,
         'stockError': e.toString(),
         'stockErrorStack': stack.toString(),
+        'syncError': true,
       });
+
       rethrow;
     }
   }
 
   Future<void> cancelOrderItems({
+    required String establishmentId,
     required String orderId,
     required List<String> orderItemIds,
     required String cancelledBy,
@@ -169,7 +190,7 @@ class OrderService {
       return double.tryParse(value.toString()) ?? 0;
     }
 
-    final orderRef = _firestore.collection('orders').doc(orderId);
+    final orderRef = _ordersRef(establishmentId).doc(orderId);
     final orderSnap = await orderRef.get();
 
     if (!orderSnap.exists || orderSnap.data() == null) {
@@ -177,6 +198,7 @@ class OrderService {
     }
 
     final orderData = Map<String, dynamic>.from(orderSnap.data()!);
+
     final paymentStatus = (orderData['paymentStatus'] ?? '')
         .toString()
         .toLowerCase();
@@ -233,10 +255,9 @@ class OrderService {
         );
       }
 
-      final menuSnap = await _firestore
-          .collection('menuItems')
-          .doc(item.menuItemId)
-          .get();
+      final menuSnap = await _menuItemsRef(
+        establishmentId,
+      ).doc(item.menuItemId).get();
 
       if (!menuSnap.exists || menuSnap.data() == null) {
         throw Exception(
@@ -260,6 +281,7 @@ class OrderService {
 
         if (!aggregatedRestitutions.containsKey(key)) {
           aggregatedRestitutions[key] = {
+            'establishmentId': establishmentId,
             'store': ingredient.store,
             'itemId': ingredient.itemId,
             'itemName': ingredient.itemName,
@@ -275,8 +297,10 @@ class OrderService {
     }
 
     final stockDeducted = orderData['stockDeducted'] == true;
+
     if (stockDeducted) {
       await _storeStockService.restoreStockForCancelledOrder(
+        establishmentId: establishmentId,
         orderId: orderId,
         orderNumber: (orderData['orderNumber'] ?? '').toString(),
         performedBy: cancelledBy,
@@ -289,6 +313,7 @@ class OrderService {
 
     for (final item in selectedItems) {
       final itemRef = orderRef.collection('items').doc(item.id);
+
       batch.update(itemRef, {
         'isCancelled': true,
         'cancelledAt': FieldValue.serverTimestamp(),
@@ -301,6 +326,7 @@ class OrderService {
     await batch.commit();
 
     final refreshedItemsSnap = await orderRef.collection('items').get();
+
     final refreshedItems = refreshedItemsSnap.docs
         .map((doc) => OrderItemModel.fromMap(doc.data(), id: doc.id))
         .toList();
@@ -328,6 +354,7 @@ class OrderService {
     final newTotal = newSubtotal + newTax;
 
     String newStatus;
+
     if (activeItems.isEmpty) {
       newStatus = 'cancelled';
     } else if (activeItems.length < refreshedItems.length) {
@@ -345,6 +372,7 @@ class OrderService {
       'stockRestored': refreshedItems.any((item) => item.isCancelled),
       'isForKitchen': activeKitchenItems.isNotEmpty,
       'isForBar': activeBarItems.isNotEmpty,
+      'updatedAt': FieldValue.serverTimestamp(),
     };
 
     if (activeKitchenItems.isEmpty) {
@@ -359,6 +387,7 @@ class OrderService {
   }
 
   Future<void> cancelOrder({
+    required String establishmentId,
     required String orderId,
     required String cancelledBy,
     required String cancelledByName,
@@ -370,7 +399,7 @@ class OrderService {
       return double.tryParse(value.toString()) ?? 0;
     }
 
-    final orderRef = _firestore.collection('orders').doc(orderId);
+    final orderRef = _ordersRef(establishmentId).doc(orderId);
     final orderSnap = await orderRef.get();
 
     if (!orderSnap.exists || orderSnap.data() == null) {
@@ -382,11 +411,13 @@ class OrderService {
     final orderNumber = (orderData['orderNumber'] ?? '').toString();
     final paymentStatus = (orderData['paymentStatus'] ?? '').toString();
     final status = (orderData['status'] ?? '').toString();
+
     final stockDeducted = orderData['stockDeducted'] == true;
     final stockRestored = orderData['stockRestored'] == true;
 
     final isForKitchen = orderData['isForKitchen'] == true;
     final isForBar = orderData['isForBar'] == true;
+
     final kitchenStatus = (orderData['kitchenStatus'] ?? '').toString();
     final barStatus = (orderData['barStatus'] ?? '').toString();
 
@@ -422,14 +453,13 @@ class OrderService {
     }
 
     final items = itemsSnap.docs
-        .map((doc) => OrderItemModel.fromMap(doc.data()))
+        .map((doc) => OrderItemModel.fromMap(doc.data(), id: doc.id))
         .toList();
 
     final Map<String, Map<String, dynamic>> aggregatedRestitutions = {};
 
     for (final item in items) {
-      final itemMap = item.toMap();
-      final menuItemId = (itemMap['menuItemId'] ?? '').toString();
+      final menuItemId = item.menuItemId;
 
       if (menuItemId.isEmpty) {
         throw Exception(
@@ -437,10 +467,9 @@ class OrderService {
         );
       }
 
-      final menuSnap = await _firestore
-          .collection('menuItems')
-          .doc(menuItemId)
-          .get();
+      final menuSnap = await _menuItemsRef(
+        establishmentId,
+      ).doc(menuItemId).get();
 
       if (!menuSnap.exists || menuSnap.data() == null) {
         throw Exception(
@@ -456,7 +485,7 @@ class OrderService {
         );
       }
 
-      final orderedQuantity = toDouble(itemMap['quantity']);
+      final orderedQuantity = toDouble(item.quantity);
 
       if (orderedQuantity <= 0) {
         throw Exception(
@@ -470,6 +499,7 @@ class OrderService {
 
         if (!aggregatedRestitutions.containsKey(key)) {
           aggregatedRestitutions[key] = {
+            'establishmentId': establishmentId,
             'store': ingredient.store,
             'itemId': ingredient.itemId,
             'itemName': ingredient.itemName,
@@ -486,6 +516,7 @@ class OrderService {
 
     if (stockDeducted) {
       await _storeStockService.restoreStockForCancelledOrder(
+        establishmentId: establishmentId,
         orderId: orderId,
         orderNumber: orderNumber,
         performedBy: cancelledBy,
@@ -502,6 +533,7 @@ class OrderService {
       'cancellationReason': cancellationReason,
       'stockRestored': stockDeducted,
       'stockRestoredAt': stockDeducted ? FieldValue.serverTimestamp() : null,
+      'updatedAt': FieldValue.serverTimestamp(),
       if (isForKitchen) 'kitchenStatus': 'cancelled',
       if (isForBar) 'barStatus': 'cancelled',
     });

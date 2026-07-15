@@ -11,7 +11,23 @@ class MajordomeHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthController>();
+    final user = auth.currentUser;
     final isSmall = MediaQuery.of(context).size.width < 800;
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text('Utilisateur introuvable.')),
+      );
+    }
+
+    final establishmentId = user.establishmentId.trim();
+
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -38,7 +54,6 @@ class MajordomeHomePage extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
-
             Card(
               elevation: 3,
               shape: RoundedRectangleBorder(
@@ -66,14 +81,15 @@ class MajordomeHomePage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const HygieneDailyPage(),
+                            builder: (_) => HygieneDailyPage(
+                              establishmentId: establishmentId,
+                            ),
                           ),
                         );
                       },
                       icon: const Icon(Icons.cleaning_services),
                       label: const Text('Hygiène journalière'),
                     ),
-
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green.shade600,
@@ -91,14 +107,15 @@ class MajordomeHomePage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const HotelStockItemFormPage(),
+                            builder: (_) => HotelStockItemFormPage(
+                              establishmentId: establishmentId,
+                            ),
                           ),
                         );
                       },
                       icon: const Icon(Icons.add_business_outlined),
                       label: const Text('Ajouter article hôtel'),
                     ),
-
                     OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
@@ -113,7 +130,8 @@ class MajordomeHomePage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const CreateStockRequestPage(
+                            builder: (_) => CreateStockRequestPage(
+                              establishmentId: establishmentId,
                               store: 'hotel',
                               requestedByRole: 'majordhomme',
                               title: 'Demande approvisionnement - Hôtel',
@@ -124,7 +142,6 @@ class MajordomeHomePage extends StatelessWidget {
                       icon: const Icon(Icons.playlist_add_circle_outlined),
                       label: const Text('Demander approvisionnement'),
                     ),
-
                     OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
@@ -139,7 +156,8 @@ class MajordomeHomePage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const StoreRequestHistoryPage(
+                            builder: (_) => StoreRequestHistoryPage(
+                              establishmentId: establishmentId,
                               store: 'hotel',
                               title: 'Réceptions à confirmer - Hôtel',
                             ),

@@ -6,7 +6,9 @@ import 'package:takapp/modeles/store_stock_model.dart';
 import 'package:takapp/services/store_stock_service.dart';
 
 class HygieneDailyPage extends StatefulWidget {
-  const HygieneDailyPage({super.key});
+  final String establishmentId;
+
+  const HygieneDailyPage({super.key, required this.establishmentId});
 
   @override
   State<HygieneDailyPage> createState() => _HygieneDailyPageState();
@@ -14,13 +16,18 @@ class HygieneDailyPage extends StatefulWidget {
 
 class _HygieneDailyPageState extends State<HygieneDailyPage> {
   final TextEditingController _roomController = TextEditingController();
+
   final TextEditingController _noteController = TextEditingController();
 
   final List<_HygieneLineInput> _lines = [_HygieneLineInput()];
 
+  String get establishmentId => widget.establishmentId.trim();
+
   Future<void> _submit(List<StoreStockModel> stocks) async {
     final auth = context.read<AuthController>();
+
     final controller = context.read<HygieneDailyController>();
+
     final user = auth.currentUser;
 
     if (user == null) {
@@ -30,7 +37,15 @@ class _HygieneDailyPageState extends State<HygieneDailyPage> {
       return;
     }
 
+    if (establishmentId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Établissement introuvable.')),
+      );
+      return;
+    }
+
     final room = _roomController.text.trim();
+
     if (room.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Veuillez saisir le numéro de chambre.')),
@@ -42,6 +57,7 @@ class _HygieneDailyPageState extends State<HygieneDailyPage> {
 
     for (int i = 0; i < _lines.length; i++) {
       final line = _lines[i];
+
       final quantity = double.tryParse(line.quantityController.text.trim());
 
       if ((line.selectedStockId == null || line.selectedStockId!.isEmpty) &&
@@ -98,6 +114,7 @@ class _HygieneDailyPageState extends State<HygieneDailyPage> {
     }
 
     final success = await controller.createDailyEntry(
+      establishmentId: establishmentId,
       roomNumber: room,
       preparedBy: user.uid,
       preparedByName: user.name,
@@ -110,9 +127,11 @@ class _HygieneDailyPageState extends State<HygieneDailyPage> {
     if (success) {
       _roomController.clear();
       _noteController.clear();
+
       for (final line in _lines) {
         line.dispose();
       }
+
       setState(() {
         _lines
           ..clear()
@@ -135,31 +154,45 @@ class _HygieneDailyPageState extends State<HygieneDailyPage> {
   void dispose() {
     _roomController.dispose();
     _noteController.dispose();
+
     for (final line in _lines) {
       line.dispose();
     }
+
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final stockService = StoreStockService();
-    final controller = context.watch<HygieneDailyController>();
-    final isSmall = MediaQuery.of(context).size.width < 800;
+ @override
+Widget build(BuildContext context) {
+  final stockService = StoreStockService();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Hygiène journalière'),
-        actions: [
-          IconButton(
-            onPressed: () => context.read<AuthController>().logout(),
-            icon: const Icon(Icons.logout),
-          ),
-        ],
+  final controller = context.watch<HygieneDailyController>();
+
+  final isSmall = MediaQuery.of(context).size.width < 800;
+
+  if (establishmentId.isEmpty) {
+    return const Scaffold(
+      body: Center(child: Text('Établissement introuvable.')),
+    );
+  }
+
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Hygiène journalière'),
+      actions: [
+        IconButton(
+          onPressed: () => context.read<AuthController>().logout(),
+          icon: const Icon(Icons.logout),
+        ),
+      ],
+    ),
+    body: StreamBuilder<List<StoreStockModel>>(
+      stream: stockService.streamStocksForStore(
+        establishmentId: establishmentId,
+        store: 'hotel',
       ),
-      body: StreamBuilder<List<StoreStockModel>>(
-        stream: stockService.streamStocksForStore('hotel'),
-        builder: (context, snapshot) {
+      builder: (context, snapshot) {
+     
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -178,6 +211,7 @@ class _HygieneDailyPageState extends State<HygieneDailyPage> {
 
           for (final line in _lines) {
             final exists = stocks.any((e) => e.itemId == line.selectedStockId);
+
             if (!exists) {
               line.selectedStockId = null;
             }
@@ -216,6 +250,7 @@ class _HygieneDailyPageState extends State<HygieneDailyPage> {
                 const SizedBox(height: 14),
                 ...List.generate(_lines.length, (index) {
                   final line = _lines[index];
+
                   return Card(
                     margin: const EdgeInsets.only(bottom: 10),
                     child: Padding(
@@ -253,6 +288,7 @@ class _HygieneDailyPageState extends State<HygieneDailyPage> {
                             items: stocks.map((item) {
                               final label =
                                   '${item.itemName} (${item.unit}) - stock: ${item.quantity.toStringAsFixed(item.quantity % 1 == 0 ? 0 : 2)}';
+
                               return DropdownMenuItem<String>(
                                 value: item.itemId,
                                 child: Text(label),
@@ -323,6 +359,7 @@ class _HygieneDailyPageState extends State<HygieneDailyPage> {
 
 class _HygieneLineInput {
   String? selectedStockId;
+
   final TextEditingController quantityController = TextEditingController();
 
   void dispose() {

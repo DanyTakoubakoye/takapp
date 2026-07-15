@@ -12,15 +12,17 @@ import 'package:takapp/services/menu_admin_service.dart';
 import 'package:takapp/services/stock_item_service.dart';
 
 class GestionMenuPage extends StatefulWidget {
-  const GestionMenuPage({super.key});
+  final String establishmentId;
+
+  const GestionMenuPage({super.key, required this.establishmentId});
 
   @override
   State<GestionMenuPage> createState() => _GestionMenuPageState();
 }
 
 class _GestionMenuPageState extends State<GestionMenuPage> {
-  final MenuAdminService _service = MenuAdminService();
-  final StockItemService _stockItemService = StockItemService();
+  late final MenuAdminService _service;
+  late final StockItemService _stockItemService;
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController categoryController = TextEditingController();
@@ -35,6 +37,17 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
 
   final List<MenuIngredientModel> _ingredients = [];
 
+  String get establishmentId => widget.establishmentId.trim();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _service = MenuAdminService(establishmentId: establishmentId);
+
+    _stockItemService = StockItemService(establishmentId: establishmentId);
+  }
+
   @override
   void dispose() {
     nameController.dispose();
@@ -45,53 +58,40 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
   }
 
   Future<void> _saveMenuItem() async {
+    if (establishmentId.isEmpty) {
+      _showSnack('Établissement introuvable.');
+      return;
+    }
+
     final name = nameController.text.trim();
     final composition = compositionController.text.trim();
     final category = categoryController.text.trim();
     final price = double.tryParse(priceController.text.trim());
 
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez renseigner le nom de l’article.'),
-        ),
-      );
+      _showSnack('Veuillez renseigner le nom de l’article.');
       return;
     }
 
     if (category.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez renseigner la catégorie.')),
-      );
+      _showSnack('Veuillez renseigner la catégorie.');
       return;
     }
 
     if (price == null || price <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez renseigner un prix valide.')),
-      );
+      _showSnack('Veuillez renseigner un prix valide.');
       return;
     }
 
     if (!isForKitchen && !isForBar) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'L’article doit appartenir au bar, à la cuisine, ou aux deux.',
-          ),
-        ),
+      _showSnack(
+        'L’article doit appartenir au bar, à la cuisine, ou aux deux.',
       );
       return;
     }
 
     if (_ingredients.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Veuillez définir au moins un ingrédient pour cet article.',
-          ),
-        ),
-      );
+      _showSnack('Veuillez définir au moins un ingrédient pour cet article.');
       return;
     }
 
@@ -102,6 +102,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
     try {
       final item = MenuItemModel(
         id: '',
+        establishmentId: establishmentId,
         name: name,
         composition: composition,
         category: category,
@@ -112,7 +113,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
         ingredients: List<MenuIngredientModel>.from(_ingredients),
       );
 
-      await _service.addMenuItem(item);
+      await _service.addMenuItem(establishmentId: establishmentId, item: item);
 
       nameController.clear();
       categoryController.clear();
@@ -127,14 +128,12 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
       });
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Article enregistré avec succès.')),
-      );
+
+      _showSnack('Article enregistré avec succès.');
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erreur : $e')));
+
+      _showSnack('Erreur : $e');
     } finally {
       if (mounted) {
         setState(() {
@@ -145,7 +144,13 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
   }
 
   Future<void> _showAddIngredientDialog() async {
+    if (establishmentId.isEmpty) {
+      _showSnack('Établissement introuvable.');
+      return;
+    }
+
     StockItemModel? selectedItem;
+
     final quantityController = TextEditingController();
 
     await showDialog<void>(
@@ -211,6 +216,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
               setState(() {
                 _ingredients.add(
                   MenuIngredientModel(
+                    establishmentId: establishmentId,
                     itemId: selectedItem!.id,
                     itemName: selectedItem!.name,
                     store: selectedItem!.store,
@@ -232,6 +238,11 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
   }
 
   Future<void> _importMenuFile() async {
+    if (establishmentId.isEmpty) {
+      _showSnack('Établissement introuvable.');
+      return;
+    }
+
     setState(() {
       isImporting = true;
     });
@@ -245,9 +256,11 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
 
       if (result == null || result.files.isEmpty) {
         if (!mounted) return;
+
         setState(() {
           isImporting = false;
         });
+
         return;
       }
 
@@ -275,16 +288,21 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
 
       int successCount = 0;
       int skippedCount = 0;
+
       final List<String> skippedReasons = [];
 
       for (final row in rows) {
         try {
           final name = (row['name'] ?? '').toString().trim();
+
           final composition = (row['composition'] ?? '').toString().trim();
+
           final category = (row['category'] ?? '').toString().trim();
+
           final price = _parsePrice(row['price']);
 
           bool parsedIsAvailable;
+
           if (row.containsKey('isAvailable')) {
             parsedIsAvailable = _parseBool(row['isAvailable'], fallback: true);
           } else {
@@ -295,6 +313,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
           bool parsedIsForBar;
 
           final hasKitchenColumn = row.containsKey('isForKitchen');
+
           final hasBarColumn = row.containsKey('isForBar');
 
           if (hasKitchenColumn || hasBarColumn) {
@@ -302,22 +321,28 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
               row['isForKitchen'],
               fallback: false,
             );
+
             parsedIsForBar = _parseBool(row['isForBar'], fallback: true);
           } else {
             final department = (row['department'] ?? '').toString().trim();
+
             final inferred = _inferDepartments(
               category: category,
               department: department,
             );
+
             parsedIsForKitchen = inferred.$1;
+
             parsedIsForBar = inferred.$2;
           }
 
           if (name.isEmpty || category.isEmpty || price == null || price <= 0) {
             skippedCount++;
+
             skippedReasons.add(
               'Ligne ignorée : nom/catégorie/prix invalide(s).',
             );
+
             continue;
           }
 
@@ -326,18 +351,23 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
               category: category,
               department: (row['department'] ?? '').toString(),
             );
+
             parsedIsForKitchen = inferred.$1;
+
             parsedIsForBar = inferred.$2;
           }
 
           if (!parsedIsForKitchen && !parsedIsForBar) {
             skippedCount++;
+
             skippedReasons.add('Article "$name" ignoré : ni bar ni cuisine.');
+
             continue;
           }
 
           final item = MenuItemModel(
             id: '',
+            establishmentId: establishmentId,
             name: name,
             composition: composition,
             category: category,
@@ -348,10 +378,15 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
             ingredients: const [],
           );
 
-          await _service.addMenuItem(item);
+          await _service.addMenuItem(
+            establishmentId: establishmentId,
+            item: item,
+          );
+
           successCount++;
         } catch (e) {
           skippedCount++;
+
           skippedReasons.add('Ligne ignorée : $e');
         }
       }
@@ -359,14 +394,14 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
       if (!mounted) return;
 
       final summary = StringBuffer();
+
       summary.write('$successCount article(s) importé(s)');
+
       if (skippedCount > 0) {
         summary.write(' • $skippedCount ignoré(s)');
       }
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(summary.toString())));
+      _showSnack(summary.toString());
 
       if (skippedReasons.isNotEmpty) {
         await showDialog<void>(
@@ -390,9 +425,8 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erreur import : $e')));
+
+      _showSnack('Erreur import : $e');
     } finally {
       if (mounted) {
         setState(() {
@@ -421,6 +455,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
     if (table.isEmpty) return [];
 
     final headers = table.first.map((e) => e.toString()).toList();
+
     final mappedHeaders = headers.map(_normalizeHeader).toList();
 
     final rows = <Map<String, dynamic>>[];
@@ -436,7 +471,9 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
 
       for (int j = 0; j < mappedHeaders.length; j++) {
         final key = mappedHeaders[j];
+
         if (key.isEmpty) continue;
+
         row[key] = j < line.length ? line[j] : null;
       }
 
@@ -448,32 +485,43 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
 
   List<Map<String, dynamic>> _parseExcelRows(Uint8List bytes) {
     final excel = Excel.decodeBytes(bytes);
+
     final rows = <Map<String, dynamic>>[];
 
     for (final sheetName in excel.tables.keys) {
       final table = excel.tables[sheetName];
-      if (table == null || table.rows.isEmpty) continue;
+
+      if (table == null || table.rows.isEmpty) {
+        continue;
+      }
 
       final headerCells = table.rows.first;
+
       final mappedHeaders = headerCells
           .map((cell) => _normalizeHeader(cell?.value?.toString() ?? ''))
           .toList();
 
       for (int i = 1; i < table.rows.length; i++) {
         final line = table.rows[i];
+
         if (line.every((cell) {
           final text = cell?.value?.toString() ?? '';
+
           return text.trim().isEmpty;
         })) {
           continue;
         }
 
         final row = <String, dynamic>{};
+
         for (int j = 0; j < mappedHeaders.length; j++) {
           final key = mappedHeaders[j];
+
           if (key.isEmpty) continue;
+
           row[key] = j < line.length ? line[j]?.value : null;
         }
+
         rows.add(row);
       }
 
@@ -592,11 +640,15 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
   }
 
   bool _parseBool(dynamic value, {required bool fallback}) {
-    if (value == null) return fallback;
+    if (value == null) {
+      return fallback;
+    }
 
     final text = value.toString().trim().toLowerCase();
 
-    if (text.isEmpty) return fallback;
+    if (text.isEmpty) {
+      return fallback;
+    }
 
     if (['true', '1', 'oui', 'yes', 'y', 'vrai', 'ok'].contains(text)) {
       return true;
@@ -613,12 +665,17 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
     if (value == null) return null;
 
     String text = value.toString().trim();
+
     if (text.isEmpty) return null;
 
     text = text.replaceAll('FCFA', '');
+
     text = text.replaceAll('fcfa', '');
+
     text = text.replaceAll('F CFA', '');
+
     text = text.replaceAll('f cfa', '');
+
     text = text.replaceAll(' ', '');
 
     if (RegExp(r'^\d{1,3}(\.\d{3})+$').hasMatch(text)) {
@@ -627,6 +684,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
       text = text.replaceAll(',', '');
     } else if (text.contains('.') && text.contains(',')) {
       text = text.replaceAll('.', '');
+
       text = text.replaceAll(',', '.');
     } else if (text.contains(',') && !text.contains('.')) {
       text = text.replaceAll(',', '.');
@@ -640,14 +698,17 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
     required String department,
   }) {
     final cat = category.trim().toLowerCase();
+
     final dep = department.trim().toLowerCase();
 
     if (dep.contains('cuisine') && dep.contains('bar')) {
       return (true, true);
     }
+
     if (dep.contains('bar')) {
       return (false, true);
     }
+
     if (dep.contains('cuisine')) {
       return (true, false);
     }
@@ -696,17 +757,32 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
     if (item.isForKitchen && item.isForBar) {
       return 'Cuisine + Bar';
     }
+
     if (item.isForKitchen) {
       return 'Cuisine';
     }
+
     if (item.isForBar) {
       return 'Bar';
     }
+
     return '-';
+  }
+
+  void _showSnack(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
     final isSmallScreen = MediaQuery.of(context).size.width < 900;
 
     return Scaffold(
@@ -842,6 +918,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                 Column(
                   children: List.generate(_ingredients.length, (index) {
                     final ingredient = _ingredients[index];
+
                     return Card(
                       margin: const EdgeInsets.symmetric(vertical: 4),
                       child: ListTile(
@@ -992,7 +1069,10 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                                 );
 
                                 if (confirmed == true) {
-                                  await _service.deleteMenuItem(item.id);
+                                  await _service.deleteMenuItem(
+                                    establishmentId: establishmentId,
+                                    id: item.id,
+                                  );
                                 }
                               },
                               icon: const Icon(

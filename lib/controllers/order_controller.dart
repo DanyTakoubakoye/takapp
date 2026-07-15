@@ -35,9 +35,8 @@ class OrderController extends ChangeNotifier {
   void addMenuItem(MenuItemModel menuItem) {
     final index = _items.indexWhere((e) => e.menuItemId == menuItem.id);
 
-    // 🔥 correction robuste
     final targetDepartment = menuItem.isForKitchen ? 'kitchen' : 'bar';
-    final Uuid _uuid = const Uuid();
+    const Uuid uuid = Uuid();
 
     if (index >= 0) {
       final existing = _items[index];
@@ -50,7 +49,11 @@ class OrderController extends ChangeNotifier {
     } else {
       _items.add(
         OrderItemModel(
-          id: _uuid.v4(), // ✅ AJOUT ICI
+          id: uuid.v4(),
+
+          /// establishmentId renseigné au submitOrder (le panier est un brouillon local)
+          establishmentId: '',
+
           menuItemId: menuItem.id,
           name: menuItem.name,
           quantity: 1,
@@ -59,7 +62,6 @@ class OrderController extends ChangeNotifier {
           note: '',
           targetDepartment: targetDepartment,
 
-          // 🔥 IMPORTANT pour la nouvelle logique
           isCancelled: false,
           cancelledAt: null,
           cancelledBy: '',
@@ -135,6 +137,7 @@ class OrderController extends ChangeNotifier {
     required String? roomNumber,
     required String createdBy,
     required String createdByName,
+    required String establishmentId,
   }) async {
     if (_items.isEmpty) {
       _errorMessage = 'Ajoutez au moins un article.';
@@ -156,15 +159,26 @@ class OrderController extends ChangeNotifier {
       return false;
     }
 
+    // Garde-fou : refuser si l'établissement n'est pas résolu
+    if (establishmentId.trim().isEmpty) {
+      _errorMessage = 'Établissement introuvable. Reconnectez-vous.';
+      notifyListeners();
+      return false;
+    }
+
     _isSubmitting = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      // 🔥 Sécurité : on envoie une copie
-      final itemsToSend = List<OrderItemModel>.from(_items);
+      // On tamponne chaque item avec le vrai établissement au moment de l'envoi
+      final itemsToSend = _items
+          .map((item) => item.copyWith(establishmentId: establishmentId))
+          .toList();
 
       await _orderService.createOrder(
+        establishmentId: establishmentId,
+
         clientType: clientType,
         tableNumber: tableNumber?.trim(),
         roomNumber: roomNumber?.trim(),

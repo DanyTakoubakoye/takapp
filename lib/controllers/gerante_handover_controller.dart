@@ -14,15 +14,17 @@ class GeranteHandoverController extends ChangeNotifier {
 
   bool get isSubmitting => _isSubmitting;
   String? get errorMessage => _errorMessage;
-  List<PaymentModel> get selectedPayments =>
-      List.unmodifiable(_selectedPayments);
+
+  List<PaymentModel> get selectedPayments {
+    return List.unmodifiable(_selectedPayments);
+  }
 
   bool isSelected(String paymentId) {
     return _selectedPayments.any((e) => e.id == paymentId);
   }
 
   double get selectedTotal {
-    return _selectedPayments.fold(0, (sum, item) => sum + item.amount);
+    return _selectedPayments.fold<double>(0, (sum, item) => sum + item.amount);
   }
 
   void togglePayment(PaymentModel payment) {
@@ -44,11 +46,18 @@ class GeranteHandoverController extends ChangeNotifier {
   }
 
   Future<bool> validateSelectedPayments({
+    required String establishmentId,
     required ServerHandoverModel handover,
     required double validatedAmount,
     required String managerId,
     required String managerName,
   }) async {
+    if (establishmentId.trim().isEmpty) {
+      _errorMessage = 'Établissement introuvable.';
+      notifyListeners();
+      return false;
+    }
+
     if (_selectedPayments.isEmpty) {
       _errorMessage = 'Veuillez sélectionner au moins une commande/paiement.';
       notifyListeners();
@@ -61,6 +70,7 @@ class GeranteHandoverController extends ChangeNotifier {
 
     try {
       await _service.validateSelectedPayments(
+        establishmentId: establishmentId,
         handoverId: handover.id,
         selectedPaymentIds: _selectedPayments.map((e) => e.id).toList(),
         validatedAmount: validatedAmount,
@@ -82,11 +92,18 @@ class GeranteHandoverController extends ChangeNotifier {
   }
 
   Future<bool> rejectSelectedPayments({
+    required String establishmentId,
     required ServerHandoverModel handover,
     required double validatedAmount,
     required String managerId,
     required String managerName,
   }) async {
+    if (establishmentId.trim().isEmpty) {
+      _errorMessage = 'Établissement introuvable.';
+      notifyListeners();
+      return false;
+    }
+
     if (_selectedPayments.isEmpty) {
       _errorMessage = 'Veuillez sélectionner au moins une commande/paiement.';
       notifyListeners();
@@ -99,6 +116,7 @@ class GeranteHandoverController extends ChangeNotifier {
 
     try {
       await _service.rejectSelectedPayments(
+        establishmentId: establishmentId,
         handoverId: handover.id,
         selectedPaymentIds: _selectedPayments.map((e) => e.id).toList(),
         validatedAmount: validatedAmount,

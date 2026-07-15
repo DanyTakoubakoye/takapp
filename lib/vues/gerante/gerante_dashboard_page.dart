@@ -16,13 +16,29 @@ import 'package:takapp/vues/shared/low_stock_page.dart';
 import 'package:takapp/vues/shared/stock_item_registry_page.dart';
 
 class GeranteDashboardPage extends StatelessWidget {
-  const GeranteDashboardPage({super.key});
+  final String establishmentId;
+  const GeranteDashboardPage({super.key,
+  required this.establishmentId});
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthController>();
-    final userName = auth.currentUser?.name ?? '';
+    final user = auth.currentUser;
     final width = MediaQuery.of(context).size.width;
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text('Utilisateur introuvable.')),
+      );
+    }
+
+    final establishmentId = user.establishmentId.trim();
+
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
 
     final isMobile = width < 700;
     final isTablet = width >= 700 && width < 1100;
@@ -43,9 +59,13 @@ class GeranteDashboardPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _GeranteWelcomeCard(userName: userName),
+              _GeranteWelcomeCard(userName: user.name),
               const SizedBox(height: 16),
-              _GeranteModulesGrid(isMobile: isMobile, isTablet: isTablet),
+              _GeranteModulesGrid(
+                establishmentId: establishmentId,
+                isMobile: isMobile,
+                isTablet: isTablet,
+              ),
             ],
           ),
         ),
@@ -99,10 +119,15 @@ class _GeranteWelcomeCard extends StatelessWidget {
 }
 
 class _GeranteModulesGrid extends StatelessWidget {
+  final String establishmentId;
   final bool isMobile;
   final bool isTablet;
 
-  const _GeranteModulesGrid({required this.isMobile, required this.isTablet});
+  const _GeranteModulesGrid({
+    required this.establishmentId,
+    required this.isMobile,
+    required this.isTablet,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -116,25 +141,29 @@ class _GeranteModulesGrid extends StatelessWidget {
           _GeranteAction(
             title: 'Gestion des stocks',
             icon: Icons.inventory_2,
-            page: const StockManagementPage(),
+            pageBuilder: (_) =>
+                StockManagementPage(establishmentId: establishmentId),
           ),
           _GeranteAction(
             title: 'Demandes stock',
             icon: Icons.assignment_outlined,
-            page: const StockRequestListPage(),
+            pageBuilder: (_) =>
+                StockRequestListPage(establishmentId: establishmentId),
           ),
           _GeranteAction(
             title: 'Stocks faibles',
             icon: Icons.warning_amber_rounded,
-            page: const LowStockPage(
-              stores: ['hotel', 'restaurant', 'bar'],
+            pageBuilder: (_) => LowStockPage(
+              establishmentId: establishmentId,
+              stores: const ['hotel', 'restaurant', 'bar'],
               title: 'Stocks faibles',
             ),
           ),
           _GeranteAction(
             title: 'Approvisionner Restaurant',
             icon: Icons.restaurant,
-            page: const DirectStockSupplyPage(
+            pageBuilder: (_) => DirectStockSupplyPage(
+              establishmentId: establishmentId,
               store: 'restaurant',
               title: 'Approvisionnement direct - Restaurant',
             ),
@@ -142,7 +171,8 @@ class _GeranteModulesGrid extends StatelessWidget {
           _GeranteAction(
             title: 'Approvisionner Bar',
             icon: Icons.local_bar,
-            page: const DirectStockSupplyPage(
+            pageBuilder: (_) => DirectStockSupplyPage(
+              establishmentId: establishmentId,
               store: 'bar',
               title: 'Approvisionnement direct - Bar',
             ),
@@ -150,7 +180,8 @@ class _GeranteModulesGrid extends StatelessWidget {
           _GeranteAction(
             title: 'Approvisionner Hôtel',
             icon: Icons.hotel,
-            page: const DirectStockSupplyPage(
+            pageBuilder: (_) => DirectStockSupplyPage(
+              establishmentId: establishmentId,
               store: 'hotel',
               title: 'Approvisionnement direct - Hôtel',
             ),
@@ -158,12 +189,14 @@ class _GeranteModulesGrid extends StatelessWidget {
           _GeranteAction(
             title: 'Registre des articles',
             icon: Icons.inventory_2_outlined,
-            page: const StockItemRegistryPage(),
+            pageBuilder: (_) =>
+                StockItemRegistryPage(establishmentId: establishmentId),
           ),
           _GeranteAction(
             title: 'Créer un stock',
             icon: Icons.add_business_outlined,
-            page: const CreateStoreStockPage(),
+            pageBuilder: (_) =>
+                CreateStoreStockPage(establishmentId: establishmentId),
           ),
         ],
       ),
@@ -176,17 +209,20 @@ class _GeranteModulesGrid extends StatelessWidget {
           _GeranteAction(
             title: 'Enregistrer un serveur',
             icon: Icons.person_add,
-            page: const EnregistrerServeurPage(),
+            pageBuilder: (_) => const EnregistrerServeurPage(),
           ),
           _GeranteAction(
             title: 'Valider les versements',
             icon: Icons.fact_check_outlined,
-            page: const VersementsServeursPage(),
+            pageBuilder: (_) =>
+                VersementsServeursPage(establishmentId: establishmentId),
           ),
           _GeranteAction(
             title: 'Encaissements serveurs',
             icon: Icons.visibility,
-            page: const SuiviEncaissementsServeursPage(),
+            pageBuilder: (_) => SuiviEncaissementsServeursPage(
+              establishmentId: establishmentId,
+            ),
           ),
         ],
       ),
@@ -199,17 +235,19 @@ class _GeranteModulesGrid extends StatelessWidget {
           _GeranteAction(
             title: 'Facturation chambres',
             icon: Icons.hotel,
-            page: const FacturationChambrePage(),
+            pageBuilder: (_) => const FacturationChambrePage(),
           ),
           _GeranteAction(
             title: 'Liste des factures',
             icon: Icons.receipt_long_outlined,
-            page: const ListeFacturesPage(),
+            pageBuilder: (_) =>
+                ListeFacturesPage(establishmentId: establishmentId),
           ),
           _GeranteAction(
             title: 'Versement compta',
             icon: Icons.account_balance_outlined,
-            page: const VersementComptaPage(),
+            pageBuilder: (_) =>
+                VersementComptaPage(establishmentId: establishmentId),
           ),
         ],
       ),
@@ -222,7 +260,8 @@ class _GeranteModulesGrid extends StatelessWidget {
           _GeranteAction(
             title: 'Gérer le menu',
             icon: Icons.restaurant_menu,
-            page: const GestionMenuPage(),
+            pageBuilder: (_) =>
+                GestionMenuPage(establishmentId: establishmentId),
           ),
         ],
       ),
@@ -414,7 +453,7 @@ class _GeranteActionCard extends StatelessWidget {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => action.page),
+            MaterialPageRoute(builder: action.pageBuilder),
           );
         },
         child: Container(
@@ -471,11 +510,11 @@ class _GeranteModule {
 class _GeranteAction {
   final String title;
   final IconData icon;
-  final Widget page;
+  final WidgetBuilder pageBuilder;
 
   const _GeranteAction({
     required this.title,
     required this.icon,
-    required this.page,
+    required this.pageBuilder,
   });
 }

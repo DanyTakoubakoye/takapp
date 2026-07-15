@@ -4,11 +4,13 @@ import 'package:takapp/modeles/stock_movement_model.dart';
 import 'package:takapp/services/store_stock_service.dart';
 
 class StockMovementHistoryPage extends StatelessWidget {
+  final String establishmentId;
   final String store;
   final String title;
 
   const StockMovementHistoryPage({
     super.key,
+    required this.establishmentId,
     required this.store,
     required this.title,
   });
@@ -29,13 +31,15 @@ class StockMovementHistoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final service = StoreStockService();
-    _storeColor();
     final isSmall = MediaQuery.of(context).size.width < 800;
 
     return Scaffold(
       appBar: AppBar(title: Text(title)),
       body: StreamBuilder<List<StockMovementModel>>(
-        stream: service.streamMovementsForStore(store),
+        stream: service.streamMovementsForStore(
+          establishmentId: establishmentId,
+          store: store,
+        ),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -58,15 +62,15 @@ class StockMovementHistoryPage extends StatelessWidget {
             itemBuilder: (context, index) {
               final item = items[index];
               final isIn = item.movementType == 'in';
+              final color = isIn ? Colors.green : Colors.red;
 
               return Card(
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: (isIn ? Colors.green : Colors.red)
-                        .withOpacity(0.12),
+                    backgroundColor: color.withOpacity(0.12),
                     child: Icon(
                       isIn ? Icons.arrow_downward : Icons.arrow_upward,
-                      color: isIn ? Colors.green : Colors.red,
+                      color: color,
                     ),
                   ),
                   title: Text(
@@ -74,6 +78,7 @@ class StockMovementHistoryPage extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(
+                    'Magasin : $store\n'
                     'Type : ${isIn ? "Entrée" : "Sortie"}\n'
                     'Quantité : ${item.quantity.toStringAsFixed(item.quantity % 1 == 0 ? 0 : 2)} ${item.unit}\n'
                     'Motif : ${item.reason}\n'
@@ -81,11 +86,8 @@ class StockMovementHistoryPage extends StatelessWidget {
                     'Date : ${item.createdAt == null ? "-" : DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt!)}',
                   ),
                   trailing: Text(
-                    isIn ? '+${item.quantity}' : '-${item.quantity}',
-                    style: TextStyle(
-                      color: isIn ? Colors.green : Colors.red,
-                      fontWeight: FontWeight.w800,
-                    ),
+                    '${isIn ? "+" : "-"}${item.quantity.toStringAsFixed(item.quantity % 1 == 0 ? 0 : 2)}',
+                    style: TextStyle(color: color, fontWeight: FontWeight.w800),
                   ),
                   isThreeLine: true,
                 ),

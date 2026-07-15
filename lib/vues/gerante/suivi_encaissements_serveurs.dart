@@ -2,22 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:takapp/services/gerante_handover_service.dart';
 
 class SuiviEncaissementsServeursPage extends StatelessWidget {
-  const SuiviEncaissementsServeursPage({super.key});
+  final String establishmentId;
+
+  const SuiviEncaissementsServeursPage({
+    super.key,
+    required this.establishmentId,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final safeEstablishmentId = establishmentId.trim();
+
+    if (safeEstablishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
     final service = GeranteHandoverService();
 
     return Scaffold(
       appBar: AppBar(title: const Text('Encaissements serveurs non versés')),
       body: StreamBuilder<List<Map<String, dynamic>>>(
-        stream: service.streamServerPaymentsNonVerses(),
+        stream: service.streamServerPaymentsNonVerses(
+          establishmentId: safeEstablishmentId,
+        ),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting &&
+              !snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final data = snapshot.data!;
+          if (snapshot.hasError) {
+            return Center(child: Text('Erreur : ${snapshot.error}'));
+          }
+
+          final data = snapshot.data ?? [];
 
           if (data.isEmpty) {
             return const Center(child: Text('Aucun encaissement en attente'));

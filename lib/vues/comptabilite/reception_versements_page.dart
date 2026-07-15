@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/comptabilite_controller.dart';
 import 'package:takapp/modeles/manager_transfer_model.dart';
@@ -20,12 +21,28 @@ class ReceptionVersementsPage extends StatelessWidget {
       );
     }
 
+    if (user.establishmentId.trim().isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
+    final establishmentId = user.establishmentId;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Réception des versements')),
+      appBar: AppBar(
+        title: Text(
+          user.establishmentName.trim().isNotEmpty
+              ? '${user.establishmentName} - Réception des versements'
+              : 'Réception des versements',
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: StreamBuilder<List<ManagerTransferModel>>(
-          stream: comptaService.streamPendingTransfers(),
+          stream: comptaService.streamPendingTransfers(
+            establishmentId: establishmentId,
+          ),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -48,7 +65,12 @@ class ReceptionVersementsPage extends StatelessWidget {
               separatorBuilder: (_, __) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final transfer = transfers[index];
+
                 return Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -72,18 +94,18 @@ class ReceptionVersementsPage extends StatelessWidget {
                           alignment: Alignment.centerRight,
                           child: ElevatedButton.icon(
                             onPressed: () async {
-                              final success = await context
-                                  .read<ComptabiliteController>()
+                              final controller = context
+                                  .read<ComptabiliteController>();
+
+                              final success = await controller
                                   .confirmTransferReception(
+                                    establishmentId: establishmentId,
                                     transferId: transfer.id,
                                     accountingId: user.uid,
                                     accountingName: user.name,
                                   );
 
                               if (!context.mounted) return;
-
-                              final controller = context
-                                  .read<ComptabiliteController>();
 
                               if (success) {
                                 ScaffoldMessenger.of(context).showSnackBar(

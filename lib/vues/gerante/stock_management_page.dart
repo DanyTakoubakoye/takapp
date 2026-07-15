@@ -3,11 +3,20 @@ import 'package:takapp/vues/gerante/stock_request_list_page.dart';
 import 'package:takapp/vues/shared/store_stock_page.dart';
 
 class StockManagementPage extends StatelessWidget {
-  const StockManagementPage({super.key});
+  final String establishmentId;
+
+  const StockManagementPage({super.key, required this.establishmentId});
 
   @override
   Widget build(BuildContext context) {
     final isSmall = MediaQuery.of(context).size.width < 800;
+    final safeEstablishmentId = establishmentId.trim();
+
+    if (safeEstablishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
 
     final stores = [
       _StoreCardData(
@@ -42,7 +51,11 @@ class StockManagementPage extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const StockRequestListPage()),
+                MaterialPageRoute(
+                  builder: (_) => StockRequestListPage(
+                    establishmentId: safeEstablishmentId,
+                  ),
+                ),
               );
             },
             icon: const Icon(Icons.inventory_2_outlined),
@@ -116,6 +129,7 @@ class StockManagementPage extends StatelessWidget {
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) => StoreStockPage(
+                                        establishmentId: safeEstablishmentId,
                                         store: item.store,
                                         title: item.title,
                                       ),
@@ -131,6 +145,7 @@ class StockManagementPage extends StatelessWidget {
                                     context,
                                     MaterialPageRoute(
                                       builder: (_) => StockRequestListPage(
+                                        establishmentId: safeEstablishmentId,
                                         storeFilter: item.store,
                                       ),
                                     ),

@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:takapp/services/menu_ingredient_service.dart';
 
 class MenuItemIngredientsFormPage extends StatefulWidget {
-  const MenuItemIngredientsFormPage({super.key});
+  final String establishmentId;
+
+  const MenuItemIngredientsFormPage({super.key, required this.establishmentId});
 
   @override
   State<MenuItemIngredientsFormPage> createState() =>
@@ -19,6 +21,8 @@ class _MenuItemIngredientsFormPageState
   final List<_IngredientLine> ingredientLines = [_IngredientLine()];
 
   bool isSaving = false;
+
+  String get establishmentId => widget.establishmentId.trim();
 
   @override
   void dispose() {
@@ -59,6 +63,11 @@ class _MenuItemIngredientsFormPageState
   Future<void> _save(
     List<DocumentSnapshot<Map<String, dynamic>>> stockItems,
   ) async {
+    if (establishmentId.isEmpty) {
+      _showMessage('Établissement introuvable.');
+      return;
+    }
+
     if (selectedMenuItemId == null) {
       _showMessage('Veuillez choisir un article cuisine.');
       return;
@@ -97,6 +106,7 @@ class _MenuItemIngredientsFormPageState
 
     try {
       await _service.updateMenuItemIngredients(
+        establishmentId: establishmentId,
         menuItemId: selectedMenuItemId!,
         ingredients: ingredients,
       );
@@ -140,10 +150,18 @@ class _MenuItemIngredientsFormPageState
   Widget build(BuildContext context) {
     final isSmallScreen = MediaQuery.of(context).size.width < 800;
 
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Composition articles cuisine')),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: _service.streamKitchenMenuItems(),
+        stream: _service.streamKitchenMenuItems(
+          establishmentId: establishmentId,
+        ),
         builder: (context, menuSnapshot) {
           if (menuSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -158,7 +176,9 @@ class _MenuItemIngredientsFormPageState
           final menuItems = menuSnapshot.data?.docs ?? [];
 
           return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: _service.streamRestaurantStockItems(),
+            stream: _service.streamRestaurantStockItems(
+              establishmentId: establishmentId,
+            ),
             builder: (context, stockSnapshot) {
               if (stockSnapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -191,7 +211,6 @@ class _MenuItemIngredientsFormPageState
                             children: [
                               _header(context),
                               const SizedBox(height: 20),
-
                               DropdownButtonFormField<String>(
                                 value:
                                     menuItems.any(
@@ -224,9 +243,7 @@ class _MenuItemIngredientsFormPageState
                                   return null;
                                 },
                               ),
-
                               const SizedBox(height: 24),
-
                               Row(
                                 children: [
                                   Expanded(
@@ -249,9 +266,7 @@ class _MenuItemIngredientsFormPageState
                                   ),
                                 ],
                               ),
-
                               const SizedBox(height: 12),
-
                               ...List.generate(ingredientLines.length, (index) {
                                 return _ingredientRow(
                                   index: index,
@@ -259,9 +274,7 @@ class _MenuItemIngredientsFormPageState
                                   isSmallScreen: isSmallScreen,
                                 );
                               }),
-
                               const SizedBox(height: 24),
-
                               SizedBox(
                                 width: double.infinity,
                                 child: ElevatedButton.icon(

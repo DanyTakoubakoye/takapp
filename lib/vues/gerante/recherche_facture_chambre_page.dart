@@ -5,7 +5,9 @@ import 'package:takapp/services/room_invoice_service.dart';
 import 'package:takapp/vues/gerante/detail_facture_chambre_page.dart';
 
 class RechercheFactureChambrePage extends StatefulWidget {
-  const RechercheFactureChambrePage({super.key});
+  final String establishmentId;
+
+  const RechercheFactureChambrePage({super.key, required this.establishmentId});
 
   @override
   State<RechercheFactureChambrePage> createState() =>
@@ -15,17 +17,22 @@ class RechercheFactureChambrePage extends StatefulWidget {
 class _RechercheFactureChambrePageState
     extends State<RechercheFactureChambrePage> {
   final RoomInvoiceService _service = RoomInvoiceService();
+
   final TextEditingController searchController = TextEditingController();
 
   bool searchByClient = true;
   bool isLoading = false;
+
   List<RoomInvoiceModel> results = [];
+
+  String get establishmentId => widget.establishmentId.trim();
 
   bool _isSmallScreen(BuildContext context) =>
       MediaQuery.of(context).size.width < 800;
 
   String _formatDate(DateTime? date) {
     if (date == null) return '-';
+
     return DateFormat('dd/MM/yyyy').format(date);
   }
 
@@ -39,14 +46,27 @@ class _RechercheFactureChambrePageState
       return;
     }
 
+    if (establishmentId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Établissement introuvable.')),
+      );
+      return;
+    }
+
     setState(() {
       isLoading = true;
     });
 
     try {
       final data = searchByClient
-          ? await _service.searchInvoicesByClient(query)
-          : await _service.searchInvoicesByRoom(query);
+          ? await _service.searchInvoicesByClient(
+              establishmentId: establishmentId,
+              clientName: query,
+            )
+          : await _service.searchInvoicesByRoom(
+              establishmentId: establishmentId,
+              roomNumber: query,
+            );
 
       if (!mounted) return;
 
@@ -213,7 +233,10 @@ class _RechercheFactureChambrePageState
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => DetailFactureChambrePage(invoice: invoice),
+              builder: (_) => DetailFactureChambrePage(
+                establishmentId: establishmentId,
+                invoice: invoice,
+              ),
             ),
           );
         },
@@ -232,12 +255,10 @@ class _RechercheFactureChambrePageState
                 ),
               ),
               const SizedBox(height: 6),
-
               if (searchByClient)
                 Text('Client : ${invoice.clientName}')
               else
                 Text('Chambre : ${invoice.roomNumber}'),
-
               Text('Entrée : ${_formatDate(invoice.startDate)}'),
               Text('Sortie : ${_formatDate(invoice.endDate)}'),
               const SizedBox(height: 4),
@@ -245,9 +266,7 @@ class _RechercheFactureChambrePageState
                 'Montant : ${invoice.total.toStringAsFixed(0)} FCFA',
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
-
               const SizedBox(height: 10),
-
               if (isSmall) ...[
                 _buildPaymentChip(invoice),
                 const SizedBox(height: 8),
@@ -261,7 +280,6 @@ class _RechercheFactureChambrePageState
                     _buildFiscalChip(invoice),
                   ],
                 ),
-
               if (invoice.isFiscalized &&
                   invoice.fiscalMecefCode.trim().isNotEmpty) ...[
                 const SizedBox(height: 10),
@@ -270,7 +288,6 @@ class _RechercheFactureChambrePageState
                   style: const TextStyle(fontSize: 12),
                 ),
               ],
-
               const SizedBox(height: 10),
               Align(
                 alignment: Alignment.centerRight,
@@ -303,6 +320,7 @@ class _RechercheFactureChambrePageState
       separatorBuilder: (_, __) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final invoice = results[index];
+
         return _buildInvoiceCard(invoice, isSmall);
       },
     );
@@ -317,6 +335,12 @@ class _RechercheFactureChambrePageState
   @override
   Widget build(BuildContext context) {
     final isSmall = _isSmallScreen(context);
+
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Recherche factures chambre')),

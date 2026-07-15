@@ -6,11 +6,13 @@ import 'package:takapp/modeles/order_item_model.dart';
 import 'package:takapp/services/order_service.dart';
 
 class CancelOrderItemsPage extends StatefulWidget {
+  final String establishmentId;
   final String orderId;
   final String orderNumber;
 
   const CancelOrderItemsPage({
     super.key,
+    required this.establishmentId,
     required this.orderId,
     required this.orderNumber,
   });
@@ -26,17 +28,23 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
   final Set<String> _selectedItemIds = {};
   bool _isSubmitting = false;
 
+  String get establishmentId => widget.establishmentId.trim();
+
+  DocumentReference<Map<String, dynamic>> get _orderRef {
+    return _firestore
+        .collection('establishments')
+        .doc(establishmentId)
+        .collection('orders')
+        .doc(widget.orderId);
+  }
+
   Future<Map<String, dynamic>?> _loadOrder() async {
-    final doc = await _firestore.collection('orders').doc(widget.orderId).get();
+    final doc = await _orderRef.get();
     return doc.data();
   }
 
   Future<List<OrderItemModel>> _loadItems() async {
-    final snapshot = await _firestore
-        .collection('orders')
-        .doc(widget.orderId)
-        .collection('items')
-        .get();
+    final snapshot = await _orderRef.collection('items').get();
 
     return snapshot.docs
         .map((doc) => OrderItemModel.fromMap(doc.data(), id: doc.id))
@@ -47,6 +55,7 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
     final paymentStatus = (orderData['paymentStatus'] ?? '')
         .toString()
         .toLowerCase();
+
     if (paymentStatus == 'paid') return false;
     if (item.isCancelled) return false;
 
@@ -86,6 +95,13 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
   }
 
   Future<void> _submit(List<OrderItemModel> items) async {
+    if (establishmentId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Établissement introuvable.')),
+      );
+      return;
+    }
+
     if (_selectedItemIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -101,24 +117,32 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
 
     try {
       final auth = context.read<AuthController>();
+      final user = auth.currentUser;
       final orderService = OrderService();
 
+      if (user == null) {
+        throw Exception('Utilisateur introuvable.');
+      }
+
       await orderService.cancelOrderItems(
+        establishmentId: establishmentId,
         orderId: widget.orderId,
         orderItemIds: _selectedItemIds.toList(),
-        cancelledBy: auth.currentUser?.uid ?? '',
-        cancelledByName:
-            auth.currentUser?.name ?? auth.currentUser?.email ?? 'Serveur',
+        cancelledBy: user.uid,
+        cancelledByName: user.name.isNotEmpty ? user.name : user.email,
         cancellationReason: _reasonController.text.trim(),
       );
 
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Articles annulés et stock restitué.')),
       );
+
       Navigator.pop(context, true);
     } catch (e) {
       if (!mounted) return;
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Erreur : $e')));
@@ -145,6 +169,12 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text('Annulation partielle ${widget.orderNumber}')),
       body: FutureBuilder<Map<String, dynamic>?>(

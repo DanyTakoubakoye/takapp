@@ -7,7 +7,9 @@ import 'package:takapp/services/cuisine_service.dart';
 import 'package:takapp/vues/serveur/cancel_order_items_page.dart';
 
 class SuiviCuisinePage extends StatelessWidget {
-  const SuiviCuisinePage({super.key});
+  final String establishmentId;
+
+  const SuiviCuisinePage({super.key, required this.establishmentId});
 
   Color _color(String status) {
     switch (status) {
@@ -100,6 +102,7 @@ class SuiviCuisinePage extends StatelessWidget {
           : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: FirebaseFirestore.instance
                   .collection('orders')
+                  .where('establishmentId', isEqualTo: establishmentId)
                   .where('createdBy', isEqualTo: user.uid)
                   .where('isForKitchen', isEqualTo: true)
                   .snapshots(),
@@ -138,6 +141,22 @@ class SuiviCuisinePage extends StatelessWidget {
                     )
                     .toList();
 
+                Future<void> openCancelPage(
+                  String orderId,
+                  String orderNumber,
+                ) async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => CancelOrderItemsPage(
+                        establishmentId: establishmentId,
+                        orderId: orderId,
+                        orderNumber: orderNumber,
+                      ),
+                    ),
+                  );
+                }
+
                 if (isMobile) {
                   return SingleChildScrollView(
                     padding: const EdgeInsets.all(12),
@@ -148,21 +167,12 @@ class SuiviCuisinePage extends StatelessWidget {
                           child: _CuisineColumn(
                             title: 'En attente',
                             orders: pending,
+                            establishmentId: establishmentId,
                             colorBuilder: _color,
                             statusLabelBuilder: _statusLabel,
                             clientLabelBuilder: _clientLabel,
                             canCancelOrder: _canCancelOrder,
-                            onCancel: (orderId, orderNumber) async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => CancelOrderItemsPage(
-                                    orderId: orderId,
-                                    orderNumber: orderNumber,
-                                  ),
-                                ),
-                              );
-                            },
+                            onCancel: openCancelPage,
                             cuisineService: cuisineService,
                           ),
                         ),
@@ -172,21 +182,12 @@ class SuiviCuisinePage extends StatelessWidget {
                           child: _CuisineColumn(
                             title: 'En préparation',
                             orders: preparing,
+                            establishmentId: establishmentId,
                             colorBuilder: _color,
                             statusLabelBuilder: _statusLabel,
                             clientLabelBuilder: _clientLabel,
                             canCancelOrder: _canCancelOrder,
-                            onCancel: (orderId, orderNumber) async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => CancelOrderItemsPage(
-                                    orderId: orderId,
-                                    orderNumber: orderNumber,
-                                  ),
-                                ),
-                              );
-                            },
+                            onCancel: openCancelPage,
                             cuisineService: cuisineService,
                           ),
                         ),
@@ -196,21 +197,12 @@ class SuiviCuisinePage extends StatelessWidget {
                           child: _CuisineColumn(
                             title: 'Prêtes',
                             orders: ready,
+                            establishmentId: establishmentId,
                             colorBuilder: _color,
                             statusLabelBuilder: _statusLabel,
                             clientLabelBuilder: _clientLabel,
                             canCancelOrder: _canCancelOrder,
-                            onCancel: (orderId, orderNumber) async {
-                              await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => CancelOrderItemsPage(
-                                    orderId: orderId,
-                                    orderNumber: orderNumber,
-                                  ),
-                                ),
-                              );
-                            },
+                            onCancel: openCancelPage,
                             cuisineService: cuisineService,
                           ),
                         ),
@@ -226,21 +218,12 @@ class SuiviCuisinePage extends StatelessWidget {
                       child: _CuisineColumn(
                         title: 'En attente',
                         orders: pending,
+                        establishmentId: establishmentId,
                         colorBuilder: _color,
                         statusLabelBuilder: _statusLabel,
                         clientLabelBuilder: _clientLabel,
                         canCancelOrder: _canCancelOrder,
-                        onCancel: (orderId, orderNumber) async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => CancelOrderItemsPage(
-                                orderId: orderId,
-                                orderNumber: orderNumber,
-                              ),
-                            ),
-                          );
-                        },
+                        onCancel: openCancelPage,
                         cuisineService: cuisineService,
                       ),
                     ),
@@ -249,21 +232,12 @@ class SuiviCuisinePage extends StatelessWidget {
                       child: _CuisineColumn(
                         title: 'En préparation',
                         orders: preparing,
+                        establishmentId: establishmentId,
                         colorBuilder: _color,
                         statusLabelBuilder: _statusLabel,
                         clientLabelBuilder: _clientLabel,
                         canCancelOrder: _canCancelOrder,
-                        onCancel: (orderId, orderNumber) async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => CancelOrderItemsPage(
-                                orderId: orderId,
-                                orderNumber: orderNumber,
-                              ),
-                            ),
-                          );
-                        },
+                        onCancel: openCancelPage,
                         cuisineService: cuisineService,
                       ),
                     ),
@@ -272,21 +246,12 @@ class SuiviCuisinePage extends StatelessWidget {
                       child: _CuisineColumn(
                         title: 'Prêtes',
                         orders: ready,
+                        establishmentId: establishmentId,
                         colorBuilder: _color,
                         statusLabelBuilder: _statusLabel,
                         clientLabelBuilder: _clientLabel,
                         canCancelOrder: _canCancelOrder,
-                        onCancel: (orderId, orderNumber) async {
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => CancelOrderItemsPage(
-                                orderId: orderId,
-                                orderNumber: orderNumber,
-                              ),
-                            ),
-                          );
-                        },
+                        onCancel: openCancelPage,
                         cuisineService: cuisineService,
                       ),
                     ),
@@ -300,6 +265,7 @@ class SuiviCuisinePage extends StatelessWidget {
 
 class _CuisineColumn extends StatelessWidget {
   final String title;
+  final String establishmentId;
   final List<QueryDocumentSnapshot<Map<String, dynamic>>> orders;
   final Color Function(String status) colorBuilder;
   final String Function(String status) statusLabelBuilder;
@@ -310,6 +276,7 @@ class _CuisineColumn extends StatelessWidget {
 
   const _CuisineColumn({
     required this.title,
+    required this.establishmentId,
     required this.orders,
     required this.colorBuilder,
     required this.statusLabelBuilder,
@@ -367,7 +334,8 @@ class _CuisineColumn extends StatelessWidget {
 
                         return FutureBuilder<List<OrderItemModel>>(
                           future: cuisineService.getKitchenItemsForOrder(
-                            doc.id,
+                            establishmentId: establishmentId,
+                            orderId: doc.id,
                           ),
                           builder: (context, itemSnapshot) {
                             if (itemSnapshot.connectionState ==
@@ -395,7 +363,6 @@ class _CuisineColumn extends StatelessWidget {
 
                             final items = itemSnapshot.data ?? [];
 
-                            // On masque la commande si elle ne contient aucun item cuisine
                             if (items.isEmpty) {
                               return const SizedBox.shrink();
                             }
@@ -495,6 +462,8 @@ class _CuisineColumn extends StatelessWidget {
                                             onPressed: () async {
                                               await cuisineService
                                                   .updateKitchenStatus(
+                                                    establishmentId:
+                                                        establishmentId,
                                                     orderId: doc.id,
                                                     newKitchenStatus:
                                                         'preparing',
@@ -509,6 +478,8 @@ class _CuisineColumn extends StatelessWidget {
                                             onPressed: () async {
                                               await cuisineService
                                                   .updateKitchenStatus(
+                                                    establishmentId:
+                                                        establishmentId,
                                                     orderId: doc.id,
                                                     newKitchenStatus: 'ready',
                                                   );
@@ -520,6 +491,8 @@ class _CuisineColumn extends StatelessWidget {
                                             onPressed: () async {
                                               await cuisineService
                                                   .updateKitchenStatus(
+                                                    establishmentId:
+                                                        establishmentId,
                                                     orderId: doc.id,
                                                     newKitchenStatus:
                                                         'preparing',
@@ -532,6 +505,8 @@ class _CuisineColumn extends StatelessWidget {
                                             onPressed: () async {
                                               await cuisineService
                                                   .updateKitchenStatus(
+                                                    establishmentId:
+                                                        establishmentId,
                                                     orderId: doc.id,
                                                     newKitchenStatus: 'served',
                                                   );

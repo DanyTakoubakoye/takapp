@@ -9,7 +9,9 @@ class AuthService {
 
   User? get currentFirebaseUser => _auth.currentUser;
 
-  Stream<User?> authStateChanges() => _auth.authStateChanges();
+  Stream<User?> authStateChanges() {
+    return _auth.authStateChanges();
+  }
 
   Future<void> sendPasswordReset({required String email}) async {
     await _auth.sendPasswordResetEmail(email: email.trim());
@@ -23,25 +25,34 @@ class AuthService {
       email: email.trim(),
       password: password.trim(),
     );
-    final userService = FirebaseAuth.instance.currentUser;
-    if (userService != null) {
-      await NotificationService().registerTokenForCurrentUser();
-      NotificationService().startServerNotificationListener(userService.uid);
+
+    final firebaseUser = credential.user;
+
+    if (firebaseUser == null) {
+      throw Exception("Utilisateur Firebase introuvable après connexion.");
     }
 
-    final uid = credential.user!.uid;
-
-    final doc = await _firestore.collection('users').doc(uid).get();
-
-    if (!doc.exists || doc.data() == null) {
-      throw Exception("Le profil utilisateur est introuvable dans Firestore.");
-    }
-
-    final user = UserModel.fromMap(doc.data()!, doc.id);
+    final user = await _loadUserProfile(firebaseUser.uid);
 
     if (!user.isActive) {
       await _auth.signOut();
       throw Exception("Ce compte est désactivé.");
+    }
+
+    if (!_hasValidSaasAccess(user)) {
+      await _auth.signOut();
+      throw Exception("Ce compte n’est rattaché à aucun établissement.");
+    }
+
+    if (!_isGlobalAdmin(user)) {
+      await NotificationService().registerTokenForCurrentUser();
+
+      if (user.establishmentId.trim().isNotEmpty) {
+        NotificationService().startServerNotificationListener(
+          establishmentId: user.establishmentId.trim(),
+          serveurId: firebaseUser.uid,
+        );
+      }
     }
 
     return user;
@@ -49,20 +60,62 @@ class AuthService {
 
   Future<UserModel?> getCurrentUserProfile() async {
     final firebaseUser = _auth.currentUser;
-    if (firebaseUser == null) return null;
 
-    final doc = await _firestore
-        .collection('users')
-        .doc(firebaseUser.uid)
-        .get();
+    if (firebaseUser == null) {
+      return null;
+    }
 
-    if (!doc.exists || doc.data() == null) return null;
+    final user = await _loadUserProfile(firebaseUser.uid);
 
-    return UserModel.fromMap(doc.data()!, doc.id);
+    if (!user.isActive) {
+      await _auth.signOut();
+      return null;
+    }
+
+    if (!_hasValidSaasAccess(user)) {
+      await _auth.signOut();
+      return null;
+    }
+
+    if (!_isGlobalAdmin(user)) {
+      await NotificationService().registerTokenForCurrentUser();
+
+      if (user.establishmentId.trim().isNotEmpty) {
+        NotificationService().startServerNotificationListener(
+          establishmentId: user.establishmentId.trim(),
+          serveurId: firebaseUser.uid,
+        );
+      }
+    }
+
+    return user;
   }
 
   Future<void> signOut() async {
     NotificationService().stopServerNotificationListener();
     await _auth.signOut();
+  }
+
+  Future<UserModel> _loadUserProfile(String uid) async {
+    final doc = await _firestore.collection('users').doc(uid).get();
+
+    if (!doc.exists || doc.data() == null) {
+      throw Exception("Le profil utilisateur est introuvable dans Firestore.");
+    }
+
+    return UserModel.fromMap(doc.data()!, doc.id);
+  }
+
+  bool _isGlobalAdmin(UserModel user) {
+    final role = user.role.trim();
+    return role == 'global_admin' || role == 'super_admin';
+  }
+
+  bool _hasValidSaasAccess(UserModel user) {
+    if (_isGlobalAdmin(user)) {
+      return true;
+    }
+
+    return user.establishmentId.trim().isNotEmpty;
   }
 }

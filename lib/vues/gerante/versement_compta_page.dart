@@ -1,8 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../controllers/auth_controller.dart';
 
 class VersementComptaPage extends StatefulWidget {
-  const VersementComptaPage({super.key});
+  final String establishmentId;
+
+  const VersementComptaPage({super.key, required this.establishmentId});
 
   @override
   State<VersementComptaPage> createState() => _VersementComptaPageState();
@@ -12,11 +17,15 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   final Set<String> selectedHandoverIds = {};
+
   final Set<String> selectedRoomInvoiceIds = {};
 
   double selectedServerTotal = 0;
   double selectedRoomTotal = 0;
+
   bool isSubmitting = false;
+
+  String get establishmentId => widget.establishmentId.trim();
 
   double get totalSelected => selectedServerTotal + selectedRoomTotal;
 
@@ -45,10 +54,28 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
   }
 
   Future<void> _submitTransfer() async {
+    if (establishmentId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Établissement introuvable.')),
+      );
+      return;
+    }
+
     if (selectedHandoverIds.isEmpty && selectedRoomInvoiceIds.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Aucun élément sélectionné.')),
       );
+      return;
+    }
+
+    final auth = context.read<AuthController>();
+
+    final user = auth.currentUser;
+
+    if (user == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
       return;
     }
 
@@ -58,22 +85,33 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
 
     try {
       final transferRef = _firestore
+          .collection('establishments')
+          .doc(establishmentId)
           .collection('managerToAccountingTransfers')
           .doc();
+
       final batch = _firestore.batch();
 
       batch.set(transferRef, {
+        'establishmentId': establishmentId,
         'amount': totalSelected,
         'source': 'manager_mixed',
         'status': 'pending',
         'handoverIds': selectedHandoverIds.toList(),
         'roomInvoiceIds': selectedRoomInvoiceIds.toList(),
+        'createdBy': user.uid,
+        'createdByName': user.name,
         'createdAt': FieldValue.serverTimestamp(),
         'receivedAt': null,
       });
 
       for (final id in selectedHandoverIds) {
-        final ref = _firestore.collection('serverHandovers').doc(id);
+        final ref = _firestore
+            .collection('establishments')
+            .doc(establishmentId)
+            .collection('serverHandovers')
+            .doc(id);
+
         batch.update(ref, {
           'accountingTransferStatus': 'declared',
           'accountingTransferId': transferRef.id,
@@ -81,7 +119,12 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
       }
 
       for (final id in selectedRoomInvoiceIds) {
-        final ref = _firestore.collection('roomInvoices').doc(id);
+        final ref = _firestore
+            .collection('establishments')
+            .doc(establishmentId)
+            .collection('roomInvoices')
+            .doc(id);
+
         batch.update(ref, {
           'accountingTransferStatus': 'declared',
           'accountingTransferId': transferRef.id,
@@ -94,7 +137,9 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
 
       setState(() {
         selectedHandoverIds.clear();
+
         selectedRoomInvoiceIds.clear();
+
         selectedServerTotal = 0;
         selectedRoomTotal = 0;
       });
@@ -113,17 +158,29 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
     final handoversStream = _firestore
+        .collection('establishments')
+        .doc(establishmentId)
         .collection('serverHandovers')
         .where('status', isEqualTo: 'validated')
         .snapshots();
 
     final invoicesStream = _firestore
+        .collection('establishments')
+        .doc(establishmentId)
         .collection('roomInvoices')
         .where('status', isEqualTo: 'paid')
         .snapshots();
 
     final transfersStream = _firestore
+        .collection('establishments')
+        .doc(establishmentId)
         .collection('managerToAccountingTransfers')
         .orderBy('createdAt', descending: true)
         .limit(50)
@@ -230,6 +287,7 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
 
                   final docs = (snapshot.data?.docs ?? []).where((doc) {
                     final data = doc.data() as Map<String, dynamic>;
+
                     return (data['accountingTransferStatus'] ?? '') !=
                         'declared';
                   }).toList();
@@ -245,7 +303,9 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
                     separatorBuilder: (_, __) => const Divider(),
                     itemBuilder: (context, index) {
                       final doc = docs[index];
+
                       final data = doc.data() as Map<String, dynamic>;
+
                       final amount = ((data['validatedAmount'] ?? 0) as num)
                           .toDouble();
 
@@ -307,6 +367,7 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
 
                   final docs = (snapshot.data?.docs ?? []).where((doc) {
                     final data = doc.data() as Map<String, dynamic>;
+
                     return (data['accountingTransferStatus'] ?? '') !=
                         'declared';
                   }).toList();
@@ -322,7 +383,9 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
                     separatorBuilder: (_, __) => const Divider(),
                     itemBuilder: (context, index) {
                       final doc = docs[index];
+
                       final data = doc.data() as Map<String, dynamic>;
+
                       final amount = ((data['total'] ?? 0) as num).toDouble();
 
                       return Container(
@@ -452,6 +515,7 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
                       final data = docs[index].data() as Map<String, dynamic>;
 
                       final amount = ((data['amount'] ?? 0) as num).toDouble();
+
                       final status = (data['status'] ?? '').toString();
 
                       return ListTile(

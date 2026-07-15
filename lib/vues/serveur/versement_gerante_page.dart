@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
@@ -5,12 +6,13 @@ import 'package:takapp/controllers/handover_controller.dart';
 import 'package:takapp/modeles/payment_model.dart';
 import 'package:takapp/modeles/server_handover_model.dart';
 import 'package:takapp/services/handover_service.dart';
-import 'dart:typed_data';
 import 'package:takapp/services/pdf_service.dart';
 import 'package:takapp/services/printer_service.dart';
 
 class VersementGerantePage extends StatelessWidget {
-  const VersementGerantePage({super.key});
+  final String establishmentId;
+
+  const VersementGerantePage({super.key, required this.establishmentId});
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +41,7 @@ class VersementGerantePage extends StatelessWidget {
                   SizedBox(
                     height: 520,
                     child: _PendingPaymentsSection(
+                      establishmentId: establishmentId,
                       serveurId: user.uid,
                       serveurName: user.name,
                       handoverService: handoverService,
@@ -48,6 +51,7 @@ class VersementGerantePage extends StatelessWidget {
                   SizedBox(
                     height: 520,
                     child: _HandoverHistorySection(
+                      establishmentId: establishmentId,
                       serveurId: user.uid,
                       handoverService: handoverService,
                     ),
@@ -64,6 +68,7 @@ class VersementGerantePage extends StatelessWidget {
                 Expanded(
                   flex: 3,
                   child: _PendingPaymentsSection(
+                    establishmentId: establishmentId,
                     serveurId: user.uid,
                     serveurName: user.name,
                     handoverService: handoverService,
@@ -73,6 +78,7 @@ class VersementGerantePage extends StatelessWidget {
                 Expanded(
                   flex: 2,
                   child: _HandoverHistorySection(
+                    establishmentId: establishmentId,
                     serveurId: user.uid,
                     handoverService: handoverService,
                   ),
@@ -87,11 +93,13 @@ class VersementGerantePage extends StatelessWidget {
 }
 
 class _PendingPaymentsSection extends StatelessWidget {
+  final String establishmentId;
   final String serveurId;
   final String serveurName;
   final HandoverService handoverService;
 
   const _PendingPaymentsSection({
+    required this.establishmentId,
     required this.serveurId,
     required this.serveurName,
     required this.handoverService,
@@ -125,7 +133,8 @@ class _PendingPaymentsSection extends StatelessWidget {
             Expanded(
               child: StreamBuilder<List<PaymentModel>>(
                 stream: handoverService.streamUnhandedPaymentsForServer(
-                  serveurId,
+                  establishmentId: establishmentId,
+                  serveurId: serveurId,
                 ),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -191,6 +200,30 @@ class _PendingPaymentsSection extends StatelessWidget {
               builder: (context, constraints) {
                 final bool smallButtons = constraints.maxWidth < 500;
 
+                Future<void> submit() async {
+                  final success = await context
+                      .read<HandoverController>()
+                      .submitHandover(
+                        establishmentId: establishmentId,
+                        serveurId: serveurId,
+                        serveurName: serveurName,
+                      );
+
+                  if (!context.mounted) return;
+
+                  if (success) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Versement déclaré avec succès.'),
+                      ),
+                    );
+                  } else if (handoverController.errorMessage != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(handoverController.errorMessage!)),
+                    );
+                  }
+                }
+
                 if (smallButtons) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -207,35 +240,7 @@ class _PendingPaymentsSection extends StatelessWidget {
                       ElevatedButton(
                         onPressed: handoverController.isSubmitting
                             ? null
-                            : () async {
-                                final success = await context
-                                    .read<HandoverController>()
-                                    .submitHandover(
-                                      serveurId: serveurId,
-                                      serveurName: serveurName,
-                                    );
-
-                                if (!context.mounted) return;
-
-                                if (success) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'Versement déclaré avec succès.',
-                                      ),
-                                    ),
-                                  );
-                                } else if (handoverController.errorMessage !=
-                                    null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        handoverController.errorMessage!,
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
+                            : submit,
                         child: handoverController.isSubmitting
                             ? const SizedBox(
                                 height: 20,
@@ -268,35 +273,7 @@ class _PendingPaymentsSection extends StatelessWidget {
                       child: ElevatedButton(
                         onPressed: handoverController.isSubmitting
                             ? null
-                            : () async {
-                                final success = await context
-                                    .read<HandoverController>()
-                                    .submitHandover(
-                                      serveurId: serveurId,
-                                      serveurName: serveurName,
-                                    );
-
-                                if (!context.mounted) return;
-
-                                if (success) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        'Versement déclaré avec succès.',
-                                      ),
-                                    ),
-                                  );
-                                } else if (handoverController.errorMessage !=
-                                    null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        handoverController.errorMessage!,
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
+                            : submit,
                         child: handoverController.isSubmitting
                             ? const SizedBox(
                                 height: 20,
@@ -321,10 +298,12 @@ class _PendingPaymentsSection extends StatelessWidget {
 }
 
 class _HandoverHistorySection extends StatelessWidget {
+  final String establishmentId;
   final String serveurId;
   final HandoverService handoverService;
 
   const _HandoverHistorySection({
+    required this.establishmentId,
     required this.serveurId,
     required this.handoverService,
   });
@@ -372,7 +351,10 @@ class _HandoverHistorySection extends StatelessWidget {
             const SizedBox(height: 12),
             Expanded(
               child: StreamBuilder<List<ServerHandoverModel>>(
-                stream: handoverService.streamServerHandovers(serveurId),
+                stream: handoverService.streamServerHandovers(
+                  establishmentId: establishmentId,
+                  serveurId: serveurId,
+                ),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -449,10 +431,14 @@ class _HandoverHistorySection extends StatelessWidget {
                                       .read<PrinterService>();
 
                                   final payments = await handoverService
-                                      .getPaymentsByIds(handover.paymentIds);
+                                      .getPaymentsByIds(
+                                        establishmentId: establishmentId,
+                                        paymentIds: handover.paymentIds,
+                                      );
 
                                   final bytes = await pdfService
                                       .buildServerHandoverPdf(
+                                        establishmentName: "TAKHOTEL",
                                         handover: handover,
                                         payments: payments,
                                       );

@@ -6,10 +6,16 @@ import 'package:takapp/services/store_stock_service.dart';
 import 'package:takapp/vues/gerante/direct_stock_supply_page.dart';
 
 class LowStockPage extends StatelessWidget {
+  final String establishmentId;
   final List<String> stores;
   final String title;
 
-  const LowStockPage({super.key, required this.stores, required this.title});
+  const LowStockPage({
+    super.key,
+    required this.establishmentId,
+    required this.stores,
+    required this.title,
+  });
 
   Color _storeColor(String store) {
     switch (store) {
@@ -31,8 +37,14 @@ class LowStockPage extends StatelessWidget {
     final isSmall = MediaQuery.of(context).size.width < 800;
 
     final Stream<List<StoreStockModel>> stream = stores.length == 1
-        ? service.streamLowStocksForStore(stores.first)
-        : service.streamLowStocksForStores(stores);
+        ? service.streamLowStocksForStore(
+            establishmentId: establishmentId,
+            store: stores.first,
+          )
+        : service.streamLowStocksForStores(
+            establishmentId: establishmentId,
+            stores: stores,
+          );
 
     return Scaffold(
       appBar: AppBar(title: Text(title)),
@@ -104,15 +116,15 @@ class LowStockPage extends StatelessWidget {
                           spacing: 8,
                           runSpacing: 8,
                           children: [
-                            // BOUTON APPROVISIONNER
                             OutlinedButton.icon(
                               onPressed: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => DirectStockSupplyPage(
+                                      establishmentId: establishmentId,
                                       store: item.store,
-                                      title: "Test Direct Supply",
+                                      title: 'Approvisionnement direct',
                                     ),
                                   ),
                                 );
@@ -124,7 +136,6 @@ class LowStockPage extends StatelessWidget {
                                 side: BorderSide(color: color),
                               ),
                             ),
-                            // BOUTON METTRE À JOUR
                             ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: color,
@@ -136,6 +147,7 @@ class LowStockPage extends StatelessWidget {
                                       final min = double.tryParse(
                                         minController.text.trim(),
                                       );
+
                                       if (min == null || min < 0) {
                                         ScaffoldMessenger.of(
                                           context,
@@ -149,6 +161,7 @@ class LowStockPage extends StatelessWidget {
 
                                       final success = await controller
                                           .setMinimumQuantity(
+                                            establishmentId: establishmentId,
                                             stockDocId: item.id,
                                             minimumQuantity: min,
                                           );

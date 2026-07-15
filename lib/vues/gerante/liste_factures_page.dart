@@ -14,7 +14,9 @@ import 'package:takapp/services/printer_service.dart';
 import 'package:takapp/services/room_invoice_service.dart';
 
 class ListeFacturesPage extends StatefulWidget {
-  const ListeFacturesPage({super.key});
+  final String establishmentId;
+
+  const ListeFacturesPage({super.key, required this.establishmentId});
 
   @override
   State<ListeFacturesPage> createState() => _ListeFacturesPageState();
@@ -26,6 +28,8 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
 
   String statusFilter = 'all';
 
+  String get establishmentId => widget.establishmentId.trim();
+
   bool _isSmallScreen(BuildContext context) =>
       MediaQuery.of(context).size.width < 800;
 
@@ -33,6 +37,12 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
   void dispose() {
     searchController.dispose();
     super.dispose();
+  }
+
+  void _showSnack(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<void> _printInvoice(RoomInvoiceModel item) async {
@@ -58,22 +68,14 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
 
   Future<void> _printFiscalizedInvoice(RoomInvoiceModel item) async {
     if (item.startDate == null || item.endDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Les dates de la facture sont invalides.'),
-        ),
-      );
+      _showSnack('Les dates de la facture sont invalides.');
       return;
     }
 
     if (!item.isFiscalized ||
         item.fiscalMecefCode.trim().isEmpty ||
         item.fiscalQrCode.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Cette facture n’est pas encore fiscalisée.'),
-        ),
-      );
+      _showSnack('Cette facture n’est pas encore fiscalisée.');
       return;
     }
 
@@ -193,43 +195,45 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
   }
 
   Future<void> _fiscalizeExistingInvoice(RoomInvoiceModel item) async {
+    if (establishmentId.isEmpty) {
+      _showSnack('Établissement introuvable.');
+      return;
+    }
+
     if (EmcfConfig.sellerIfu.trim().isEmpty ||
         EmcfConfig.sellerIfu == 'METS_ICI_IFU_ETABLISSEMENT') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez d’abord renseigner EmcfConfig.sellerIfu.'),
-        ),
-      );
+      _showSnack('Veuillez d’abord renseigner EmcfConfig.sellerIfu.');
       return;
     }
 
     if (EmcfConfig.bearerToken.trim().isEmpty ||
         EmcfConfig.bearerToken == 'METS_ICI_TOKEN_JWT_DGI') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez d’abord renseigner EmcfConfig.bearerToken.'),
-        ),
-      );
+      _showSnack('Veuillez d’abord renseigner EmcfConfig.bearerToken.');
       return;
     }
 
     if (item.isFiscalized) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cette facture est déjà fiscalisée.')),
-      );
+      _showSnack('Cette facture est déjà fiscalisée.');
       return;
     }
 
     final auth = context.read<AuthController>();
     final user = auth.currentUser;
-    final sellerName = user?.name ?? 'Operateur';
-    final operatorId = user?.uid ?? '';
+
+    if (user == null) {
+      _showSnack('Utilisateur introuvable.');
+      return;
+    }
+
+    final sellerName = user.name.isNotEmpty ? user.name : 'Operateur';
+    final operatorId = user.uid;
 
     final request = _buildEmcfRequestForItem(item, sellerName, operatorId);
 
     final fiscalController = context.read<FiscalizationController>();
 
     await fiscalController.fiscalizeInvoice(
+      establishmentId: establishmentId,
       invoiceId: item.id,
       request: request,
     );
@@ -238,21 +242,11 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
 
     if (fiscalController.confirmResult != null &&
         !fiscalController.confirmResult!.hasError) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Facture fiscalisée. Code MECeF : ${fiscalController.confirmResult!.codeMECeFDGI}',
-          ),
-        ),
+      _showSnack(
+        'Facture fiscalisée. Code MECeF : ${fiscalController.confirmResult!.codeMECeFDGI}',
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            fiscalController.errorMessage ?? 'Échec de fiscalisation',
-          ),
-        ),
-      );
+      _showSnack(fiscalController.errorMessage ?? 'Échec de fiscalisation');
     }
   }
 
@@ -401,7 +395,6 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
             ),
             Text('Total : ${item.total.toStringAsFixed(0)} FCFA'),
             const SizedBox(height: 8),
-
             if (isSmall) ...[
               _buildStatusChip(item),
               const SizedBox(height: 8),
@@ -412,9 +405,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
                 runSpacing: 8,
                 children: [_buildStatusChip(item), _buildFiscalChip(item)],
               ),
-
             const SizedBox(height: 12),
-
             if (item.isFiscalized &&
                 item.fiscalMecefCode.trim().isNotEmpty) ...[
               Text(
@@ -423,7 +414,6 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
               ),
               const SizedBox(height: 4),
             ],
-
             Align(
               alignment: Alignment.centerRight,
               child: Wrap(
@@ -433,12 +423,14 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
                   if (item.status != 'paid')
                     ElevatedButton.icon(
                       onPressed: () async {
-                        await _service.markAsPaid(item.id);
+                        await _service.markAsPaid(
+                          establishmentId: establishmentId,
+                          invoiceId: item.id,
+                        );
                       },
                       icon: const Icon(Icons.check_circle_outline),
                       label: const Text('Marquer payée'),
                     ),
-
                   if (!item.isFiscalized)
                     Consumer<FiscalizationController>(
                       builder: (context, fiscalController, _) {
@@ -459,14 +451,12 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
                         );
                       },
                     ),
-
                   if (item.isFiscalized)
                     OutlinedButton.icon(
                       onPressed: () => _printFiscalizedInvoice(item),
                       icon: const Icon(Icons.verified_outlined),
                       label: const Text('Imprimer normalisée'),
                     ),
-
                   OutlinedButton.icon(
                     onPressed: () => _printInvoice(item),
                     icon: const Icon(Icons.print_outlined),
@@ -483,8 +473,22 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthController>();
+    final user = auth.currentUser;
     final dateFormat = DateFormat('dd/MM/yyyy');
     final isSmall = _isSmallScreen(context);
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text('Utilisateur introuvable.')),
+      );
+    }
+
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Liste des factures chambres')),
@@ -496,7 +500,9 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
             const SizedBox(height: 12),
             Expanded(
               child: StreamBuilder<List<RoomInvoiceModel>>(
-                stream: _service.streamInvoices(),
+                stream: _service.streamInvoices(
+                  establishmentId: establishmentId,
+                ),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -530,6 +536,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
                     separatorBuilder: (_, __) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       final item = items[index];
+
                       return _buildInvoiceCard(
                         context,
                         item,

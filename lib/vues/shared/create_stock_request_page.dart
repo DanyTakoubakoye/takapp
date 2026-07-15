@@ -7,12 +7,14 @@ import 'package:takapp/modeles/stock_request_item_model.dart';
 import 'package:takapp/services/stock_item_service.dart';
 
 class CreateStockRequestPage extends StatefulWidget {
+  final String establishmentId;
   final String store;
   final String requestedByRole;
   final String title;
 
   const CreateStockRequestPage({
     super.key,
+    required this.establishmentId,
     required this.store,
     required this.requestedByRole,
     required this.title,
@@ -24,7 +26,6 @@ class CreateStockRequestPage extends StatefulWidget {
 
 class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
   final TextEditingController _noteController = TextEditingController();
-
   final List<_RequestLineInput> _lines = [_RequestLineInput()];
 
   Color _storeColor() {
@@ -97,11 +98,15 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
       requestItems.add(
         StockRequestItemModel(
           id: '',
+          establishmentId: user.establishmentId,
           itemId: selected.id,
           itemName: selected.name,
           unit: selected.unit,
           quantityRequested: quantity,
           quantityDelivered: 0,
+          status: 'pending',
+          pendingSync: false,
+          syncError: false,
         ),
       );
     }
@@ -114,6 +119,7 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
     }
 
     final success = await controller.createRequest(
+      establishmentId: widget.establishmentId,
       store: widget.store,
       requestedBy: user.uid,
       requestedByName: user.name,
@@ -157,7 +163,9 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: StreamBuilder<List<StockItemModel>>(
-        stream: itemService.streamItems(),
+        stream: itemService.streamItems(
+          establishmentId: widget.establishmentId,
+        ),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -219,6 +227,7 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
                 const SizedBox(height: 14),
                 ...List.generate(_lines.length, (index) {
                   final line = _lines[index];
+
                   return Card(
                     margin: const EdgeInsets.only(bottom: 10),
                     child: Padding(

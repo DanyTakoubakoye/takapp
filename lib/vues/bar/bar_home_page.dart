@@ -13,7 +13,9 @@ import 'package:takapp/vues/shared/store_request_history_page.dart';
 import 'package:takapp/vues/shared/stock_movement_history_page.dart';
 
 class BarHomePage extends StatelessWidget {
-  const BarHomePage({super.key});
+  final String establishmentId;
+
+  const BarHomePage({super.key, required this.establishmentId});
 
   Color _statusColor(String status) {
     switch (status) {
@@ -87,7 +89,9 @@ class BarHomePage extends StatelessWidget {
           : Padding(
               padding: const EdgeInsets.all(12),
               child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: barService.streamBarOrders(),
+                stream: barService.streamBarOrders(
+                  establishmentId: establishmentId,
+                ),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
@@ -123,9 +127,12 @@ class BarHomePage extends StatelessWidget {
                         children: [
                           _WelcomeCard(userName: user.name),
                           const SizedBox(height: 12),
-                          const _BarStockActionsCard(),
+                          _BarStockActionsCard(
+                            establishmentId: establishmentId,
+                          ),
                           const SizedBox(height: 12),
                           _BarSection(
+                            establishmentId: establishmentId,
                             title: 'En attente',
                             docs: pending,
                             isMobile: true,
@@ -136,6 +143,7 @@ class BarHomePage extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           _BarSection(
+                            establishmentId: establishmentId,
                             title: 'En préparation',
                             docs: preparing,
                             isMobile: true,
@@ -146,6 +154,7 @@ class BarHomePage extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           _BarSection(
+                            establishmentId: establishmentId,
                             title: 'Prêtes',
                             docs: ready,
                             isMobile: true,
@@ -163,7 +172,7 @@ class BarHomePage extends StatelessWidget {
                     children: [
                       _WelcomeCard(userName: user.name),
                       const SizedBox(height: 12),
-                      const _BarStockActionsCard(),
+                      _BarStockActionsCard(establishmentId: establishmentId),
                       const SizedBox(height: 12),
                       Expanded(
                         child: Row(
@@ -171,6 +180,7 @@ class BarHomePage extends StatelessWidget {
                           children: [
                             Expanded(
                               child: _BarSection(
+                                establishmentId: establishmentId,
                                 title: 'En attente',
                                 docs: pending,
                                 isMobile: false,
@@ -183,6 +193,7 @@ class BarHomePage extends StatelessWidget {
                             const SizedBox(width: 12),
                             Expanded(
                               child: _BarSection(
+                                establishmentId: establishmentId,
                                 title: 'En préparation',
                                 docs: preparing,
                                 isMobile: false,
@@ -195,6 +206,7 @@ class BarHomePage extends StatelessWidget {
                             const SizedBox(width: 12),
                             Expanded(
                               child: _BarSection(
+                                establishmentId: establishmentId,
                                 title: 'Prêtes',
                                 docs: ready,
                                 isMobile: false,
@@ -255,7 +267,138 @@ class _WelcomeCard extends StatelessWidget {
   }
 }
 
+class _BarStockActionsCard extends StatelessWidget {
+  final String establishmentId;
+
+  const _BarStockActionsCard({required this.establishmentId});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Wrap(
+          spacing: 10,
+          runSpacing: 10,
+          children: [
+            ElevatedButton.icon(
+              icon: const Icon(Icons.inventory_2_outlined),
+              label: const Text('Stock Bar'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => StoreStockPage(
+                      establishmentId: establishmentId,
+                      store: 'bar',
+                      title: 'Stock Bar',
+                    ),
+                  ),
+                );
+              },
+            ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.playlist_add),
+              label: const Text('Approvisionnement'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CreateStockRequestPage(
+                      establishmentId: establishmentId,
+                      store: 'bar',
+                      requestedByRole: 'barman',
+                      title: 'Demande approvisionnement Bar',
+                    ),
+                  ),
+                );
+              },
+            ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.remove_shopping_cart),
+              label: const Text('Sortie Stock'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => StockOutPage(
+                      establishmentId: establishmentId,
+                      store: 'bar',
+                      title: 'Sortie Stock Bar',
+                      defaultReason: 'Consommation Bar',
+                    ),
+                  ),
+                );
+              },
+            ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.history),
+              label: const Text('Mouvements'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => StockMovementHistoryPage(
+                      establishmentId: establishmentId,
+                      store: 'bar',
+                      title: 'Historique mouvements Bar',
+                    ),
+                  ),
+                );
+              },
+            ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.checklist),
+              label: const Text('Réceptions'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => StoreRequestHistoryPage(
+                      establishmentId: establishmentId,
+                      store: 'bar',
+                      title: 'Réceptions Bar',
+                    ),
+                  ),
+                );
+              },
+            ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.fastfood),
+              label: const Text('Articles Bar'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        BarStockItemFormPage(establishmentId: establishmentId),
+                  ),
+                );
+              },
+            ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.local_drink),
+              label: const Text('Ingrédients'),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => BarMenuItemIngredientsFormPage(
+                      establishmentId: establishmentId,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _BarSection extends StatelessWidget {
+  final String establishmentId;
   final String title;
   final List<QueryDocumentSnapshot<Map<String, dynamic>>> docs;
   final bool isMobile;
@@ -265,6 +408,7 @@ class _BarSection extends StatelessWidget {
   final String Function(Map<String, dynamic>) clientLabelResolver;
 
   const _BarSection({
+    required this.establishmentId,
     required this.title,
     required this.docs,
     required this.isMobile,
@@ -313,6 +457,7 @@ class _BarSection extends StatelessWidget {
                       separatorBuilder: (_, __) => const SizedBox(height: 10),
                       itemBuilder: (context, index) {
                         return _BarOrderCard(
+                          establishmentId: establishmentId,
                           doc: docs[index],
                           colorResolver: colorResolver,
                           statusLabelResolver: statusLabelResolver,
@@ -330,6 +475,7 @@ class _BarSection extends StatelessWidget {
                         separatorBuilder: (_, __) => const SizedBox(height: 10),
                         itemBuilder: (context, index) {
                           return _BarOrderCard(
+                            establishmentId: establishmentId,
                             doc: docs[index],
                             colorResolver: colorResolver,
                             statusLabelResolver: statusLabelResolver,
@@ -347,6 +493,7 @@ class _BarSection extends StatelessWidget {
 }
 
 class _BarOrderCard extends StatelessWidget {
+  final String establishmentId;
   final QueryDocumentSnapshot<Map<String, dynamic>> doc;
   final Color Function(String) colorResolver;
   final String Function(String) statusLabelResolver;
@@ -354,58 +501,13 @@ class _BarOrderCard extends StatelessWidget {
   final String Function(Map<String, dynamic>) clientLabelResolver;
 
   const _BarOrderCard({
+    required this.establishmentId,
     required this.doc,
     required this.colorResolver,
     required this.statusLabelResolver,
     required this.barService,
     required this.clientLabelResolver,
   });
-
-  Future<void> _createBarReadyNotification() async {
-    final data = doc.data();
-    final firestore = FirebaseFirestore.instance;
-
-    final orderId = doc.id;
-    final orderNumber = (data['orderNumber'] ?? '').toString();
-
-    final serveurId =
-        (data['createdBy'] ?? data['serveurId'] ?? data['serverId'] ?? '')
-            .toString()
-            .trim();
-
-    if (serveurId.isEmpty) {
-      debugPrint(
-        'Impossible de créer la notification bar : createdBy/serveurId vide pour orderId=$orderId',
-      );
-      return;
-    }
-
-    final clientType = (data['clientType'] ?? '').toString();
-    final tableNumber = (data['tableNumber'] ?? '').toString().trim();
-    final roomNumber = (data['roomNumber'] ?? '').toString().trim();
-
-    String clientLabel = 'du client';
-
-    if (clientType == 'hotel' && roomNumber.isNotEmpty) {
-      clientLabel = 'de la chambre $roomNumber';
-    } else if (tableNumber.isNotEmpty) {
-      clientLabel = 'de la table $tableNumber';
-    } else if (clientType == 'bar') {
-      clientLabel = 'du client bar';
-    }
-
-    await firestore.collection('serverNotifications').add({
-      'title': 'Commande bar prête',
-      'body': 'La commande $clientLabel est prête au bar.',
-      'createdAt': FieldValue.serverTimestamp(),
-      'updatedAt': FieldValue.serverTimestamp(),
-      'isRead': false,
-      'orderId': orderId,
-      'orderNumber': orderNumber,
-      'serveurId': serveurId,
-      'source': 'bar',
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -423,7 +525,10 @@ class _BarOrderCard extends StatelessWidget {
         : double.tryParse(totalValue?.toString() ?? '0') ?? 0;
 
     return FutureBuilder<List<Map<String, dynamic>>>(
-      future: barService.getBarItemsForOrder(orderId),
+      future: barService.getBarItemsForOrder(
+        establishmentId: establishmentId,
+        orderId: orderId,
+      ),
       builder: (context, itemSnapshot) {
         if (itemSnapshot.connectionState == ConnectionState.waiting) {
           return const Padding(
@@ -509,6 +614,7 @@ class _BarOrderCard extends StatelessWidget {
                       ElevatedButton.icon(
                         onPressed: () async {
                           await barService.updateBarStatus(
+                            establishmentId: establishmentId,
                             orderId: orderId,
                             newBarStatus: 'preparing',
                           );
@@ -516,25 +622,23 @@ class _BarOrderCard extends StatelessWidget {
                         icon: const Icon(Icons.local_bar),
                         label: const Text('Passer en préparation'),
                       ),
-
                     if (status == 'preparing')
                       ElevatedButton.icon(
                         onPressed: () async {
                           await barService.updateBarStatus(
+                            establishmentId: establishmentId,
                             orderId: orderId,
                             newBarStatus: 'ready',
                           );
-
-                          await _createBarReadyNotification();
                         },
                         icon: const Icon(Icons.check_circle_outline),
                         label: const Text('Marquer prête'),
                       ),
-
                     if (status == 'ready')
                       OutlinedButton.icon(
                         onPressed: () async {
                           await barService.updateBarStatus(
+                            establishmentId: establishmentId,
                             orderId: orderId,
                             newBarStatus: 'preparing',
                           );
@@ -542,11 +646,11 @@ class _BarOrderCard extends StatelessWidget {
                         icon: const Icon(Icons.undo),
                         label: const Text('Revenir'),
                       ),
-
                     if (status == 'ready')
                       ElevatedButton.icon(
                         onPressed: () async {
                           await barService.updateBarStatus(
+                            establishmentId: establishmentId,
                             orderId: orderId,
                             newBarStatus: 'served',
                           );
@@ -561,395 +665,6 @@ class _BarOrderCard extends StatelessWidget {
           ),
         );
       },
-    );
-  }
-}
-
-class _BarStockActionsCard extends StatelessWidget {
-  const _BarStockActionsCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final isSmallScreen = MediaQuery.of(context).size.width < 900;
-
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Colors.indigo.withOpacity(0.12),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(Icons.local_bar, color: Colors.indigo),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Gestion stock bar',
-                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            if (isSmallScreen)
-              Column(
-                children: [
-                  _BarMainButton(
-                    title: 'Gestion du Bar',
-                    subtitle: 'Cocktails • Articles • Consommation • Réception',
-                    color: Colors.indigo,
-                    icon: Icons.settings,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const BarManagementPage(),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  _BarMainButton(
-                    title: 'Consultation & Suivi',
-                    subtitle: 'Stocks • Approvisionnement • Historique',
-                    color: Colors.green,
-                    icon: Icons.visibility,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const BarConsultationPage(),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              )
-            else
-              Row(
-                children: [
-                  Expanded(
-                    child: _BarMainButton(
-                      title: 'Gestion du Bar',
-                      subtitle:
-                          'Cocktails • Articles • Consommation • Réception',
-                      color: Colors.indigo,
-                      icon: Icons.settings,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const BarManagementPage(),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: _BarMainButton(
-                      title: 'Consultation & Suivi',
-                      subtitle: 'Stocks • Approvisionnement • Historique',
-                      color: Colors.green,
-                      icon: Icons.visibility,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const BarConsultationPage(),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _BarMainButton extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final Color color;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _BarMainButton({
-    required this.title,
-    required this.subtitle,
-    required this.color,
-    required this.icon,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: color,
-      borderRadius: BorderRadius.circular(18),
-      elevation: 3,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
-        child: Container(
-          width: double.infinity,
-          height: 160,
-          padding: const EdgeInsets.all(18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, color: Colors.white, size: 32),
-              const Spacer(),
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                subtitle,
-                softWrap: true,
-                maxLines: 3,
-                overflow: TextOverflow.visible,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 13,
-                  height: 1.3,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class BarManagementPage extends StatelessWidget {
-  const BarManagementPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return _BarMenuPage(
-      title: 'Gestion du Bar',
-      color: Colors.indigo,
-      actions: [
-        _BarAction(
-          title: 'Composer cocktails',
-          icon: Icons.local_bar,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const BarMenuItemIngredientsFormPage(),
-              ),
-            );
-          },
-        ),
-        _BarAction(
-          title: 'Ajouter un article',
-          icon: Icons.add_box,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const BarStockItemFormPage()),
-            );
-          },
-        ),
-        _BarAction(
-          title: 'Déclarer une consommation',
-          icon: Icons.remove_shopping_cart,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const StockOutPage(
-                  store: 'bar',
-                  title: 'Sortie de stock - Bar',
-                  defaultReason: 'Consommation bar',
-                ),
-              ),
-            );
-          },
-        ),
-        _BarAction(
-          title: 'Confirmer réception',
-          icon: Icons.check_circle,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const StoreRequestHistoryPage(
-                  store: 'bar',
-                  title: 'Réceptions à confirmer - Bar',
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-}
-
-class BarConsultationPage extends StatelessWidget {
-  const BarConsultationPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return _BarMenuPage(
-      title: 'Consultation & Suivi',
-      color: Colors.green,
-      actions: [
-        _BarAction(
-          title: 'Voir les stocks',
-          icon: Icons.inventory,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) =>
-                    const StoreStockPage(store: 'bar', title: 'Stock Bar'),
-              ),
-            );
-          },
-        ),
-        _BarAction(
-          title: 'Demander approvisionnement',
-          icon: Icons.playlist_add,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const CreateStockRequestPage(
-                  store: 'bar',
-                  requestedByRole: 'barman',
-                  title: 'Demande approvisionnement - Bar',
-                ),
-              ),
-            );
-          },
-        ),
-        _BarAction(
-          title: 'Historique stock',
-          icon: Icons.history,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const StockMovementHistoryPage(
-                  store: 'bar',
-                  title: 'Historique mouvements - Bar',
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-}
-
-class _BarAction {
-  final String title;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _BarAction({
-    required this.title,
-    required this.icon,
-    required this.onTap,
-  });
-}
-
-class _BarMenuPage extends StatelessWidget {
-  final String title;
-  final Color color;
-  final List<_BarAction> actions;
-
-  const _BarMenuPage({
-    required this.title,
-    required this.color,
-    required this.actions,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isSmall = MediaQuery.of(context).size.width < 800;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-        backgroundColor: color,
-        foregroundColor: Colors.white,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(18),
-        child: GridView.builder(
-          itemCount: actions.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: isSmall ? 1 : 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: isSmall ? 3.2 : 3.5,
-          ),
-          itemBuilder: (context, index) {
-            final action = actions[index];
-
-            return Material(
-              color: color.withOpacity(0.10),
-              borderRadius: BorderRadius.circular(18),
-              child: InkWell(
-                onTap: action.onTap,
-                borderRadius: BorderRadius.circular(18),
-                child: Container(
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: color.withOpacity(0.35)),
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 26,
-                        backgroundColor: color,
-                        child: Icon(action.icon, color: Colors.white),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Text(
-                          action.title,
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      Icon(Icons.arrow_forward_ios, color: color, size: 18),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ),
     );
   }
 }

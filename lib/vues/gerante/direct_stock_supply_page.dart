@@ -6,11 +6,13 @@ import 'package:takapp/modeles/stock_item_model.dart';
 import 'package:takapp/services/stock_item_service.dart';
 
 class DirectStockSupplyPage extends StatefulWidget {
+  final String establishmentId;
   final String store;
   final String title;
 
   const DirectStockSupplyPage({
     super.key,
+    required this.establishmentId,
     required this.store,
     required this.title,
   });
@@ -25,6 +27,8 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
   );
 
   final List<_SupplyLineInput> _lines = [_SupplyLineInput()];
+
+  String get establishmentId => widget.establishmentId.trim();
 
   Color _storeColor() {
     switch (widget.store) {
@@ -51,12 +55,21 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
       return;
     }
 
+    if (establishmentId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Établissement introuvable.')),
+      );
+      return;
+    }
+
     for (int i = 0; i < _lines.length; i++) {
       final line = _lines[i];
+
       final selected = items.cast<StockItemModel?>().firstWhere(
         (item) => item?.id == line.selectedItemId,
         orElse: () => null,
       );
+
       final quantity = double.tryParse(line.quantityController.text.trim());
 
       if (selected == null && line.quantityController.text.trim().isEmpty) {
@@ -78,6 +91,7 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
       }
 
       final success = await controller.directSupply(
+        establishmentId: establishmentId,
         store: widget.store,
         itemId: selected.id,
         itemName: selected.name,
@@ -90,6 +104,7 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
 
       if (!success) {
         if (!mounted) return;
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(controller.errorMessage ?? 'Erreur inconnue.'),
@@ -100,7 +115,9 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
     }
 
     if (!mounted) return;
+
     Navigator.pop(context);
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Approvisionnement direct enregistré avec succès.'),
@@ -111,9 +128,11 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
   @override
   void dispose() {
     _reasonController.dispose();
+
     for (final line in _lines) {
       line.dispose();
     }
+
     super.dispose();
   }
 
@@ -124,10 +143,19 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
     final color = _storeColor();
     final isSmall = MediaQuery.of(context).size.width < 800;
 
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: StreamBuilder<List<StockItemModel>>(
-        stream: service.streamItems(),
+        stream: service.streamItems(
+          establishmentId: establishmentId,
+          store: widget.store,
+        ),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -160,6 +188,7 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
                 const SizedBox(height: 14),
                 ...List.generate(_lines.length, (index) {
                   final line = _lines[index];
+
                   return Card(
                     margin: const EdgeInsets.only(bottom: 10),
                     child: Padding(
@@ -178,12 +207,14 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
                               ),
                               if (_lines.length > 1)
                                 IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      line.dispose();
-                                      _lines.removeAt(index);
-                                    });
-                                  },
+                                  onPressed: controller.isSubmitting
+                                      ? null
+                                      : () {
+                                          setState(() {
+                                            line.dispose();
+                                            _lines.removeAt(index);
+                                          });
+                                        },
                                   icon: const Icon(Icons.delete_outline),
                                 ),
                             ],
@@ -205,15 +236,18 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
                                 child: Text('${item.name} (${item.unit})'),
                               );
                             }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                line.selectedItemId = value;
-                              });
-                            },
+                            onChanged: controller.isSubmitting
+                                ? null
+                                : (value) {
+                                    setState(() {
+                                      line.selectedItemId = value;
+                                    });
+                                  },
                           ),
                           const SizedBox(height: 12),
                           TextField(
                             controller: line.quantityController,
+                            enabled: !controller.isSubmitting,
                             keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
                             ),
@@ -227,11 +261,13 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
                   );
                 }),
                 TextButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _lines.add(_SupplyLineInput());
-                    });
-                  },
+                  onPressed: controller.isSubmitting
+                      ? null
+                      : () {
+                          setState(() {
+                            _lines.add(_SupplyLineInput());
+                          });
+                        },
                   icon: const Icon(Icons.add),
                   label: const Text('Ajouter un article'),
                 ),

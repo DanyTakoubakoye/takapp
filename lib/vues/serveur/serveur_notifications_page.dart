@@ -4,19 +4,38 @@ import 'package:intl/intl.dart';
 import 'package:takapp/services/server_notification_service.dart';
 
 class ServeurNotificationsPage extends StatelessWidget {
-  final String serverId;
+  final String establishmentId;
+  final String serveurId;
 
-  const ServeurNotificationsPage({super.key, required this.serverId});
+  const ServeurNotificationsPage({
+    super.key,
+    required this.establishmentId,
+    required this.serveurId,
+  });
 
   String _formatDate(dynamic value) {
     if (value is Timestamp) {
       return DateFormat('dd/MM/yyyy HH:mm').format(value.toDate());
     }
+
     return '-';
   }
 
   @override
   Widget build(BuildContext context) {
+    final safeEstablishmentId = establishmentId.trim();
+    final safeServerId = serveurId.trim();
+
+    if (safeEstablishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
+    if (safeServerId.isEmpty) {
+      return const Scaffold(body: Center(child: Text('Serveur introuvable.')));
+    }
+
     final service = ServerNotificationService();
     final isSmallScreen = MediaQuery.of(context).size.width < 700;
 
@@ -25,9 +44,13 @@ class ServeurNotificationsPage extends StatelessWidget {
       body: Padding(
         padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
         child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          stream: service.streamNotificationsForServer(serverId),
+          stream: service.streamNotificationsForServer(
+            establishmentId: safeEstablishmentId,
+            serveurId: safeServerId,
+          ),
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
+            if (snapshot.connectionState == ConnectionState.waiting &&
+                !snapshot.hasData) {
               return const Center(child: CircularProgressIndicator());
             }
 
@@ -42,6 +65,7 @@ class ServeurNotificationsPage extends StatelessWidget {
             }
 
             final notifications = [...docs];
+
             notifications.sort((a, b) {
               final aDate = a.data()['createdAt'];
               final bDate = b.data()['createdAt'];

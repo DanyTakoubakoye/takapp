@@ -1,13 +1,41 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:takapp/modeles/payment_model.dart';
 import 'package:takapp/modeles/server_handover_model.dart';
 
 class GeranteHandoverService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Stream<List<ServerHandoverModel>> streamPendingHandovers() {
+  /// =========================
+  /// HELPERS
+  /// =========================
+
+  CollectionReference<Map<String, dynamic>> _handoversRef({
+    required String establishmentId,
+  }) {
     return _firestore
-        .collection('serverHandovers')
+        .collection('establishments')
+        .doc(establishmentId)
+        .collection('serverHandovers');
+  }
+
+  CollectionReference<Map<String, dynamic>> _paymentsRef({
+    required String establishmentId,
+  }) {
+    return _firestore
+        .collection('establishments')
+        .doc(establishmentId)
+        .collection('payments');
+  }
+
+  /// =========================
+  /// STREAM VERSEMENTS
+  /// =========================
+
+  Stream<List<ServerHandoverModel>> streamPendingHandovers({
+    required String establishmentId,
+  }) {
+    return _handoversRef(establishmentId: establishmentId)
         .where('status', whereIn: ['pending', 'partially_validated'])
         .orderBy('createdAt', descending: true)
         .snapshots()
@@ -18,34 +46,50 @@ class GeranteHandoverService {
         );
   }
 
-  Stream<List<QueryDocumentSnapshot>> getUnpaidServerPayments() {
-    return _firestore
-        .collection('payments')
+  /// =========================
+  /// PAIEMENTS NON VERSES
+  /// =========================
+
+  Stream<List<QueryDocumentSnapshot<Map<String, dynamic>>>>
+  getUnpaidServerPayments({required String establishmentId}) {
+    return _paymentsRef(establishmentId: establishmentId)
         .where('handoverStatus', isEqualTo: 'pending')
         .snapshots()
         .map((s) => s.docs);
   }
 
-  Stream<List<Map<String, dynamic>>> streamServerPaymentsNonVerses() {
-    return FirebaseFirestore.instance
-        .collection('payments')
+  /// =========================
+  /// STREAM PAIEMENTS SERVEURS
+  /// =========================
+
+  Stream<List<Map<String, dynamic>>> streamServerPaymentsNonVerses({
+    required String establishmentId,
+  }) {
+    return _paymentsRef(establishmentId: establishmentId)
         .where('handoverStatus', isEqualTo: 'pending')
         .snapshots()
         .map(
           (snapshot) => snapshot.docs
               .map((doc) => {...doc.data(), 'id': doc.id})
-              .where((data) => (data['type'] ?? '') != 'room') // EXCLURE HOTEL
+              .where((data) => (data['type'] ?? '') != 'room')
               .toList(),
         );
   }
 
-  Future<List<PaymentModel>> getPaymentsForHandover(
-    List<String> paymentIds,
-  ) async {
-    if (paymentIds.isEmpty) return [];
+  /// =========================
+  /// GET PAYMENTS FOR HANDOVER
+  /// =========================
+
+  Future<List<PaymentModel>> getPaymentsForHandover({
+    required String establishmentId,
+    required List<String> paymentIds,
+  }) async {
+    if (paymentIds.isEmpty) {
+      return [];
+    }
 
     final futures = paymentIds.map(
-      (id) => _firestore.collection('payments').doc(id).get(),
+      (id) => _paymentsRef(establishmentId: establishmentId).doc(id).get(),
     );
 
     final docs = await Future.wait(futures);
@@ -56,7 +100,12 @@ class GeranteHandoverService {
         .toList();
   }
 
+  /// =========================
+  /// VALIDATE PAYMENTS
+  /// =========================
+
   Future<void> validateSelectedPayments({
+    required String establishmentId,
     required String handoverId,
     required List<String> selectedPaymentIds,
     required double validatedAmount,
@@ -67,9 +116,10 @@ class GeranteHandoverService {
       throw Exception('Aucune commande sélectionnée.');
     }
 
-    final handoverRef = _firestore
-        .collection('serverHandovers')
-        .doc(handoverId);
+    final handoverRef = _handoversRef(
+      establishmentId: establishmentId,
+    ).doc(handoverId);
+
     final handoverSnap = await handoverRef.get();
 
     if (!handoverSnap.exists || handoverSnap.data() == null) {
@@ -77,13 +127,17 @@ class GeranteHandoverService {
     }
 
     final data = handoverSnap.data()!;
+
     final paymentIds = List<String>.from(data['paymentIds'] ?? []);
+
     final validatedIds = List<String>.from(data['validatedPaymentIds'] ?? []);
+
     final rejectedIds = List<String>.from(data['rejectedPaymentIds'] ?? []);
 
     final newValidatedIds = {...validatedIds, ...selectedPaymentIds}.toList();
 
     String newStatus = 'partially_validated';
+
     if ((newValidatedIds.length + rejectedIds.length) >= paymentIds.length) {
       newStatus = 'validated';
     }
@@ -92,22 +146,49 @@ class GeranteHandoverService {
 
     batch.update(handoverRef, {
       'validatedPaymentIds': newValidatedIds,
+
       'validatedAmount': validatedAmount,
+
       'status': newStatus,
+
       'receivedByManagerId': managerId,
+
       'receivedByManagerName': managerName,
+
       'validatedAt': FieldValue.serverTimestamp(),
+
+      'updatedAt': FieldValue.serverTimestamp(),
+
+      'pendingSync': false,
+
+      'syncError': false,
     });
 
     for (final paymentId in selectedPaymentIds) {
-      final paymentRef = _firestore.collection('payments').doc(paymentId);
-      batch.update(paymentRef, {'handoverStatus': 'validated'});
+      final paymentRef = _paymentsRef(
+        establishmentId: establishmentId,
+      ).doc(paymentId);
+
+      batch.update(paymentRef, {
+        'handoverStatus': 'validated',
+
+        'updatedAt': FieldValue.serverTimestamp(),
+
+        'pendingSync': false,
+
+        'syncError': false,
+      });
     }
 
     await batch.commit();
   }
 
+  /// =========================
+  /// REJECT PAYMENTS
+  /// =========================
+
   Future<void> rejectSelectedPayments({
+    required String establishmentId,
     required String handoverId,
     required List<String> selectedPaymentIds,
     required double validatedAmount,
@@ -118,9 +199,10 @@ class GeranteHandoverService {
       throw Exception('Aucune commande sélectionnée.');
     }
 
-    final handoverRef = _firestore
-        .collection('serverHandovers')
-        .doc(handoverId);
+    final handoverRef = _handoversRef(
+      establishmentId: establishmentId,
+    ).doc(handoverId);
+
     final handoverSnap = await handoverRef.get();
 
     if (!handoverSnap.exists || handoverSnap.data() == null) {
@@ -128,13 +210,17 @@ class GeranteHandoverService {
     }
 
     final data = handoverSnap.data()!;
+
     final paymentIds = List<String>.from(data['paymentIds'] ?? []);
+
     final validatedIds = List<String>.from(data['validatedPaymentIds'] ?? []);
+
     final rejectedIds = List<String>.from(data['rejectedPaymentIds'] ?? []);
 
     final newRejectedIds = {...rejectedIds, ...selectedPaymentIds}.toList();
 
     String newStatus = 'partially_validated';
+
     if ((validatedIds.length + newRejectedIds.length) >= paymentIds.length) {
       newStatus = 'validated';
     }
@@ -143,18 +229,39 @@ class GeranteHandoverService {
 
     batch.update(handoverRef, {
       'rejectedPaymentIds': newRejectedIds,
+
       'validatedAmount': validatedAmount,
+
       'status': newStatus,
+
       'receivedByManagerId': managerId,
+
       'receivedByManagerName': managerName,
+
       'validatedAt': FieldValue.serverTimestamp(),
+
+      'updatedAt': FieldValue.serverTimestamp(),
+
+      'pendingSync': false,
+
+      'syncError': false,
     });
 
     for (final paymentId in selectedPaymentIds) {
-      final paymentRef = _firestore.collection('payments').doc(paymentId);
+      final paymentRef = _paymentsRef(
+        establishmentId: establishmentId,
+      ).doc(paymentId);
+
       batch.update(paymentRef, {
         'handoverStatus': 'pending',
+
         'handoverId': null,
+
+        'updatedAt': FieldValue.serverTimestamp(),
+
+        'pendingSync': false,
+
+        'syncError': false,
       });
     }
 

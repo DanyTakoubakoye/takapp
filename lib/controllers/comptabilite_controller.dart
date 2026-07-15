@@ -13,20 +13,29 @@ class ComptabiliteController extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
 
   Future<bool> confirmTransferReception({
+    required String establishmentId,
     required String transferId,
     required String accountingId,
     required String accountingName,
   }) async {
+    if (establishmentId.trim().isEmpty) {
+      _errorMessage = 'Établissement introuvable.';
+      notifyListeners();
+      return false;
+    }
+
     _isSubmitting = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
       await _service.confirmTransferReception(
+        establishmentId: establishmentId,
         transferId: transferId,
         accountingId: accountingId,
         accountingName: accountingName,
       );
+
       return true;
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');
@@ -38,6 +47,7 @@ class ComptabiliteController extends ChangeNotifier {
   }
 
   Future<bool> createExpense({
+    required String establishmentId,
     required String label,
     required String category,
     required String accountType,
@@ -45,6 +55,12 @@ class ComptabiliteController extends ChangeNotifier {
     required String createdBy,
     required String createdByName,
   }) async {
+    if (establishmentId.trim().isEmpty) {
+      _errorMessage = 'Établissement introuvable.';
+      notifyListeners();
+      return false;
+    }
+
     if (label.trim().isEmpty) {
       _errorMessage = 'Veuillez saisir un libellé.';
       notifyListeners();
@@ -63,13 +79,15 @@ class ComptabiliteController extends ChangeNotifier {
 
     try {
       await _service.createExpense(
-        label: label,
-        category: category,
-        accountType: accountType,
+        establishmentId: establishmentId,
+        label: label.trim(),
+        category: category.trim(),
+        accountType: accountType.trim(),
         amount: amount,
         createdBy: createdBy,
         createdByName: createdByName,
       );
+
       return true;
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');

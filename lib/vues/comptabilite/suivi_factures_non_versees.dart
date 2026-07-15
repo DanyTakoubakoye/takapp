@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:takapp/controllers/auth_controller.dart';
 
 class SuiviFacturesNonVerseesPage extends StatefulWidget {
   const SuiviFacturesNonVerseesPage({super.key});
@@ -12,6 +15,34 @@ class SuiviFacturesNonVerseesPage extends StatefulWidget {
 class _SuiviFacturesNonVerseesPageState
     extends State<SuiviFacturesNonVerseesPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  /// =========================
+  /// SAAS HELPERS
+  /// =========================
+
+  String get establishmentId {
+    final auth = context.read<AuthController>();
+    return auth.currentUser?.establishmentId ?? '';
+  }
+
+  String get establishmentName {
+    final auth = context.read<AuthController>();
+    return auth.currentUser?.establishmentName ?? '';
+  }
+
+  CollectionReference<Map<String, dynamic>> get _roomInvoicesCol {
+    return _firestore
+        .collection('establishments')
+        .doc(establishmentId)
+        .collection('roomInvoices');
+  }
+
+  CollectionReference<Map<String, dynamic>> get _paymentsCol {
+    return _firestore
+        .collection('establishments')
+        .doc(establishmentId)
+        .collection('payments');
+  }
 
   bool _isRoomInvoiceStillUntransferred(Map<String, dynamic> data) {
     final transferStatus = (data['accountingTransferStatus'] ?? '')
@@ -34,21 +65,38 @@ class _SuiviFacturesNonVerseesPageState
 
   @override
   Widget build(BuildContext context) {
-    final invoicesStream = _firestore
-        .collection('roomInvoices')
+    final auth = context.watch<AuthController>();
+    final user = auth.currentUser;
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text('Utilisateur introuvable.')),
+      );
+    }
+
+    if (user.establishmentId.trim().isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
+    final invoicesStream = _roomInvoicesCol
         .where('status', isEqualTo: 'paid')
         .orderBy('paidAt', descending: true)
         .snapshots();
 
-    final paymentsStream = _firestore
-        .collection('payments')
+    final paymentsStream = _paymentsCol
         .where('handoverStatus', isEqualTo: 'pending')
         .orderBy('createdAt', descending: true)
         .snapshots();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Suivi factures / encaissements non versés'),
+        title: Text(
+          user.establishmentName.trim().isNotEmpty
+              ? '${user.establishmentName} - Suivi non versés'
+              : 'Suivi factures / encaissements non versés',
+        ),
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -103,7 +151,7 @@ class _SuiviFacturesNonVerseesPageState
   }
 
   Widget _buildRoomInvoicesCard(
-    Stream<QuerySnapshot<Object?>> invoicesStream, {
+    Stream<QuerySnapshot<Map<String, dynamic>>> invoicesStream, {
     required bool isMobile,
   }) {
     return Card(
@@ -125,7 +173,7 @@ class _SuiviFacturesNonVerseesPageState
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: StreamBuilder<QuerySnapshot>(
+              child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                 stream: invoicesStream,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -137,8 +185,7 @@ class _SuiviFacturesNonVerseesPageState
                   }
 
                   final docs = (snapshot.data?.docs ?? []).where((doc) {
-                    final data = doc.data() as Map<String, dynamic>;
-                    return _isRoomInvoiceStillUntransferred(data);
+                    return _isRoomInvoiceStillUntransferred(doc.data());
                   }).toList();
 
                   if (docs.isEmpty) {
@@ -151,7 +198,7 @@ class _SuiviFacturesNonVerseesPageState
                     itemCount: docs.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
-                      final data = docs[index].data() as Map<String, dynamic>;
+                      final data = docs[index].data();
                       final total = ((data['total'] ?? 0) as num).toDouble();
 
                       return Container(
@@ -227,7 +274,7 @@ class _SuiviFacturesNonVerseesPageState
   }
 
   Widget _buildServerPaymentsCard(
-    Stream<QuerySnapshot<Object?>> paymentsStream, {
+    Stream<QuerySnapshot<Map<String, dynamic>>> paymentsStream, {
     required bool isMobile,
   }) {
     return Card(
@@ -249,7 +296,7 @@ class _SuiviFacturesNonVerseesPageState
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: StreamBuilder<QuerySnapshot>(
+              child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
                 stream: paymentsStream,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -261,8 +308,7 @@ class _SuiviFacturesNonVerseesPageState
                   }
 
                   final docs = (snapshot.data?.docs ?? []).where((doc) {
-                    final data = doc.data() as Map<String, dynamic>;
-                    return _isServerPaymentStillUntransferred(data);
+                    return _isServerPaymentStillUntransferred(doc.data());
                   }).toList();
 
                   if (docs.isEmpty) {
@@ -275,7 +321,7 @@ class _SuiviFacturesNonVerseesPageState
                     itemCount: docs.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
-                      final data = docs[index].data() as Map<String, dynamic>;
+                      final data = docs[index].data();
                       final amount = ((data['amount'] ?? 0) as num).toDouble();
 
                       return Container(

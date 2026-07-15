@@ -6,7 +6,9 @@ import 'package:takapp/services/bar_service.dart';
 import 'package:takapp/vues/serveur/cancel_order_items_page.dart';
 
 class SuiviBarPage extends StatelessWidget {
-  const SuiviBarPage({super.key});
+  final String establishmentId;
+
+  const SuiviBarPage({super.key, required this.establishmentId});
 
   Color _color(String status) {
     switch (status) {
@@ -64,7 +66,6 @@ class SuiviBarPage extends StatelessWidget {
         .trim()
         .toLowerCase();
     final status = (data['status'] ?? '').toString().trim().toLowerCase();
-
     final kitchenStatus = (data['kitchenStatus'] ?? '').toString().trim();
     final barStatus = (data['barStatus'] ?? '').toString().trim();
 
@@ -80,12 +81,13 @@ class SuiviBarPage extends StatelessWidget {
     BuildContext context,
     QueryDocumentSnapshot doc,
     List<Map<String, dynamic>> barItems,
+    String safeEstablishmentId,
   ) {
     final barService = BarService();
     final data = doc.data() as Map<String, dynamic>;
 
     final totalValue = data['total'];
-    final double total = totalValue is num
+    final total = totalValue is num
         ? totalValue.toDouble()
         : double.tryParse(totalValue?.toString() ?? '0') ?? 0;
 
@@ -154,6 +156,7 @@ class SuiviBarPage extends StatelessWidget {
                   ElevatedButton.icon(
                     onPressed: () async {
                       await barService.updateBarStatus(
+                        establishmentId: safeEstablishmentId,
                         orderId: doc.id,
                         newBarStatus: 'preparing',
                       );
@@ -165,6 +168,7 @@ class SuiviBarPage extends StatelessWidget {
                   ElevatedButton.icon(
                     onPressed: () async {
                       await barService.updateBarStatus(
+                        establishmentId: safeEstablishmentId,
                         orderId: doc.id,
                         newBarStatus: 'ready',
                       );
@@ -176,6 +180,7 @@ class SuiviBarPage extends StatelessWidget {
                   OutlinedButton.icon(
                     onPressed: () async {
                       await barService.updateBarStatus(
+                        establishmentId: safeEstablishmentId,
                         orderId: doc.id,
                         newBarStatus: 'preparing',
                       );
@@ -187,6 +192,7 @@ class SuiviBarPage extends StatelessWidget {
                   ElevatedButton.icon(
                     onPressed: () async {
                       await barService.updateBarStatus(
+                        establishmentId: safeEstablishmentId,
                         orderId: doc.id,
                         newBarStatus: 'served',
                       );
@@ -201,6 +207,7 @@ class SuiviBarPage extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (_) => CancelOrderItemsPage(
+                            establishmentId: safeEstablishmentId,
                             orderId: doc.id,
                             orderNumber: orderNumber,
                           ),
@@ -218,77 +225,81 @@ class SuiviBarPage extends StatelessWidget {
     );
   }
 
-  Widget _buildColumn(
+  Widget _buildColumnCard(
     BuildContext context,
     String title,
     List<QueryDocumentSnapshot> orders,
+    String safeEstablishmentId,
   ) {
     final barService = BarService();
 
-    return Expanded(
-      child: Card(
-        margin: const EdgeInsets.all(8),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Expanded(
-                child: orders.isEmpty
-                    ? const Center(child: Text('Aucune commande'))
-                    : ListView.separated(
-                        itemCount: orders.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
-                        itemBuilder: (context, index) {
-                          final doc = orders[index];
+    return Card(
+      margin: const EdgeInsets.all(8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          children: [
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: orders.isEmpty
+                  ? const Center(child: Text('Aucune commande'))
+                  : ListView.separated(
+                      itemCount: orders.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      itemBuilder: (context, index) {
+                        final doc = orders[index];
 
-                          return FutureBuilder<List<Map<String, dynamic>>>(
-                            future: barService.getBarItemsForOrder(doc.id),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return const Card(
-                                  child: Padding(
-                                    padding: EdgeInsets.all(16),
-                                    child: Center(
-                                      child: CircularProgressIndicator(),
-                                    ),
+                        return FutureBuilder<List<Map<String, dynamic>>>(
+                          future: barService.getBarItemsForOrder(
+                            establishmentId: safeEstablishmentId,
+                            orderId: doc.id,
+                          ),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Card(
+                                child: Padding(
+                                  padding: EdgeInsets.all(16),
+                                  child: Center(
+                                    child: CircularProgressIndicator(),
                                   ),
-                                );
-                              }
+                                ),
+                              );
+                            }
 
-                              if (snapshot.hasError) {
-                                return Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Text(
-                                      'Erreur articles bar : ${snapshot.error}',
-                                    ),
+                            if (snapshot.hasError) {
+                              return Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Text(
+                                    'Erreur articles bar : ${snapshot.error}',
                                   ),
-                                );
-                              }
+                                ),
+                              );
+                            }
 
-                              final barItems = snapshot.data ?? [];
+                            final barItems = snapshot.data ?? [];
 
-                              if (barItems.isEmpty) {
-                                return const SizedBox.shrink();
-                              }
+                            if (barItems.isEmpty) {
+                              return const SizedBox.shrink();
+                            }
 
-                              return _buildOrderCard(context, doc, barItems);
-                            },
-                          );
-                        },
-                      ),
-              ),
-            ],
-          ),
+                            return _buildOrderCard(
+                              context,
+                              doc,
+                              barItems,
+                              safeEstablishmentId,
+                            );
+                          },
+                        );
+                      },
+                    ),
+            ),
+          ],
         ),
       ),
     );
@@ -296,51 +307,63 @@ class SuiviBarPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final safeEstablishmentId = establishmentId.trim();
     final user = context.watch<AuthController>().currentUser;
     final isSmallScreen = MediaQuery.of(context).size.width < 900;
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(child: Text('Utilisateur introuvable.')),
+      );
+    }
+
+    final serveurId = user.uid;
+
+    if (safeEstablishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Suivi Bar')),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
+            .collection('establishments')
+            .doc(safeEstablishmentId)
             .collection('orders')
-            .where('createdBy', isEqualTo: user?.uid)
+            .where('createdBy', isEqualTo: serveurId)
             .where('isForBar', isEqualTo: true)
             .snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting &&
+              !snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final docs = snapshot.data!.docs.where((doc) {
+          if (snapshot.hasError) {
+            return Center(child: Text('Erreur : ${snapshot.error}'));
+          }
+
+          final docs = (snapshot.data?.docs ?? []).where((doc) {
             final data = doc.data() as Map<String, dynamic>;
             return (data['status'] ?? '').toString() != 'cancelled';
           }).toList();
 
-          final pending = docs
-              .where(
-                (doc) =>
-                    ((doc.data() as Map<String, dynamic>)['barStatus'] ??
-                        'pending') ==
-                    'pending',
-              )
-              .toList();
+          final pending = docs.where((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return (data['barStatus'] ?? 'pending') == 'pending';
+          }).toList();
 
-          final preparing = docs
-              .where(
-                (doc) =>
-                    ((doc.data() as Map<String, dynamic>)['barStatus'] ?? '') ==
-                    'preparing',
-              )
-              .toList();
+          final preparing = docs.where((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return (data['barStatus'] ?? '') == 'preparing';
+          }).toList();
 
-          final ready = docs
-              .where(
-                (doc) =>
-                    ((doc.data() as Map<String, dynamic>)['barStatus'] ?? '') ==
-                    'ready',
-              )
-              .toList();
+          final ready = docs.where((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return (data['barStatus'] ?? '') == 'ready';
+          }).toList();
 
           if (isSmallScreen) {
             return SingleChildScrollView(
@@ -349,17 +372,32 @@ class SuiviBarPage extends StatelessWidget {
                 children: [
                   SizedBox(
                     height: 500,
-                    child: _buildColumn(context, 'En attente', pending),
+                    child: _buildColumnCard(
+                      context,
+                      'En attente',
+                      pending,
+                      safeEstablishmentId,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
                     height: 500,
-                    child: _buildColumn(context, 'En préparation', preparing),
+                    child: _buildColumnCard(
+                      context,
+                      'En préparation',
+                      preparing,
+                      safeEstablishmentId,
+                    ),
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
                     height: 500,
-                    child: _buildColumn(context, 'Prêtes', ready),
+                    child: _buildColumnCard(
+                      context,
+                      'Prêtes',
+                      ready,
+                      safeEstablishmentId,
+                    ),
                   ),
                 ],
               ),
@@ -369,9 +407,30 @@ class SuiviBarPage extends StatelessWidget {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildColumn(context, 'En attente', pending),
-              _buildColumn(context, 'En préparation', preparing),
-              _buildColumn(context, 'Prêtes', ready),
+              Expanded(
+                child: _buildColumnCard(
+                  context,
+                  'En attente',
+                  pending,
+                  safeEstablishmentId,
+                ),
+              ),
+              Expanded(
+                child: _buildColumnCard(
+                  context,
+                  'En préparation',
+                  preparing,
+                  safeEstablishmentId,
+                ),
+              ),
+              Expanded(
+                child: _buildColumnCard(
+                  context,
+                  'Prêtes',
+                  ready,
+                  safeEstablishmentId,
+                ),
+              ),
             ],
           );
         },

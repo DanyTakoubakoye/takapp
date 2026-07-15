@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
@@ -9,10 +10,20 @@ import 'package:takapp/services/pdf_service.dart';
 import 'package:takapp/services/printer_service.dart';
 
 class VersementsServeursPage extends StatelessWidget {
-  const VersementsServeursPage({super.key});
+  final String establishmentId;
+
+  const VersementsServeursPage({super.key, required this.establishmentId});
 
   @override
   Widget build(BuildContext context) {
+    final safeEstablishmentId = establishmentId.trim();
+
+    if (safeEstablishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
     final service = GeranteHandoverService();
 
     return Scaffold(
@@ -20,7 +31,9 @@ class VersementsServeursPage extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: StreamBuilder<List<ServerHandoverModel>>(
-          stream: service.streamPendingHandovers(),
+          stream: service.streamPendingHandovers(
+            establishmentId: safeEstablishmentId,
+          ),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -41,6 +54,7 @@ class VersementsServeursPage extends StatelessWidget {
               separatorBuilder: (_, __) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final handover = handovers[index];
+
                 return Card(
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -71,6 +85,7 @@ class VersementsServeursPage extends StatelessWidget {
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => GeranteHandoverDetailPage(
+                                    establishmentId: safeEstablishmentId,
                                     handover: handover,
                                   ),
                                 ),
@@ -94,9 +109,14 @@ class VersementsServeursPage extends StatelessWidget {
 }
 
 class GeranteHandoverDetailPage extends StatefulWidget {
+  final String establishmentId;
   final ServerHandoverModel handover;
 
-  const GeranteHandoverDetailPage({super.key, required this.handover});
+  const GeranteHandoverDetailPage({
+    super.key,
+    required this.establishmentId,
+    required this.handover,
+  });
 
   @override
   State<GeranteHandoverDetailPage> createState() =>
@@ -105,13 +125,16 @@ class GeranteHandoverDetailPage extends StatefulWidget {
 
 class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
   late final TextEditingController validatedAmountController;
-  final Set<String> selectedPaymentIds = {};
 
+  final Set<String> selectedPaymentIds = {};
   final GeranteHandoverService geranteService = GeranteHandoverService();
+
+  String get establishmentId => widget.establishmentId.trim();
 
   @override
   void initState() {
     super.initState();
+
     validatedAmountController = TextEditingController(
       text: widget.handover.declaredAmount.toStringAsFixed(0),
     );
@@ -126,12 +149,26 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
   Future<void> _validate() async {
     final auth = context.read<AuthController>();
     final user = auth.currentUser;
-    if (user == null) return;
+
+    if (user == null) {
+      _showSnack('Utilisateur introuvable.');
+      return;
+    }
+
+    if (establishmentId.isEmpty) {
+      _showSnack('Établissement introuvable.');
+      return;
+    }
 
     final amount = double.tryParse(validatedAmountController.text.trim());
-    if (amount == null) return;
+
+    if (amount == null) {
+      _showSnack('Montant constaté invalide.');
+      return;
+    }
 
     await geranteService.validateSelectedPayments(
+      establishmentId: establishmentId,
       handoverId: widget.handover.id,
       selectedPaymentIds: selectedPaymentIds.toList(),
       validatedAmount: amount,
@@ -140,21 +177,34 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
     );
 
     if (!mounted) return;
+
     Navigator.pop(context);
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Commandes validées.')));
+    _showSnack('Commandes validées.');
   }
 
   Future<void> _reject() async {
     final auth = context.read<AuthController>();
     final user = auth.currentUser;
-    if (user == null) return;
+
+    if (user == null) {
+      _showSnack('Utilisateur introuvable.');
+      return;
+    }
+
+    if (establishmentId.isEmpty) {
+      _showSnack('Établissement introuvable.');
+      return;
+    }
 
     final amount = double.tryParse(validatedAmountController.text.trim());
-    if (amount == null) return;
+
+    if (amount == null) {
+      _showSnack('Montant constaté invalide.');
+      return;
+    }
 
     await geranteService.rejectSelectedPayments(
+      establishmentId: establishmentId,
       handoverId: widget.handover.id,
       selectedPaymentIds: selectedPaymentIds.toList(),
       validatedAmount: amount,
@@ -163,16 +213,27 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
     );
 
     if (!mounted) return;
+
     Navigator.pop(context);
+    _showSnack('Commandes rejetées.');
+  }
+
+  void _showSnack(String message) {
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text('Commandes rejetées.')));
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
   Widget build(BuildContext context) {
     final pdfService = context.read<PdfService>();
     final printerService = context.read<PrinterService>();
+
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(title: Text('Versement - ${widget.handover.serveurName}')),
@@ -211,7 +272,8 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
                   padding: const EdgeInsets.all(16),
                   child: FutureBuilder<List<PaymentModel>>(
                     future: geranteService.getPaymentsForHandover(
-                      widget.handover.paymentIds,
+                      establishmentId: establishmentId,
+                      paymentIds: widget.handover.paymentIds,
                     ),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
@@ -235,10 +297,12 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
                         separatorBuilder: (_, __) => const Divider(),
                         itemBuilder: (context, index) {
                           final payment = payments[index];
+
                           final alreadyValidated = widget
                               .handover
                               .validatedPaymentIds
                               .contains(payment.id);
+
                           final alreadyRejected = widget
                               .handover
                               .rejectedPaymentIds
@@ -292,7 +356,10 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
                   child: OutlinedButton.icon(
                     onPressed: () async {
                       final payments = await geranteService
-                          .getPaymentsForHandover(widget.handover.paymentIds);
+                          .getPaymentsForHandover(
+                            establishmentId: establishmentId,
+                            paymentIds: widget.handover.paymentIds,
+                          );
 
                       final bytes = await pdfService.buildManagerValidationPdf(
                         handover: widget.handover,

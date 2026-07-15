@@ -8,7 +8,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 class CreateStoreStockPage extends StatefulWidget {
-  const CreateStoreStockPage({super.key});
+  final String establishmentId;
+
+  const CreateStoreStockPage({super.key, required this.establishmentId});
 
   @override
   State<CreateStoreStockPage> createState() => _CreateStoreStockPageState();
@@ -29,6 +31,22 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
 
   String? _importMessage;
 
+  String get establishmentId => widget.establishmentId.trim();
+
+  CollectionReference<Map<String, dynamic>> get _stockItemsCol {
+    return _firestore
+        .collection('establishments')
+        .doc(establishmentId)
+        .collection('stock_items');
+  }
+
+  CollectionReference<Map<String, dynamic>> get _storeStocksCol {
+    return _firestore
+        .collection('establishments')
+        .doc(establishmentId)
+        .collection('store_stocks');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -42,13 +60,14 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
   }
 
   Future<void> _loadStockItems() async {
+    if (establishmentId.isEmpty) return;
+
     setState(() {
       _isLoadingItems = true;
     });
 
     try {
-      final snapshot = await _firestore
-          .collection('stock_items')
+      final snapshot = await _stockItemsCol
           .where('isActive', isEqualTo: true)
           .orderBy('name')
           .get();
@@ -56,6 +75,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
       final items = snapshot.docs
           .map((doc) {
             final data = doc.data();
+
             return _StockItemOption(
               id: doc.id,
               name: (data['name'] ?? '').toString(),
@@ -72,6 +92,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
       });
     } catch (e) {
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erreur chargement articles : $e')),
       );
@@ -85,6 +106,13 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
   }
 
   Future<void> _submit() async {
+    if (establishmentId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Établissement introuvable.')),
+      );
+      return;
+    }
+
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedItem == null) {
@@ -95,6 +123,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
     }
 
     final quantity = int.tryParse(_quantityController.text.trim());
+
     if (quantity == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('La quantité doit être un entier.')),
@@ -118,6 +147,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
       _quantityController.clear();
     } catch (e) {
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erreur lors de l’enregistrement : $e')),
       );
@@ -134,28 +164,28 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
     required String itemId,
     required int quantity,
   }) async {
-    final stockItemDoc = await _firestore
-        .collection('stock_items')
-        .doc(itemId)
-        .get();
+    final stockItemDoc = await _stockItemsCol.doc(itemId).get();
 
     final stockItemData = stockItemDoc.data();
+
     if (stockItemData == null) {
       throw Exception('Article introuvable dans stock_items');
     }
 
     final itemName = (stockItemData['name'] ?? '').toString();
+
     final store = (stockItemData['store'] ?? '').toString();
+
     final unit = (stockItemData['unit'] ?? '').toString();
 
-    final existing = await _firestore
-        .collection('store_stocks')
+    final existing = await _storeStocksCol
         .where('itemId', isEqualTo: itemId)
         .limit(1)
         .get();
 
     if (existing.docs.isNotEmpty) {
       await existing.docs.first.reference.update({
+        'establishmentId': establishmentId,
         'itemName': itemName,
         'quantity': quantity,
         'minimumQuantity': 0,
@@ -165,13 +195,15 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
         'updatedAt': Timestamp.now(),
       });
     } else {
-      await _firestore.collection('store_stocks').add({
+      await _storeStocksCol.add({
+        'establishmentId': establishmentId,
         'itemId': itemId,
         'itemName': itemName,
         'quantity': quantity,
         'minimumQuantity': 0,
         'isLowStock': false,
         'createdAt': Timestamp.now(),
+        'updatedAt': Timestamp.now(),
         'store': store,
         'unit': unit,
       });
@@ -179,6 +211,13 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
   }
 
   Future<void> _importFile() async {
+    if (establishmentId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Établissement introuvable.')),
+      );
+      return;
+    }
+
     setState(() {
       _isImporting = true;
       _importMessage = null;
@@ -207,6 +246,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
       }
 
       List<Map<String, String>> rows;
+
       if (fileName.endsWith('.csv')) {
         rows = _readCsvRows(bytes);
       } else if (fileName.endsWith('.xlsx')) {
@@ -220,6 +260,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
       }
 
       int successCount = 0;
+
       final errors = <String>[];
 
       for (int i = 0; i < rows.length; i++) {
@@ -227,6 +268,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
 
         try {
           final itemName = _pick(row, ['itemname', 'name', 'article', 'nom']);
+
           final quantityText = _pick(row, ['quantity', 'quantite', 'qty']);
 
           if (itemName.isEmpty) {
@@ -234,12 +276,12 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
           }
 
           final quantity = int.tryParse(quantityText);
+
           if (quantity == null) {
             throw Exception('quantité invalide');
           }
 
-          final stockItemQuery = await _firestore
-              .collection('stock_items')
+          final stockItemQuery = await _stockItemsCol
               .where('name', isEqualTo: itemName)
               .limit(1)
               .get();
@@ -251,6 +293,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
           final itemId = stockItemQuery.docs.first.id;
 
           await _upsertStoreStock(itemId: itemId, quantity: quantity);
+
           successCount++;
         } catch (e) {
           errors.add('Ligne ${i + 2}: $e');
@@ -267,6 +310,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
       });
 
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('$successCount stock(s) importé(s).')),
       );
@@ -276,6 +320,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
       });
 
       if (!mounted) return;
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Erreur import : $e')));
@@ -290,6 +335,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
 
   List<Map<String, String>> _readCsvRows(Uint8List bytes) {
     final content = utf8.decode(bytes);
+
     final rows = const CsvToListConverter(
       eol: '\n',
       shouldParseNumbers: false,
@@ -305,13 +351,16 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
 
     for (int i = 1; i < rows.length; i++) {
       final row = rows[i];
+
       final map = <String, String>{};
 
       for (int j = 0; j < headers.length; j++) {
         final key = headers[j];
+
         if (key.isEmpty) continue;
 
         final value = j < row.length ? row[j].toString().trim() : '';
+
         map[key] = value;
       }
 
@@ -323,11 +372,16 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
 
   List<Map<String, String>> _readXlsxRows(Uint8List bytes) {
     final excel = xlsx.Excel.decodeBytes(bytes);
+
     if (excel.tables.isEmpty) return [];
 
     final firstSheetName = excel.tables.keys.first;
+
     final sheet = excel.tables[firstSheetName];
-    if (sheet == null || sheet.rows.isEmpty) return [];
+
+    if (sheet == null || sheet.rows.isEmpty) {
+      return [];
+    }
 
     final headers = sheet.rows.first
         .map((cell) => _normalizeHeader(cell?.value?.toString() ?? ''))
@@ -337,15 +391,18 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
 
     for (int i = 1; i < sheet.rows.length; i++) {
       final row = sheet.rows[i];
+
       final map = <String, String>{};
 
       for (int j = 0; j < headers.length; j++) {
         final key = headers[j];
+
         if (key.isEmpty) continue;
 
         final value = j < row.length
             ? row[j]?.value?.toString().trim() ?? ''
             : '';
+
         map[key] = value;
       }
 
@@ -373,10 +430,12 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
   String _pick(Map<String, String> row, List<String> keys) {
     for (final key in keys) {
       final value = row[key];
+
       if (value != null && value.trim().isNotEmpty) {
         return value.trim();
       }
     }
+
     return '';
   }
 
@@ -470,6 +529,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
                     if (value == null) {
                       return 'Veuillez choisir un article';
                     }
+
                     return null;
                   },
                 ),
@@ -486,16 +546,21 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
                   ),
                   validator: (value) {
                     final text = value?.trim() ?? '';
+
                     if (text.isEmpty) {
                       return 'Veuillez saisir une quantité';
                     }
+
                     final parsed = int.tryParse(text);
+
                     if (parsed == null) {
                       return 'La quantité doit être un entier';
                     }
+
                     if (parsed < 0) {
                       return 'La quantité ne peut pas être négative';
                     }
+
                     return null;
                   },
                 ),
@@ -592,11 +657,11 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
   Widget _buildImportInfoCard() {
     return Card(
       elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+      child: const Padding(
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text(
               'Format d’import recommandé',
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -619,11 +684,11 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
   Widget _buildInfoCard() {
     return Card(
       elevation: 1,
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+      child: const Padding(
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text(
               'Champs enregistrés dans store_stocks',
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -635,8 +700,10 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
             Text('• minimumQuantity = 0'),
             Text('• isLowStock = false'),
             Text('• createdAt'),
+            Text('• updatedAt'),
             Text('• store'),
             Text('• unit'),
+            Text('• establishmentId'),
           ],
         ),
       ),
@@ -645,6 +712,12 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
 
   @override
   Widget build(BuildContext context) {
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Création stock gérante')),
       body: RefreshIndicator(

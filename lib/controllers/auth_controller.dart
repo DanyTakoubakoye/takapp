@@ -9,8 +9,8 @@ class AuthController extends ChangeNotifier {
   AuthController(this._authService);
 
   UserModel? _currentUser;
-  bool _isLoading = false; // pour login/logout/initialisation
-  bool _isResetLoading = false; // uniquement pour mot de passe oublié
+  bool _isLoading = false;
+  bool _isResetLoading = false;
   String? _errorMessage;
   bool _isInitialized = false;
 
@@ -21,6 +21,59 @@ class AuthController extends ChangeNotifier {
   bool get isInitialized => _isInitialized;
   bool get isLoggedIn => _currentUser != null;
 
+  String get establishmentId => _currentUser?.establishmentId ?? '';
+  String get establishmentName => _currentUser?.establishmentName ?? '';
+  String get currentUserId => _currentUser?.uid ?? '';
+  String get currentUserName => _currentUser?.name ?? '';
+  String get currentUserRole => _currentUser?.role ?? '';
+
+  bool get hasValidEstablishment {
+    return establishmentId.trim().isNotEmpty;
+  }
+
+  bool get isGlobalAdmin => currentUserRole == 'global_admin';
+
+  bool get isSuperAdmin => currentUserRole == 'super_admin';
+
+  bool get isPlatformAdmin => isGlobalAdmin || isSuperAdmin;
+
+  bool get isProprietaire => currentUserRole == 'proprietaire';
+
+  bool get isGerante => currentUserRole == 'gerante';
+
+  bool get isComptable => currentUserRole == 'comptable';
+
+  bool get isServeur => currentUserRole == 'serveur';
+
+  bool get isChefCuisine => currentUserRole == 'chef_cuisine';
+
+  bool get isBarman => currentUserRole == 'barman';
+
+  bool get isServiceHygiene {
+    return currentUserRole == 'service_hygiene' ||
+        currentUserRole == 'majordhomme';
+  }
+
+  bool get canAccessRestaurant {
+    return _currentUser?.canAccessRestaurant == true;
+  }
+
+  bool get canAccessBar {
+    return _currentUser?.canAccessBar == true;
+  }
+
+  bool get canAccessHotel {
+    return _currentUser?.canAccessHotel == true;
+  }
+
+  bool get canAccessStock {
+    return _currentUser?.canAccessStock == true;
+  }
+
+  bool get canAccessFiscalization {
+    return _currentUser?.canAccessFiscalization == true;
+  }
+
   Future<void> initialize() async {
     if (_isInitialized) return;
 
@@ -29,8 +82,14 @@ class AuthController extends ChangeNotifier {
 
     try {
       _currentUser = await _authService.getCurrentUserProfile();
+
+      if (_currentUser != null && !isPlatformAdmin && !hasValidEstablishment) {
+        await _authService.signOut();
+        _currentUser = null;
+        _errorMessage = 'Votre compte n’est rattaché à aucun établissement.';
+      }
     } catch (e) {
-      _errorMessage = e.toString();
+      _errorMessage = _cleanError(e);
     } finally {
       _isInitialized = true;
       _setLoading(false);
@@ -46,9 +105,19 @@ class AuthController extends ChangeNotifier {
         email: email,
         password: password,
       );
+
+      if (_currentUser != null && !isPlatformAdmin && !hasValidEstablishment) {
+        await _authService.signOut();
+        _currentUser = null;
+        _errorMessage = 'Votre compte n’est rattaché à aucun établissement.';
+        notifyListeners();
+        return false;
+      }
+
       notifyListeners();
       return true;
     } catch (e) {
+      debugPrint('LOGIN ERROR = $e');
       _errorMessage = _cleanError(e);
       notifyListeners();
       return false;
@@ -117,6 +186,9 @@ class AuthController extends ChangeNotifier {
     }
     if (text.contains('network-request-failed')) {
       return 'Problème réseau. Vérifiez votre connexion.';
+    }
+    if (text.contains('permission-denied')) {
+      return 'Accès refusé par les règles Firestore.';
     }
 
     return text.replaceFirst('Exception: ', '');

@@ -50,12 +50,23 @@ class EncaissementPage extends StatelessWidget {
       );
     }
 
+    final establishmentId = user.establishmentId.trim();
+
+    if (establishmentId.isEmpty) {
+      return const Scaffold(
+        body: Center(child: Text('Établissement introuvable.')),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Encaissement')),
       body: Padding(
         padding: EdgeInsets.all(isSmall ? 12 : 16),
         child: StreamBuilder<List<OrderModel>>(
-          stream: paymentService.streamUnpaidOrdersForServer(user.uid),
+          stream: paymentService.streamUnpaidOrdersForServer(
+            establishmentId: establishmentId,
+            serveurId: user.uid,
+          ),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -115,8 +126,10 @@ class EncaissementPage extends StatelessWidget {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (_) =>
-                                          DetailConsommationPage(order: order),
+                                      builder: (_) => DetailConsommationPage(
+                                        establishmentId: establishmentId,
+                                        order: order,
+                                      ),
                                     ),
                                   );
                                 },
@@ -127,8 +140,10 @@ class EncaissementPage extends StatelessWidget {
                                 onPressed: () {
                                   showDialog(
                                     context: context,
-                                    builder: (_) =>
-                                        _PaymentDialog(order: order),
+                                    builder: (_) => _PaymentDialog(
+                                      establishmentId: establishmentId,
+                                      order: order,
+                                    ),
                                   );
                                 },
                                 icon: const Icon(Icons.payments_outlined),
@@ -151,9 +166,10 @@ class EncaissementPage extends StatelessWidget {
 }
 
 class _PaymentDialog extends StatefulWidget {
+  final String establishmentId;
   final OrderModel order;
 
-  const _PaymentDialog({required this.order});
+  const _PaymentDialog({required this.establishmentId, required this.order});
 
   @override
   State<_PaymentDialog> createState() => _PaymentDialogState();
@@ -162,6 +178,8 @@ class _PaymentDialog extends StatefulWidget {
 class _PaymentDialogState extends State<_PaymentDialog> {
   late final TextEditingController amountController;
   String selectedMethod = AppPaymentMethods.cash;
+
+  String get establishmentId => widget.establishmentId.trim();
 
   @override
   void initState() {
@@ -182,9 +200,22 @@ class _PaymentDialogState extends State<_PaymentDialog> {
     final paymentController = context.read<PaymentController>();
     final user = auth.currentUser;
 
-    if (user == null) return;
+    if (user == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
+      return;
+    }
+
+    if (establishmentId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Établissement introuvable.')),
+      );
+      return;
+    }
 
     final amount = double.tryParse(amountController.text.trim());
+
     if (amount == null) {
       ScaffoldMessenger.of(
         context,
@@ -193,6 +224,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
     }
 
     final success = await paymentController.registerPayment(
+      establishmentId: establishmentId,
       orderId: widget.order.id,
       orderNumber: widget.order.orderNumber,
       receivedBy: user.uid,
@@ -205,6 +237,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
 
     if (success) {
       Navigator.pop(context);
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Paiement enregistré avec succès.')),
       );
@@ -236,16 +269,20 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                     ),
                   )
                   .toList(),
-              onChanged: (value) {
-                if (value == null) return;
-                setState(() {
-                  selectedMethod = value;
-                });
-              },
+              onChanged: paymentController.isSubmitting
+                  ? null
+                  : (value) {
+                      if (value == null) return;
+
+                      setState(() {
+                        selectedMethod = value;
+                      });
+                    },
             ),
             const SizedBox(height: 14),
             TextField(
               controller: amountController,
+              enabled: !paymentController.isSubmitting,
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(labelText: 'Montant reçu'),
             ),
