@@ -1,0 +1,490 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+
+class VersementComptaPage extends StatefulWidget {
+  const VersementComptaPage({super.key});
+
+  @override
+  State<VersementComptaPage> createState() => _VersementComptaPageState();
+}
+
+class _VersementComptaPageState extends State<VersementComptaPage> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  final Set<String> selectedHandoverIds = {};
+  final Set<String> selectedRoomInvoiceIds = {};
+
+  double selectedServerTotal = 0;
+  double selectedRoomTotal = 0;
+  bool isSubmitting = false;
+
+  double get totalSelected => selectedServerTotal + selectedRoomTotal;
+
+  void _toggleHandover(String id, double amount, bool selected) {
+    setState(() {
+      if (selected) {
+        selectedHandoverIds.add(id);
+        selectedServerTotal += amount;
+      } else {
+        selectedHandoverIds.remove(id);
+        selectedServerTotal -= amount;
+      }
+    });
+  }
+
+  void _toggleRoomInvoice(String id, double amount, bool selected) {
+    setState(() {
+      if (selected) {
+        selectedRoomInvoiceIds.add(id);
+        selectedRoomTotal += amount;
+      } else {
+        selectedRoomInvoiceIds.remove(id);
+        selectedRoomTotal -= amount;
+      }
+    });
+  }
+
+  Future<void> _submitTransfer() async {
+    if (selectedHandoverIds.isEmpty && selectedRoomInvoiceIds.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Aucun élément sélectionné.')),
+      );
+      return;
+    }
+
+    setState(() {
+      isSubmitting = true;
+    });
+
+    try {
+      final transferRef = _firestore
+          .collection('managerToAccountingTransfers')
+          .doc();
+      final batch = _firestore.batch();
+
+      batch.set(transferRef, {
+        'amount': totalSelected,
+        'source': 'manager_mixed',
+        'status': 'pending',
+        'handoverIds': selectedHandoverIds.toList(),
+        'roomInvoiceIds': selectedRoomInvoiceIds.toList(),
+        'createdAt': FieldValue.serverTimestamp(),
+        'receivedAt': null,
+      });
+
+      for (final id in selectedHandoverIds) {
+        final ref = _firestore.collection('serverHandovers').doc(id);
+        batch.update(ref, {
+          'accountingTransferStatus': 'declared',
+          'accountingTransferId': transferRef.id,
+        });
+      }
+
+      for (final id in selectedRoomInvoiceIds) {
+        final ref = _firestore.collection('roomInvoices').doc(id);
+        batch.update(ref, {
+          'accountingTransferStatus': 'declared',
+          'accountingTransferId': transferRef.id,
+        });
+      }
+
+      await batch.commit();
+
+      if (!mounted) return;
+
+      setState(() {
+        selectedHandoverIds.clear();
+        selectedRoomInvoiceIds.clear();
+        selectedServerTotal = 0;
+        selectedRoomTotal = 0;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Versement déclaré à la comptabilité.')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isSubmitting = false;
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final handoversStream = _firestore
+        .collection('serverHandovers')
+        .where('status', isEqualTo: 'validated')
+        .snapshots();
+
+    final invoicesStream = _firestore
+        .collection('roomInvoices')
+        .where('status', isEqualTo: 'paid')
+        .snapshots();
+
+    final transfersStream = _firestore
+        .collection('managerToAccountingTransfers')
+        .orderBy('createdAt', descending: true)
+        .limit(50)
+        .snapshots();
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Versement gérante → comptabilité')),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 3,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(14),
+                        child: Column(
+                          children: [
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Versements serveurs validés',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Expanded(
+                              child: StreamBuilder<QuerySnapshot>(
+                                stream: handoversStream,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+
+                                  if (snapshot.hasError) {
+                                    return Center(
+                                      child: Text('Erreur: ${snapshot.error}'),
+                                    );
+                                  }
+
+                                  final docs = (snapshot.data?.docs ?? []).where((
+                                    doc,
+                                  ) {
+                                    final data =
+                                        doc.data() as Map<String, dynamic>;
+                                    return (data['accountingTransferStatus'] ??
+                                            '') !=
+                                        'declared';
+                                  }).toList();
+
+                                  if (docs.isEmpty) {
+                                    return const Center(
+                                      child: Text(
+                                        'Aucun versement serveur disponible.',
+                                      ),
+                                    );
+                                  }
+
+                                  return ListView.separated(
+                                    itemCount: docs.length,
+                                    separatorBuilder: (_, __) =>
+                                        const Divider(),
+                                    itemBuilder: (context, index) {
+                                      final doc = docs[index];
+                                      final data =
+                                          doc.data() as Map<String, dynamic>;
+                                      final amount =
+                                          ((data['validatedAmount'] ?? 0)
+                                                  as num)
+                                              .toDouble();
+
+                                      return CheckboxListTile(
+                                        value: selectedHandoverIds.contains(
+                                          doc.id,
+                                        ),
+                                        onChanged: (value) {
+                                          _toggleHandover(
+                                            doc.id,
+                                            amount,
+                                            value ?? false,
+                                          );
+                                        },
+                                        title: Text(
+                                          (data['serveurName'] ?? '')
+                                              .toString(),
+                                        ),
+                                        subtitle: Text(
+                                          'Montant : ${amount.toStringAsFixed(0)} FCFA',
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(14),
+                        child: Column(
+                          children: [
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Factures chambres encaissées non versées',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Expanded(
+                              child: StreamBuilder<QuerySnapshot>(
+                                stream: invoicesStream,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+
+                                  if (snapshot.hasError) {
+                                    return Center(
+                                      child: Text('Erreur: ${snapshot.error}'),
+                                    );
+                                  }
+
+                                  final docs = (snapshot.data?.docs ?? []).where((
+                                    doc,
+                                  ) {
+                                    final data =
+                                        doc.data() as Map<String, dynamic>;
+                                    return (data['accountingTransferStatus'] ??
+                                            '') !=
+                                        'declared';
+                                  }).toList();
+
+                                  if (docs.isEmpty) {
+                                    return const Center(
+                                      child: Text(
+                                        'Aucune facture chambre disponible.',
+                                      ),
+                                    );
+                                  }
+
+                                  return ListView.separated(
+                                    itemCount: docs.length,
+                                    separatorBuilder: (_, __) =>
+                                        const Divider(),
+                                    itemBuilder: (context, index) {
+                                      final doc = docs[index];
+                                      final data =
+                                          doc.data() as Map<String, dynamic>;
+                                      final amount =
+                                          ((data['total'] ?? 0) as num)
+                                              .toDouble();
+
+                                      return CheckboxListTile(
+                                        value: selectedRoomInvoiceIds.contains(
+                                          doc.id,
+                                        ),
+                                        onChanged: (value) {
+                                          _toggleRoomInvoice(
+                                            doc.id,
+                                            amount,
+                                            value ?? false,
+                                          );
+                                        },
+                                        title: Text(
+                                          '${(data['clientName'] ?? '').toString()} • Chambre ${(data['roomNumber'] ?? '').toString()}',
+                                        ),
+                                        subtitle: Text(
+                                          'Montant : ${amount.toStringAsFixed(0)} FCFA',
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              flex: 2,
+              child: Column(
+                children: [
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        children: [
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Résumé du versement',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          _line(
+                            'Versements serveurs',
+                            '${selectedServerTotal.toStringAsFixed(0)} FCFA',
+                          ),
+                          _line(
+                            'Factures chambres',
+                            '${selectedRoomTotal.toStringAsFixed(0)} FCFA',
+                          ),
+                          const Divider(),
+                          _line(
+                            'TOTAL',
+                            '${totalSelected.toStringAsFixed(0)} FCFA',
+                            isBold: true,
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: isSubmitting ? null : _submitTransfer,
+                              icon: const Icon(Icons.send),
+                              label: isSubmitting
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : const Text('Déclarer à la comptabilité'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(14),
+                        child: Column(
+                          children: [
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'Historique versements gérante',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Expanded(
+                              child: StreamBuilder<QuerySnapshot>(
+                                stream: transfersStream,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+
+                                  if (snapshot.hasError) {
+                                    return Center(
+                                      child: Text('Erreur: ${snapshot.error}'),
+                                    );
+                                  }
+
+                                  final docs = snapshot.data?.docs ?? [];
+
+                                  if (docs.isEmpty) {
+                                    return const Center(
+                                      child: Text(
+                                        'Aucun versement enregistré.',
+                                      ),
+                                    );
+                                  }
+
+                                  return ListView.separated(
+                                    itemCount: docs.length,
+                                    separatorBuilder: (_, __) =>
+                                        const Divider(),
+                                    itemBuilder: (context, index) {
+                                      final data =
+                                          docs[index].data()
+                                              as Map<String, dynamic>;
+
+                                      final amount =
+                                          ((data['amount'] ?? 0) as num)
+                                              .toDouble();
+                                      final status = (data['status'] ?? '')
+                                          .toString();
+
+                                      return ListTile(
+                                        title: Text(
+                                          '${amount.toStringAsFixed(0)} FCFA',
+                                        ),
+                                        subtitle: Text('Statut : $status'),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _line(String label, String value, {bool isBold = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Expanded(child: Text(label)),
+          Text(
+            value,
+            style: TextStyle(
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

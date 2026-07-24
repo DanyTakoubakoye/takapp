@@ -1,0 +1,142 @@
+[
+  {
+    "id": "6DWo5GiP1yZdTnZLPzFJW0kqoi43",
+    "email": "irene@tak-hotel.com",
+    "isActive": true,
+    "name": "Irene",
+    "phone": "+2290158585848",
+    "role": "hygiene",
+    "uid": "",
+    "lastTokenUpdate": {
+      "_seconds": 1777415545,
+      "_nanoseconds": 590000000
+    },
+    "fcmToken": "dmV5u6sBHwAn0xNSfNDdxs:APA91bHGmW0Q_x-GKJX0rHm4VTa6Fj3fX3KWJ42_o7jrNr2Wblm6QVUc6gCgw6ZwCl-C2TLjuwsm1aKLoc-dl2mi15mXrjSbtryzG2cGx-zQMYvx4uEfd8s"
+  },
+  {
+    "id": "6pKojXHWK6adb1M5mZNM8tSTGG93",
+    "email": "djibo@tak-hotel.com",
+    "phone": "+2290158585848",
+    "isActive": true,
+    "role": "owner",
+    "name": "Dany",
+    "uid": "",
+    "lastTokenUpdate": {
+      "_seconds": 1777415193,
+      "_nanoseconds": 27000000
+    },
+    "fcmToken": "dmV5u6sBHwAn0xNSfNDdxs:APA91bHGmW0Q_x-GKJX0rHm4VTa6Fj3fX3KWJ42_o7jrNr2Wblm6QVUc6gCgw6ZwCl-C2TLjuwsm1aKLoc-dl2mi15mXrjSbtryzG2cGx-zQMYvx4uEfd8s"
+  },
+  {
+    "id": "8gsVdM3GAUZdqXO8MSoiulVxeCw1",
+    "email": "irene.agbotonnou@tak-hotel.com",
+    "isActive": true,
+    "name": "Irene Agbotonnou",
+    "phone": "+2290158585848",
+    "role": "majordhomme",
+    "uid": "",
+    "lastTokenUpdate": {
+      "_seconds": 1777415456,
+      "_nanoseconds": 968000000
+    },
+    "fcmToken": "dmV5u6sBHwAn0xNSfNDdxs:APA91bHGmW0Q_x-GKJX0rHm4VTa6Fj3fX3KWJ42_o7jrNr2Wblm6QVUc6gCgw6ZwCl-C2TLjuwsm1aKLoc-dl2mi15mXrjSbtryzG2cGx-zQMYvx4uEfd8s"
+  },
+  {
+    "id": "A7KJZ230Vke9jx9VHKbiCJMu7t83",
+    "name": "Armandine Togbin",
+    "email": "armandine.togbin@tak-hotel.com",
+    "phone": "+22958585848",
+    "role": "comptable",
+    "isActive": true,
+    "uid": "",
+    "fcmToken": "dmV5u6sBHwAn0xNSfNDdxs:APA91bHGmW0Q_x-GKJX0rHm4VTa6Fj3fX3KWJ42_o7jrNr2Wblm6QVUc6gCgw6ZwCl-C2TLjuwsm1aKLoc-dl2mi15mXrjSbtryzG2cGx-zQMYvx4uEfd8s",
+    "lastTokenUpdate": {
+      "_seconds": 1777415274,
+      "_nanoseconds": 269000000
+    }
+  },
+  {
+    "id": "FMV9ljqMjhalHR38IBv49dco3b93",
+    "name": "armandine",
+    "email": "armandine@tak-hotel.com",
+    "phone": "+2290158585848",
+    "isActive": true,
+    "role": "gerante",
+    "uid": "",
+    "lastTokenUpdate": {
+      "_seconds": 1777413267,
+      "_nanoseconds": 294000000
+    },
+    "fcmToken": "dmV5u6sBHwAn0xNSfNDdxs:APA91bHGmW0Q_x-GKJX0rHm4VTa6Fj3fX3KWJ42_o7jrNr2Wblm6QVUc6gCgw6ZwCl-C2TLjuwsm1aKLoc-dl2mi15mXrjSbtryzG2cGx-zQMYvx4uEfd8s"
+  },
+  {
+    "id": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "name": "Odilia",
+    "email": "odilia@tak-hotel.com",
+    "phone": "+2290158585848",
+    "role": "serveur",
+    "isActive": true,
+    "uid": "",
+    "fcmToken": "ffk9QMKbSLaglxZyOp1bb6:APA91bHCC_8RQIEar95lK70hgUinDbGThRH3PrxnONXk2E1m0ezhWLAERYvPMRdWr7ysiEBrzOHSkwoUWMXkL0WxHQ1HKOiAjbgpzT-p8JYs17jgZ_uMwfQ",
+    "lastTokenUpdate": {
+      "_seconds": 1779054148,
+      "_nanoseconds": 314000000
+    }
+  },
+  {
+    "id": "aWYtM7f1fDNQJJWIVlGNA9PXoCw1",
+    "email": "danytakoubakoye@gmail.com",
+    "isActive": true,
+    "name": "Daouda",
+    "phone": "+2290158585848",
+    "role": "owner",
+    "lastTokenUpdate": {
+      "_seconds": 1776517339,
+      "_nanoseconds": 129000000
+    },
+    "fcmToken": "cCOkYrBbAh0Os7G3hxMMw6:APA91bGXVnjpLS6qmYg4eHIvTIGI2w5bNe6C1BJVPydmUIUwUF9M3bTqIVIFsl9ibCuawaWrZJ6pHUuu-mTV6HktrDw6LkP9LNMZx9d2XzpeX3FZGh9NriI",
+    "uid": ""
+  },
+  {
+    "id": "tlYG8bG8nPgNFr6t7xewgvqaP9l2",
+    "name": "frederic",
+    "email": "frederic@tak-hotel.com",
+    "phone": "+2290158585848",
+    "isActive": true,
+    "role": "chef_cuisine",
+    "uid": "",
+    "lastTokenUpdate": {
+      "_seconds": 1777414920,
+      "_nanoseconds": 818000000
+    },
+    "fcmToken": "dmV5u6sBHwAn0xNSfNDdxs:APA91bHGmW0Q_x-GKJX0rHm4VTa6Fj3fX3KWJ42_o7jrNr2Wblm6QVUc6gCgw6ZwCl-C2TLjuwsm1aKLoc-dl2mi15mXrjSbtryzG2cGx-zQMYvx4uEfd8s"
+  },
+  {
+    "id": "u4eu2fJMkYTsjXJ2FHIcu1fjdLh2",
+    "email": "valicia@tak-hotel.com",
+    "isActive": true,
+    "name": "Valicia",
+    "phone": "+22901585848",
+    "role": "serveur",
+    "uid": "",
+    "fcmToken": "fxFCZ_QWRkM8h5ZdBQ4nja:APA91bEY-6N34gVAiRviDfAYBL3b5A4RlW4a1ItiWq5WzkgDA15swOs1zqPvY9DTMVG_P43YR3zy7vQndhz616dq5KGb7567j-5_nBOHfibMx1m06fZvUpM",
+    "lastTokenUpdate": {
+      "_seconds": 1777390527,
+      "_nanoseconds": 677000000
+    }
+  },
+  {
+    "id": "wvTwc0yJO2WpweYvlg1DoyxhGJf2",
+    "email": "barman@tak-hotel.com",
+    "isActive": true,
+    "name": "Bar Man",
+    "phone": "+2290158585848",
+    "role": "barman",
+    "uid": "",
+    "lastTokenUpdate": {
+      "_seconds": 1777414655,
+      "_nanoseconds": 57000000
+    },
+    "fcmToken": "dmV5u6sBHwAn0xNSfNDdxs:APA91bHGmW0Q_x-GKJX0rHm4VTa6Fj3fX3KWJ42_o7jrNr2Wblm6QVUc6gCgw6ZwCl-C2TLjuwsm1aKLoc-dl2mi15mXrjSbtryzG2cGx-zQMYvx4uEfd8s"
+  }
+]

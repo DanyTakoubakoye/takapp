@@ -1,0 +1,32 @@
+[
+  {
+    "id": "me1zD7r7jGzYZyZfppF3",
+    "menuItemId": "ZCqSe28ZKXGPuX4H4E5W",
+    "name": "Sauce Arachide Test",
+    "quantity": 1,
+    "unitPrice": 4500,
+    "totalPrice": 4500,
+    "note": "",
+    "targetDepartment": "kitchen",
+    "isCancelled": false,
+    "cancelledAt": null,
+    "cancelledBy": "",
+    "cancelledByName": "",
+    "cancellationReason": ""
+  },
+  {
+    "id": "szbigoW8sRzeST3K5v3a",
+    "menuItemId": "EXO81hwx5Kz9FAtbrOcz",
+    "name": "Black Conso Test",
+    "quantity": 1,
+    "unitPrice": 4500,
+    "totalPrice": 4500,
+    "note": "",
+    "targetDepartment": "bar",
+    "isCancelled": false,
+    "cancelledAt": null,
+    "cancelledBy": "",
+    "cancelledByName": "",
+    "cancellationReason": ""
+  }
+]

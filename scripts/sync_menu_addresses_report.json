@@ -1,0 +1,938 @@
+[
+  {
+    "name": "Pack Croustillant + Accompagnement + Sucrerie",
+    "docId": "hSXW3vHT3RPMpx4xUwEJ",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/packcroustillantaccompagnementsucrerie.jpg"
+  },
+  {
+    "name": "Pack Charwama + Frite + Sucrerie",
+    "docId": "LXZSioQlhuHTcS9VYAbm",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Grand Pack burger + Frite + Sucrerie",
+    "docId": "ZewFYkQRhuzSwaUPLYnR",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/grandpackburgerfritesucrerie.jpg"
+  },
+  {
+    "name": "Petit Pack burger + Frite + Sucrerie",
+    "docId": "hiGKk4lbGBjwRiBeuH0u",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/petitpackburgerfritesucrerie.jpg"
+  },
+  {
+    "name": "Pack Moyen cheese burger + Frite + Sucrerie",
+    "docId": "3dqNrgy4h6p8Tn73gfSs",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Pack chili chicken + Accompagnement + Sucrerie",
+    "docId": "Jv0R3trathNIwiVRZhP0",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/packchilichickenaccompagnementsucrerie.jpg"
+  },
+  {
+    "name": "Hamburger",
+    "docId": "DXs1aLoaa1BMr2kZGvQT",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/hamburger.jpg"
+  },
+  {
+    "name": "Chicken burger",
+    "docId": "SoPvSOPIC8Nm12wct58g",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/chickenburger.jpg"
+  },
+  {
+    "name": "Chicken cheese burger",
+    "docId": "6L7TfPweMvc7WVx53aBp",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Cheese burger",
+    "docId": "AtMjNdlOWa6JoEvXuYEE",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/cheeseburger.jpg"
+  },
+  {
+    "name": "Crispy chicken burger",
+    "docId": "R4qZNF84cKcPy3T1xl5L",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/crispychickenburger.jpg"
+  },
+  {
+    "name": "Crispy fish burger",
+    "docId": "9lOSdbWvL3WkKH9LSCfr",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/crispyfishburger.jpg"
+  },
+  {
+    "name": "Double Burger",
+    "docId": "uyvNbCkXWwqAkT4u7W84",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/doubleburger.jpg"
+  },
+  {
+    "name": "Double cheese burger",
+    "docId": "tFjzFFW1Myr4nCkGDcMI",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/doublecheeseburger.jpg"
+  },
+  {
+    "name": "Charwama viande",
+    "docId": "Fer0e7grfvTpWTg1F0EZ",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/charwamaviande.jpg"
+  },
+  {
+    "name": "Charwama poulet",
+    "docId": "1NN8qTeCycPrz9GsrDsE",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Hamburger BIG",
+    "docId": "NwatUnoXcAr1pqf2y1Ib",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/hamburgerbig.jpg"
+  },
+  {
+    "name": "Big Chicken burger",
+    "docId": "YpjKWAOIPPtd3GO7mzMU",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/bigchickenburger.jpg"
+  },
+  {
+    "name": "Big Chicken cheese burger",
+    "docId": "1oMdAcGFlnJzsfF4sfwg",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Big Cheese burger",
+    "docId": "BN7YANTPmy4Jy6k3cRhe",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/bigcheeseburger.jpg"
+  },
+  {
+    "name": "Big Crispy chicken burger",
+    "docId": "0pWJweQcyeU4IaEhaFBy",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Big Crispy fish burger",
+    "docId": "nCz93rwSgh1bYY3aCJCl",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/bigcrispyfishburger.jpg"
+  },
+  {
+    "name": "Big Double Burger",
+    "docId": "Q53Wa7ekEvU8ZpqjLNUX",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/bigdoubleburger.jpg"
+  },
+  {
+    "name": "Big Double cheese burger",
+    "docId": "z2TVGsnVWoxFFlyPxHFE",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/bigdoublecheeseburger.jpg"
+  },
+  {
+    "name": "Big Charwama viande",
+    "docId": "gAbwXrSttRlzyg6PR59M",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/bigcharwamaviande.jpg"
+  },
+  {
+    "name": "Big Charwama poulet",
+    "docId": "D6qeTJYljzRZ6F98MIi1",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Croque-monsieur",
+    "docId": "G7t0v9AdjEVwwoQI6yVH",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/croquemonsieur.jpg"
+  },
+  {
+    "name": "Croque-madame",
+    "docId": "y4fOH1ZYkA9wsnTMahXY",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Club sandwichs",
+    "docId": "1P4FEug8KhkeIhuIJy6Y",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/clubsandwichs.jpg"
+  },
+  {
+    "name": "Panini poulet",
+    "docId": "65llRtN9AxaVt8fTeueo",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/paninipoulet.jpg"
+  },
+  {
+    "name": "Panini jambon - fromage",
+    "docId": "dXleEc0qm46Zz5BU7cDc",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/paninijambonfromage.jpg"
+  },
+  {
+    "name": "Sandwich au poulet / au thon ou à la viande",
+    "docId": "F3YPZGlG0BjB5PIRucKD",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Sandwich jambon-fromage",
+    "docId": "nKODJKh7TqSvVB8shL78",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/sandwichjambonfromage.jpg"
+  },
+  {
+    "name": "Omelette Paysanne",
+    "docId": "66XyNrlNHh65MsgGE9Ag",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/omelettepaysanne.jpg"
+  },
+  {
+    "name": "Omelette Dolyan",
+    "docId": "2wOTenWxTOs8VF2cJObL",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/omelettedolyan.jpg"
+  },
+  {
+    "name": "Omelette Nature",
+    "docId": "TEC8a69orZ75Acc8mZmp",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/omelettenature.jpg"
+  },
+  {
+    "name": "Omelette jambon-fromage",
+    "docId": "9v76cLEzd0JPOQyY5iFm",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/omelettejambonfromage.jpg"
+  },
+  {
+    "name": "Œuf au plat",
+    "docId": "ErHSddhJni8KfFW8jr3K",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Pizza Margarita",
+    "docId": "my5NQwjcmyNCa7oyZDYa",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Pizza Reine",
+    "docId": "pnUBog5O4B9MNJmEAUA7",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/pizzareine.jpg"
+  },
+  {
+    "name": "Pizza Quatre Saisons",
+    "docId": "fdMb3euiVF7mdfMBPRgn",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/pizzaquatresaisons.jpg"
+  },
+  {
+    "name": "Pizza Blanche",
+    "docId": "dpXMcP0UVpvKlZwoX2wo",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/pizzablanche.jpg"
+  },
+  {
+    "name": "Pizza Mexicaine",
+    "docId": "w8IPmMvrUnetop1YWlzw",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Pizza cinq Fromages",
+    "docId": "6ozPGFxWeBCChJfS9EJy",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/pizzacinqfromages.jpg"
+  },
+  {
+    "name": "Pizza Végétarienne",
+    "docId": "pSu53eLCLUS6Y2kRBrxR",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Pizza Fruit de Mer",
+    "docId": "ezAgzQETigFW4q3j6Bwg",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/pizzafruitdemer.jpg"
+  },
+  {
+    "name": "Pizza forestière",
+    "docId": "mA4ixKh44YDOlDoMaN5G",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Pizza buffalo",
+    "docId": "ncphybsfRwFPTX3WIMMX",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Pizza Norvégienne",
+    "docId": "q2zPxrAVyDm4bbKt0WBJ",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Pizza Dolyan",
+    "docId": "rAW3OiCrIiXv30ZR4tvV",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/pizzadolyan.jpg"
+  },
+  {
+    "name": "Salade Dolyan",
+    "docId": "n3Iluwzifq5X7jgehFXY",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/saladedolyan.jpg"
+  },
+  {
+    "name": "Salade niçoise",
+    "docId": "VUqkf0lb0dTjQ43lWx7w",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Salade césar",
+    "docId": "WK2rfMmO3TreWoPVQXdT",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Salade du chef",
+    "docId": "qeHXNnvVnYdR99usG27a",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/saladeduchef.jpg"
+  },
+  {
+    "name": "Duo de crevette à l’avocat",
+    "docId": "LzxxymViiCPU18YHcfOe",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Salade pêcheur",
+    "docId": "c2mhYJmSjyks5JENpB9n",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Neem au poulet / viande (5 pièces)",
+    "docId": "plRHKO9X3KEkij12WkSH",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Salade de gésier à la macédoine",
+    "docId": "14P6ddXBZ0T9BfH8JvVP",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Salade de crevette au poivron",
+    "docId": "U9ZrCOc26wodcWaze0wt",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/saladedecrevetteaupoivron.jpg"
+  },
+  {
+    "name": "Velouté de petits pois aux crevettes",
+    "docId": "fToHvVv3FaPJShSReLyn",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Soupe de Poisson",
+    "docId": "y3xDdFP30bHGZBXFQNst",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Salade Fatouche",
+    "docId": "9mGssNNf2e4vSOZnoq96",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/saladefatouche.jpg"
+  },
+  {
+    "name": "Hommos",
+    "docId": "nPMKEascVPR7HmDHCzsX",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/hommos.jpg"
+  },
+  {
+    "name": "Falafel (6 pièces)",
+    "docId": "aZLaDBjU884gUis14fAc",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Grand Samossa Veg / poulet / mouton (5 pièces)",
+    "docId": "10AaRh0ztL6pWRM9Kl9N",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Samossa Veg / poulet / mouton (5 pièces)",
+    "docId": "T6l8tUlCz3dQWFeskp2F",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Salade Taboulé",
+    "docId": "Gln4euQapEImzX9AasHn",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Spaghetti bolo",
+    "docId": "xnKbzuY9k0hcvfRxebb7",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Spaghetti Dolyan",
+    "docId": "4E9CkQywwnPw9L15fAaW",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/spaghettidolyan.jpg"
+  },
+  {
+    "name": "Penne / Tagliatelle aux fruits de mer",
+    "docId": "Bdvz2opoDPJULP1NUa4Z",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/pennetagliatelleauxfruitsdemer.jpg"
+  },
+  {
+    "name": "Penne / tagliatelle au blanc de poulet",
+    "docId": "1IacWM7cbgGDHe8TdZtC",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/pennetagliatelleaublancdepoulet.jpg"
+  },
+  {
+    "name": "Penne / tagliatelle Forestière",
+    "docId": "LzTAdDfXaYQsgqNmlZj0",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Spaghetti végétarien",
+    "docId": "0KQagRxEQFDXnL25id7M",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Spaghetti sumbala à la viande de bœuf",
+    "docId": "uZnzHlWAHN4CSorzVnmo",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Planche mixte mer",
+    "docId": "96WJdweP0r7CheN5wwtD",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/planchemixtemer.jpg"
+  },
+  {
+    "name": "Planche mixte terre",
+    "docId": "zvBuhQe8yq3zyZU53VIg",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/planchemixteterre.jpg"
+  },
+  {
+    "name": "Steak haché de bœuf / Petit légume + frite",
+    "docId": "VXyBiEPtYsnmTGPJ2br9",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Steak haché de poulet / Petit légume + frite",
+    "docId": "Pi6xWOhTLU866vUwqAEO",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Saucisses de Merguez / Petit légume + frite",
+    "docId": "lRnXLd68ge7CzkiPh4SQ",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Saucisses de Poulet / salade verte + frite",
+    "docId": "GmziDulfWwnghCkRDa1O",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/saucissesdepouletsaladevertefrite.jpg"
+  },
+  {
+    "name": "Pintade rôti aux fines herbes",
+    "docId": "SGQtqlX8hsea0MWWdLlw",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Pintade à la moutarde façon Dolyan",
+    "docId": "sBeZa0HLKy084h8eJxbB",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Poulet (entier) désossé grillé",
+    "docId": "y3JwTFx7hxzWntwsIvR7",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Demi-poulet chair",
+    "docId": "yJ1OG7E1KvdQ69PoZ1CZ",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/demipouletchair.jpg"
+  },
+  {
+    "name": "Aileron de Dinde grillé ou braisé",
+    "docId": "u4kgnYoX0pTLRKxuIcxd",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Poulet entier rôti à la DOLYAN",
+    "docId": "a07xY1YG143LRp1ciVaY",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Poulet locale",
+    "docId": "9F1BKRYTqVKwgrVl0VX5",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/pouletlocale.jpg"
+  },
+  {
+    "name": "Blanc de poulet à la plancha",
+    "docId": "vDVWXWehdjtBVzYX66Ar",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Brochette de poulet (3 tiges)",
+    "docId": "yUpOjjZuRGMZ7wITBOx1",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/brochettedepoulet3tiges.jpg"
+  },
+  {
+    "name": "Escalope de poulet",
+    "docId": "T4KwvTw1XJsmYwVJgJHq",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/escalopedepoulet.jpg"
+  },
+  {
+    "name": "Escalope de poulet au fromage",
+    "docId": "GkCQ8S6GaJLDIa3fvYPL",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Émincer de Poulet à l’Indienne",
+    "docId": "MVppztJRLwSbqM4n5g0z",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Filet de bœuf grillé",
+    "docId": "ftEtsTXxg7fexEH2vXZo",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Filet de bœuf au poivre",
+    "docId": "gaqJsvGQUlAtq01qTMjW",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Grand Escalope de bœuf pané / Fromage",
+    "docId": "0l6nq5qz8tsJNMS1KR4Q",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Escalope de bœuf pané / Fromage",
+    "docId": "WK5s2SVUfszoAY4QquLg",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Entre-côte de veau",
+    "docId": "ALTc4YdSjd5mwWGo3A7b",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Sauté d’agneau façon Dolyan",
+    "docId": "HHqn16DDbMazb7Flvs4g",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Agneau grillé",
+    "docId": "FSjF4bh0eai0fGoutD03",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/agneaugrille.jpg"
+  },
+  {
+    "name": "Souri d’agneau",
+    "docId": "lj3M67ArCAAj9IrlPeLh",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/souridagneau.jpg"
+  },
+  {
+    "name": "Côtelette d’agneau grillé",
+    "docId": "ECpFBiXWoicdyW2zYijh",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Langue de bœuf grillé",
+    "docId": "1yikX0BzDPB7wdMWaqhd",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Langue de bœuf à la provençale",
+    "docId": "qbVtzXp4ssguDQn6kYA2",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Côtelette de porc grillé",
+    "docId": "VtUE0KUp4PMIHAVrcNmT",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Gratin aux fruits de mer",
+    "docId": "zHW3K09efPNrbGIhzdtL",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Filet de poisson grillé",
+    "docId": "Zy8YjmmyQQAVaEnJvTnU",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Brochette de poisson grillé",
+    "docId": "vkxAXLnurGwNXudKFqWk",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Fruits de mer",
+    "docId": "wjgj1kiWqIBWuBBCZ33X",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/fruitsdemer.jpg"
+  },
+  {
+    "name": "Poisson braisé (Carpe sol 400g, dorade)",
+    "docId": "VSYGJgCBDuzVwy2kCV1q",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Poisson braisé (Carpe,  dorade, sole 800 g)",
+    "docId": "Ht87F1t2PTYyvm6fMvyj",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Filet de poisson pané",
+    "docId": "9ksa7rFEylvXPgm9wvTM",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Sole meunière",
+    "docId": "6JY35zlo0RSq17rHvc7z",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Filet de sole Biscaïenne",
+    "docId": "YcOGOMBBM6BD6wOf1xHB",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Gambas grillé ou sauté à l’ail",
+    "docId": "bE3M0HRAfw8nE25igT4w",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Calamar à la plancha / sauté à l’ail",
+    "docId": "N9mVtobpEgEuIo9IhB2u",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Crevette à la provençale",
+    "docId": "xKUaGmox2eDRMH9gVA9V",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Poulet yassa / Pintade yassa",
+    "docId": "7kDiHnk0ziGigMChCmlt",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Kédjénou poulet / Kédjénou de Pintade",
+    "docId": "UaGE1sqUkQZunjjHUYUT",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Mouton et fromage en sauce arachide",
+    "docId": "EfrzBIL7FCa67AA3nYzg",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Sauce Gboman",
+    "docId": "goKIjDRELkfdGV8EXtyr",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Sauce tchayo",
+    "docId": "UnKRPLYEgCpCoKX7ACzI",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Sauce amavivè",
+    "docId": "D2Ye5Zknsa80NdXBFj19",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Sauce crincrin",
+    "docId": "kV0tSmphi5GAkjkqW8b4",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Sauce Gombo",
+    "docId": "Fex86S22cg3mAUx3iyLy",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Sauce poisson frais ou frit",
+    "docId": "lh1ha8jUBY43iu9nQtWW",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Sauce zinmassa à la pâte d’arachide",
+    "docId": "xctrHOwS1imuyZ1SYo0I",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Mafé de poulet / d’agneau ou de poisson",
+    "docId": "PjAax0ggXy8LzUZrDVLL",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Frite",
+    "docId": "wzjUoW0bkKj9XeUsfZ2l",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Spaghetti",
+    "docId": "oH3bsK8O2TzR0iPq44uk",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Riz blanc",
+    "docId": "gDFcpNBk7uEgdaiwEids",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Couscous",
+    "docId": "OeMHH4QgQX98jnZDPhyS",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Pomme de terre sautées",
+    "docId": "ugTihrCo7r0GS0CrxoVF",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Pomme de terre vapeur",
+    "docId": "xgK3gzlP3rMcd4qxYrST",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Haricot vert",
+    "docId": "66RqnjmCS1XuRkbGzwc9",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Akassa",
+    "docId": "9dubQ9pIM4XdAuE2GcOG",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/akassa.jpg"
+  },
+  {
+    "name": "Pâte blanche",
+    "docId": "pGbPNpStp4KvfqCtLCRe",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Pâte noire",
+    "docId": "RDeO8OF7SDzQkB7aNkwG",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Pâte rouge",
+    "docId": "orMe2xX6tMgXWaO048CX",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Agbéli",
+    "docId": "leh58TlTQic1pR1Q9bGg",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/agbeli.jpg"
+  },
+  {
+    "name": "Atièkè",
+    "docId": "82IEqEwWfw4c3xo0X9I9",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/atieke.jpg"
+  },
+  {
+    "name": "Aloco",
+    "docId": "QgtIZ1mdBtKaAWZqvhxc",
+    "status": "UPDATED_WITH_IMAGE",
+    "adresse": "assets/images/menuimages/aloco.jpg"
+  },
+  {
+    "name": "Légumes sautés",
+    "docId": "hyVwAVURsIjg0cEVx7d6",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Riz au gras",
+    "docId": "t6Mor637wz5FhJSfRZY4",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Purée de pomme de terre",
+    "docId": "AbDhTgk3nP5KJTFZPy1B",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Riz oriental",
+    "docId": "9Z5AkZnPYxxYcErrDDSK",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Riz cantonais",
+    "docId": "FbeeS2aT7uvmmnfsWs8h",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Crêpes au Nutella",
+    "docId": "WWmcAO5FFZFpCreucLIT",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Gauffre au Nutella",
+    "docId": "Djkdf25ugzv7rnrH2kUg",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Pancakes au Nutella",
+    "docId": "kmstr9KVsDLug65w7jGP",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Mousse au chocolat",
+    "docId": "mPEQ1H7CE6dsaBL5NuEf",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Fondant au chocolat",
+    "docId": "bXNc18MIkdYKI9lLVW8z",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Ananas flambée au Rhum",
+    "docId": "lHM0QcQtypoUjTG0dFBa",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Tarte aux pommes",
+    "docId": "6jRCuB4Qcbk2xmfVb31E",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Grand Tasse Fruits saison",
+    "docId": "MChNpMSyUgNuYLQfPF9Y",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Fruits saison",
+    "docId": "LWbG30a7PFdVqOmnSuXJ",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  },
+  {
+    "name": "Salade de fruits",
+    "docId": "16208EnidymaecTokIax",
+    "status": "UPDATED_WITH_NULL",
+    "adresse": null
+  }
+]

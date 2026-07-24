@@ -1,0 +1,146 @@
+[
+  {
+    "id": "0TVbeSeRwjkd9CToehyo",
+    "store": "bar",
+    "itemId": "4ZOLXAg6qJVHfdLPVgXY",
+    "itemName": "Black",
+    "unit": "cl",
+    "minimumQuantity": 2500,
+    "isLowStock": false,
+    "quantity": 7255,
+    "updatedAt": {
+      "_seconds": 1777414624,
+      "_nanoseconds": 471000000
+    }
+  },
+  {
+    "id": "A7ietzuXe6Zi2Gilm7NC",
+    "store": "hotel",
+    "itemId": "i6wQpRlmqYtlpheiXPrA",
+    "itemName": "savon",
+    "unit": "pièce",
+    "isLowStock": false,
+    "quantity": 217,
+    "updatedAt": {
+      "_seconds": 1776681884,
+      "_nanoseconds": 888000000
+    },
+    "minimumQuantity": 100
+  },
+  {
+    "id": "CvKxRCyVKo5ed74uhiF7",
+    "store": "restaurant",
+    "itemId": "79DaLRwQpf62P5nH5NWo",
+    "itemName": "Riz",
+    "isLowStock": false,
+    "minimumQuantity": 3000,
+    "unit": "g",
+    "quantity": 45850,
+    "updatedAt": {
+      "_seconds": 1777390328,
+      "_nanoseconds": 688000000
+    }
+  },
+  {
+    "id": "LoBnVrJVcF7i0kAphv68",
+    "store": "hotel",
+    "itemId": "4JltXtNd02Iln22kfOOo",
+    "itemName": "Papier Hygiènique",
+    "unit": "pièce",
+    "minimumQuantity": 30,
+    "quantity": 39,
+    "isLowStock": false,
+    "updatedAt": {
+      "_seconds": 1777051695,
+      "_nanoseconds": 586000000
+    }
+  },
+  {
+    "id": "RQ0rClCGinoOzj8Ruq5Q",
+    "itemId": "uRvTTX0Wfi8xYymeKtgY",
+    "itemName": "Pomme de terre",
+    "quantity": 3000,
+    "minimumQuantity": 0,
+    "isLowStock": false,
+    "createdAt": {
+      "_seconds": 1776971484,
+      "_nanoseconds": 3000000
+    },
+    "store": "restaurant",
+    "unit": "g"
+  },
+  {
+    "id": "jfJP0lZZElKBUcU2Y3RF",
+    "store": "hotel",
+    "itemId": "vKUL770M4skfPqjEmwIa",
+    "itemName": "Drap",
+    "unit": "pièce",
+    "quantity": 15,
+    "isLowStock": false,
+    "updatedAt": {
+      "_seconds": 1776626463,
+      "_nanoseconds": 472000000
+    },
+    "minimumQuantity": 5
+  },
+  {
+    "id": "jvrG38H8Xv30TMzAhZkT",
+    "itemName": "Huile",
+    "isLowStock": false,
+    "minimumQuantity": 200,
+    "store": "restaurant",
+    "unit": "cl",
+    "updateAt": {
+      "_seconds": 1776767995,
+      "_nanoseconds": 0
+    },
+    "itemId": "d0DS3E1NA1UoRhnItdK6",
+    "quantity": 260,
+    "updatedAt": {
+      "_seconds": 1777390328,
+      "_nanoseconds": 688000000
+    }
+  },
+  {
+    "id": "qA11P32rwVMiAq3Pzbux",
+    "store": "restaurant",
+    "itemId": "VUoHVrbUcXunJ0fLUpS8",
+    "itemName": "Viande de mouton",
+    "minimumQuantity": 1800,
+    "unit": "g",
+    "isLowStock": false,
+    "quantity": 47900,
+    "updatedAt": {
+      "_seconds": 1777390328,
+      "_nanoseconds": 688000000
+    }
+  },
+  {
+    "id": "sWL3eN2fxMTI1RiuxS4y",
+    "store": "restaurant",
+    "itemId": "nR5WaghxHnu3tSG15OqP",
+    "itemName": "Poulet",
+    "unit": "pièce",
+    "isLowStock": false,
+    "updatedAt": {
+      "_seconds": 1776616735,
+      "_nanoseconds": 106000000
+    },
+    "quantity": 5,
+    "minimumQuantity": 1
+  },
+  {
+    "id": "yNrpvaerljMFho4XgvrN",
+    "store": "bar",
+    "itemId": "oLdkzS6EGaPfeivCy82w",
+    "itemName": "Black",
+    "isLowStock": false,
+    "updatedAt": {
+      "_seconds": 1776681912,
+      "_nanoseconds": 161000000
+    },
+    "minimumQuantity": 750,
+    "unit": "cl",
+    "quantity": 75000
+  }
+]

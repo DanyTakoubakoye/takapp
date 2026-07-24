@@ -1,0 +1,50 @@
+# SECRETS
+serviceAccountKey.json
+**/serviceAccountKey.json
+*serviceAccount*.json
+OPEN AI KEY.txt
+**/OPEN AI KEY.txt
+*.key
+*.pem
+.env
+.env.*
+
+# NODE
+node_modules/
+**/node_modules/
+npm-debug.log*
+
+# FIREBASE
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+firestore-debug.log
+ui-debug.log
+*.local
+firestore.rules.backup*
+firestore.rules.*.bak
+
+# FLUTTER / DART
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# ANDROID
+takapp/android/.gradle/
+takapp/android/local.properties
+takapp/android/key.properties
+*.jks
+*.keystore
+
+# WINDOWS / WEB EPHEMERAL
+takapp/windows/flutter/ephemeral/
+takapp/web/build/
+
+# IDE / SYSTÈME
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db

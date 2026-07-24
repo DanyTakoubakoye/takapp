@@ -1,0 +1,282 @@
+[
+  {
+    "id": "B5mb9a5inyzZKb8fTnp7",
+    "clientName": "Dany Takoubakoye",
+    "roomNumber": "16",
+    "nights": 14,
+    "pricePerNight": 20000,
+    "roomTotal": 280000,
+    "extrasTotal": 173000,
+    "servicesTotal": 0,
+    "total": 453000,
+    "startDate": {
+      "_seconds": 1774994400,
+      "_nanoseconds": 0
+    },
+    "endDate": {
+      "_seconds": 1776204000,
+      "_nanoseconds": 0
+    },
+    "createdAt": {
+      "_seconds": 1776277013,
+      "_nanoseconds": 54000000
+    },
+    "paidAt": {
+      "_seconds": 1776277048,
+      "_nanoseconds": 253000000
+    },
+    "status": "paid",
+    "fiscalError": "",
+    "fiscalRequestSnapshot": {
+      "ifu": "3202532349197",
+      "type": "FV",
+      "items": [
+        {
+          "code": "ROOM_NIGHT",
+          "name": "Nuitee chambre 16",
+          "price": 20000,
+          "quantity": 14,
+          "taxGroup": "B"
+        },
+        {
+          "code": "HOTEL_EXTRAS",
+          "name": "Consommations bar/resto",
+          "price": 173000,
+          "quantity": 1,
+          "taxGroup": "B"
+        }
+      ],
+      "operator": {
+        "id": "FMV9ljqMjhalHR38IBv49dco3b93",
+        "name": "armandine"
+      },
+      "client": {
+        "ifu": "",
+        "name": "Dany Takoubakoye",
+        "contact": "",
+        "address": ""
+      },
+      "payment": [
+        {
+          "name": "ESPECES",
+          "amount": 453000
+        }
+      ]
+    },
+    "fiscalQrCode": "F;TS01018344;TESTLAXTIMAJK2F7VFJTVB24;3202532349197;20260417203459",
+    "fiscalNim": "TS01018344",
+    "isFiscalized": true,
+    "fiscalizedAt": {
+      "_seconds": 1776454499,
+      "_nanoseconds": 775000000
+    },
+    "fiscalEmcfUid": "c35311d8-39fa-493c-82bb-2d48d14a1136",
+    "fiscalMecefCode": "TEST-LAXT-IMAJ-K2F7-VFJT-VB24",
+    "fiscalMachineDateTime": "17/04/2026 20:34:59",
+    "fiscalRawConfirmResponse": "{\"dateTime\":\"17/04/2026 20:34:59\",\"qrCode\":\"F;TS01018344;TESTLAXTIMAJK2F7VFJTVB24;3202532349197;20260417203459\",\"codeMECeFDGI\":\"TEST-LAXT-IMAJ-K2F7-VFJT-VB24\",\"counters\":\"2/3 FV\",\"nim\":\"TS01018344\",\"refundWithAibPayment\":false}",
+    "fiscalRawCreateResponse": "{\"uid\":\"c35311d8-39fa-493c-82bb-2d48d14a1136\",\"ta\":0,\"tb\":18,\"tc\":0,\"td\":18,\"taa\":0,\"tab\":453000,\"tac\":0,\"tad\":0,\"tae\":0,\"taf\":0,\"hab\":383898,\"had\":0,\"vab\":69102,\"vad\":0,\"aib\":0,\"ts\":0,\"total\":453000}",
+    "fiscalCounter": "2/3 FV",
+    "fiscalStatus": "success",
+    "accountingTransferId": "dvchHl3X1IAuRWSVpUrL",
+    "accountingTransferStatus": "declared"
+  },
+  {
+    "id": "DSujvSB2Cg92OCjw1kTi",
+    "clientName": "Marjeno Benin",
+    "clientIfu": "3202563993822",
+    "clientAddress": "N° DE PARCELLE D MAISON MADINA BOURAIMA djbo@marjero.com Gbédokpo, 5ème arrondissement Cotonou, Littoral",
+    "clientPhone": "0158585848",
+    "roomNumber": "16",
+    "nights": 3,
+    "pricePerNight": 30000,
+    "roomTotal": 90000,
+    "extrasTotal": 0,
+    "servicesTotal": 0,
+    "total": 90000,
+    "paymentMethod": "cash",
+    "aibType": "aib1",
+    "fiscalError": "",
+    "fiscalInvoiceType": "FV",
+    "startDate": {
+      "_seconds": 1776117600,
+      "_nanoseconds": 0
+    },
+    "endDate": {
+      "_seconds": 1776376800,
+      "_nanoseconds": 0
+    },
+    "paidAt": {
+      "_seconds": 1776450658,
+      "_nanoseconds": 397000000
+    },
+    "paidAmount": 90000,
+    "status": "paid",
+    "fiscalRequestSnapshot": {
+      "ifu": "3202532349197",
+      "type": "FV",
+      "items": [
+        {
+          "code": "ROOM_NIGHT",
+          "name": "Nuitee chambre 16",
+          "price": 30000,
+          "quantity": 3,
+          "taxGroup": "B"
+        }
+      ],
+      "operator": {
+        "id": "FMV9ljqMjhalHR38IBv49dco3b93",
+        "name": "armandine"
+      },
+      "aib": "A",
+      "client": {
+        "ifu": "3202563993822",
+        "name": "Marjeno Benin",
+        "contact": "0158585848",
+        "address": "N° DE PARCELLE D MAISON MADINA BOURAIMA djbo@marjero.com Gbédokpo, 5ème arrondissement Cotonou, Littoral"
+      },
+      "payment": [
+        {
+          "name": "ESPECES",
+          "amount": 90000
+        }
+      ]
+    },
+    "fiscalQrCode": "F;TS01018344;TEST6HQAE4KOGAPHZJUQRW74;3202532349197;20260418113028",
+    "fiscalNim": "TS01018344",
+    "isFiscalized": true,
+    "fiscalizedAt": {
+      "_seconds": 1776508228,
+      "_nanoseconds": 484000000
+    },
+    "fiscalEmcfUid": "ac913d0e-cd2f-4714-88be-d832bfd8cf20",
+    "fiscalMecefCode": "TEST-6HQA-E4KO-GAPH-ZJUQ-RW74",
+    "fiscalMachineDateTime": "18/04/2026 11:30:28",
+    "fiscalRawConfirmResponse": "{\"dateTime\":\"18/04/2026 11:30:28\",\"qrCode\":\"F;TS01018344;TEST6HQAE4KOGAPHZJUQRW74;3202532349197;20260418113028\",\"codeMECeFDGI\":\"TEST-6HQA-E4KO-GAPH-ZJUQ-RW74\",\"counters\":\"3/4 FV\",\"nim\":\"TS01018344\",\"refundWithAibPayment\":false}",
+    "fiscalRawCreateResponse": "{\"uid\":\"ac913d0e-cd2f-4714-88be-d832bfd8cf20\",\"ta\":0,\"tb\":18,\"tc\":0,\"td\":18,\"taa\":0,\"tab\":90000,\"tac\":0,\"tad\":0,\"tae\":0,\"taf\":0,\"hab\":76271,\"had\":0,\"vab\":13729,\"vad\":0,\"aib\":763,\"ts\":0,\"total\":90763}",
+    "fiscalCounter": "3/4 FV",
+    "fiscalStatus": "success",
+    "accountingTransferId": "dvchHl3X1IAuRWSVpUrL",
+    "accountingTransferStatus": "declared"
+  },
+  {
+    "id": "ZM8Ms8TRFayUtSh6XW4N"
+  },
+  {
+    "id": "pNFrDn8JOUvb3cpHi7xM",
+    "clientName": "Marjeno Benin SARL",
+    "clientIfu": "3202563993822",
+    "clientAddress": "N° DE PARCELLE D MAISON MADINA BOURAIMA djbo@marjero.com Gbédokpo, 5ème arrondissement Cotonou, Littoral BÉNIN",
+    "clientPhone": "0158585848",
+    "roomNumber": "16",
+    "nights": 22,
+    "pricePerNight": 20000,
+    "roomTotal": 440000,
+    "extrasTotal": 173000,
+    "servicesTotal": 0,
+    "total": 613000,
+    "paymentMethod": "cash",
+    "aibType": "aib1",
+    "fiscalError": "",
+    "fiscalInvoiceType": "FV",
+    "startDate": {
+      "_seconds": 1774306800,
+      "_nanoseconds": 0
+    },
+    "endDate": {
+      "_seconds": 1776290400,
+      "_nanoseconds": 0
+    },
+    "fiscalRequestSnapshot": {
+      "ifu": "3202532349197",
+      "type": "FV",
+      "items": [
+        {
+          "code": "ROOM_NIGHT",
+          "name": "Nuitee chambre 16",
+          "price": 20000,
+          "quantity": 22,
+          "taxGroup": "B"
+        },
+        {
+          "code": "HOTEL_EXTRAS",
+          "name": "Consommations bar/resto",
+          "price": 173000,
+          "quantity": 1,
+          "taxGroup": "B"
+        }
+      ],
+      "operator": {
+        "id": "FMV9ljqMjhalHR38IBv49dco3b93",
+        "name": "armandine"
+      },
+      "aib": "A",
+      "client": {
+        "ifu": "3202563993822",
+        "name": "Marjeno Benin SARL",
+        "contact": "0158585848",
+        "address": "N° DE PARCELLE D MAISON MADINA BOURAIMA djbo@marjero.com Gbédokpo, 5ème arrondissement Cotonou, Littoral BÉNIN"
+      },
+      "payment": [
+        {
+          "name": "ESPECES",
+          "amount": 613000
+        }
+      ]
+    },
+    "fiscalQrCode": "F;TS01018344;TESTE6DQFMXZHD4U22CANCWD;3202532349197;20260417191454",
+    "fiscalNim": "TS01018344",
+    "isFiscalized": true,
+    "fiscalizedAt": {
+      "_seconds": 1776449694,
+      "_nanoseconds": 678000000
+    },
+    "fiscalEmcfUid": "6252a5d8-0801-4a94-a142-fb9b36d2b2ee",
+    "fiscalMecefCode": "TEST-E6DQ-FMXZ-HD4U-22CA-NCWD",
+    "fiscalMachineDateTime": "17/04/2026 19:14:54",
+    "fiscalRawConfirmResponse": "{\"dateTime\":\"17/04/2026 19:14:54\",\"qrCode\":\"F;TS01018344;TESTE6DQFMXZHD4U22CANCWD;3202532349197;20260417191454\",\"codeMECeFDGI\":\"TEST-E6DQ-FMXZ-HD4U-22CA-NCWD\",\"counters\":\"1/2 FV\",\"nim\":\"TS01018344\",\"refundWithAibPayment\":false}",
+    "fiscalRawCreateResponse": "{\"uid\":\"6252a5d8-0801-4a94-a142-fb9b36d2b2ee\",\"ta\":0,\"tb\":18,\"tc\":0,\"td\":18,\"taa\":0,\"tab\":613000,\"tac\":0,\"tad\":0,\"tae\":0,\"taf\":0,\"hab\":519492,\"had\":0,\"vab\":93508,\"vad\":0,\"aib\":5195,\"ts\":0,\"total\":618195}",
+    "fiscalCounter": "1/2 FV",
+    "fiscalStatus": "success",
+    "receivedBy": "FMV9ljqMjhalHR38IBv49dco3b93",
+    "receivedByName": "armandine",
+    "paidAt": {
+      "_seconds": 1776449963,
+      "_nanoseconds": 245000000
+    },
+    "paidAmount": 613000,
+    "status": "paid",
+    "accountingTransferId": "dvchHl3X1IAuRWSVpUrL",
+    "accountingTransferStatus": "declared"
+  },
+  {
+    "id": "saN3PJydNVDMJh4rNXXg",
+    "clientName": "Dany Takoubakoye",
+    "roomNumber": "16",
+    "nights": 21,
+    "pricePerNight": 25000,
+    "roomTotal": 525000,
+    "extrasTotal": 173000,
+    "servicesTotal": 0,
+    "total": 698000,
+    "startDate": {
+      "_seconds": 1774306800,
+      "_nanoseconds": 0
+    },
+    "endDate": {
+      "_seconds": 1776204000,
+      "_nanoseconds": 0
+    },
+    "createdAt": {
+      "_seconds": 1776274088,
+      "_nanoseconds": 20000000
+    },
+    "paidAt": {
+      "_seconds": 1776450662,
+      "_nanoseconds": 551000000
+    },
+    "paidAmount": 698000,
+    "status": "paid",
+    "accountingTransferId": "dvchHl3X1IAuRWSVpUrL",
+    "accountingTransferStatus": "declared"
+  }
+]

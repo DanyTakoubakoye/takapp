@@ -1,0 +1,22 @@
+{
+  "id": "ZjfeUbSLvnZCfK8Lf18X",
+  "orderNumber": "CMD-20260423-1776944557063",
+  "clientType": "restaurant",
+  "tableNumber": "23",
+  "roomNumber": "",
+  "createdBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+  "createdByName": "Odilia",
+  "status": "sent",
+  "subtotal": 9000,
+  "tax": 0,
+  "total": 9000,
+  "paymentStatus": "unpaid",
+  "isForKitchen": true,
+  "kitchenStatus": "pending",
+  "isForBar": true,
+  "barStatus": "pending",
+  "stockRestored": false,
+  "createdAt": "2026-04-23T11:42:37.640Z",
+  "stockDeductedAt": "2026-04-23T11:42:42.257Z",
+  "stockDeducted": true
+}

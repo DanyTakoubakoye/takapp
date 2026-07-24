@@ -1,0 +1,596 @@
+[
+  {
+    "id": "7WYXfW1ZY0FkBFzbW2T0",
+    "orderId": "NfI6vQqvXe36h5xKvqwt",
+    "orderNumber": "CMD-20260412-1776011006876",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 28500,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776517695,
+      "_nanoseconds": 210000000
+    },
+    "handoverId": "n5MwkDPrlSzenC3L5Jvh",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "8xxTcOQ83cuoeDWibOWm",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "amount": 21000,
+    "orderNumber": "CMD-20260405-1775426595004",
+    "method": "cash",
+    "orderId": "qZQYRRsH9UnGz8JEuNnI",
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1775426766,
+      "_nanoseconds": 5000000
+    },
+    "handoverId": "NZILQexsNDp4uliraEeZ",
+    "handoverStatus": "validated"
+  },
+  {
+    "id": "Do0nNyI1gumZglY83gb2",
+    "orderId": "pHa7Q3mMlsXH13OH6uQe",
+    "orderNumber": "CMD-20260410-1775813762269",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 130000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1775814328,
+      "_nanoseconds": 411000000
+    },
+    "handoverId": "uyULGy7ADMc7FXzCvkVo",
+    "handoverStatus": "validated"
+  },
+  {
+    "id": "EZT0DUnSITOGoz4Fh72I",
+    "orderId": "ZiOkaYhUPXS5xfLW54aV",
+    "orderNumber": "CMD-20260404-1775306935366",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "mobile_money",
+    "amount": 10500,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776517744,
+      "_nanoseconds": 171000000
+    },
+    "handoverId": "dMUNEs6PbbEquvAqAdfY",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "H4teKFkFwiXF18aZBZXj",
+    "orderId": "dp9S9LB6rqh5RdaLrKXm",
+    "orderNumber": "CMD-20260404-1775325561508",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 28000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1775814308,
+      "_nanoseconds": 822000000
+    },
+    "handoverId": "sILv6sZgFEWbabLwDaAQ",
+    "handoverStatus": "validated"
+  },
+  {
+    "id": "HfcpJqNZwHKPvgBd44Wn",
+    "orderId": "Hs6DPDdGSyzSZ3Nc1BYL",
+    "orderNumber": "CMD-20260404-1775306031384",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "mobile_money",
+    "amount": 30000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776517771,
+      "_nanoseconds": 929000000
+    },
+    "handoverId": "dMUNEs6PbbEquvAqAdfY",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "IUY9LusvbxXKeQWrXTIj"
+  },
+  {
+    "id": "JtPFKcpIapAg2WHcvRfC",
+    "orderId": "rHoYiNHrViDL5o4ks3WF",
+    "orderNumber": "CMD-20260403-1775234545481",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 14000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1775301734,
+      "_nanoseconds": 773000000
+    },
+    "handoverId": "NZILQexsNDp4uliraEeZ",
+    "handoverStatus": "validated"
+  },
+  {
+    "id": "LBLwD0uj37MdeR9km5hJ",
+    "orderId": "F5GvC1nQk4aUYgXffNjl",
+    "orderNumber": "CMD-20260404-1775306646767",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "mobile_money",
+    "amount": 40500,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776517751,
+      "_nanoseconds": 238000000
+    },
+    "handoverId": "dMUNEs6PbbEquvAqAdfY",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "Lcd2RGxtZoKMXc1AEJOz",
+    "orderId": "Itb9mn67Q68ZrRHiyKzP",
+    "orderNumber": "CMD-20260404-1775302425630",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "mobile_money",
+    "amount": 10500,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776517780,
+      "_nanoseconds": 800000000
+    },
+    "handoverId": "dMUNEs6PbbEquvAqAdfY",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "LgYrfZmhgNd9Uhz8Pk9F",
+    "orderId": "y8YGaVh38Uwm4URvl6hb",
+    "orderNumber": "CMD-20260412-1776011765491",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 64000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776517687,
+      "_nanoseconds": 86000000
+    },
+    "handoverId": "n5MwkDPrlSzenC3L5Jvh",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "LwoWznpmhpbYueZo9H3D",
+    "orderId": "H1znqKJS9MfuruwDjQdl",
+    "orderNumber": "CMD-20260413-1776074594657",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 2000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776517673,
+      "_nanoseconds": 319000000
+    },
+    "handoverId": "n5MwkDPrlSzenC3L5Jvh",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "NEqaFJqTT64ZphOfa92R",
+    "orderId": "4WwmwK3453xccrey63Qk",
+    "orderNumber": "CMD-20260404-1775312542543",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "benin resto",
+    "amount": 16500,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776517726,
+      "_nanoseconds": 135000000
+    },
+    "handoverId": "dMUNEs6PbbEquvAqAdfY",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "SEV6Mm8c1YyjznKnlm9E",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "amount": 9000,
+    "handoverId": null,
+    "orderNumber": "CMD-20260429-1777414635406",
+    "method": "credit",
+    "orderId": "XLE6q2kwRPPHX5QbVEw2",
+    "handoverStatus": "pending",
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1777414785,
+      "_nanoseconds": 836000000
+    }
+  },
+  {
+    "id": "SaFkVRqYeidaLbIvd4rR",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "amount": 27000,
+    "orderNumber": "CMD-20260404-1775329978362",
+    "method": "cash",
+    "orderId": "UJ1xt41ciG0YIjvykKJL",
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1775426774,
+      "_nanoseconds": 905000000
+    },
+    "handoverId": "0nQ6tKlKjV84X4onXZPx",
+    "handoverStatus": "validated"
+  },
+  {
+    "id": "UZzRrSCoCDmKbO5becjK",
+    "type": "room",
+    "invoiceId": "B5mb9a5inyzZKb8fTnp7",
+    "amount": 453000,
+    "method": "cash",
+    "receivedBy": "FMV9ljqMjhalHR38IBv49dco3b93",
+    "receivedByName": "armandine",
+    "handoverStatus": "pending",
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776277048,
+      "_nanoseconds": 253000000
+    }
+  },
+  {
+    "id": "XVWWdXZuCLA9UbCjbLe4",
+    "orderId": "5VI7mmKKu48WP0t7yQfd",
+    "orderNumber": "CMD-20260413-1776083322794",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 15000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776511787,
+      "_nanoseconds": 917000000
+    },
+    "handoverId": "n5MwkDPrlSzenC3L5Jvh",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "XXdckF5d0Oyl8Q9yddnT",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "amount": 21000,
+    "orderNumber": "CMD-20260405-1775412935622",
+    "method": "cash",
+    "orderId": "FK3RNoKOziCJbbufkNCv",
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1775426772,
+      "_nanoseconds": 853000000
+    },
+    "handoverId": "0nQ6tKlKjV84X4onXZPx",
+    "handoverStatus": "validated"
+  },
+  {
+    "id": "Y8JeglNYBx8exU4jyRwX",
+    "orderId": "guUdNRDcY3j7D8mtg2VJ",
+    "orderNumber": "CMD-20260403-1775213635583",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 32000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776793813,
+      "_nanoseconds": 691000000
+    },
+    "handoverId": "vjItwYx6FvypJuztucEW",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "YOJO3x7N3vqLmEIBILl6",
+    "orderId": "NaceTXGfG92bOudW9zE3",
+    "orderNumber": "CMD-20260404-1775325000831",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "mobile_money",
+    "amount": 12000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776517711,
+      "_nanoseconds": 973000000
+    },
+    "handoverId": "dMUNEs6PbbEquvAqAdfY",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "aURy06P2FNAKlUIiNCtl",
+    "orderId": "tPPXbQr0MZ3KWI0IXD2G",
+    "orderNumber": "CMD-20260403-1775234534260",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 14000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776525352,
+      "_nanoseconds": 553000000
+    },
+    "handoverId": "vjItwYx6FvypJuztucEW",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "b2jL7CuGjIPtD7Xhzb4i",
+    "orderId": "8xxIsgzejEMP7drxtJlF",
+    "orderNumber": "CMD-20260403-1775234041799",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 25000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776793799,
+      "_nanoseconds": 181000000
+    },
+    "handoverId": "vjItwYx6FvypJuztucEW",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "c2GcnZJKKp0iVC2UHxE6",
+    "orderId": "BMUAC2FW3JK0bTKl1rj9",
+    "orderNumber": "CMD-20260404-1775302365642",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 18000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776525289,
+      "_nanoseconds": 167000000
+    },
+    "handoverId": "vjItwYx6FvypJuztucEW",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "c6XlbO3FhRs5pgh1pPCP",
+    "orderId": "XhnvCjY8aupZVtYsezNd",
+    "orderNumber": "CMD-20260404-1775306510100",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "mobile_money",
+    "amount": 18000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776517760,
+      "_nanoseconds": 196000000
+    },
+    "handoverId": "dMUNEs6PbbEquvAqAdfY",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "cUmp2Pj5j6qdwALUTHtB",
+    "orderId": "g68RbAhEYtd8istLsVCn",
+    "orderNumber": "CMD-20260412-1776019820365",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 2000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776517678,
+      "_nanoseconds": 182000000
+    },
+    "handoverId": "n5MwkDPrlSzenC3L5Jvh",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "fOt3b8VxrNtX6U9GjWg0",
+    "orderId": "GgxlvbRIR7LjeWgtLuyU",
+    "orderNumber": "CMD-20260403-1775213681048",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 30000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776793809,
+      "_nanoseconds": 149000000
+    },
+    "handoverId": "vjItwYx6FvypJuztucEW",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "gtoBWTUMNy8eG5F5KkSW",
+    "orderId": "c5WIekngOS1XHnzwrLg3",
+    "orderNumber": "CMD-20260412-1776011737103",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 148000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776517690,
+      "_nanoseconds": 816000000
+    },
+    "handoverId": "n5MwkDPrlSzenC3L5Jvh",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "hwNMr8FaqzoXv6m5nMmO",
+    "orderId": "feqTKD2JxsK2rJHd8T9t",
+    "orderNumber": "CMD-20260403-1775234009451",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 70500,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776793805,
+      "_nanoseconds": 152000000
+    },
+    "handoverId": "vjItwYx6FvypJuztucEW",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "j6ejpQjsLpCIciFKshN8",
+    "orderId": "pTvLmrkoGg4loNlZbeEi",
+    "orderNumber": "CMD-20260413-1776087100121",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 25500,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776511974,
+      "_nanoseconds": 320000000
+    },
+    "handoverId": "n5MwkDPrlSzenC3L5Jvh",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "jDMshOyZ5g1A3f8G6sF7",
+    "orderId": "FthpAxLOVAjV0EKUOZTv",
+    "orderNumber": "CMD-20260412-1776019257254",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 3000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776517683,
+      "_nanoseconds": 81000000
+    },
+    "handoverId": "n5MwkDPrlSzenC3L5Jvh",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "ki9Yc6rcjtP2S2HXrQ50",
+    "orderId": "YHfvGwyq1g4l7dVo5Q82",
+    "orderNumber": "CMD-20260403-1775212862490",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 15000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776793817,
+      "_nanoseconds": 949000000
+    },
+    "handoverId": "vjItwYx6FvypJuztucEW",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "nrLi5LUdkwEkYEpZ46yU",
+    "orderId": "2psQfhLctVsdJ0wjnUQN",
+    "orderNumber": "CMD-20260422-1776882562208",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 4500,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1777052314,
+      "_nanoseconds": 85000000
+    },
+    "handoverId": "dIv8o0qwpinbQWfIo2Wy",
+    "handoverStatus": "validated"
+  },
+  {
+    "id": "o91KKxMTQ571YBUjFV1o",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "amount": 12000,
+    "orderNumber": "CMD-20260405-1775421202122",
+    "method": "cash",
+    "orderId": "MyqqrrTZiJVd4bTuEsPu",
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1775426770,
+      "_nanoseconds": 485000000
+    },
+    "handoverId": "0nQ6tKlKjV84X4onXZPx",
+    "handoverStatus": "validated"
+  },
+  {
+    "id": "q1GzLKHu72mHwiZPKBfl",
+    "orderId": "iMTlrRSpjyRpHlNVcrwQ",
+    "orderNumber": "CMD-20260413-1776074547689",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 60000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776511758,
+      "_nanoseconds": 334000000
+    },
+    "handoverId": "n5MwkDPrlSzenC3L5Jvh",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "t4YZNJ86EZ1jGB9G2SWz",
+    "orderId": "DpbEw2XZ8acmcdmGjNts",
+    "orderNumber": "CMD-20260404-1775311678663",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "card",
+    "amount": 15000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776517734,
+      "_nanoseconds": 829000000
+    },
+    "handoverId": "dMUNEs6PbbEquvAqAdfY",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "wdnWt6wYKbvsIolT2G0W",
+    "orderId": "27srJXJfBTLpFcqa6UPG",
+    "orderNumber": "CMD-20260413-1776083334864",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 12000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776453753,
+      "_nanoseconds": 840000000
+    },
+    "handoverId": "VtAP8CMCJTNRtZ1Ji7v8",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "y4WRtq9x1MbEkwfPJoQr",
+    "orderId": "L0500zrWg37WsvkC565N",
+    "orderNumber": "CMD-20260412-1776006730485",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 106500,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776517700,
+      "_nanoseconds": 875000000
+    },
+    "handoverId": "dMUNEs6PbbEquvAqAdfY",
+    "handoverStatus": "declared"
+  },
+  {
+    "id": "ydMn69vJyrS6BXsBY0db",
+    "orderId": "ruj6hXiA2KXNxhsujB3X",
+    "orderNumber": "CMD-20260412-1776020399631",
+    "receivedBy": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "receivedByName": "Odilia",
+    "method": "cash",
+    "amount": 6000,
+    "status": "confirmed",
+    "createdAt": {
+      "_seconds": 1776074420,
+      "_nanoseconds": 177000000
+    },
+    "handoverId": "oSEPiS0lY2ZSdMbsqsP9",
+    "handoverStatus": "declared"
+  }
+]

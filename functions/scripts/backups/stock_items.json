@@ -1,0 +1,194 @@
+[
+  {
+    "id": "4JltXtNd02Iln22kfOOo",
+    "name": "Papier Hygiènique",
+    "category": "Consommables hôtel",
+    "unit": "pièce",
+    "isActive": true,
+    "createdAt": {
+      "_seconds": 1776626375,
+      "_nanoseconds": 406000000
+    },
+    "store": "hotel"
+  },
+  {
+    "id": "4ZOLXAg6qJVHfdLPVgXY",
+    "name": "Black",
+    "isActive": true,
+    "createdAt": {
+      "_seconds": 1776612692,
+      "_nanoseconds": 675000000
+    },
+    "store": "bar",
+    "unit": "cl",
+    "category": "Boisson"
+  },
+  {
+    "id": "79DaLRwQpf62P5nH5NWo",
+    "name": "Riz",
+    "category": "Céréales",
+    "isActive": true,
+    "createdAt": {
+      "_seconds": 1776612578,
+      "_nanoseconds": 277000000
+    },
+    "store": "restaurant",
+    "unit": "g"
+  },
+  {
+    "id": "OOmEPEQe6TUQSjjV8MuC",
+    "name": "coca cola zero",
+    "category": "Boisson gazeuse",
+    "unit": "bouteille",
+    "store": "bar",
+    "isActive": true,
+    "createdAt": {
+      "_seconds": 1777028177,
+      "_nanoseconds": 150000000
+    }
+  },
+  {
+    "id": "VUoHVrbUcXunJ0fLUpS8",
+    "name": "Viande de mouton",
+    "category": "Viandes et poissons",
+    "isActive": true,
+    "createdAt": {
+      "_seconds": 1776612613,
+      "_nanoseconds": 841000000
+    },
+    "store": "restaurant",
+    "unit": "g"
+  },
+  {
+    "id": "Y6CEx4b806HG9hTT2M07",
+    "name": "Drap",
+    "category": "Consommables hôtel",
+    "store": "hotel",
+    "isActive": true,
+    "createdAt": {
+      "_seconds": 1776712936,
+      "_nanoseconds": 687000000
+    },
+    "unit": "piece"
+  },
+  {
+    "id": "ZJgxkWjS5IZ8nE0Cu5u3",
+    "name": "Tappette",
+    "category": "Bien-être",
+    "unit": "piece",
+    "store": "hotel",
+    "isActive": true,
+    "createdAt": {
+      "_seconds": 1777028963,
+      "_nanoseconds": 325000000
+    }
+  },
+  {
+    "id": "d0DS3E1NA1UoRhnItdK6",
+    "category": "Consommable Restaurant",
+    "createdAt": {
+      "_seconds": 1776768189,
+      "_nanoseconds": 0
+    },
+    "isActive": true,
+    "name": "Huile",
+    "store": "restaurant",
+    "unit": "cl"
+  },
+  {
+    "id": "d0FFxAmWbItA1hq92sZR",
+    "name": "serpière",
+    "category": "Consommables hôtel",
+    "unit": "pièce",
+    "isActive": true,
+    "createdAt": {
+      "_seconds": 1776626293,
+      "_nanoseconds": 257000000
+    },
+    "store": "hotel"
+  },
+  {
+    "id": "i6wQpRlmqYtlpheiXPrA",
+    "name": "savon",
+    "category": "Consommables hôtel",
+    "unit": "pièce",
+    "isActive": true,
+    "createdAt": {
+      "_seconds": 1776626336,
+      "_nanoseconds": 38000000
+    },
+    "store": "hotel"
+  },
+  {
+    "id": "mfMis3WoP5j38jsnpCRw",
+    "name": "Champoing",
+    "category": "Chambre",
+    "unit": "pièce",
+    "store": "hotel",
+    "isActive": true,
+    "createdAt": {
+      "_seconds": 1777029040,
+      "_nanoseconds": 239000000
+    }
+  },
+  {
+    "id": "nR5WaghxHnu3tSG15OqP",
+    "name": "Poulet",
+    "category": "Viandes et poissons",
+    "unit": "pièce",
+    "isActive": true,
+    "createdAt": {
+      "_seconds": 1776612649,
+      "_nanoseconds": 231000000
+    },
+    "store": "restaurant"
+  },
+  {
+    "id": "osgNZTKdZl2gm1jpW5VK",
+    "name": "café",
+    "category": "Consommables hôtel",
+    "unit": "pièce",
+    "isActive": true,
+    "createdAt": {
+      "_seconds": 1776626307,
+      "_nanoseconds": 187000000
+    },
+    "store": "hotel"
+  },
+  {
+    "id": "sW8MatHePbziSLjXHj3X",
+    "name": "Black Label",
+    "category": "Whiskey",
+    "unit": "cl",
+    "store": "bar",
+    "isActive": true,
+    "createdAt": {
+      "_seconds": 1777028127,
+      "_nanoseconds": 392000000
+    }
+  },
+  {
+    "id": "uRvTTX0Wfi8xYymeKtgY",
+    "name": "Pomme de terre",
+    "category": "Plat",
+    "isActive": true,
+    "createdAt": {
+      "_seconds": 1776964294,
+      "_nanoseconds": 923000000
+    },
+    "store": "restaurant",
+    "unit": "g"
+  },
+  {
+    "id": "vKUL770M4skfPqjEmwIa",
+    "name": "Drap",
+    "category": "Consommables hôtel",
+    "unit": "pièce",
+    "isActive": true,
+    "createdAt": {
+      "_seconds": 1776626273,
+      "_nanoseconds": 881000000
+    },
+    "store": "hotel"
+  }
+]

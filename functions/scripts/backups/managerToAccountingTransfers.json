@@ -1,0 +1,71 @@
+[
+  {
+    "id": "1AW8wU37Zgkj4qydFBxo"
+  },
+  {
+    "id": "7lA6MZrP04PQjkRIkyzt",
+    "amount": 134500,
+    "source": "manager_mixed",
+    "status": "pending",
+    "handoverIds": [
+      "dIv8o0qwpinbQWfIo2Wy",
+      "uyULGy7ADMc7FXzCvkVo"
+    ],
+    "roomInvoiceIds": [],
+    "receivedAt": null,
+    "createdAt": {
+      "_seconds": 1777414264,
+      "_nanoseconds": 893000000
+    }
+  },
+  {
+    "id": "FLC1U8QkzbCorTPSONUn",
+    "amount": 253000,
+    "roomInvoiceIds": [],
+    "handoverIds": [
+      "0nQ6tKlKjV84X4onXZPx",
+      "NZILQexsNDp4uliraEeZ",
+      "sILv6sZgFEWbabLwDaAQ",
+      "uyULGy7ADMc7FXzCvkVo"
+    ],
+    "source": "manager_mixed",
+    "createdAt": {
+      "_seconds": 1775814539,
+      "_nanoseconds": 902000000
+    },
+    "receivedByAccountingName": "Armandine Togbin",
+    "receivedAt": {
+      "_seconds": 1775814627,
+      "_nanoseconds": 239000000
+    },
+    "status": "received",
+    "receivedByAccountingId": "A7KJZ230Vke9jx9VHKbiCJMu7t83"
+  },
+  {
+    "id": "dvchHl3X1IAuRWSVpUrL",
+    "amount": 1977000,
+    "roomInvoiceIds": [
+      "B5mb9a5inyzZKb8fTnp7",
+      "DSujvSB2Cg92OCjw1kTi",
+      "pNFrDn8JOUvb3cpHi7xM",
+      "saN3PJydNVDMJh4rNXXg"
+    ],
+    "handoverIds": [
+      "0nQ6tKlKjV84X4onXZPx",
+      "NZILQexsNDp4uliraEeZ",
+      "sILv6sZgFEWbabLwDaAQ"
+    ],
+    "source": "manager_mixed",
+    "createdAt": {
+      "_seconds": 1777123372,
+      "_nanoseconds": 782000000
+    },
+    "receivedByAccountingName": "Armandine Togbin",
+    "receivedAt": {
+      "_seconds": 1777123560,
+      "_nanoseconds": 748000000
+    },
+    "status": "received",
+    "receivedByAccountingId": "A7KJZ230Vke9jx9VHKbiCJMu7t83"
+  }
+]

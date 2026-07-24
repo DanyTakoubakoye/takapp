@@ -1,0 +1,9 @@
+{
+  "id": "VUoHVrbUcXunJ0fLUpS8",
+  "name": "Viande de mouton",
+  "category": "Viandes et poissons",
+  "isActive": true,
+  "createdAt": "2026-04-19T15:30:13.841Z",
+  "store": "restaurant",
+  "unit": "g"
+}

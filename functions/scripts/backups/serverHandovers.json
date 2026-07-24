@@ -1,0 +1,253 @@
+[
+  {
+    "id": "0nQ6tKlKjV84X4onXZPx",
+    "paymentIds": [
+      "SaFkVRqYeidaLbIvd4rR",
+      "XXdckF5d0Oyl8Q9yddnT",
+      "o91KKxMTQ571YBUjFV1o"
+    ],
+    "serveurName": "Odilia",
+    "declaredAmount": 60000,
+    "serveurId": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "createdAt": {
+      "_seconds": 1775426801,
+      "_nanoseconds": 635000000
+    },
+    "receivedByManagerName": "armandine",
+    "validatedAmount": 60000,
+    "validatedPaymentIds": [
+      "SaFkVRqYeidaLbIvd4rR",
+      "XXdckF5d0Oyl8Q9yddnT",
+      "o91KKxMTQ571YBUjFV1o"
+    ],
+    "receivedByManagerId": "FMV9ljqMjhalHR38IBv49dco3b93",
+    "validatedAt": {
+      "_seconds": 1775426889,
+      "_nanoseconds": 561000000
+    },
+    "status": "validated",
+    "accountingTransferId": "dvchHl3X1IAuRWSVpUrL",
+    "accountingTransferStatus": "declared"
+  },
+  {
+    "id": "NZILQexsNDp4uliraEeZ",
+    "paymentIds": [
+      "8xxTcOQ83cuoeDWibOWm",
+      "JtPFKcpIapAg2WHcvRfC"
+    ],
+    "serveurName": "Odilia",
+    "declaredAmount": 35000,
+    "serveurId": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "createdAt": {
+      "_seconds": 1775426809,
+      "_nanoseconds": 634000000
+    },
+    "receivedByManagerName": "armandine",
+    "validatedAmount": 35000,
+    "validatedPaymentIds": [
+      "8xxTcOQ83cuoeDWibOWm",
+      "JtPFKcpIapAg2WHcvRfC"
+    ],
+    "receivedByManagerId": "FMV9ljqMjhalHR38IBv49dco3b93",
+    "validatedAt": {
+      "_seconds": 1775426882,
+      "_nanoseconds": 792000000
+    },
+    "status": "validated",
+    "accountingTransferId": "dvchHl3X1IAuRWSVpUrL",
+    "accountingTransferStatus": "declared"
+  },
+  {
+    "id": "VtAP8CMCJTNRtZ1Ji7v8",
+    "serveurId": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "serveurName": "Odilia",
+    "declaredAmount": 12000,
+    "validatedAmount": null,
+    "status": "pending",
+    "receivedByManagerId": null,
+    "receivedByManagerName": null,
+    "validatedAt": null,
+    "paymentIds": [
+      "wdnWt6wYKbvsIolT2G0W"
+    ],
+    "createdAt": {
+      "_seconds": 1776517851,
+      "_nanoseconds": 420000000
+    }
+  },
+  {
+    "id": "dIv8o0qwpinbQWfIo2Wy",
+    "serveurId": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "serveurName": "Odilia",
+    "declaredAmount": 4500,
+    "paymentIds": [
+      "nrLi5LUdkwEkYEpZ46yU"
+    ],
+    "createdAt": {
+      "_seconds": 1777052339,
+      "_nanoseconds": 774000000
+    },
+    "receivedByManagerName": "armandine",
+    "validatedAmount": 4500,
+    "validatedPaymentIds": [
+      "nrLi5LUdkwEkYEpZ46yU"
+    ],
+    "receivedByManagerId": "FMV9ljqMjhalHR38IBv49dco3b93",
+    "validatedAt": {
+      "_seconds": 1777413435,
+      "_nanoseconds": 912000000
+    },
+    "status": "validated",
+    "accountingTransferId": "7lA6MZrP04PQjkRIkyzt",
+    "accountingTransferStatus": "declared"
+  },
+  {
+    "id": "dMUNEs6PbbEquvAqAdfY",
+    "serveurId": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "serveurName": "Odilia",
+    "declaredAmount": 259500,
+    "validatedAmount": null,
+    "status": "pending",
+    "receivedByManagerId": null,
+    "receivedByManagerName": null,
+    "validatedAt": null,
+    "paymentIds": [
+      "Lcd2RGxtZoKMXc1AEJOz",
+      "HfcpJqNZwHKPvgBd44Wn",
+      "c6XlbO3FhRs5pgh1pPCP",
+      "LBLwD0uj37MdeR9km5hJ",
+      "EZT0DUnSITOGoz4Fh72I",
+      "t4YZNJ86EZ1jGB9G2SWz",
+      "NEqaFJqTT64ZphOfa92R",
+      "YOJO3x7N3vqLmEIBILl6",
+      "y4WRtq9x1MbEkwfPJoQr"
+    ],
+    "createdAt": {
+      "_seconds": 1776517833,
+      "_nanoseconds": 2000000
+    }
+  },
+  {
+    "id": "n5MwkDPrlSzenC3L5Jvh",
+    "serveurId": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "serveurName": "Odilia",
+    "declaredAmount": 348000,
+    "validatedAmount": null,
+    "status": "pending",
+    "receivedByManagerId": null,
+    "receivedByManagerName": null,
+    "validatedAt": null,
+    "paymentIds": [
+      "7WYXfW1ZY0FkBFzbW2T0",
+      "gtoBWTUMNy8eG5F5KkSW",
+      "LgYrfZmhgNd9Uhz8Pk9F",
+      "jDMshOyZ5g1A3f8G6sF7",
+      "cUmp2Pj5j6qdwALUTHtB",
+      "LwoWznpmhpbYueZo9H3D",
+      "j6ejpQjsLpCIciFKshN8",
+      "XVWWdXZuCLA9UbCjbLe4",
+      "q1GzLKHu72mHwiZPKBfl"
+    ],
+    "createdAt": {
+      "_seconds": 1776517846,
+      "_nanoseconds": 617000000
+    }
+  },
+  {
+    "id": "oSEPiS0lY2ZSdMbsqsP9",
+    "serveurId": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "serveurName": "Odilia",
+    "declaredAmount": 6000,
+    "validatedAmount": null,
+    "status": "pending",
+    "receivedByManagerId": null,
+    "receivedByManagerName": null,
+    "validatedAt": null,
+    "paymentIds": [
+      "ydMn69vJyrS6BXsBY0db"
+    ],
+    "createdAt": {
+      "_seconds": 1776453736,
+      "_nanoseconds": 217000000
+    }
+  },
+  {
+    "id": "sILv6sZgFEWbabLwDaAQ",
+    "serveurId": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "serveurName": "Odilia",
+    "declaredAmount": 28000,
+    "paymentIds": [
+      "H4teKFkFwiXF18aZBZXj"
+    ],
+    "createdAt": {
+      "_seconds": 1775814378,
+      "_nanoseconds": 55000000
+    },
+    "receivedByManagerName": "armandine",
+    "validatedAmount": 28000,
+    "validatedPaymentIds": [
+      "H4teKFkFwiXF18aZBZXj"
+    ],
+    "receivedByManagerId": "FMV9ljqMjhalHR38IBv49dco3b93",
+    "validatedAt": {
+      "_seconds": 1775814467,
+      "_nanoseconds": 973000000
+    },
+    "status": "validated",
+    "accountingTransferId": "dvchHl3X1IAuRWSVpUrL",
+    "accountingTransferStatus": "declared"
+  },
+  {
+    "id": "uyULGy7ADMc7FXzCvkVo",
+    "serveurId": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "serveurName": "Odilia",
+    "declaredAmount": 130000,
+    "paymentIds": [
+      "Do0nNyI1gumZglY83gb2"
+    ],
+    "createdAt": {
+      "_seconds": 1775814356,
+      "_nanoseconds": 78000000
+    },
+    "receivedByManagerName": "armandine",
+    "validatedAmount": 130000,
+    "validatedPaymentIds": [
+      "Do0nNyI1gumZglY83gb2"
+    ],
+    "receivedByManagerId": "FMV9ljqMjhalHR38IBv49dco3b93",
+    "status": "validated",
+    "validatedAt": {
+      "_seconds": 1775814477,
+      "_nanoseconds": 560000000
+    },
+    "accountingTransferId": "7lA6MZrP04PQjkRIkyzt",
+    "accountingTransferStatus": "declared"
+  },
+  {
+    "id": "v3U7LKlqxz3EGPbWoOut"
+  },
+  {
+    "id": "vjItwYx6FvypJuztucEW",
+    "serveurId": "RcK1lXKqihNsrJ9mu0FMajA28uH3",
+    "serveurName": "Odilia",
+    "declaredAmount": 204500,
+    "validatedAmount": null,
+    "status": "pending",
+    "receivedByManagerId": null,
+    "receivedByManagerName": null,
+    "validatedAt": null,
+    "paymentIds": [
+      "ki9Yc6rcjtP2S2HXrQ50",
+      "Y8JeglNYBx8exU4jyRwX",
+      "fOt3b8VxrNtX6U9GjWg0",
+      "hwNMr8FaqzoXv6m5nMmO",
+      "b2jL7CuGjIPtD7Xhzb4i",
+      "aURy06P2FNAKlUIiNCtl",
+      "c2GcnZJKKp0iVC2UHxE6"
+    ],
+    "createdAt": {
+      "_seconds": 1776945932,
+      "_nanoseconds": 876000000
+    }
+  }
+]

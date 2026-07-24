@@ -1,0 +1,6483 @@
+[
+  {
+    "id": "0B19JnAizmY5J8VlqLvE",
+    "name": "Redbull",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "0KQagRxEQFDXnL25id7M",
+    "name": "Spaghetti végétarien",
+    "composition": "",
+    "category": "plat",
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": null,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "0cRvZf04P2axAOyoSiiX",
+    "name": "SHOT RAIL DE 6",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 5500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "0l6nq5qz8tsJNMS1KR4Q",
+    "name": "Grand Escalope de bœuf pané / Fromage",
+    "composition": "",
+    "category": "plat",
+    "price": 6000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": null,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "0pWJweQcyeU4IaEhaFBy",
+    "name": "Big Crispy chicken burger",
+    "composition": "",
+    "category": "snack",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "10AaRh0ztL6pWRM9Kl9N",
+    "name": "Grand Samossa Veg / poulet / mouton (5 pièces)",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "14P6ddXBZ0T9BfH8JvVP",
+    "name": "Salade de gésier à la macédoine",
+    "composition": "Laitue, gésier, carotte, Pomme de terre, oigon.",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "16208EnidymaecTokIax",
+    "name": "Salade de fruits",
+    "composition": "",
+    "category": "dessert",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "1IacWM7cbgGDHe8TdZtC",
+    "name": "Penne / tagliatelle au blanc de poulet",
+    "composition": "",
+    "category": "plat",
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/pennetagliatelleaublancdepoulet.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "1NN8qTeCycPrz9GsrDsE",
+    "name": "Charwama poulet",
+    "composition": "",
+    "category": "snack",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "1P4FEug8KhkeIhuIJy6Y",
+    "name": "Club sandwichs",
+    "composition": "",
+    "category": "snack",
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/clubsandwichs.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "1ZVVZZEX7UDycssszPwb",
+    "name": "Red Label (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 30000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "1bPjOyJJDsv6bg0GnevC",
+    "name": "Demoiselle de Portillon",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 12500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "1oMdAcGFlnJzsfF4sfwg",
+    "name": "Big Chicken cheese burger",
+    "composition": "",
+    "category": "snack",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "1yikX0BzDPB7wdMWaqhd",
+    "name": "Langue de bœuf grillé",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 6000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "29Tew86B5y7GdcJfjbFx",
+    "name": "Martell VSOP (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 60000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "2SP29eC0zGhYk5fWsGLv",
+    "name": "Sex on the beach",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "2VSRqyRZWotquu5ho0u8",
+    "name": "Jack Daniel (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 35000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "2g5LUS2J9oXrc3BuL4XE",
+    "name": "Cappuccino",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "2wOTenWxTOs8VF2cJObL",
+    "name": "Omelette Dolyan",
+    "composition": "(œuf, ail, sel, poivre, oignon, tomate, piment vert, persil, thon)",
+    "category": "snack",
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/omelettedolyan.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "36bDy21ugeox972gZEFz",
+    "name": "Belvédère (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 65000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "3B8lN4dmvq3sqNVH8zH9",
+    "name": "Pression (1l)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "3IX9xFH21zq0JKMfEzKE",
+    "name": "Hennesy XO (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 180000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "3dqNrgy4h6p8Tn73gfSs",
+    "name": "Pack Moyen cheese burger + Frite + Sucrerie",
+    "composition": "Chicken cheese burger; Beef cheese burger",
+    "category": "snack",
+    "adresse": null,
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "3wJzIQADYVVxY8qjJbO7",
+    "name": "Cément d’alsace",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 25000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "4E9CkQywwnPw9L15fAaW",
+    "name": "Spaghetti Dolyan",
+    "composition": "Blanc de poulet - champignon - filet de bœuf - oignon - poivron - Basilic - tomate pelé ou crème fraiche",
+    "category": "plat",
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/spaghettidolyan.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "4LJdUeb8F7Ix0zx4PDia",
+    "name": "CERVELLE DE SINGE",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "4a8WQPo0GOiruyLaWPNv",
+    "name": "Jus d’orange",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "4iNcEbCP26J6q0CpTCZ4",
+    "name": "Ricard (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "4oexWDY0zrRWabHUVA6X",
+    "name": "Perrier",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "4rTIRHD7pb4ImYyQjOYk",
+    "name": "Dolyan",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "4vj4bmKntXWbiNjSyvUf",
+    "name": "Florida",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "5TxxbJiPS1sB08fsG9u9",
+    "name": "Tango (0,25L)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "5z9evPqTfL5FDA6HqB8B",
+    "name": "Double Black Label (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 5500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "65llRtN9AxaVt8fTeueo",
+    "name": "Panini poulet",
+    "composition": "",
+    "category": "snack",
+    "price": 2500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/paninipoulet.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "66RqnjmCS1XuRkbGzwc9",
+    "name": "Haricot vert",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "66XyNrlNHh65MsgGE9Ag",
+    "name": "Omelette Paysanne",
+    "composition": "(œuf, fromage, beurre, pomme de terre, lait, persil, sel, poivre, poireau, carotte)",
+    "category": "snack",
+    "price": 2500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/omelettepaysanne.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "6EdkzH1Gk9cW6k8K8EuI",
+    "name": "KAMIKAZE",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "6JY35zlo0RSq17rHvc7z",
+    "name": "Sole meunière",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 6500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "6L7TfPweMvc7WVx53aBp",
+    "name": "Chicken cheese burger",
+    "composition": "",
+    "category": "snack",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "6ZCokdUy6kCydobCx7w9",
+    "name": "Stolichnaye (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 35000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "6jRCuB4Qcbk2xmfVb31E",
+    "name": "Tarte aux pommes",
+    "composition": "",
+    "category": "dessert",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "6ozPGFxWeBCChJfS9EJy",
+    "name": "Pizza cinq Fromages",
+    "composition": "Sauce tomate, mozzarella, emmental, fromage fumé, fromage de chèvre, parmesan",
+    "category": "plat",
+    "price": 6500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/pizzacinqfromages.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "72IqJ0ERKSOfChA7aqUB",
+    "name": "Saumur Champigny (sec)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 18000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "73BZuC8GuSy9rrD4Sn2L",
+    "name": "Expresso / Nespresso",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "78lJXJll28cJ2NHXuEHH",
+    "name": "Smoothie El Gogo",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "7b6T3o5XPofLS6KNNa6K",
+    "name": "Tango (1l)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "7eRJnfeSUEWfdVeAfetk",
+    "name": "Suze (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 25000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "7kDiHnk0ziGigMChCmlt",
+    "name": "Poulet yassa / Pintade yassa",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 5500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "82IEqEwWfw4c3xo0X9I9",
+    "name": "Atièkè",
+    "composition": "",
+    "category": "plat",
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/atieke.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "96WJdweP0r7CheN5wwtD",
+    "name": "Planche mixte mer",
+    "composition": "Calamar, Filet de poisson, Gambas + 2 garnitures",
+    "category": "plat",
+    "price": 20000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/planchemixtemer.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "9F1BKRYTqVKwgrVl0VX5",
+    "name": "Poulet locale",
+    "composition": "",
+    "category": "plat",
+    "price": 5500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/pouletlocale.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "9WKVhz9H8Uv8Vz0ZlZiF",
+    "name": "St José Téquila (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "9Z5AkZnPYxxYcErrDDSK",
+    "name": "Riz oriental",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "9dubQ9pIM4XdAuE2GcOG",
+    "name": "Akassa",
+    "composition": "",
+    "category": "plat",
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/akassa.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "9ksa7rFEylvXPgm9wvTM",
+    "name": "Filet de poisson pané",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 6500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "9lOSdbWvL3WkKH9LSCfr",
+    "name": "Crispy fish burger",
+    "composition": "",
+    "category": "snack",
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/crispyfishburger.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "9mGssNNf2e4vSOZnoq96",
+    "name": "Salade Fatouche",
+    "composition": "Laitue, tomate, concombre, oignon, feuille de menthe, poivron, huile d’olive, pain grille.",
+    "category": "plat",
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/saladefatouche.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "9v76cLEzd0JPOQyY5iFm",
+    "name": "Omelette jambon-fromage",
+    "composition": "",
+    "category": "snack",
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/omelettejambonfromage.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "9yxAFyKsnQ7RooREeXjR",
+    "name": "William Lawson (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 30000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "ALTc4YdSjd5mwWGo3A7b",
+    "name": "Entre-côte de veau",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 7000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "AbDhTgk3nP5KJTFZPy1B",
+    "name": "Purée de pomme de terre",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 1500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "AgcaKh9iTiDL7qtkop9r",
+    "name": "Louis Eschenauer",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 12500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "AtMjNdlOWa6JoEvXuYEE",
+    "name": "Cheese burger",
+    "composition": "",
+    "category": "snack",
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/cheeseburger.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "B6ybEuK2GSo3MVj5TDRF",
+    "name": "Grey Goos (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 70000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "B9KZrVkyujmZN1vZjAEn",
+    "name": "Milkshake",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "BN7YANTPmy4Jy6k3cRhe",
+    "name": "Big Cheese burger",
+    "composition": "",
+    "category": "snack",
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/bigcheeseburger.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "BWkr7Fd9JdcRjpAWi9Da",
+    "name": "Thé Mojito",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "BdaswTpeqq4YVxxVONlz",
+    "name": "Double Black Label (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 50000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "Bdvz2opoDPJULP1NUa4Z",
+    "name": "Penne / Tagliatelle aux fruits de mer",
+    "composition": "",
+    "category": "plat",
+    "price": 5500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/pennetagliatelleauxfruitsdemer.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "CWwjv1qYppFy7RJiaOT8",
+    "name": "Stolichnaye (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "CehBk6wJ22efVjmRWFlK",
+    "name": "SHOT RAIL DE 12",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 11000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "D2Ye5Zknsa80NdXBFj19",
+    "name": "Sauce amavivè",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "D6qeTJYljzRZ6F98MIi1",
+    "name": "Big Charwama poulet",
+    "composition": "",
+    "category": "snack",
+    "adresse": null,
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "DBOQon1JBUBkL7xGYHY4",
+    "name": "Jus d’ananas",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "DXs1aLoaa1BMr2kZGvQT",
+    "name": "Hamburger",
+    "composition": "",
+    "category": "snack",
+    "price": 2500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/hamburger.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "DYayNYko9aNmXIti5VHS",
+    "name": "Mojito",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "Djkdf25ugzv7rnrH2kUg",
+    "name": "Gauffre au Nutella",
+    "composition": "",
+    "category": "dessert",
+    "adresse": null,
+    "price": 2500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "DwgiAhwDMk9uBO8BygVR",
+    "name": "Mouton cadet (Bordeau)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 18000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "DygKobscdtd9waM8VaSx",
+    "name": "Campari (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "E0u9yWxUagvsFH1yn6qn",
+    "name": "Domaine de la baume (sec)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 22000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "E2rSbX5tpHX6vdxIEzl9",
+    "name": "VAT 69 (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 30000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "ECpFBiXWoicdyW2zYijh",
+    "name": "Côtelette d’agneau grillé",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 6000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "EMsBxOMeH7IWwRsnbXmN",
+    "name": "Miss Passion",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "ETZmrKnt4WU9v7GtIQ6E",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "EXO81hwx5Kz9FAtbrOcz",
+    "adresse": "",
+    "category": "boisson",
+    "composition": "",
+    "isAvailable": true,
+    "isForbar": true,
+    "isForKitchen": false,
+    "name": "Black Conso Test",
+    "price": 4500,
+    "store": "bar",
+    "ingredients": [
+      {
+        "itemId": "4ZOLXAg6qJVHfdLPVgXY",
+        "quantity": 35,
+        "store": "bar",
+        "itemName": "Black",
+        "unit": "cl"
+      }
+    ]
+  },
+  {
+    "id": "EfrzBIL7FCa67AA3nYzg",
+    "name": "Mouton et fromage en sauce arachide",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 5000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "ErHSddhJni8KfFW8jr3K",
+    "name": "Œuf au plat",
+    "composition": "",
+    "category": "snack",
+    "adresse": null,
+    "price": 1500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "F3YPZGlG0BjB5PIRucKD",
+    "name": "Sandwich au poulet / au thon ou à la viande",
+    "composition": "",
+    "category": "snack",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "FSjF4bh0eai0fGoutD03",
+    "name": "Agneau grillé",
+    "composition": "",
+    "category": "plat",
+    "price": 6000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/agneaugrille.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "FbeeS2aT7uvmmnfsWs8h",
+    "name": "Riz cantonais",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "FcYPRpz0NRKVGG4BZiQ7",
+    "name": "Monaco (1l)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "Fer0e7grfvTpWTg1F0EZ",
+    "name": "Charwama viande",
+    "composition": "",
+    "category": "snack",
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/charwamaviande.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "Fex86S22cg3mAUx3iyLy",
+    "name": "Sauce Gombo",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "FxgBFYaTuBuDU72NuPJ0",
+    "name": "Guiness / Awoyo",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "G7t0v9AdjEVwwoQI6yVH",
+    "name": "Croque-monsieur",
+    "composition": "",
+    "category": "snack",
+    "price": 2500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/croquemonsieur.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "GkCQ8S6GaJLDIa3fvYPL",
+    "name": "Escalope de poulet au fromage",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 5000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "Gln4euQapEImzX9AasHn",
+    "name": "Salade Taboulé",
+    "composition": "Persil frais, tomate, blé concassé, oignon huile d’olive, sumac, jus de citron, feuilles de menthe",
+    "category": "plat",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "GmziDulfWwnghCkRDa1O",
+    "name": "Saucisses de Poulet / salade verte + frite",
+    "composition": "",
+    "category": "plat",
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/saucissesdepouletsaladevertefrite.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "Gw58SUm5RpHRjCWwZp9a",
+    "name": "Sminirnoff (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 35000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "HHqn16DDbMazb7Flvs4g",
+    "name": "Sauté d’agneau façon Dolyan",
+    "composition": "Carotte - poivron - oignon - courgette fleur",
+    "category": "plat",
+    "adresse": null,
+    "price": 6500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "HLCBwJThBEOrVhCF1mj0",
+    "name": "Black Label (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "HURzxEomwpgQkbIJQSE5",
+    "name": "Long Islande",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "Ht87F1t2PTYyvm6fMvyj",
+    "name": "Poisson braisé (Carpe,  dorade, sole 800 g)",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 12000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "I6lDpCzszfOsBQP8lwzL",
+    "name": "Coca Light / Coca zéro",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "J24QFESQ9AmCZbudVk8y",
+    "name": "Rhum St James (Brun / Blanc) (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "J4VBgnxjWjt5nOEMjUJC",
+    "name": "Girafe Monaco ( 3L)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 14000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "JiQ341rMuULSCTFq3Rtr",
+    "name": "Jus de baobab",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "JkEOyLkJEa7yYhHkvY0U",
+    "name": "Roof top (moelleux)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 22000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "Jv0R3trathNIwiVRZhP0",
+    "name": "Pack chili chicken + Accompagnement + Sucrerie",
+    "composition": "Chicken chili wings; pilon de poulet pimenté",
+    "category": "snack",
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/packchilichickenaccompagnementsucrerie.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "Jxb41d3jtE8klBfrIlFW",
+    "name": "Bières (Béninoise, Beaufort, Eku)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "KwSdZca03cKcAkwHBbLm",
+    "name": "El Cobrizo (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 25000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "LEPlqLJH2c770mtiiNSR",
+    "name": "ORGASME",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "LWbG30a7PFdVqOmnSuXJ",
+    "name": "Fruits saison",
+    "composition": "",
+    "category": "dessert",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "LXZSioQlhuHTcS9VYAbm",
+    "name": "Pack Charwama + Frite + Sucrerie",
+    "composition": "Charwama végétarien ; Charwama poulet ou charwama viande",
+    "category": "snack",
+    "adresse": null,
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "Lq3pF48pASKJmXkkTTqH",
+    "name": "Blue Label (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 20000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "LvODrMBjQLisVK1YgaiT",
+    "name": "Bora bora",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "LzTAdDfXaYQsgqNmlZj0",
+    "name": "Penne / tagliatelle Forestière",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "LzxxymViiCPU18YHcfOe",
+    "name": "Duo de crevette à l’avocat",
+    "composition": "Crevette avocat, sauce cocktail, oignon, tomate, persil huile d’olive.",
+    "category": "plat",
+    "adresse": null,
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "M0aZKSoc5FGZgtO1qSbi",
+    "name": "Wafako",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "MChNpMSyUgNuYLQfPF9Y",
+    "name": "Grand Tasse Fruits saison",
+    "composition": "",
+    "category": "dessert",
+    "adresse": null,
+    "price": 2500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "MM91GTXv6G1PdzI1ehCw",
+    "name": "Sirop de Grenadine (+ Eau minérale 0.3L)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "MVppztJRLwSbqM4n5g0z",
+    "name": "Émincer de Poulet à l’Indienne",
+    "composition": "Blanc de Poulet, Curry, lait de coco, crème fraiche, oignon, poivron, coriande",
+    "category": "plat",
+    "adresse": null,
+    "price": 5000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "N9mVtobpEgEuIo9IhB2u",
+    "name": "Calamar à la plancha / sauté à l’ail",
+    "composition": "",
+    "category": "plat",
+    "price": 6500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets\\images\\menuimages\\calamaralaplachesautealail.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "NKuOQJ5RFQRr4E1uNxMY",
+    "name": "Ballantines (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 5000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "NwatUnoXcAr1pqf2y1Ib",
+    "name": "Hamburger BIG",
+    "composition": "",
+    "category": "snack",
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/hamburgerbig.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "O9ldRJksOa9EWrn0iQ9x",
+    "name": "Monaco (0.5L)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 2500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "OQDPF7f7uEMAtWNfNgho",
+    "name": "Jack Daniel (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "OeMHH4QgQX98jnZDPhyS",
+    "name": "Couscous",
+    "composition": "",
+    "category": "plat",
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets\\images\\menuimages\\crevettealaprovincale.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "OreLdn4Ti2enJTJ4hA0q",
+    "name": "PRETTY GOOD",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "PQWelQ367glIgMAiJ9ec",
+    "name": "Smoothie Dolyan",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "PbcZN0mgftFUZRa5mCwB",
+    "name": "Négroni",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "Pi6xWOhTLU866vUwqAEO",
+    "name": "Steak haché de poulet / Petit légume + frite",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "PjAax0ggXy8LzUZrDVLL",
+    "name": "Mafé de poulet / d’agneau ou de poisson",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "Q2CjWFflVvN0bi6RvoHT",
+    "name": "Possotomé gazéifié (1L)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "Q53Wa7ekEvU8ZpqjLNUX",
+    "name": "Big Double Burger",
+    "composition": "",
+    "category": "snack",
+    "price": 5000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/bigdoubleburger.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "QgtIZ1mdBtKaAWZqvhxc",
+    "name": "Aloco",
+    "composition": "",
+    "category": "plat",
+    "price": 1500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/aloco.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "QwwgQuXuWUqJZud2rU3g",
+    "name": "Hennesy XO (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 20000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "R4qZNF84cKcPy3T1xl5L",
+    "name": "Crispy chicken burger",
+    "composition": "",
+    "category": "snack",
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/crispychickenburger.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "R9XgQQDqyYav0fzm0DBM",
+    "name": "Chivas Regal 12ans (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 40000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "RA7a65uINYuBQzWWzUpT",
+    "name": "Remy Martin VSOP (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 60000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "RDeO8OF7SDzQkB7aNkwG",
+    "name": "Pâte noire",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "RTN7IobJOIvDY0VD1vzk",
+    "name": "Valse (0,5L)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 2500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "RXgqcxfXCtqcDWelq5Xr",
+    "name": "Valse (1l)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "S2VwMQwyKct8IL1ZJYtn",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "S8cRLJQRCt5BNzjcoCB9",
+    "name": "JB (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 30000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "SGQtqlX8hsea0MWWdLlw",
+    "name": "Pintade rôti aux fines herbes",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 6000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "SULfzwdkoT0TtOPMuZvG",
+    "name": "Absolute Regular (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 30000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "SgbpvILV1fP18BZb7M0u",
+    "name": "Ruinart blanc de blanc",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 110000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "SoPvSOPIC8Nm12wct58g",
+    "name": "Chicken burger",
+    "composition": "",
+    "category": "snack",
+    "price": 2500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/chickenburger.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "StLGPNQL2G92xgtM67nc",
+    "name": "Amarula (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "T4KwvTw1XJsmYwVJgJHq",
+    "name": "Escalope de poulet",
+    "composition": "",
+    "category": "plat",
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/escalopedepoulet.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "T6l8tUlCz3dQWFeskp2F",
+    "name": "Samossa Veg / poulet / mouton (5 pièces)",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "T8cMMFThyAQZDDVQkH4H",
+    "name": "Copa Cabana",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "T9ltQwvRjbmA06sGsZf1",
+    "name": "El Cobrizo (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "TEC8a69orZ75Acc8mZmp",
+    "name": "Omelette Nature",
+    "composition": "",
+    "category": "snack",
+    "price": 1500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/omelettenature.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "TTUHuDc8vx2exwmcdMEq",
+    "name": "Jack Honey (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 35000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "TydcH17RmogYzBfdWd6N",
+    "name": "Génèse",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "U6C9FWvdsx1yax8zQHtp",
+    "name": "REVELATION (Bordeaux)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 12500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "U9ZrCOc26wodcWaze0wt",
+    "name": "Salade de crevette au poivron",
+    "composition": "Laitue, crevette, poivron, tomate, oignon",
+    "category": "plat",
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/saladedecrevetteaupoivron.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "UBFsmAOjtqd0OwvXuqA6",
+    "name": "Pression (0,25L)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "UIOhiYGvTdOJJNurfwOc",
+    "name": "JB (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "UaGE1sqUkQZunjjHUYUT",
+    "name": "Kédjénou poulet / Kédjénou de Pintade",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 5500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "Uinp4cVOsoqSQCXvi8mw",
+    "name": "Sirop de menthe (+ Eau minérale 0.3L)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "UnKRPLYEgCpCoKX7ACzI",
+    "name": "Sauce tchayo",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "VDqIFwDlMaWqbCYsuzvV",
+    "name": "Eau Minérale (1L)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "VGvND6E1QNsI6QspBOkf",
+    "name": "SHOT (Rhum / Tequila)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "VHGdKZKh5jmc0dw5iQpA",
+    "name": "SHOT COMPOSÉ RAIL DE 12",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 16000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "VHzwVCSUV7762xs6feGc",
+    "name": "Sucreries (coca, Fanta, Sprite, Moka)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 8000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "VSYGJgCBDuzVwy2kCV1q",
+    "name": "Poisson braisé (Carpe sol 400g, dorade)",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 6500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "VUqkf0lb0dTjQ43lWx7w",
+    "name": "Salade niçoise",
+    "composition": "Laitue, pomme de terre vapeur, Haricot vert, thon, filet, d’anchoi olive noire.",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "VXyBiEPtYsnmTGPJ2br9",
+    "name": "Steak haché de bœuf / Petit légume + frite",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "VsTm5vPB2HD4FOOYfv16",
+    "name": "Martini (Rouge / Blanc / Rosé) (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "VtUE0KUp4PMIHAVrcNmT",
+    "name": "Côtelette de porc grillé",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 6500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "VxS5scNBNqQlKnOZhu4r",
+    "name": "Gordon Gin (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "Vyh6tqy6Lab5NBOf9VNP",
+    "name": "Daguet de Berticot (Sec)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 12500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "W5MOuO5bM7d15r81VTpn",
+    "name": "SHOT COMPOSÉ RAIL DE 6",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 8000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "WJNugjcdfzMSukr5NjDQ",
+    "name": "Rose d’Anjou",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 12500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "WK2rfMmO3TreWoPVQXdT",
+    "name": "Salade césar",
+    "composition": "Laitue, blanc de poulet, œuf, crouton de pain, parmesan râpé, sauce césar.",
+    "category": "plat",
+    "adresse": null,
+    "price": 5000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "WK5s2SVUfszoAY4QquLg",
+    "name": "Escalope de bœuf pané / Fromage",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 5500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "WKwjVBOY67lckPDAmO7F",
+    "name": "Cosmopolitain",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "WWmcAO5FFZFpCreucLIT",
+    "name": "Crêpes au Nutella",
+    "composition": "",
+    "category": "dessert",
+    "adresse": null,
+    "price": 2500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "WYVJMMV9CRbcMWysRNiW",
+    "name": "Milkshake alcoolisé",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "XIzWQYoJPHDXyHk3wW16",
+    "name": "Glenfiddich 12ans (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 5500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "XOlDv7TfGMoZoCK1NMYy",
+    "name": "Jus de bissap",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "XQBsRK6wDslX0RW7hTn8",
+    "name": "Blue Label (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 190000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "YFgcBocn2KgowfXyf4Ip",
+    "name": "Girafe Monaco (2L )",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 9500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "YLNu0LlKVWM0V4uZ01wi",
+    "name": "Jus de pastèque",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "YQNarbK49cLrKL2XHaBx",
+    "name": "Gordon Gin (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 25000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "YcOGOMBBM6BD6wOf1xHB",
+    "name": "Filet de sole Biscaïenne",
+    "composition": "Filet de sole, lait de coco ; carotte, poivre, oignon, tomate, crème fraiche.",
+    "category": "plat",
+    "adresse": null,
+    "price": 7000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "YpjKWAOIPPtd3GO7mzMU",
+    "name": "Big Chicken burger",
+    "composition": "",
+    "category": "snack",
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/bigchickenburger.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "YxLD94WElRJtYWK0hmBq",
+    "name": "Hennesy VSOP (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 70000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "ZCqSe28ZKXGPuX4H4E5W",
+    "adresse": "",
+    "category": "plat",
+    "name": "Sauce Arachide Test",
+    "isAvailable": true,
+    "isForKitchen": true,
+    "store": "restaurant",
+    "price": 4500,
+    "composition": "Riz, Huile, Viande de mouton",
+    "isForBar": false,
+    "ingredients": [
+      {
+        "quantity": 300,
+        "store": "restaurant",
+        "itemName": "Riz",
+        "unit": "g",
+        "itemId": "79DaLRwQpf62P5nH5NWo"
+      },
+      {
+        "store": "restaurant",
+        "unit": "cl",
+        "itemName": "Huile",
+        "quantity": 35,
+        "itemId": "d0DS3E1NA1UoRhnItdK6"
+      },
+      {
+        "itemId": "VUoHVrbUcXunJ0fLUpS8",
+        "unit": "g",
+        "itemName": "Viande de mouton",
+        "store": "restaurant",
+        "quantity": 350
+      }
+    ]
+  },
+  {
+    "id": "ZZsj7T4dn2y8JRT8VhJE",
+    "name": "Remy Martin VSOP (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 6500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "Zb84ZCz1JpoPXCvZkYX4",
+    "name": "Hennesy VS (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 50000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "ZewFYkQRhuzSwaUPLYnR",
+    "name": "Grand Pack burger + Frite + Sucrerie",
+    "composition": "Chicken burger ; burger viande ; crispy fish burger",
+    "category": "snack",
+    "price": 5000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/grandpackburgerfritesucrerie.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "ZgmluOQXGhVo0UFBJuwI",
+    "name": "Martini (Rouge / Blanc / Rosé) (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 25000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "Zy8YjmmyQQAVaEnJvTnU",
+    "name": "Filet de poisson grillé",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 6500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "a07xY1YG143LRp1ciVaY",
+    "name": "Poulet entier rôti à la DOLYAN",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 7500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "a2XMwDnFdd2kJFrQGgNv",
+    "name": "Chivas Regal 12ans (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "aLWMM8pFWBnbiif8IoXb",
+    "name": "Domaine de Vabbaye",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 12500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "aZLaDBjU884gUis14fAc",
+    "name": "Falafel (6 pièces)",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "bE3M0HRAfw8nE25igT4w",
+    "name": "Gambas grillé ou sauté à l’ail",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 10500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "bXNc18MIkdYKI9lLVW8z",
+    "name": "Fondant au chocolat",
+    "composition": "",
+    "category": "dessert",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "c2mhYJmSjyks5JENpB9n",
+    "name": "Salade pêcheur",
+    "composition": "Calamar poisson, crevette oignon, tomate, avocat, champignon noir, laitue, grain de sésames, huile d’olive, jus de citron, persil.",
+    "category": "plat",
+    "adresse": null,
+    "price": 6000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "c3K5N7BfyliJn9PLNoHH",
+    "name": "Gin Bombay Saphire (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 45000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "cTXNV8XqfVbJS51psLKZ",
+    "name": "Smoothie aux fruits de saison",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "coCtNevfTPZ81egufFJA",
+    "name": "Gold Label / Green Label (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 70000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "cyinq4cwlxSFNjIawbdw",
+    "name": "Moet",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 50000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "dXleEc0qm46Zz5BU7cDc",
+    "name": "Panini jambon - fromage",
+    "composition": "",
+    "category": "snack",
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/paninijambonfromage.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "dcbaOsbuJe7VfEfSgb4v",
+    "name": "Kamicase",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "dpXMcP0UVpvKlZwoX2wo",
+    "name": "Pizza Blanche",
+    "composition": "Crème fraiche, fromages, pomme de terre, ail, oignon caramélisée",
+    "category": "plat",
+    "price": 6000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/pizzablanche.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "e91qtyeWrQQnk6g1DvjY",
+    "name": "Smoothie Pomme",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "ezAgzQETigFW4q3j6Bwg",
+    "name": "Pizza Fruit de Mer",
+    "composition": "Sauce tomate, fromage, crevettes, poisson, ail, basilique, olive noire.",
+    "category": "plat",
+    "price": 7500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/pizzafruitdemer.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "fPu25PT7tFa9gLPoXnK7",
+    "name": "Ballantines (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 45000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "fToHvVv3FaPJShSReLyn",
+    "name": "Velouté de petits pois aux crevettes",
+    "composition": "Crème de petits pois, crevette poêlé, crème fraiche, basilic",
+    "category": "plat",
+    "adresse": null,
+    "price": 5500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "fdMb3euiVF7mdfMBPRgn",
+    "name": "Pizza Quatre Saisons",
+    "composition": "Sauce tomate, champignons, fromage, champignons, jambon de dinde, artichauts, olive noir",
+    "category": "plat",
+    "price": 6000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/pizzaquatresaisons.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "fpv4S6xf2PnlvS9tbr49",
+    "name": "Glenfiddich 15ans (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 7000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "ftEtsTXxg7fexEH2vXZo",
+    "name": "Filet de bœuf grillé",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 5000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "g0Xdep7whBrUMyGEh4eQ",
+    "name": "Rhum St James (Brun / Blanc) (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 30000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "gAbwXrSttRlzyg6PR59M",
+    "name": "Big Charwama viande",
+    "composition": "",
+    "category": "snack",
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/bigcharwamaviande.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "gDFcpNBk7uEgdaiwEids",
+    "name": "Riz blanc",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "gaqJsvGQUlAtq01qTMjW",
+    "name": "Filet de bœuf au poivre",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 5500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "goKIjDRELkfdGV8EXtyr",
+    "name": "Sauce Gboman",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "hIfmDSJObKndQPtU3yAp",
+    "name": "Glenfiddich 18ans (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 75000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "hNDyxSfYxtRwh4RHhzxN",
+    "name": "Glenfiddich 12ans (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 50000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "hSXW3vHT3RPMpx4xUwEJ",
+    "name": "Pack Croustillant + Accompagnement + Sucrerie",
+    "composition": "Poulet pané, nugget de poulet, pépite de poulet, Pilon de poulet croustillant etc...",
+    "category": "snack",
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/packcroustillantaccompagnementsucrerie.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "hiGKk4lbGBjwRiBeuH0u",
+    "name": "Petit Pack burger + Frite + Sucrerie",
+    "composition": "Chicken burger ; burger viande ; crispy fish burger",
+    "category": "snack",
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/petitpackburgerfritesucrerie.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "hyVwAVURsIjg0cEVx7d6",
+    "name": "Légumes sautés",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 1500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "iCoNrBJLUcTNhT8wQanz",
+    "name": "William Lawson (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "iIr7sJCdGmRuUW0SVHWY",
+    "name": "Parisette",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 2500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "iIv09T19HYoN6EbogQkG",
+    "name": "Glenfiddich 15ans (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 65000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "iPY1QEQJGmaNPrBJm2he",
+    "name": "Campari (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 35000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "if5ciKeO33Mm6rCobswI",
+    "name": "Girafe (3L)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 13000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "irZDjHkk86RaQSAcfv5f",
+    "name": "Pastis 51 (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "jIS1q4kZcD3omKdjPsmB",
+    "name": "Tango (O,5L)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 2500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "jpUYjdZ2vJNRNxWxT18Q",
+    "name": "Glenfiddich 18ans (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 8000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "jvuEUJVCGS60qZ6Naktp",
+    "name": "Amarula (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 30000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "kBlOqD2hlg33StZCFJec",
+    "name": "Veuve Clicquot",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 60000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "kIgv4v2Yp8DkEncLndfF",
+    "name": "Grey Goos (70 CL / 100 CL) (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 5000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "kQs7Njh4DkE3dUhxqZAm",
+    "name": "Black Label (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 40000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "kV0tSmphi5GAkjkqW8b4",
+    "name": "Sauce crincrin",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "kfot09oRmxCNu4SDUe9a",
+    "name": "Martell VSOP (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 6500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "kmstr9KVsDLug65w7jGP",
+    "name": "Pancakes au Nutella",
+    "composition": "",
+    "category": "dessert",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "lAIThD1ORe2irDAaZHwD",
+    "name": "Sminirnoff (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "lHM0QcQtypoUjTG0dFBa",
+    "name": "Ananas flambée au Rhum",
+    "composition": "",
+    "category": "dessert",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "lRnXLd68ge7CzkiPh4SQ",
+    "name": "Saucisses de Merguez / Petit légume + frite",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "leh58TlTQic1pR1Q9bGg",
+    "name": "Agbéli",
+    "composition": "",
+    "category": "plat",
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/agbeli.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "lh1ha8jUBY43iu9nQtWW",
+    "name": "Sauce poisson frais ou frit",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "lj3M67ArCAAj9IrlPeLh",
+    "name": "Souri d’agneau",
+    "composition": "",
+    "category": "plat",
+    "price": 6500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/souridagneau.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "mA4ixKh44YDOlDoMaN5G",
+    "name": "Pizza forestière",
+    "composition": "Sauce tomate, fromages, cœur de palmier, œuf, fromage de chèvre,",
+    "category": "plat",
+    "adresse": null,
+    "price": 7000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "mGWv32QrhMRbShyR1VPP",
+    "name": "Haussman (Bordeau)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 20000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "mPEQ1H7CE6dsaBL5NuEf",
+    "name": "Mousse au chocolat",
+    "composition": "",
+    "category": "dessert",
+    "adresse": null,
+    "price": 2500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "maBcmX4bICrcpeFHd93E",
+    "name": "Grasshopper",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "mbchpXJwvDiJnrdTBv9m",
+    "name": "Ricard (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 25000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "me0ZJwq1WbU18AC0sl6Z",
+    "name": "Grande Bière (Flag/Beaufort/Castel)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "mhAgh3dTwaCOoOxyjGHX",
+    "name": "Girafe Tango ( 3L)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 13500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "mnGVCjyxrlV5yZPdznAJ",
+    "name": "Téquila Sunrise",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "my5NQwjcmyNCa7oyZDYa",
+    "name": "Pizza Margarita",
+    "composition": "Sauce tomate, fromage, origan, basilic",
+    "category": "plat",
+    "adresse": null,
+    "price": 5000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "n3Iluwzifq5X7jgehFXY",
+    "name": "Salade Dolyan",
+    "composition": "Laitue, tomate, oignon, poulet, thon, crouton de pain, copeaux de fromage, maïs doux, Petits pois, Pomme de terre, Avocat, sauce piquante ou sauce césar.",
+    "category": "plat",
+    "price": 5000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/saladedolyan.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "n45TrokIsHVDTORHRWns",
+    "name": "Hennesy VSOP (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 7500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "n9Cr8bmAyJVvXJfYZYzv",
+    "name": "Mouton Cadet reservé",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 24000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "nCz93rwSgh1bYY3aCJCl",
+    "name": "Big Crispy fish burger",
+    "composition": "",
+    "category": "snack",
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/bigcrispyfishburger.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "nGnR7y2quwDIGE0TXMBu",
+    "name": "Suze (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "nKODJKh7TqSvVB8shL78",
+    "name": "Sandwich jambon-fromage",
+    "composition": "",
+    "category": "snack",
+    "price": 2500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/sandwichjambonfromage.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "nOAtDSRaqfQOdNFndsAK",
+    "name": "Absolute Regular (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "nPMKEascVPR7HmDHCzsX",
+    "name": "Hommos",
+    "composition": "Purée de pois chiche",
+    "category": "plat",
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/hommos.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "nX2wmxX3NNjZQOAWHlnt",
+    "name": "Chivas Regal 18ans (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 6500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "ncphybsfRwFPTX3WIMMX",
+    "name": "Pizza buffalo",
+    "composition": "Sauce tomate, fromages, champignon, viande hachée, jambon de dinde, fromage de chèvre.",
+    "category": "plat",
+    "adresse": null,
+    "price": 7500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "nrp3zgn5aS1f54M3QsUK",
+    "name": "St José Téquila (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 25000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "nsxhosN28ouFUx3kS9Ms",
+    "name": "Chocolat Chaud",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "o9NtYKodxZsfnXYYIgwm",
+    "name": "Eclat d’or (Moelleux)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 15000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "o9pXO00IBzT7s1nrC8oi",
+    "name": "Get 27 / Get 31 (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "oGnhifJQSuoshxoUleC2",
+    "name": "Thé (thé noir-mente-verveine-tilleul etc.)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "oH3bsK8O2TzR0iPq44uk",
+    "name": "Spaghetti",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "oPwJc3o9nlynvLp9VfjX",
+    "name": "Piñá Colada",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "oVHYMPT7ngEAsBEgB7sN",
+    "name": "Belaire (blanc / Rosé)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 25000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "orMe2xX6tMgXWaO048CX",
+    "name": "Pâte rouge",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "p2RhSmpcJBtn5RXXaAnP",
+    "name": "DAGUET DE BERTICOT (Merlot)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 12500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "pFypjgwBJEkpYR8S6MPa",
+    "name": "Martell VS (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 5500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "pGbPNpStp4KvfqCtLCRe",
+    "name": "Pâte blanche",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "pSu53eLCLUS6Y2kRBrxR",
+    "name": "Pizza Végétarienne",
+    "composition": "Sauce tomate, fromage, Champignon, poivron, Oignon, Tomate fraiche, maïs doux, olive.",
+    "category": "plat",
+    "adresse": null,
+    "price": 5500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "plRHKO9X3KEkij12WkSH",
+    "name": "Neem au poulet / viande (5 pièces)",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "pnUBog5O4B9MNJmEAUA7",
+    "name": "Pizza Reine",
+    "composition": "Sauce tomate, fromage, champignons, origan, jambon de dinde, olive noir",
+    "category": "plat",
+    "price": 6000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/pizzareine.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "po0vxuMhSzdRK8V1R5ma",
+    "name": "B52",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "q2zPxrAVyDm4bbKt0WBJ",
+    "name": "Pizza Norvégienne",
+    "composition": "crème fraiche, fromage, saumon fumé, oignon, pomme de terre, poivron",
+    "category": "plat",
+    "adresse": null,
+    "price": 8500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "qIegMFagg0JNTNbovzwr",
+    "name": "GOLDEN T",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "qVENqIk2HGekihJjxH0h",
+    "name": "Get 27 / Get 31 (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 35000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "qbVtzXp4ssguDQn6kYA2",
+    "name": "Langue de bœuf à la provençale",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 6000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "qcprlGAvDOxdekZibpp9",
+    "name": "Belvédère (70 CL / 100 CL) (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 6000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "qeHXNnvVnYdR99usG27a",
+    "name": "Salade du chef",
+    "composition": "Laitue, jambon, fromage, maïs doux, concombre olive noire, blanc de poulet pain grille au fromage.",
+    "category": "plat",
+    "price": 5000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/saladeduchef.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "rAW3OiCrIiXv30ZR4tvV",
+    "name": "Pizza Dolyan",
+    "composition": "Crème fraîche, fromage, bacon de bœuf, Merguez, poisson, poivron oignon, basilic",
+    "category": "plat",
+    "price": 9000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/pizzadolyan.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "rTIiqlG9LQ0hJVMboS5T",
+    "name": "Jus de gingembre",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "rXyM1lVMrjuZrsY2CCsd",
+    "name": "Gin Bombay Saphire (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "sBeZa0HLKy084h8eJxbB",
+    "name": "Pintade à la moutarde façon Dolyan",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 6000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "sDBKruJ7NLJBxXoV7Wgx",
+    "name": "Heineken / despérado",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 2000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "sXoLoxoGQciZgAC2STed",
+    "name": "SHOT COMPOSÉ (Rhum / Tequila)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "t6Mor637wz5FhJSfRZY4",
+    "name": "Riz au gras",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 1500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "t89biLaB6ZAR6LIlMMJv",
+    "name": "Energie Drink (Rox XXL , Cody, soda)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "tCcNSepLanClS2fpIHX3",
+    "name": "Girafe (2L )",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 8500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "tFjzFFW1Myr4nCkGDcMI",
+    "name": "Double cheese burger",
+    "composition": "",
+    "category": "snack",
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/doublecheeseburger.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "ttabYQ3Qz5zhvflPXl4h",
+    "name": "Bailey’s (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 25000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "u4kgnYoX0pTLRKxuIcxd",
+    "name": "Aileron de Dinde grillé ou braisé",
+    "composition": "",
+    "category": "plat",
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets\\images\\menuimages\\ailerondedindegrille.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "uK96gHjcSpOtWXhcvsZm",
+    "name": "Red Label (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "uZnzHlWAHN4CSorzVnmo",
+    "name": "Spaghetti sumbala à la viande de bœuf",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "ugTihrCo7r0GS0CrxoVF",
+    "name": "Pomme de terre sautées",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "uuFnQJMUkdAr5PQ6ARQj",
+    "name": "Hennesy VS (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 5500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "uyvNbCkXWwqAkT4u7W84",
+    "name": "Double Burger",
+    "composition": "",
+    "category": "snack",
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/doubleburger.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "vDVWXWehdjtBVzYX66Ar",
+    "name": "Blanc de poulet à la plancha",
+    "composition": "",
+    "category": "plat",
+    "price": 4500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets\\images\\menuimages\\blancdepouletalaplanche.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "vKbjuF5EZuOFB6RNeEVV",
+    "name": "Virgin Mojito",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "vkHlGvOOmcygWaWKSQ7X",
+    "name": "VAT 69 (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "vkxAXLnurGwNXudKFqWk",
+    "name": "Brochette de poisson grillé",
+    "composition": "",
+    "category": "plat",
+    "price": 6500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets\\images\\menuimages\\brochettedepoisson.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "vzNohGxxrJVH5vJ6T8Js",
+    "name": "Monaco (0,25L)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "w8IPmMvrUnetop1YWlzw",
+    "name": "Pizza Mexicaine",
+    "composition": "Sauce tomate, fromage, viande hanchée, oignon, poivron",
+    "category": "plat",
+    "adresse": null,
+    "price": 7000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "wWuZdHujKumvg4A2zG91",
+    "name": "Infusion nature (citronnelle-mente-thé vert-",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "wjgj1kiWqIBWuBBCZ33X",
+    "name": "Fruits de mer",
+    "composition": "",
+    "category": "plat",
+    "price": 6500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/fruitsdemer.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "wzQJYmhdHX6eNDMD5P9G",
+    "name": "Eau Minérale (0,5L)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 600,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "wzjUoW0bkKj9XeUsfZ2l",
+    "name": "Frite",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "x7VqH20PwUu9k3Ji9Eoe",
+    "name": "Explosion",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "xJ8hL8dMsg7NoWxUHpjT",
+    "name": "Bailey’s (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "xKUaGmox2eDRMH9gVA9V",
+    "name": "Crevette à la provençale",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 6500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "xMY6MjY7EvtWpzRvoZFt",
+    "name": "Possotomé gazéifié (0,5L)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 600,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "xMdBYB5Af6hkeJS9IAVB",
+    "name": "Martell VS (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 50000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "xc6X5VpkjsLbj1GMUbw0",
+    "name": "Pastis 51 (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 30000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "xctrHOwS1imuyZ1SYo0I",
+    "name": "Sauce zinmassa à la pâte d’arachide",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "xgK3gzlP3rMcd4qxYrST",
+    "name": "Pomme de terre vapeur",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "xgLhXzAjnuuZogEM21Ut",
+    "name": "Pression (0.5l)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "xnKbzuY9k0hcvfRxebb7",
+    "name": "Spaghetti bolo",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "xtH1CGjMkofatdDFBAiM",
+    "name": "Girafe Tango (2L)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 9000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "y3JwTFx7hxzWntwsIvR7",
+    "name": "Poulet (entier) désossé grillé",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 8000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "y3xDdFP30bHGZBXFQNst",
+    "name": "Soupe de Poisson",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 5000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "y4fOH1ZYkA9wsnTMahXY",
+    "name": "Croque-madame",
+    "composition": "",
+    "category": "snack",
+    "adresse": null,
+    "price": 3000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "yE5Aj0uCKAX6YCiTDmPi",
+    "name": "Mas de la Garigue (Muscat Moelleux)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 12500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "yJ1OG7E1KvdQ69PoZ1CZ",
+    "name": "Demi-poulet chair",
+    "composition": "",
+    "category": "plat",
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/demipouletchair.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "yNIiIt8ll0wwJFsH0RXo",
+    "name": "Valse (0,25L)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 1500,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "yUpOjjZuRGMZ7wITBOx1",
+    "name": "Brochette de poulet (3 tiges)",
+    "composition": "",
+    "category": "plat",
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/brochettedepoulet3tiges.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "yzWtVwVuRVcfcI9HoRAA",
+    "name": "Jack Honey (Conso)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 4000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "z2TVGsnVWoxFFlyPxHFE",
+    "name": "Big Double cheese burger",
+    "composition": "",
+    "category": "snack",
+    "price": 5500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/bigdoublecheeseburger.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "zAL2G2Tlf1DNLvpe012C",
+    "name": "Chivas Regal 18ans (Bouteille)",
+    "composition": "",
+    "category": "boisson",
+    "adresse": null,
+    "price": 65000,
+    "isAvailable": true,
+    "isForKitchen": false,
+    "isForBar": true,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "zHW3K09efPNrbGIhzdtL",
+    "name": "Gratin aux fruits de mer",
+    "composition": "",
+    "category": "plat",
+    "adresse": null,
+    "price": 7500,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  },
+  {
+    "id": "zvBuhQe8yq3zyZU53VIg",
+    "name": "Planche mixte terre",
+    "composition": "Agneau, Filet de bœuf, Blanc de poulet + 2 garnitures",
+    "category": "plat",
+    "price": 15000,
+    "isAvailable": true,
+    "isForKitchen": true,
+    "isForBar": false,
+    "adresse": "assets/images/menuimages/planchemixteterre.jpg",
+    "ingredients": [
+      {
+        "ingredientId": " ",
+        "quantity": 0,
+        "unit": ""
+      }
+    ],
+    "store": ""
+  }
+]
