@@ -242,8 +242,6 @@ class PdfService {
     return pdf.save();
   }
 
-  
-
   Future<List<int>> buildManagerValidationPdf({
     required ServerHandoverModel handover,
     required List<PaymentModel> payments,
@@ -1107,6 +1105,225 @@ class PdfService {
   }
 
   /// =========================
+  /// TICKET DE CAISSE BAR/RESTO (80mm) — V2
+  /// =========================
+  /// Format rouleau étroit ~80mm, hauteur auto. Gère le cas simple et
+  /// fiscalisé. Détail HT/TVA lu depuis CertiLink si fourni, sinon décomposé
+  /// du total TTC (TVA 18% incluse).
+  Future<List<int>> buildConsumptionTicketV2({
+    required String sellerName,
+    String sellerIfu = '',
+    String sellerAddress = '',
+    required String clientName,
+    String clientIfu = '',
+    required String reference, // n° table ou chambre
+    required List<Map<String, dynamic>> lines,
+    required double total,
+    bool certified = false,
+    String paymentMethodLabel = '',
+    String codeMECeFDGI = '',
+    String qrCode = '',
+    String nim = '',
+    String counters = '',
+    String fiscalDateTime = '',
+    String fiscalRawCreateResponse = '',
+  }) async {
+    final pdf = pw.Document();
+
+    // Détail fiscal
+    double ht;
+    double tva;
+    double ttc = total;
+    int vatRatePct = 18;
+    final fiscalMap = _tryParseJson(fiscalRawCreateResponse);
+    if (fiscalMap != null) {
+      final raw = fiscalMap['rawCreateResponse'] is Map
+          ? Map<String, dynamic>.from(fiscalMap['rawCreateResponse'] as Map)
+          : fiscalMap;
+      final num? habN = raw['hab'] is num ? raw['hab'] as num : null;
+      final num? vabN = raw['vab'] is num ? raw['vab'] as num : null;
+      final num? totN = raw['total'] is num ? raw['total'] as num : null;
+      final num? tbN = raw['tb'] is num ? raw['tb'] as num : null;
+      if (habN != null && vabN != null) {
+        ht = habN.toDouble();
+        tva = vabN.toDouble();
+        ttc = (totN ?? total).toDouble();
+        if (tbN != null && tbN > 0) vatRatePct = tbN.toInt();
+      } else {
+        ht = total / 1.18;
+        tva = total - ht;
+      }
+    } else {
+      ht = total / 1.18;
+      tva = total - ht;
+    }
+
+    // Format 80mm de large, hauteur généreuse (le contenu court remonte).
+    const double mm = PdfPageFormat.mm;
+    final format = PdfPageFormat(80 * mm, 297 * mm, marginAll: 4 * mm);
+
+    pw.Widget divider() => pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(vertical: 3),
+      child: pw.Text(
+        '------------------------------',
+        style: const pw.TextStyle(fontSize: 8),
+      ),
+    );
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: format,
+        build: (context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+            mainAxisSize: pw.MainAxisSize.min,
+            children: [
+              // En-tête
+              pw.Center(
+                child: pw.Text(
+                  sellerName.toUpperCase(),
+                  textAlign: pw.TextAlign.center,
+                  style: pw.TextStyle(
+                    fontSize: 12,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+              ),
+              if (sellerAddress.trim().isNotEmpty)
+                pw.Center(
+                  child: pw.Text(
+                    sellerAddress,
+                    textAlign: pw.TextAlign.center,
+                    style: const pw.TextStyle(fontSize: 7),
+                  ),
+                ),
+              if (sellerIfu.trim().isNotEmpty)
+                pw.Center(
+                  child: pw.Text(
+                    'IFU : $sellerIfu',
+                    style: const pw.TextStyle(fontSize: 7),
+                  ),
+                ),
+              divider(),
+              pw.Center(
+                child: pw.Text(
+                  certified ? 'FACTURE NORMALISÉE' : 'TICKET',
+                  style: pw.TextStyle(
+                    fontSize: 9,
+                    fontWeight: pw.FontWeight.bold,
+                  ),
+                ),
+              ),
+              pw.SizedBox(height: 2),
+              pw.Text(
+                'Réf : $reference',
+                style: const pw.TextStyle(fontSize: 8),
+              ),
+              if (clientName.trim().isNotEmpty)
+                pw.Text(
+                  'Client : $clientName',
+                  style: const pw.TextStyle(fontSize: 8),
+                ),
+              if (clientIfu.trim().isNotEmpty)
+                pw.Text(
+                  'IFU cl. : $clientIfu',
+                  style: const pw.TextStyle(fontSize: 8),
+                ),
+              pw.Text(
+                'Date : ${_formatDate(DateTime.now())}',
+                style: const pw.TextStyle(fontSize: 8),
+              ),
+              divider(),
+
+              // Articles
+              ...lines.map((line) {
+                final name = _safeString(line['itemName'] ?? line['name']);
+                final qty = line['quantity'] ?? 0;
+                final lineTotal = line['total'] ?? 0;
+                final lt = (lineTotal is num) ? lineTotal.toDouble() : 0.0;
+                return pw.Padding(
+                  padding: const pw.EdgeInsets.symmetric(vertical: 1),
+                  child: pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.stretch,
+                    children: [
+                      pw.Text(name, style: const pw.TextStyle(fontSize: 8)),
+                      pw.Row(
+                        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                        children: [
+                          pw.Text(
+                            '  x$qty',
+                            style: const pw.TextStyle(fontSize: 8),
+                          ),
+                          pw.Text(
+                            _formatAmount(lt),
+                            style: const pw.TextStyle(fontSize: 8),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              }),
+              divider(),
+
+              // Récap fiscal
+              _ticketLine('Total H.T.', _formatAmount(ht)),
+              _ticketLine('TVA ($vatRatePct%)', _formatAmount(tva)),
+              pw.SizedBox(height: 2),
+              _ticketLine('TOTAL TTC', _formatAmount(ttc), bold: true),
+              if (paymentMethodLabel.trim().isNotEmpty) ...[
+                pw.SizedBox(height: 2),
+                _ticketLine('Paiement', paymentMethodLabel),
+              ],
+
+              // Bloc fiscal
+              if (certified) ...[
+                divider(),
+                pw.Text(
+                  'Code MECeF : $codeMECeFDGI',
+                  style: const pw.TextStyle(fontSize: 7),
+                ),
+                pw.Text('NIM : $nim', style: const pw.TextStyle(fontSize: 7)),
+                if (counters.trim().isNotEmpty)
+                  pw.Text(
+                    'Compteurs : $counters',
+                    style: const pw.TextStyle(fontSize: 7),
+                  ),
+                if (fiscalDateTime.trim().isNotEmpty)
+                  pw.Text(
+                    'Date fisc. : $fiscalDateTime',
+                    style: const pw.TextStyle(fontSize: 7),
+                  ),
+                if (qrCode.trim().isNotEmpty) ...[
+                  pw.SizedBox(height: 4),
+                  pw.Center(
+                    child: pw.BarcodeWidget(
+                      barcode: pw.Barcode.qrCode(),
+                      data: qrCode.trim(),
+                      width: 70,
+                      height: 70,
+                    ),
+                  ),
+                ],
+              ],
+
+              divider(),
+              pw.Center(
+                child: pw.Text(
+                  'Merci de votre visite',
+                  style: const pw.TextStyle(fontSize: 8),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    return pdf.save();
+  }
+
+  /// =========================
   /// TABLE HELPERS
   /// =========================
   Map<String, dynamic>? _tryParseJson(String raw) {
@@ -1161,6 +1378,28 @@ class PdfService {
           ),
         ],
       ),
+    );
+  }
+
+  pw.Widget _ticketLine(String label, String value, {bool bold = false}) {
+    return pw.Row(
+      mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+      children: [
+        pw.Text(
+          label,
+          style: pw.TextStyle(
+            fontSize: bold ? 10 : 8,
+            fontWeight: bold ? pw.FontWeight.bold : pw.FontWeight.normal,
+          ),
+        ),
+        pw.Text(
+          value,
+          style: pw.TextStyle(
+            fontSize: bold ? 10 : 8,
+            fontWeight: bold ? pw.FontWeight.bold : pw.FontWeight.normal,
+          ),
+        ),
+      ],
     );
   }
 
