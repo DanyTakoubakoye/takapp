@@ -48,3 +48,6 @@ takapp/web/build/
 *.iml
 .DS_Store
 Thumbs.db
+# Sauvegardes de regles (git fait deja l'historique)
+takapp/firestore.rules.backup
+takapp/firestore.rules.*.bak
