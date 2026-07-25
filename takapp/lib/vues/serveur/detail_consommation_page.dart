@@ -32,6 +32,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String _sellerIfu = '';
   String _sellerName = "";
+  String _sellerAddress = '';
 
   final TextEditingController clientNameController = TextEditingController();
 
@@ -61,20 +62,20 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
     return DateFormat('dd/MM/yyyy HH:mm').format(date);
   }
 
-  Future<void> _loadSellerIfu() async {
+  Future<void> _loadSellerInfo() async {
     final doc = await _firestore
         .collection('establishments')
         .doc(establishmentId)
         .get();
-    _sellerIfu = (doc.data()?['ifu'] ?? '').toString().trim();
-  }
-
-  Future<void> _loadSellerName() async {
-    final doc = await _firestore
-        .collection('establishments')
-        .doc(establishmentId)
-        .get();
-    _sellerName = (doc.data()?['name'] ?? '').toString().trim();
+    final data = doc.data() ?? {};
+    if (!mounted) return;
+    setState(() {
+      _sellerName = (data['name'] ?? '').toString().trim();
+      _sellerIfu = (data['ifu'] ?? '').toString().trim();
+      final address = (data['address'] ?? '').toString().trim();
+      final city = (data['city'] ?? '').toString().trim();
+      _sellerAddress = [address, city].where((e) => e.isNotEmpty).join(', ');
+    });
   }
 
   String _clientLabel(OrderModel order) {
@@ -237,15 +238,18 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
 
       final printer = context.read<PrinterService>();
 
-      final bytes = await pdfService.buildConsumptionInvoicePdf(
+      final bytes = await pdfService.buildConsumptionTicketV2(
+        certified: false,
+        sellerName: _sellerName,
+        sellerIfu: _sellerIfu,
+        sellerAddress: _sellerAddress,
         clientName: clientNameController.text.trim().isEmpty
             ? _clientLabel(widget.order)
             : clientNameController.text.trim(),
-        roomNumber: widget.order.roomNumber ?? widget.order.tableNumber ?? '-',
+        reference: widget.order.roomNumber ?? widget.order.tableNumber ?? '-',
         lines: items,
         total: widget.order.total,
       );
-
       await printer.printPdf(Uint8List.fromList(bytes));
 
       if (!mounted) return;
@@ -454,28 +458,28 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
 
       final printer = context.read<PrinterService>();
 
-      final bytes = await pdfService.buildFiscalizedConsumptionInvoicePdf(
+      final bytes = await pdfService.buildConsumptionTicketV2(
+        certified: true,
         sellerName: _sellerName,
         sellerIfu: _sellerIfu,
+        sellerAddress: _sellerAddress,
         clientName: clientNameController.text.trim().isEmpty
             ? _clientLabel(widget.order)
             : clientNameController.text.trim(),
         clientIfu: clientIfuController.text.trim(),
-        clientAddress: clientAddressController.text.trim(),
-        clientPhone: '',
-        roomNumber: widget.order.roomNumber ?? widget.order.tableNumber ?? '-',
+        reference: widget.order.roomNumber ?? widget.order.tableNumber ?? '-',
         lines: items,
         total: widget.order.total,
         paymentMethodLabel:
             AppPaymentMethods.labels[selectedPaymentMethod] ??
             selectedPaymentMethod,
-        invoiceTypeLabel: 'FV',
         codeMECeFDGI: orderDoc?['fiscalMecefCode']?.toString() ?? '',
         qrCode: orderDoc?['fiscalQrCode']?.toString() ?? '',
         nim: orderDoc?['fiscalNim']?.toString() ?? '',
         counters: orderDoc?['fiscalCounter']?.toString() ?? '',
         fiscalDateTime: orderDoc?['fiscalMachineDateTime']?.toString() ?? '',
-        fiscalStatusLabel: orderDoc?['fiscalStatus']?.toString() ?? 'success',
+        fiscalRawCreateResponse:
+            orderDoc?['fiscalRawConfirmResponse']?.toString() ?? '',
       );
 
       await printer.printPdf(Uint8List.fromList(bytes));
@@ -543,8 +547,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
   @override
   void initState() {
     super.initState();
-    _loadSellerIfu();
-    _loadSellerName();
+    _loadSellerInfo();
   }
 
   @override
