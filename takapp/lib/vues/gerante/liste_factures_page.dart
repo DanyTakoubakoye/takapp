@@ -32,6 +32,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
   String get establishmentId => widget.establishmentId.trim();
   String _sellerIfu = '';
   String _sellerName = "";
+  String _sellerAddress = "";
 
   bool _isSmallScreen(BuildContext context) =>
       MediaQuery.of(context).size.width < 800;
@@ -39,8 +40,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
   @override
   void initState() {
     super.initState();
-    _loadSellerIfu();
-    _loadSellerName();
+    _loadSellerInfo();
   }
 
   @override
@@ -61,35 +61,42 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
     final pdfService = context.read<PdfService>();
     final printer = context.read<PrinterService>();
 
-    final bytes = await pdfService.buildRoomInvoicePdf(
+    final bytes = await pdfService.buildRoomInvoicePdfV2(
+      certified: false,
+      sellerName: _sellerName,
+      sellerIfu: _sellerIfu,
+      sellerAddress: _sellerAddress,
       clientName: item.clientName,
+      clientIfu: item.clientIfu,
+      clientAddress: item.clientAddress,
+      clientPhone: item.clientPhone,
       room: item.roomNumber,
       nights: item.nights,
       pricePerNight: item.pricePerNight,
       extras: item.extrasTotal,
       services: item.servicesTotal,
       total: item.total,
-      start: item.startDate!,
-      end: item.endDate!,
+      start: item.startDate,
+      end: item.endDate,
     );
 
     await printer.printPdf(Uint8List.fromList(bytes));
   }
 
-  Future<void> _loadSellerIfu() async {
+  Future<void> _loadSellerInfo() async {
     final doc = await FirebaseFirestore.instance
         .collection('establishments')
-        .doc(establishmentId) // adapter au nom exact de la variable dans la vue
+        .doc(establishmentId)
         .get();
-    _sellerIfu = (doc.data()?['ifu'] ?? '').toString().trim();
-  }
-
-  Future<void> _loadSellerName() async {
-    final doc = await FirebaseFirestore.instance
-        .collection('establishments')
-        .doc(establishmentId) // adapter au nom exact de la variable dans la vue
-        .get();
-    _sellerName = (doc.data()?['name'] ?? '').toString().trim();
+    final data = doc.data() ?? {};
+    if (!mounted) return;
+    setState(() {
+      _sellerName = (data['name'] ?? '').toString().trim();
+      _sellerIfu = (data['ifu'] ?? '').toString().trim();
+      final address = (data['address'] ?? '').toString().trim();
+      final city = (data['city'] ?? '').toString().trim();
+      _sellerAddress = [address, city].where((e) => e.isNotEmpty).join(', ');
+    });
   }
 
   Future<void> _printFiscalizedInvoice(RoomInvoiceModel item) async {
@@ -108,9 +115,11 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
     final pdfService = context.read<PdfService>();
     final printer = context.read<PrinterService>();
 
-    final bytes = await pdfService.buildFiscalizedRoomInvoicePdf(
+    final bytes = await pdfService.buildRoomInvoicePdfV2(
+      certified: true,
       sellerName: _sellerName,
       sellerIfu: _sellerIfu,
+      sellerAddress: _sellerAddress,
       clientName: item.clientName,
       clientIfu: item.clientIfu,
       clientAddress: item.clientAddress,
@@ -121,8 +130,8 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
       extras: item.extrasTotal,
       services: item.servicesTotal,
       total: item.total,
-      start: item.startDate!,
-      end: item.endDate!,
+      start: item.startDate,
+      end: item.endDate,
       paymentMethodLabel: item.paymentMethod,
       invoiceTypeLabel: item.fiscalInvoiceType,
       codeMECeFDGI: item.fiscalMecefCode,
@@ -130,7 +139,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
       nim: item.fiscalNim,
       counters: item.fiscalCounter,
       fiscalDateTime: item.fiscalMachineDateTime,
-      fiscalStatusLabel: item.fiscalStatus,
+      fiscalRawCreateResponse: item.fiscalRawConfirmResponse,
     );
 
     await printer.printPdf(Uint8List.fromList(bytes));

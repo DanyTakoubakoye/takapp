@@ -32,6 +32,7 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
   final RoomInvoiceService _service = RoomInvoiceService();
   String _sellerIfu = '';
   String _sellerName = "";
+  String _sellerAddress = '';
   String get establishmentId => widget.establishmentId.trim();
 
   late RoomInvoiceModel currentInvoice;
@@ -41,8 +42,7 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
   void initState() {
     super.initState();
     currentInvoice = widget.invoice;
-    _loadSellerIfu();
-    _loadSellerName();
+    _loadSellerInfo();
   }
 
   String formatDate(DateTime? date) {
@@ -60,22 +60,21 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
     return user?.establishmentId.trim() ?? '';
   }
 
-  Future<void> _loadSellerIfu() async {
+  Future<void> _loadSellerInfo() async {
     final doc = await FirebaseFirestore.instance
         .collection('establishments')
-        .doc(establishmentId) // adapter au nom exact de la variable dans la vue
+        .doc(establishmentId)
         .get();
-    _sellerIfu = (doc.data()?['ifu'] ?? '').toString().trim();
+    final data = doc.data() ?? {};
+    if (!mounted) return;
+    setState(() {
+      _sellerName = (data['name'] ?? '').toString().trim();
+      _sellerIfu = (data['ifu'] ?? '').toString().trim();
+      final address = (data['address'] ?? '').toString().trim();
+      final city = (data['city'] ?? '').toString().trim();
+      _sellerAddress = [address, city].where((e) => e.isNotEmpty).join(', ');
+    });
   }
-
-  Future<void> _loadSellerName() async {
-    final doc = await FirebaseFirestore.instance
-        .collection('establishments')
-        .doc(establishmentId) // adapter au nom exact de la variable dans la vue
-        .get();
-    _sellerName = (doc.data()?['name'] ?? '').toString().trim();
-  }
-
   Future<void> _reloadInvoice(BuildContext context) async {
     final establishmentId = _establishmentId(context);
 
@@ -116,16 +115,23 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
     final pdfService = context.read<PdfService>();
     final printer = context.read<PrinterService>();
 
-    final bytes = await pdfService.buildRoomInvoicePdf(
+    final bytes = await pdfService.buildRoomInvoicePdfV2(
+      certified: false,
+      sellerName: _sellerName,
+      sellerIfu: _sellerIfu,
+      sellerAddress: _sellerAddress,
       clientName: currentInvoice.clientName,
+      clientIfu: currentInvoice.clientIfu,
+      clientAddress: currentInvoice.clientAddress,
+      clientPhone: currentInvoice.clientPhone,
       room: currentInvoice.roomNumber,
       nights: currentInvoice.nights,
       pricePerNight: currentInvoice.pricePerNight,
       extras: currentInvoice.extrasTotal,
       services: currentInvoice.servicesTotal,
       total: currentInvoice.total,
-      start: currentInvoice.startDate ?? DateTime.now(),
-      end: currentInvoice.endDate ?? DateTime.now(),
+      start: currentInvoice.startDate,
+      end: currentInvoice.endDate,
     );
 
     await printer.printPdf(Uint8List.fromList(bytes));
@@ -151,9 +157,11 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
     final pdfService = context.read<PdfService>();
     final printer = context.read<PrinterService>();
 
-    final bytes = await pdfService.buildFiscalizedRoomInvoicePdf(
+    final bytes = await pdfService.buildRoomInvoicePdfV2(
+      certified: true,
       sellerName: _sellerName,
       sellerIfu: _sellerIfu,
+      sellerAddress: _sellerAddress,
       clientName: currentInvoice.clientName,
       clientIfu: currentInvoice.clientIfu,
       clientAddress: currentInvoice.clientAddress,
@@ -164,8 +172,8 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
       extras: currentInvoice.extrasTotal,
       services: currentInvoice.servicesTotal,
       total: currentInvoice.total,
-      start: currentInvoice.startDate!,
-      end: currentInvoice.endDate!,
+      start: currentInvoice.startDate,
+      end: currentInvoice.endDate,
       paymentMethodLabel: currentInvoice.paymentMethod,
       invoiceTypeLabel: currentInvoice.fiscalInvoiceType,
       codeMECeFDGI: currentInvoice.fiscalMecefCode,
@@ -173,7 +181,7 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
       nim: currentInvoice.fiscalNim,
       counters: currentInvoice.fiscalCounter,
       fiscalDateTime: currentInvoice.fiscalMachineDateTime,
-      fiscalStatusLabel: currentInvoice.fiscalStatus,
+      fiscalRawCreateResponse: currentInvoice.fiscalRawConfirmResponse,
     );
 
     await printer.printPdf(Uint8List.fromList(bytes));

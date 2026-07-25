@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -6,6 +8,7 @@ import 'package:takapp/modeles/order_item_model.dart';
 import 'package:takapp/modeles/order_model.dart';
 import 'package:takapp/modeles/payment_model.dart';
 import 'package:takapp/modeles/server_handover_model.dart';
+import 'package:takapp/services/pdf_service.dart' as pdfService;
 
 class PdfService {
   /// =========================
@@ -240,170 +243,7 @@ class PdfService {
     return pdf.save();
   }
 
-  Future<List<int>> buildRoomInvoicePdf({
-    required String clientName,
-    required String room,
-    required int nights,
-    required double pricePerNight,
-    required double extras,
-    required double services,
-    required double total,
-    required DateTime start,
-    required DateTime end,
-  }) async {
-    final pdf = pw.Document();
-
-    pdf.addPage(
-      pw.Page(
-        build: (context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Text(
-                'FACTURE CHAMBRE',
-                style: pw.TextStyle(
-                  fontSize: 22,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-
-              pw.SizedBox(height: 20),
-
-              pw.Text('Client : $clientName'),
-              pw.Text('Chambre : $room'),
-              pw.Text('Entrée : ${DateFormat('dd/MM/yyyy').format(start)}'),
-              pw.Text('Sortie : ${DateFormat('dd/MM/yyyy').format(end)}'),
-              pw.Text('Nuitées : $nights'),
-
-              pw.SizedBox(height: 12),
-
-              pw.Text('Prix / nuit : ${pricePerNight.toStringAsFixed(0)} FCFA'),
-              pw.Text('Extras : ${extras.toStringAsFixed(0)} FCFA'),
-              pw.Text('Services : ${services.toStringAsFixed(0)} FCFA'),
-
-              pw.Divider(),
-
-              pw.Text(
-                'TOTAL : ${total.toStringAsFixed(0)} FCFA',
-                style: pw.TextStyle(
-                  fontWeight: pw.FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-
-    return pdf.save();
-  }
-
-  Future<List<int>> buildFiscalizedRoomInvoicePdf({
-    required String sellerName,
-    required String sellerIfu,
-    required String clientName,
-    required String clientIfu,
-    required String clientAddress,
-    required String clientPhone,
-    required String room,
-    required int nights,
-    required double pricePerNight,
-    required double extras,
-    required double services,
-    required double total,
-    required DateTime start,
-    required DateTime end,
-    required String paymentMethodLabel,
-    required String invoiceTypeLabel,
-    required String codeMECeFDGI,
-    required String qrCode,
-    required String nim,
-    required String counters,
-    required String fiscalDateTime,
-    required String fiscalStatusLabel,
-  }) async {
-    final pdf = pw.Document();
-
-    pdf.addPage(
-      pw.Page(
-        build: (context) {
-          return pw.Column(
-            crossAxisAlignment: pw.CrossAxisAlignment.start,
-            children: [
-              pw.Text(
-                sellerName,
-                style: pw.TextStyle(
-                  fontSize: 22,
-                  fontWeight: pw.FontWeight.bold,
-                ),
-              ),
-
-              pw.Text('IFU : $sellerIfu'),
-
-              pw.SizedBox(height: 20),
-
-              pw.Text('FACTURE NORMALISÉE'),
-
-              pw.SizedBox(height: 16),
-
-              pw.Text('Client : $clientName'),
-              pw.Text('IFU Client : $clientIfu'),
-              pw.Text('Téléphone : $clientPhone'),
-              pw.Text('Adresse : $clientAddress'),
-
-              pw.SizedBox(height: 16),
-
-              pw.Text('Chambre : $room'),
-              pw.Text('Nuitées : $nights'),
-
-              pw.Text('Prix / nuit : ${pricePerNight.toStringAsFixed(0)} FCFA'),
-
-              pw.Text('Extras : ${extras.toStringAsFixed(0)} FCFA'),
-
-              pw.Text('Services : ${services.toStringAsFixed(0)} FCFA'),
-
-              pw.Divider(),
-
-              pw.Text(
-                'TOTAL : ${total.toStringAsFixed(0)} FCFA',
-                style: pw.TextStyle(
-                  fontWeight: pw.FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-
-              pw.SizedBox(height: 20),
-
-              pw.Text('Code MECeF : $codeMECeFDGI'),
-              pw.Text('NIM : $nim'),
-              pw.Text('Compteurs : $counters'),
-              pw.Text('Date fiscale : $fiscalDateTime'),
-              pw.Text('Mode paiement : $paymentMethodLabel'),
-              pw.Text('Type facture : $invoiceTypeLabel'),
-              pw.Text('Statut : $fiscalStatusLabel'),
-              if (qrCode.trim().isNotEmpty) ...[
-                pw.SizedBox(height: 12),
-
-                pw.Center(
-                  child: pw.BarcodeWidget(
-                    barcode: pw.Barcode.qrCode(),
-                    data: qrCode.trim(),
-                    width: 90,
-                    height: 90,
-                  ),
-                ),
-
-                pw.SizedBox(height: 8),
-              ],
-            ],
-          );
-        },
-      ),
-    );
-
-    return pdf.save();
-  }
+  
 
   Future<List<int>> buildManagerValidationPdf({
     required ServerHandoverModel handover,
@@ -886,13 +726,442 @@ class PdfService {
   }
 
   /// =========================
+  /// FACTURE CHAMBRE — VERSION SOIGNÉE (V2)
+  /// =========================
+  /// Une seule méthode pour les deux cas (fiscalisée ou non), format A4,
+  /// pensée pour tenir sur une seule page.
+  ///
+  /// Le détail fiscal (HT / TVA / TTC) est lu depuis la réponse CertiLink
+  /// [fiscalRawCreateResponse] quand elle est fournie (source DGI) ; sinon
+  /// il est décomposé depuis le total TTC (TVA 18% incluse).
+  Future<List<int>> buildRoomInvoicePdfV2({
+    // Vendeur (tenant)
+    required String sellerName,
+    String sellerIfu = '',
+    String sellerAddress = '',
+    String sellerPhone = '',
+
+    // Client
+    required String clientName,
+    String clientIfu = '',
+    String clientAddress = '',
+    String clientPhone = '',
+
+    // Séjour
+    required String room,
+    required int nights,
+    required double pricePerNight,
+    required double extras,
+    required double services,
+    required double total,
+    DateTime? start,
+    DateTime? end,
+
+    // Fiscalisation (optionnelle)
+    bool certified = false,
+    String paymentMethodLabel = '',
+    String invoiceTypeLabel = '',
+    String codeMECeFDGI = '',
+    String qrCode = '',
+    String nim = '',
+    String counters = '',
+    String fiscalDateTime = '',
+    // Réponse brute CertiLink (JSON) : source du détail fiscal si présente.
+    String fiscalRawCreateResponse = '',
+  }) async {
+    final pdf = pw.Document();
+
+    // ---- Détail fiscal : CertiLink d'abord, sinon décomposition TTC 18% ----
+    double ht;
+    double tva;
+    double ttc = total;
+    double specificTax = 0;
+    int vatRatePct = 18;
+
+    final fiscalMap = _tryParseJson(fiscalRawCreateResponse);
+    if (fiscalMap != null) {
+      // rawCreateResponse peut être imbriqué OU être la racine.
+      final raw = fiscalMap['rawCreateResponse'] is Map
+          ? Map<String, dynamic>.from(fiscalMap['rawCreateResponse'] as Map)
+          : fiscalMap;
+      final num? habN = raw['hab'] is num ? raw['hab'] as num : null;
+      final num? vabN = raw['vab'] is num ? raw['vab'] as num : null;
+      final num? totN = raw['total'] is num ? raw['total'] as num : null;
+      final num? tsN = raw['ts'] is num ? raw['ts'] as num : null;
+      final num? tbN = raw['tb'] is num ? raw['tb'] as num : null;
+      if (habN != null && vabN != null) {
+        ht = habN.toDouble();
+        tva = vabN.toDouble();
+        ttc = (totN ?? total).toDouble();
+        specificTax = (tsN ?? 0).toDouble();
+        if (tbN != null && tbN > 0) vatRatePct = tbN.toInt();
+      } else {
+        // JSON présent mais sans les montants attendus → décomposition.
+        ht = total / 1.18;
+        tva = total - ht;
+      }
+    } else {
+      // Pas de réponse fiscale → décomposition du TTC (TVA 18% incluse).
+      ht = total / 1.18;
+      tva = total - ht;
+    }
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        margin: const pw.EdgeInsets.all(28),
+        build: (context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              // ---------- EN-TÊTE ----------
+              pw.Row(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  // Bloc initiales (repli logo)
+                  pw.Container(
+                    width: 60,
+                    height: 60,
+                    alignment: pw.Alignment.center,
+                    decoration: pw.BoxDecoration(
+                      border: pw.Border.all(color: PdfColors.blueGrey400),
+                      borderRadius: pw.BorderRadius.circular(8),
+                    ),
+                    child: pw.Text(
+                      _initials(sellerName),
+                      style: pw.TextStyle(
+                        fontSize: 20,
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColors.blueGrey800,
+                      ),
+                    ),
+                  ),
+                  pw.SizedBox(width: 14),
+                  pw.Expanded(
+                    child: pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text(
+                          sellerName.toUpperCase(),
+                          style: pw.TextStyle(
+                            fontSize: 18,
+                            fontWeight: pw.FontWeight.bold,
+                          ),
+                        ),
+                        if (sellerAddress.trim().isNotEmpty)
+                          pw.Text(
+                            sellerAddress,
+                            style: const pw.TextStyle(fontSize: 10),
+                          ),
+                        if (sellerPhone.trim().isNotEmpty)
+                          pw.Text(
+                            'Tél : $sellerPhone',
+                            style: const pw.TextStyle(fontSize: 10),
+                          ),
+                        if (sellerIfu.trim().isNotEmpty)
+                          pw.Text(
+                            'IFU : $sellerIfu',
+                            style: const pw.TextStyle(fontSize: 10),
+                          ),
+                      ],
+                    ),
+                  ),
+                  // Badge certifié / non certifié
+                  pw.Container(
+                    padding: const pw.EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    decoration: pw.BoxDecoration(
+                      color: certified
+                          ? PdfColors.green100
+                          : PdfColors.orange100,
+                      borderRadius: pw.BorderRadius.circular(6),
+                    ),
+                    child: pw.Text(
+                      certified ? 'FACTURE CERTIFIÉE' : 'FACTURE',
+                      style: pw.TextStyle(
+                        fontSize: 9,
+                        fontWeight: pw.FontWeight.bold,
+                        color: certified
+                            ? PdfColors.green800
+                            : PdfColors.orange800,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              pw.SizedBox(height: 6),
+              pw.Divider(color: PdfColors.grey400),
+
+              // ---------- TITRE + DATES ----------
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    'FACTURE DE CHAMBRE',
+                    style: pw.TextStyle(
+                      fontSize: 14,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                  if (start != null && end != null)
+                    pw.Text(
+                      'Séjour : ${_formatShortDate(start)} → ${_formatShortDate(end)}',
+                      style: const pw.TextStyle(fontSize: 10),
+                    ),
+                ],
+              ),
+              pw.SizedBox(height: 14),
+
+              // ---------- CLIENT ----------
+              pw.Container(
+                width: double.infinity,
+                padding: const pw.EdgeInsets.all(10),
+                decoration: pw.BoxDecoration(
+                  border: pw.Border.all(color: PdfColors.grey300),
+                  borderRadius: pw.BorderRadius.circular(6),
+                ),
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      'CLIENT',
+                      style: pw.TextStyle(
+                        fontSize: 9,
+                        fontWeight: pw.FontWeight.bold,
+                        color: PdfColors.grey700,
+                      ),
+                    ),
+                    pw.SizedBox(height: 4),
+                    pw.Text(
+                      clientName.isEmpty ? '-' : clientName,
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
+                    if (clientIfu.trim().isNotEmpty)
+                      pw.Text(
+                        'IFU : $clientIfu',
+                        style: const pw.TextStyle(fontSize: 10),
+                      ),
+                    if (clientPhone.trim().isNotEmpty)
+                      pw.Text(
+                        'Tél : $clientPhone',
+                        style: const pw.TextStyle(fontSize: 10),
+                      ),
+                    if (clientAddress.trim().isNotEmpty)
+                      pw.Text(
+                        'Adresse : $clientAddress',
+                        style: const pw.TextStyle(fontSize: 10),
+                      ),
+                  ],
+                ),
+              ),
+              pw.SizedBox(height: 14),
+
+              // ---------- DÉTAIL SÉJOUR ----------
+              pw.TableHelper.fromTextArray(
+                headers: const ['Désignation', 'Qté', 'P.U.', 'Montant'],
+                headerStyle: pw.TextStyle(
+                  fontWeight: pw.FontWeight.bold,
+                  fontSize: 10,
+                ),
+                headerDecoration: const pw.BoxDecoration(
+                  color: PdfColors.blueGrey100,
+                ),
+                cellStyle: const pw.TextStyle(fontSize: 10),
+                cellAlignments: {
+                  1: pw.Alignment.center,
+                  2: pw.Alignment.centerRight,
+                  3: pw.Alignment.centerRight,
+                },
+                border: pw.TableBorder.all(color: PdfColors.grey300),
+                data: [
+                  [
+                    'Nuitée chambre $room',
+                    '$nights',
+                    _formatAmount(pricePerNight),
+                    _formatAmount(nights * pricePerNight),
+                  ],
+                  if (extras > 0)
+                    ['Consommations / extras', '', '', _formatAmount(extras)],
+                  if (services > 0)
+                    ['Services', '', '', _formatAmount(services)],
+                ],
+              ),
+              pw.SizedBox(height: 16),
+
+              // ---------- RÉCAPITULATIF FISCAL ----------
+              pw.Align(
+                alignment: pw.Alignment.centerRight,
+                child: pw.Container(
+                  width: 260,
+                  padding: const pw.EdgeInsets.all(10),
+                  decoration: pw.BoxDecoration(
+                    border: pw.Border.all(color: PdfColors.grey300),
+                    borderRadius: pw.BorderRadius.circular(6),
+                  ),
+                  child: pw.Column(
+                    children: [
+                      _sumLine('Total H.T.', _formatAmount(ht)),
+                      _sumLine('TVA ($vatRatePct%)', _formatAmount(tva)),
+                      if (specificTax > 0)
+                        _sumLine('Taxe spécifique', _formatAmount(specificTax)),
+                      pw.Divider(color: PdfColors.grey400),
+                      _sumLine('TOTAL TTC', _formatAmount(ttc), bold: true),
+                    ],
+                  ),
+                ),
+              ),
+
+              // ---------- BLOC FISCAL (si certifiée) ----------
+              if (certified) ...[
+                pw.SizedBox(height: 18),
+                pw.Container(
+                  width: double.infinity,
+                  padding: const pw.EdgeInsets.all(10),
+                  decoration: pw.BoxDecoration(
+                    color: PdfColors.green50,
+                    border: pw.Border.all(color: PdfColors.green300),
+                    borderRadius: pw.BorderRadius.circular(6),
+                  ),
+                  child: pw.Row(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      if (qrCode.trim().isNotEmpty)
+                        pw.Container(
+                          width: 80,
+                          height: 80,
+                          padding: const pw.EdgeInsets.all(3),
+                          decoration: const pw.BoxDecoration(
+                            color: PdfColors.white,
+                          ),
+                          child: pw.BarcodeWidget(
+                            barcode: pw.Barcode.qrCode(),
+                            data: qrCode.trim(),
+                          ),
+                        ),
+                      if (qrCode.trim().isNotEmpty) pw.SizedBox(width: 12),
+                      pw.Expanded(
+                        child: pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Text(
+                              'Éléments de sécurité fiscale',
+                              style: pw.TextStyle(
+                                fontWeight: pw.FontWeight.bold,
+                                fontSize: 10,
+                              ),
+                            ),
+                            pw.SizedBox(height: 4),
+                            pw.Text(
+                              'Code MECeF/DGI : $codeMECeFDGI',
+                              style: const pw.TextStyle(fontSize: 9),
+                            ),
+                            pw.Text(
+                              'NIM : $nim',
+                              style: const pw.TextStyle(fontSize: 9),
+                            ),
+                            pw.Text(
+                              'Compteurs : $counters',
+                              style: const pw.TextStyle(fontSize: 9),
+                            ),
+                            if (fiscalDateTime.trim().isNotEmpty)
+                              pw.Text(
+                                'Date fiscale : $fiscalDateTime',
+                                style: const pw.TextStyle(fontSize: 9),
+                              ),
+                            if (paymentMethodLabel.trim().isNotEmpty)
+                              pw.Text(
+                                'Paiement : $paymentMethodLabel',
+                                style: const pw.TextStyle(fontSize: 9),
+                              ),
+                            if (invoiceTypeLabel.trim().isNotEmpty)
+                              pw.Text(
+                                'Type : $invoiceTypeLabel',
+                                style: const pw.TextStyle(fontSize: 9),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              pw.Spacer(),
+              pw.Center(
+                child: pw.Text(
+                  'Merci de votre confiance.',
+                  style: const pw.TextStyle(
+                    fontSize: 9,
+                    color: PdfColors.grey600,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    return pdf.save();
+  }
+
+  /// =========================
   /// TABLE HELPERS
   /// =========================
+  Map<String, dynamic>? _tryParseJson(String raw) {
+    if (raw.trim().isEmpty) return null;
+    try {
+      final decoded = jsonDecode(raw);
+      return decoded is Map<String, dynamic> ? decoded : null;
+    } catch (_) {
+      return null;
+    }
+  }
 
   pw.Widget _tableHeader(String text) {
     return pw.Padding(
       padding: const pw.EdgeInsets.all(6),
       child: pw.Text(text, style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+    );
+  }
+
+  /// Initiales de repli quand aucun logo n'est disponible.
+  String _initials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty || parts.first.isEmpty) return 'TK';
+    if (parts.length == 1) {
+      final p = parts.first;
+      return (p.length >= 2 ? p.substring(0, 2) : p).toUpperCase();
+    }
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+
+  /// Ligne du récapitulatif fiscal (libellé à gauche, montant à droite).
+  pw.Widget _sumLine(String label, String value, {bool bold = false}) {
+    return pw.Padding(
+      padding: const pw.EdgeInsets.symmetric(vertical: 2),
+      child: pw.Row(
+        children: [
+          pw.Expanded(
+            child: pw.Text(
+              label,
+              style: pw.TextStyle(
+                fontWeight: bold ? pw.FontWeight.bold : pw.FontWeight.normal,
+                fontSize: bold ? 12 : 10,
+              ),
+            ),
+          ),
+          pw.Text(
+            value,
+            style: pw.TextStyle(
+              fontWeight: bold ? pw.FontWeight.bold : pw.FontWeight.normal,
+              fontSize: bold ? 12 : 10,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

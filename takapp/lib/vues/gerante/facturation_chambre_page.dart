@@ -42,6 +42,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
 
   String _sellerIfu = '';
   String _sellerName = "";
+  String _sellerAddress = '';
   String get establishmentId => widget.establishmentId.trim();
 
   final TextEditingController clientController = TextEditingController();
@@ -171,9 +172,11 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
     final pdfService = context.read<PdfService>();
     final printer = context.read<PrinterService>();
 
-    final bytes = await pdfService.buildFiscalizedRoomInvoicePdf(
+    final bytes = await pdfService.buildRoomInvoicePdfV2(
+      certified: true,
       sellerName: _sellerName,
       sellerIfu: _sellerIfu,
+      sellerAddress: _sellerAddress,
       clientName: invoice.clientName,
       clientIfu: invoice.clientIfu,
       clientAddress: invoice.clientAddress,
@@ -184,8 +187,8 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
       extras: invoice.extrasTotal,
       services: invoice.servicesTotal,
       total: invoice.total,
-      start: invoice.startDate!,
-      end: invoice.endDate!,
+      start: invoice.startDate,
+      end: invoice.endDate,
       paymentMethodLabel: invoice.paymentMethod,
       invoiceTypeLabel: invoice.fiscalInvoiceType,
       codeMECeFDGI: invoice.fiscalMecefCode,
@@ -193,8 +196,9 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
       nim: invoice.fiscalNim,
       counters: invoice.fiscalCounter,
       fiscalDateTime: invoice.fiscalMachineDateTime,
-      fiscalStatusLabel: invoice.fiscalStatus,
+      fiscalRawCreateResponse: invoice.fiscalRawConfirmResponse,
     );
+    
 
     await printer.printPdf(Uint8List.fromList(bytes));
   }
@@ -655,16 +659,23 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
     final pdfService = context.read<PdfService>();
     final printer = context.read<PrinterService>();
 
-    final bytes = await pdfService.buildRoomInvoicePdf(
+    final bytes = await pdfService.buildRoomInvoicePdfV2(
+      certified: false,
+      sellerName: _sellerName,
+      sellerIfu: _sellerIfu,
+      sellerAddress: _sellerAddress,
       clientName: clientController.text.trim(),
+      clientIfu: clientIfuController.text.trim(),
+      clientAddress: clientAddressController.text.trim(),
+      clientPhone: clientPhoneController.text.trim(),
       room: roomController.text.trim(),
       nights: nights,
       pricePerNight: double.tryParse(priceController.text.trim()) ?? 0,
       extras: consumptionTotal,
       services: servicesTotal,
       total: total,
-      start: startDate!,
-      end: endDate!,
+      start: startDate,
+      end: endDate,
     );
 
     await printer.printPdf(Uint8List.fromList(bytes));
@@ -757,8 +768,8 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   @override
   void initState() {
     super.initState();
-    _loadSellerIfu();
-    _loadSellerName();
+    _loadSellerInfo();
+    
 
     // Pré-remplissage depuis une réservation (check-out)
     final resa = widget.reservation;
@@ -840,21 +851,30 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
     );
   }
 
-  Future<void> _loadSellerIfu() async {
+  Future<void> _loadSellerInfo() async {
     final doc = await FirebaseFirestore.instance
         .collection('establishments')
-        .doc(establishmentId) // adapter au nom exact de la variable dans la vue
+        .doc(establishmentId)
         .get();
-    _sellerIfu = (doc.data()?['ifu'] ?? '').toString().trim();
+    final data = doc.data() ?? {};
+    if (!mounted) return;
+    setState(() {
+      _sellerName = (data['name'] ?? '').toString().trim();
+      _sellerIfu = (data['ifu'] ?? '').toString().trim();
+      _sellerAddress = _composeAddress(data);
+    });
   }
 
-  Future<void> _loadSellerName() async {
-    final doc = await FirebaseFirestore.instance
-        .collection('establishments')
-        .doc(establishmentId) // adapter au nom exact de la variable dans la vue
-        .get();
-    _sellerName = (doc.data()?['name'] ?? '').toString().trim();
+  /// Compose une adresse lisible à partir des champs disponibles de
+  /// l'établissement (address, city). On n'affiche que ce qui existe.
+  String _composeAddress(Map<String, dynamic> data) {
+    final address = (data['address'] ?? '').toString().trim();
+    final city = (data['city'] ?? '').toString().trim();
+    final parts = [address, city].where((e) => e.isNotEmpty).toList();
+    return parts.join(', ');
   }
+
+  
 
   Widget _buildDesktopLayout({required String establishmentId}) {
     return Padding(
