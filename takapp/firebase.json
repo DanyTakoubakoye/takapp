@@ -1,0 +1,55 @@
+ {
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "takhotel-b0a4a",
+          "appId": "1:886351472574:android:e5e71d0560b6d96f4a7bef",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "takhotel-b0a4a",
+          "configurations": {
+            "android": "1:886351472574:android:e5e71d0560b6d96f4a7bef",
+            "web": "1:886351472574:web:0f9e9206d32fd85d4a7bef",
+            "windows": "1:886351472574:web:234076ccd7b4fbeb4a7bef"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/reset-password.html",
+        "destination": "/reset-password.html"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "firestore": {
+    "database": "(default)",
+    "location": "nam5",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "emulators": {
+    "firestore": {
+      "port": 8080
+    },
+    "ui": {
+      "enabled": true
+    }
+  }
+}
