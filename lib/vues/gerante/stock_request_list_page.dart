@@ -117,7 +117,7 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                     ? Column(
                         children: [
                           DropdownButtonFormField<String>(
-                            value: statusFilter,
+                            initialValue: statusFilter,
                             decoration: const InputDecoration(
                               labelText: 'Statut',
                             ),
@@ -162,7 +162,7 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                           SizedBox(
                             width: 220,
                             child: DropdownButtonFormField<String>(
-                              value: statusFilter,
+                              initialValue: statusFilter,
                               decoration: const InputDecoration(
                                 labelText: 'Statut',
                               ),
@@ -228,7 +228,7 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
 
                   return ListView.separated(
                     itemCount: items.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       final item = items[index];
 
@@ -272,7 +272,7 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                                       vertical: 6,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: storeColor.withOpacity(0.12),
+                                      color: storeColor.withValues(alpha: 0.12),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
@@ -289,7 +289,7 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                                       vertical: 6,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: statusColor.withOpacity(0.12),
+                                      color: statusColor.withValues(alpha: 0.12),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(

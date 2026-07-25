@@ -11,11 +11,94 @@ import 'package:takapp/vues/shared/create_stock_request_page.dart';
 import 'package:takapp/vues/shared/stock_out_page.dart';
 import 'package:takapp/vues/shared/store_request_history_page.dart';
 import 'package:takapp/vues/shared/stock_movement_history_page.dart';
+import 'package:takapp/services/notification_web_helper_stub.dart'
+    if (dart.library.html) 'package:takapp/services/notification_web_helper.dart';
 
-class BarHomePage extends StatelessWidget {
+class BarHomePage extends StatefulWidget {
   final String establishmentId;
 
   const BarHomePage({super.key, required this.establishmentId});
+
+  @override
+  State<BarHomePage> createState() => _BarHomePageState();
+}
+
+class _BarHomePageState extends State<BarHomePage> {
+  final Set<String> _knownOrderIds = {};
+  bool _isFirstSnapshot = true;
+  bool _isPopupOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Débloque le son dès le premier clic de l'utilisateur dans la page
+    unlockWebSoundAfterUserInteraction();
+  }
+
+  void _handleNewBarOrders(
+    List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
+  ) {
+    // Au tout premier chargement, on mémorise sans alerter
+    if (_isFirstSnapshot) {
+      for (final d in docs) {
+        _knownOrderIds.add(d.id);
+      }
+      _isFirstSnapshot = false;
+      return;
+    }
+
+    for (final d in docs) {
+      if (_knownOrderIds.contains(d.id)) continue;
+      _knownOrderIds.add(d.id);
+
+      final data = d.data();
+      final clientLabel = _clientLabel(data);
+      final orderNumber = (data['orderNumber'] ?? '').toString();
+
+      // Son
+      playWebNotificationSound(
+        'bar_new_order',
+        establishmentId: widget.establishmentId,
+      );
+
+      // Notification navigateur
+      showWebNotification(
+        title: 'Nouvelle commande bar',
+        body: 'Commande $orderNumber - $clientLabel',
+        establishmentId: widget.establishmentId,
+        tag: 'takapp_bar_${widget.establishmentId}_${d.id}',
+      );
+
+      // Popup in-app (une seule à la fois)
+      _showNewOrderPopup(orderNumber, clientLabel);
+    }
+  }
+
+  Future<void> _showNewOrderPopup(
+    String orderNumber,
+    String clientLabel,
+  ) async {
+    if (_isPopupOpen) return;
+    if (!mounted) return;
+
+    _isPopupOpen = true;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) => AlertDialog(
+        icon: const Icon(Icons.local_bar, color: Colors.indigo, size: 40),
+        title: const Text('Nouvelle commande bar'),
+        content: Text('Commande $orderNumber\n$clientLabel'),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+    _isPopupOpen = false;
+  }
 
   Color _statusColor(String status) {
     switch (status) {
@@ -69,6 +152,7 @@ class BarHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final establishmentId = widget.establishmentId;
     final auth = context.watch<AuthController>();
     final user = auth.currentUser;
     final barService = BarService();
@@ -76,7 +160,18 @@ class BarHomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TAKHOTEL - Bar'),
+        title: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+          future: FirebaseFirestore.instance
+              .collection('establishments')
+              .doc(establishmentId)
+              .get(),
+          builder: (context, snapshot) {
+            final name = (snapshot.data?.data()?['name'] ?? '')
+                .toString()
+                .toUpperCase();
+            return Text(name.isEmpty ? 'Bar' : '$name - Bar');
+          },
+        ),
         actions: [
           IconButton(
             onPressed: () => context.read<AuthController>().logout(),
@@ -105,6 +200,10 @@ class BarHomePage extends StatelessWidget {
                     final data = d.data();
                     return (data['status'] ?? '') != 'cancelled';
                   }).toList();
+                  // Alerte son + popup pour les nouvelles commandes bar
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _handleNewBarOrders(docs);
+                  });
 
                   final pending = docs
                       .where(
@@ -454,7 +553,7 @@ class _BarSection extends StatelessWidget {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: docs.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      separatorBuilder: (_, _) => const SizedBox(height: 10),
                       itemBuilder: (context, index) {
                         return _BarOrderCard(
                           establishmentId: establishmentId,
@@ -472,7 +571,7 @@ class _BarSection extends StatelessWidget {
                     ? const Center(child: Text('Aucune commande'))
                     : ListView.separated(
                         itemCount: docs.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        separatorBuilder: (_, _) => const SizedBox(height: 10),
                         itemBuilder: (context, index) {
                           return _BarOrderCard(
                             establishmentId: establishmentId,
@@ -582,7 +681,7 @@ class _BarOrderCard extends StatelessWidget {
                     vertical: 6,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(

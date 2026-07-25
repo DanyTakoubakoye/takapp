@@ -13,11 +13,89 @@ import 'package:takapp/vues/shared/store_request_history_page.dart';
 import 'package:takapp/vues/shared/stock_movement_history_page.dart';
 import 'package:takapp/vues/cuisine/stock_item_form_page.dart';
 import 'package:takapp/vues/cuisine/menu_item_ingredients_form_page.dart';
+import 'package:takapp/services/notification_web_helper_stub.dart'
+    if (dart.library.html) 'package:takapp/services/notification_web_helper.dart';
 
-class CuisineHomePage extends StatelessWidget {
+class CuisineHomePage extends StatefulWidget {
   final String establishmentId;
-  const CuisineHomePage({super.key,
-  required this.establishmentId});
+  const CuisineHomePage({super.key, required this.establishmentId});
+
+  @override
+  State<CuisineHomePage> createState() => _CuisineHomePageState();
+}
+
+class _CuisineHomePageState extends State<CuisineHomePage> {
+  final Set<String> _knownOrderIds = {};
+  bool _isFirstSnapshot = true;
+  bool _isPopupOpen = false;
+
+  @override
+  void initState() {
+    super.initState();
+    unlockWebSoundAfterUserInteraction();
+  }
+
+  void _handleNewKitchenOrders(List<KitchenOrderModel> orders) {
+    if (_isFirstSnapshot) {
+      for (final o in orders) {
+        _knownOrderIds.add(o.id);
+      }
+      _isFirstSnapshot = false;
+      return;
+    }
+
+    for (final o in orders) {
+      if (_knownOrderIds.contains(o.id)) continue;
+      _knownOrderIds.add(o.id);
+
+      try {
+        final clientLabel = _clientLabel(o);
+        final orderNumber = o.orderNumber;
+
+        playWebNotificationSound(
+          'kitchen_new_order',
+          establishmentId: widget.establishmentId,
+        );
+
+        showWebNotification(
+          title: 'Nouvelle commande cuisine',
+          body: 'Commande $orderNumber - $clientLabel',
+          establishmentId: widget.establishmentId,
+          tag: 'takapp_kitchen_${widget.establishmentId}_${o.id}',
+        );
+
+        _showNewOrderPopup(orderNumber, clientLabel);
+      } catch (e) {
+        debugPrint('Notif cuisine ignorée: $e');
+      }
+    }
+  }
+
+  Future<void> _showNewOrderPopup(
+    String orderNumber,
+    String clientLabel,
+  ) async {
+    if (_isPopupOpen) return;
+    if (!mounted) return;
+
+    _isPopupOpen = true;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) => AlertDialog(
+        icon: const Icon(Icons.restaurant, color: Colors.deepOrange, size: 40),
+        title: const Text('Nouvelle commande cuisine'),
+        content: Text('Commande $orderNumber\n$clientLabel'),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+    _isPopupOpen = false;
+  }
 
   String _clientLabel(KitchenOrderModel order) {
     switch (order.clientType) {
@@ -83,7 +161,18 @@ class CuisineHomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TAKHOTEL - Cuisine'),
+        title: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+          future: FirebaseFirestore.instance
+              .collection('establishments')
+              .doc(establishmentId)
+              .get(),
+          builder: (context, snapshot) {
+            final name = (snapshot.data?.data()?['name'] ?? '')
+                .toString()
+                .toUpperCase();
+            return Text(name.isEmpty ? 'Cuisine' : '$name - Cuisine');
+          },
+        ),
         actions: [
           IconButton(
             onPressed: () => context.read<AuthController>().logout(),
@@ -111,6 +200,10 @@ class CuisineHomePage extends StatelessWidget {
             final kitchenOrders = allOrders
                 .where((order) => order.isForKitchen)
                 .toList();
+            // Alerte son + popup pour les nouvelles commandes cuisine
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _handleNewKitchenOrders(kitchenOrders);
+            });
 
             final pendingOrders = kitchenOrders
                 .where(
@@ -294,7 +387,7 @@ class _KitchenStockActionsCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.deepOrange.withOpacity(0.12),
+                    color: Colors.deepOrange.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: const Icon(
@@ -523,7 +616,7 @@ class _KitchenSection extends StatelessWidget {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemCount: orders.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      separatorBuilder: (_, _) => const SizedBox(height: 10),
                       itemBuilder: (context, index) {
                         final order = orders[index];
 
@@ -543,7 +636,7 @@ class _KitchenSection extends StatelessWidget {
                     ? const Center(child: Text('Aucune commande'))
                     : ListView.separated(
                         itemCount: orders.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
+                        separatorBuilder: (_, _) => const SizedBox(height: 10),
                         itemBuilder: (context, index) {
                           final order = orders[index];
 
@@ -756,7 +849,7 @@ class _KitchenStockMenuPage extends StatelessWidget {
             final action = actions[index];
 
             return Material(
-              color: color.withOpacity(0.10),
+              color: color.withValues(alpha: 0.10),
               borderRadius: BorderRadius.circular(18),
               child: InkWell(
                 onTap: action.onTap,
@@ -765,7 +858,7 @@ class _KitchenStockMenuPage extends StatelessWidget {
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: color.withOpacity(0.35)),
+                    border: Border.all(color: color.withValues(alpha: 0.35)),
                   ),
                   child: Row(
                     children: [
@@ -887,7 +980,7 @@ class _KitchenOrderCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(

@@ -490,7 +490,7 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: selectedType,
+                initialValue: selectedType,
                 decoration: const InputDecoration(
                   labelText: 'Type d’établissement',
                 ),
@@ -513,7 +513,7 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: selectedPlan,
+                initialValue: selectedPlan,
                 decoration: const InputDecoration(labelText: 'Plan'),
                 items: const [
                   DropdownMenuItem(value: 'starter', child: Text('Starter')),
@@ -531,7 +531,7 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: selectedStatus,
+                initialValue: selectedStatus,
                 decoration: const InputDecoration(labelText: 'Statut'),
                 items: const [
                   DropdownMenuItem(value: 'active', child: Text('Actif')),
@@ -736,8 +736,8 @@ class _EstablishmentCard extends StatelessWidget {
                 Chip(
                   label: Text(status.isEmpty ? 'Sans statut' : status),
                   backgroundColor: isActive
-                      ? Colors.green.withOpacity(0.12)
-                      : Colors.red.withOpacity(0.12),
+                      ? Colors.green.withValues(alpha: 0.12)
+                      : Colors.red.withValues(alpha: 0.12),
                 ),
                 Chip(label: Text('Plan ${plan.isEmpty ? "-" : plan}')),
                 ...modules.entries
@@ -863,7 +863,7 @@ class _CreateEstablishmentAdminDialogState
           child: Column(
             children: [
               DropdownButtonFormField<String>(
-                value: selectedEstablishmentId,
+                initialValue: selectedEstablishmentId,
                 decoration: const InputDecoration(labelText: 'Établissement'),
                 items: widget.establishments.map((doc) {
                   final data = doc.data();

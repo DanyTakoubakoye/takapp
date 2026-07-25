@@ -95,8 +95,8 @@ class _RechercheFactureChambrePageState
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: isPaid
-            ? Colors.green.withOpacity(0.12)
-            : Colors.orange.withOpacity(0.12),
+            ? Colors.green.withValues(alpha: 0.12)
+            : Colors.orange.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -117,8 +117,8 @@ class _RechercheFactureChambrePageState
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: isFiscalized
-            ? Colors.blue.withOpacity(0.12)
-            : Colors.red.withOpacity(0.10),
+            ? Colors.blue.withValues(alpha: 0.12)
+            : Colors.red.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -136,33 +136,29 @@ class _RechercheFactureChambrePageState
       return Card(
         child: Padding(
           padding: const EdgeInsets.all(12),
-          child: Column(
-            children: [
-              RadioListTile<bool>(
-                contentPadding: EdgeInsets.zero,
-                value: true,
-                groupValue: searchByClient,
-                title: const Text('Recherche par client'),
-                onChanged: (value) {
-                  setState(() {
-                    searchByClient = true;
-                    results = [];
-                  });
-                },
-              ),
-              RadioListTile<bool>(
-                contentPadding: EdgeInsets.zero,
-                value: false,
-                groupValue: searchByClient,
-                title: const Text('Recherche par chambre'),
-                onChanged: (value) {
-                  setState(() {
-                    searchByClient = false;
-                    results = [];
-                  });
-                },
-              ),
-            ],
+          child: RadioGroup<bool>(
+            groupValue: searchByClient,
+            onChanged: (value) {
+              if (value == null) return;
+              setState(() {
+                searchByClient = value;
+                results = [];
+              });
+            },
+            child: Column(
+              children: [
+                RadioListTile<bool>(
+                  contentPadding: EdgeInsets.zero,
+                  value: true,
+                  title: const Text('Recherche par client'),
+                ),
+                RadioListTile<bool>(
+                  contentPadding: EdgeInsets.zero,
+                  value: false,
+                  title: const Text('Recherche par chambre'),
+                ),
+              ],
+            ),
           ),
         ),
       );
@@ -171,35 +167,31 @@ class _RechercheFactureChambrePageState
     return Card(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
-          children: [
-            Expanded(
-              child: RadioListTile<bool>(
-                value: true,
-                groupValue: searchByClient,
-                title: const Text('Par client'),
-                onChanged: (value) {
-                  setState(() {
-                    searchByClient = true;
-                    results = [];
-                  });
-                },
+        child: RadioGroup<bool>(
+          groupValue: searchByClient,
+          onChanged: (value) {
+            if (value == null) return;
+            setState(() {
+              searchByClient = value;
+              results = [];
+            });
+          },
+          child: Row(
+            children: [
+              Expanded(
+                child: RadioListTile<bool>(
+                  value: true,
+                  title: const Text('Par client'),
+                ),
               ),
-            ),
-            Expanded(
-              child: RadioListTile<bool>(
-                value: false,
-                groupValue: searchByClient,
-                title: const Text('Par chambre'),
-                onChanged: (value) {
-                  setState(() {
-                    searchByClient = false;
-                    results = [];
-                  });
-                },
+              Expanded(
+                child: RadioListTile<bool>(
+                  value: false,
+                  title: const Text('Par chambre'),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -317,7 +309,7 @@ class _RechercheFactureChambrePageState
 
     return ListView.separated(
       itemCount: results.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (_, _) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final invoice = results[index];
 

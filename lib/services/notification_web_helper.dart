@@ -1,5 +1,7 @@
 import 'dart:html' as html;
 
+import 'package:flutter/foundation.dart';
+
 /// =======================================================
 /// WEB NOTIFICATION HELPERS - VERSION SAAS
 /// =======================================================
@@ -27,7 +29,7 @@ Future<void> requestWebNotificationPermission() async {
       await html.Notification.requestPermission();
     }
   } catch (e) {
-    print('WEB NOTIFICATION PERMISSION ERROR = $e');
+    debugPrint('WEB NOTIFICATION PERMISSION ERROR = $e');
   }
 }
 
@@ -54,7 +56,7 @@ void showWebNotification({
 
     html.Notification(title, body: body, tag: notificationTag);
   } catch (e) {
-    print('WEB NOTIFICATION ERROR = $e');
+    debugPrint('WEB NOTIFICATION ERROR = $e');
   }
 }
 
@@ -81,9 +83,9 @@ void unlockWebSoundAfterUserInteraction() {
 
       _webSoundUnlocked = true;
 
-      print('WEB SOUND UNLOCKED');
+      debugPrint('WEB SOUND UNLOCKED');
     } catch (e) {
-      print('WEB SOUND UNLOCK FAILED = $e');
+      debugPrint('WEB SOUND UNLOCK FAILED = $e');
     }
   });
 }
@@ -100,7 +102,7 @@ Future<void> playWebNotificationSound(
 }) async {
   try {
     if (!_webSoundUnlocked) {
-      print(
+      debugPrint(
         'WEB SOUND BLOCKED '
         '(interaction utilisateur requise)',
       );
@@ -124,6 +126,6 @@ Future<void> playWebNotificationSound(
 
     await audio.play();
   } catch (e) {
-    print('WEB SOUND PLAY ERROR = $e');
+    debugPrint('WEB SOUND PLAY ERROR = $e');
   }
 }

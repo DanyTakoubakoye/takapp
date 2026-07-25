@@ -282,7 +282,7 @@ class _BarMenuItemIngredientsFormPageState
                               const SizedBox(height: 20),
 
                               DropdownButtonFormField<String>(
-                                value:
+                                initialValue:
                                     menuItems.any((doc) {
                                       return doc.id == selectedMenuItemId;
                                     })
@@ -434,7 +434,7 @@ class _BarMenuItemIngredientsFormPageState
           padding: const EdgeInsets.all(12),
 
           decoration: BoxDecoration(
-            color: Colors.blueGrey.withOpacity(0.12),
+            color: Colors.blueGrey.withValues(alpha: 0.12),
 
             borderRadius: BorderRadius.circular(14),
           ),
@@ -471,7 +471,7 @@ class _BarMenuItemIngredientsFormPageState
     final line = ingredientLines[index];
 
     final ingredientDropdown = DropdownButtonFormField<String>(
-      value:
+      initialValue:
           stockItems.any((doc) {
             return doc.id == line.selectedStockItemId;
           })

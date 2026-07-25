@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter/foundation.dart';
 import 'package:takapp/modeles/kitchen_order_model.dart';
 import 'package:takapp/modeles/order_item_model.dart';
 
@@ -99,7 +100,7 @@ class CuisineService {
     /// =========================
 
     if (newKitchenStatus == 'ready') {
-      print(
+      debugPrint(
         'APPEL notifyKitchenReady '
         'pour orderId=$orderId '
         'establishmentId=$establishmentId',

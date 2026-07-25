@@ -116,9 +116,9 @@ class _StockOutPageState extends State<StockOutPage> {
             : _reasonController.text.trim(),
       );
 
-      if (!success) {
-        if (!mounted) return;
+      if (!mounted) return;
 
+      if (!success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(controller.errorMessage ?? 'Erreur inconnue.'),

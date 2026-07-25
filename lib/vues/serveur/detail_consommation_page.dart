@@ -177,6 +177,8 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
       return true;
     }
 
+    if (!mounted) return false;
+
     final auth = context.read<AuthController>();
 
     final paymentController = context.read<PaymentController>();
@@ -228,6 +230,8 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
       final paid = await _ensurePaymentRegistered();
 
       if (!paid) return;
+
+      if (!mounted) return;
 
       final pdfService = context.read<PdfService>();
 
@@ -340,6 +344,8 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
     try {
       await _saveClientInfo();
 
+      if (!mounted) return;
+
       final auth = context.read<AuthController>();
 
       final fiscalController = context.read<FiscalizationController>();
@@ -387,6 +393,8 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
           'fiscalCounter': fiscalController.confirmResult!.counters,
           'fiscalMachineDateTime': fiscalController.confirmResult!.dateTime,
         });
+
+        if (!mounted) return;
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -439,6 +447,8 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
       final paid = await _ensurePaymentRegistered();
 
       if (!paid) return;
+
+      if (!mounted) return;
 
       final pdfService = context.read<PdfService>();
 
@@ -589,7 +599,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                         padding: const EdgeInsets.all(12),
                         margin: const EdgeInsets.only(bottom: 14),
                         decoration: BoxDecoration(
-                          color: Colors.green.withOpacity(0.12),
+                          color: Colors.green.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: Colors.green),
                         ),
@@ -673,7 +683,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                             const SizedBox(height: 12),
 
                             DropdownButtonFormField<String>(
-                              value: selectedPaymentMethod,
+                              initialValue: selectedPaymentMethod,
                               decoration: const InputDecoration(
                                 labelText: 'Mode de paiement',
                               ),

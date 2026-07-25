@@ -49,7 +49,7 @@ class NotificationService {
 
     final token = await _messaging.getToken(vapidKey: _webVapidKey);
 
-    print('WEB FCM TOKEN = $token');
+    debugPrint('WEB FCM TOKEN = $token');
 
     if (token == null || token.trim().isEmpty) return;
 
@@ -79,7 +79,7 @@ class NotificationService {
     final safeServeurId = serveurId.trim();
 
     if (safeEstablishmentId.isEmpty || safeServeurId.isEmpty) {
-      print('WEB NOTIFICATIONS LISTENER ERROR = établissement ou serveur vide');
+      debugPrint('WEB NOTIFICATIONS LISTENER ERROR = établissement ou serveur vide');
       return;
     }
 
@@ -87,8 +87,9 @@ class NotificationService {
     _serverNotificationsSub?.cancel();
 
     _serverNotificationsSub = _firestore
+        .collection('establishments')
+        .doc(safeEstablishmentId)
         .collection('serverNotifications')
-        .where('establishmentId', isEqualTo: safeEstablishmentId)
         .where('serveurId', isEqualTo: safeServeurId)
         .where('isRead', isEqualTo: false)
         .orderBy('createdAt', descending: true)
@@ -131,7 +132,7 @@ class NotificationService {
             });
           },
           onError: (error) {
-            print('WEB SERVER NOTIFICATIONS LISTENER ERROR = $error');
+            debugPrint('WEB SERVER NOTIFICATIONS LISTENER ERROR = $error');
           },
         );
   }
@@ -153,20 +154,14 @@ class NotificationService {
     if (notificationId.trim().isEmpty || safeEstablishmentId.isEmpty) return;
 
     final docRef = _firestore
+        .collection('establishments')
+        .doc(safeEstablishmentId)
         .collection('serverNotifications')
         .doc(notificationId);
 
     final doc = await docRef.get();
 
     if (!doc.exists) return;
-
-    final data = doc.data();
-
-    if (data == null) return;
-
-    if ((data['establishmentId'] ?? '').toString() != safeEstablishmentId) {
-      throw Exception('Notification non liée à cet établissement.');
-    }
 
     await docRef.update({
       'isRead': true,
@@ -187,7 +182,7 @@ class NotificationService {
         (message.data['establishmentId'] ?? _currentEstablishmentId).toString();
 
     if (establishmentId.trim().isEmpty) {
-      print('WEB NOTIFICATION ignored: establishmentId manquant');
+      debugPrint('WEB NOTIFICATION ignored: establishmentId manquant');
       return;
     }
 
@@ -217,7 +212,7 @@ class NotificationService {
       context: context,
       barrierDismissible: false,
       barrierLabel: 'Notification',
-      barrierColor: Colors.black.withOpacity(0.20),
+      barrierColor: Colors.black.withValues(alpha: 0.20),
       pageBuilder: (dialogContext, animation, secondaryAnimation) {
         return SafeArea(
           child: Align(

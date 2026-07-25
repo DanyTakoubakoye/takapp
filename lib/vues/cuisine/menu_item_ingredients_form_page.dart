@@ -212,7 +212,7 @@ class _MenuItemIngredientsFormPageState
                               _header(context),
                               const SizedBox(height: 20),
                               DropdownButtonFormField<String>(
-                                value:
+                                initialValue:
                                     menuItems.any(
                                       (doc) => doc.id == selectedMenuItemId,
                                     )
@@ -329,7 +329,7 @@ class _MenuItemIngredientsFormPageState
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.deepOrange.withOpacity(0.12),
+            color: Colors.deepOrange.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(14),
           ),
           child: const Icon(Icons.food_bank_outlined, color: Colors.deepOrange),
@@ -355,7 +355,7 @@ class _MenuItemIngredientsFormPageState
     final line = ingredientLines[index];
 
     final ingredientDropdown = DropdownButtonFormField<String>(
-      value: stockItems.any((doc) => doc.id == line.selectedStockItemId)
+      initialValue: stockItems.any((doc) => doc.id == line.selectedStockItemId)
           ? line.selectedStockItemId
           : null,
       decoration: InputDecoration(

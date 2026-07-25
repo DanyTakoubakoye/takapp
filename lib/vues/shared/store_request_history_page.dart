@@ -67,7 +67,7 @@ class StoreRequestHistoryPage extends StatelessWidget {
           return ListView.separated(
             padding: EdgeInsets.all(isSmall ? 12 : 16),
             itemCount: requests.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            separatorBuilder: (_, _) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
               final item = requests[index];
 

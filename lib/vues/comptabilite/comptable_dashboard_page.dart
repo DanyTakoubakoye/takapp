@@ -528,7 +528,7 @@ class _ComptableActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: color.withOpacity(0.10),
+      color: color.withValues(alpha: 0.10),
 
       borderRadius: BorderRadius.circular(18),
 
@@ -549,7 +549,7 @@ class _ComptableActionCard extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
 
-            border: Border.all(color: color.withOpacity(0.35)),
+            border: Border.all(color: color.withValues(alpha: 0.35)),
           ),
 
           child: Row(

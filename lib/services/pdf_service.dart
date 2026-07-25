@@ -99,7 +99,7 @@ class PdfService {
                 'Période : ${_formatShortDate(startDate)} - ${_formatShortDate(endDate)}',
               ),
             pw.SizedBox(height: 16),
-            pw.Table.fromTextArray(
+            pw.TableHelper.fromTextArray(
               headers: const ['Article', 'Qté', 'Prix U.', 'Total'],
               data: lines.map((line) {
                 final itemName = _safeString(line['itemName'] ?? line['name']);
@@ -183,7 +183,7 @@ class PdfService {
                 'Période : ${_formatShortDate(startDate)} - ${_formatShortDate(endDate)}',
               ),
             pw.SizedBox(height: 16),
-            pw.Table.fromTextArray(
+            pw.TableHelper.fromTextArray(
               headers: const ['Article', 'Qté', 'Prix U.', 'Total'],
               data: lines.map((line) {
                 final itemName = _safeString(line['itemName'] ?? line['name']);
@@ -435,7 +435,7 @@ class PdfService {
 
             pw.SizedBox(height: 20),
 
-            pw.Table.fromTextArray(
+            pw.TableHelper.fromTextArray(
               headers: const ['Commande', 'Méthode', 'Montant'],
               data: payments.map((payment) {
                 return [

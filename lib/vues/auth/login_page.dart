@@ -54,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
       _savedEmails = emails;
     });
 
-    print('Emails chargés: $_savedEmails');
+    debugPrint('Emails chargés: $_savedEmails');
   }
 
   Future<void> _saveEmailIfNeeded(String email) async {
@@ -82,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     _refreshSuggestions();
-    print('Emails sauvegardés: $_savedEmails');
+    debugPrint('Emails sauvegardés: $_savedEmails');
   }
 
   Future<void> _removeSavedEmail(String email) async {
@@ -180,12 +180,14 @@ class _LoginPageState extends State<LoginPage> {
 
     if (!_formKey.currentState!.validate()) return;
 
+    if (!mounted) return;
+
     final auth = context.read<AuthController>();
     final password = _passwordController.text.trim();
 
     final success = await auth.login(email: email, password: password);
 
-    print('Résultat login success = $success pour email = $email');
+    debugPrint('Résultat login success = $success pour email = $email');
 
     if (!mounted) return;
 
@@ -273,8 +275,8 @@ class _LoginPageState extends State<LoginPage> {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       decoration: BoxDecoration(
         color: _resetSuccess
-            ? Colors.green.withOpacity(0.12)
-            : Colors.red.withOpacity(0.12),
+            ? Colors.green.withValues(alpha: 0.12)
+            : Colors.red.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: _resetSuccess ? Colors.green : Colors.red),
       ),

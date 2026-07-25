@@ -506,7 +506,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
                 )
               else ...[
                 DropdownButtonFormField<_StockItemOption>(
-                  value: _selectedItem,
+                  initialValue: _selectedItem,
                   isExpanded: true,
                   decoration: InputDecoration(
                     labelText: 'Article de stock',

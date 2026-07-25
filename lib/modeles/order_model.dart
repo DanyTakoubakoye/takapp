@@ -14,6 +14,9 @@ class OrderModel {
   final String? tableNumber;
   final String? roomNumber;
 
+  /// Fiche client rattachée. Chaîne vide = commande non rattachée.
+  final String clientId;
+
   final String createdBy;
   final String createdByName;
 
@@ -57,6 +60,7 @@ class OrderModel {
     required this.clientType,
     required this.tableNumber,
     required this.roomNumber,
+    required this.clientId,
     required this.createdBy,
     required this.createdByName,
     required this.status,
@@ -108,6 +112,8 @@ class OrderModel {
 
       roomNumber: map['roomNumber']?.toString(),
 
+      clientId: map['clientId']?.toString() ?? '',
+
       createdBy: (map['createdBy'] ?? '').toString(),
 
       createdByName: (map['createdByName'] ?? '').toString(),
@@ -156,6 +162,8 @@ class OrderModel {
       'tableNumber': tableNumber,
       'roomNumber': roomNumber,
 
+      'clientId': clientId,
+
       'createdBy': createdBy,
       'createdByName': createdByName,
 
@@ -194,6 +202,7 @@ class OrderModel {
     String? clientType,
     String? tableNumber,
     String? roomNumber,
+    String? clientId,
     String? createdBy,
     String? createdByName,
     String? status,
@@ -224,6 +233,8 @@ class OrderModel {
       tableNumber: tableNumber ?? this.tableNumber,
 
       roomNumber: roomNumber ?? this.roomNumber,
+
+      clientId: clientId ?? this.clientId,
 
       createdBy: createdBy ?? this.createdBy,
 

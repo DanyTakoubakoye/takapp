@@ -103,7 +103,37 @@ class AuthService {
       throw Exception("Le profil utilisateur est introuvable dans Firestore.");
     }
 
-    return UserModel.fromMap(doc.data()!, doc.id);
+    final data = doc.data()!;
+    final establishmentId = (data['establishmentId'] ?? '').toString().trim();
+
+    // Abonnement de l'établissement : plafonne les droits du rôle.
+    // En cas d'absence d'établissement ou d'échec de lecture, on laisse
+    // establishmentModules à null => fail-open (aucune restriction ajoutée).
+    Map<String, dynamic>? establishmentModules;
+
+    if (establishmentId.isNotEmpty) {
+      try {
+        final estabDoc = await _firestore
+            .collection('establishments')
+            .doc(establishmentId)
+            .get();
+
+        final estabData = estabDoc.data();
+        final rawModules = estabData?['modules'];
+
+        if (rawModules is Map) {
+          establishmentModules = Map<String, dynamic>.from(rawModules);
+        }
+      } catch (_) {
+        establishmentModules = null;
+      }
+    }
+
+    return UserModel.fromMap(
+      data,
+      doc.id,
+      establishmentModules: establishmentModules,
+    );
   }
 
   bool _isGlobalAdmin(UserModel user) {

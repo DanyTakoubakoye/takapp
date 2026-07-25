@@ -120,7 +120,7 @@ class SuiviBarPage extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -249,7 +249,7 @@ class SuiviBarPage extends StatelessWidget {
                   ? const Center(child: Text('Aucune commande'))
                   : ListView.separated(
                       itemCount: orders.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      separatorBuilder: (_, _) => const SizedBox(height: 10),
                       itemBuilder: (context, index) {
                         final doc = orders[index];
 

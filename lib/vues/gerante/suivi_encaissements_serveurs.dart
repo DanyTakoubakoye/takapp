@@ -45,7 +45,7 @@ class SuiviEncaissementsServeursPage extends StatelessWidget {
 
           return ListView.separated(
             itemCount: data.length,
-            separatorBuilder: (_, __) => const Divider(),
+            separatorBuilder: (_, _) => const Divider(),
             itemBuilder: (context, index) {
               final item = data[index];
               final amount = ((item['amount'] ?? 0) as num).toDouble();

@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 
 import '../modeles/store_stock_model.dart';
 import '../modeles/stock_movement_model.dart';
@@ -122,6 +121,10 @@ class StoreStockService {
       return double.tryParse(value.toString()) ?? 0;
     }
 
+    // Affiche un nombre sans ".0" superflu (3.0 -> "3", 2.5 -> "2.5")
+    String fmt(double v) =>
+        v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toString();
+
     final List<
       ({
         DocumentReference<Map<String, dynamic>> ref,
@@ -169,12 +172,6 @@ class StoreStockService {
         );
       }
 
-      debugPrint(
-        '[SAAS][$establishmentId] '
-        'Vérification ingrédient '
-        '$itemName',
-      );
-
       final query = await _stockCol(establishmentId: establishmentId)
           .where('store', isEqualTo: store)
           .where('itemId', isEqualTo: itemId)
@@ -192,7 +189,15 @@ class StoreStockService {
       stockRefs.add((ref: query.docs.first.reference, deduction: deduction));
     }
 
+    // On capture la raison d'échec dans une variable au lieu de la lancer
+    // depuis l'intérieur de la transaction : sur Flutter web, un `throw` dans
+    // runTransaction est "boxé" (message perdu -> "Dart exception thrown from
+    // converted Future"). On relance l'exception APRÈS la transaction, avec un
+    // message explicite nommant l'ingrédient concerné.
+    String? stockError;
+
     await _firestore.runTransaction((transaction) async {
+      stockError = null; // reset : la transaction peut être rejouée
       final List<Map<String, dynamic>> preparedWrites = [];
 
       for (final entry in stockRefs) {
@@ -207,11 +212,8 @@ class StoreStockService {
         final docSnap = await transaction.get(entry.ref);
 
         if (!docSnap.exists || docSnap.data() == null) {
-          throw Exception(
-            'Document de stock '
-            'introuvable pour '
-            '$itemName.',
-          );
+          stockError = 'Stock introuvable pour « $itemName ».';
+          return;
         }
 
         final data = Map<String, dynamic>.from(docSnap.data()!);
@@ -223,17 +225,18 @@ class StoreStockService {
         final stockUnit = data['unit']?.toString() ?? '';
 
         if (stockUnit != unit) {
-          throw Exception(
-            'Unité incohérente '
-            'pour $itemName.',
-          );
+          stockError =
+              'Unité incohérente pour « $itemName » : '
+              'stock en "$stockUnit" mais recette en "$unit".';
+          return;
         }
 
         if (current < quantity) {
-          throw Exception(
-            'Stock insuffisant '
-            'pour $itemName.',
-          );
+          stockError =
+              'Stock insuffisant pour « $itemName » : '
+              'disponible ${fmt(current)} $stockUnit, '
+              'requis ${fmt(quantity)} $unit.';
+          return;
         }
 
         final newQuantity = current - quantity;
@@ -319,6 +322,12 @@ class StoreStockService {
         });
       }
     });
+
+    // La transaction a été volontairement abandonnée (aucune déduction faite).
+    // On relance ici, hors transaction, pour que le message survive au web.
+    if (stockError != null) {
+      throw Exception(stockError);
+    }
   }
 
   /// =========================
@@ -581,6 +590,7 @@ class StoreStockService {
     required String performedBy,
     required String performedByName,
     required String reason,
+    bool allowNegative = false,
   }) async {
     final query = await _stockCol(establishmentId: establishmentId)
         .where('store', isEqualTo: store)
@@ -593,17 +603,20 @@ class StoreStockService {
     }
 
     final doc = query.docs.first;
-
     final current = (doc.data()['quantity'] as num?)?.toDouble() ?? 0;
-
     final minimumQuantity =
         (doc.data()['minimumQuantity'] as num?)?.toDouble() ?? 0;
 
+    double newQuantity;
     if (current < quantity) {
-      throw Exception('Stock insuffisant pour $itemName.');
+      if (!allowNegative) {
+        throw Exception('Stock insuffisant pour $itemName.');
+      }
+      // Stock insuffisant mais on laisse passer : on planche à 0.
+      newQuantity = 0;
+    } else {
+      newQuantity = current - quantity;
     }
-
-    final newQuantity = current - quantity;
 
     final batch = _firestore.batch();
 

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/modeles/stock_item_model.dart';
 import 'package:takapp/services/stock_item_service.dart';
+import 'package:takapp/vues/commun/module_visibility.dart';
 
 class StockItemRegistryPage extends StatefulWidget {
   final String establishmentId;
@@ -172,6 +175,17 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
   @override
   Widget build(BuildContext context) {
     final isSmall = MediaQuery.of(context).size.width < 800;
+    final user = context.watch<AuthController>().currentUser;
+
+    // Magasins proposables à la création, limités aux modules souscrits
+    // ('divers' reste toujours proposé). Abonné à tout ⇒ liste inchangée.
+    final visibleStores = _stores
+        .where((s) => user == null || user.canSeeStore(s))
+        .toList();
+
+    if (visibleStores.isNotEmpty && !visibleStores.contains(_selectedStore)) {
+      _selectedStore = visibleStores.first;
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -186,7 +200,10 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
               establishmentId: widget.establishmentId,
             ),
             builder: (context, snapshot) {
-              final items = snapshot.data ?? [];
+              // On masque les articles d'un magasin non souscrit.
+              final items = (snapshot.data ?? [])
+                  .where((it) => user == null || user.canSeeStore(it.store))
+                  .toList();
 
               return LayoutBuilder(
                 builder: (context, constraints) {
@@ -197,7 +214,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                         children: [
                           _buildHeaderCard(items.length),
                           const SizedBox(height: 12),
-                          _buildFormCard(),
+                          _buildFormCard(visibleStores),
                           const SizedBox(height: 12),
                           _buildListCard(snapshot, items),
                         ],
@@ -216,7 +233,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                             children: [
                               _buildHeaderCard(items.length),
                               const SizedBox(height: 16),
-                              _buildFormCard(),
+                              _buildFormCard(visibleStores),
                             ],
                           ),
                         ),
@@ -250,7 +267,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withOpacity(0.18),
+            color: Colors.blue.withValues(alpha: 0.18),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -261,7 +278,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(16),
             ),
             child: const Icon(
@@ -287,7 +304,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                 Text(
                   'Crée et organise les articles de stock avant approvisionnement.',
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.92),
+                    color: Colors.white.withValues(alpha: 0.92),
                     fontSize: 13.5,
                   ),
                 ),
@@ -297,7 +314,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.16),
+              color: Colors.white.withValues(alpha: 0.16),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Column(
@@ -323,7 +340,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
     );
   }
 
-  Widget _buildFormCard() {
+  Widget _buildFormCard(List<String> stores) {
     return Card(
       elevation: 2,
       shadowColor: Colors.black12,
@@ -366,7 +383,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
               ),
               const SizedBox(height: 14),
               DropdownButtonFormField<String>(
-                value: _selectedCategory,
+                initialValue: _selectedCategory,
                 decoration: InputDecoration(
                   labelText: 'Catégorie',
                   prefixIcon: const Icon(Icons.category_outlined),
@@ -389,7 +406,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
               ),
               const SizedBox(height: 14),
               DropdownButtonFormField<String>(
-                value: _selectedStore,
+                initialValue: _selectedStore,
                 decoration: InputDecoration(
                   labelText: 'Magasin',
                   prefixIcon: const Icon(Icons.store),
@@ -397,7 +414,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                items: _stores.map((store) {
+                items: stores.map((store) {
                   return DropdownMenuItem<String>(
                     value: store,
                     child: Text(_storeLabel(store)),
@@ -546,7 +563,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                   itemCount: items.length,
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  separatorBuilder: (_, _) => const SizedBox(height: 10),
                   itemBuilder: (context, index) {
                     final item = items[index];
                     final color = _categoryColor(item.category);
@@ -567,7 +584,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                             width: 46,
                             height: 46,
                             decoration: BoxDecoration(
-                              color: color.withOpacity(0.12),
+                              color: color.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(14),
                             ),
                             child: Icon(icon, color: color),
@@ -595,7 +612,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                                         vertical: 5,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: color.withOpacity(0.10),
+                                        color: color.withValues(alpha: 0.10),
                                         borderRadius: BorderRadius.circular(30),
                                       ),
                                       child: Text(
@@ -613,7 +630,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                                         vertical: 5,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.blueGrey.withOpacity(
+                                        color: Colors.blueGrey.withValues(alpha: 
                                           0.10,
                                         ),
                                         borderRadius: BorderRadius.circular(30),
@@ -633,7 +650,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                                         vertical: 5,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: storeColor.withOpacity(0.10),
+                                        color: storeColor.withValues(alpha: 0.10),
                                         borderRadius: BorderRadius.circular(30),
                                       ),
                                       child: Row(

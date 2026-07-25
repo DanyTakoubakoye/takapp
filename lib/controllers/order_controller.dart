@@ -138,6 +138,9 @@ class OrderController extends ChangeNotifier {
     required String createdBy,
     required String createdByName,
     required String establishmentId,
+
+    /// Fiche client rattachée. Optionnel : chaîne vide = non rattachée.
+    String clientId = '',
   }) async {
     if (_items.isEmpty) {
       _errorMessage = 'Ajoutez au moins un article.';
@@ -182,6 +185,7 @@ class OrderController extends ChangeNotifier {
         clientType: clientType,
         tableNumber: tableNumber?.trim(),
         roomNumber: roomNumber?.trim(),
+        clientId: clientId.trim(),
         createdBy: createdBy,
         createdByName: createdByName,
         subtotal: subtotal,

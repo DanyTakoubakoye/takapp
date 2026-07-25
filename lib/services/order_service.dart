@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:takapp/modeles/order_item_model.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
+import 'package:takapp/modeles/order_model.dart';
 import 'package:takapp/services/store_stock_service.dart';
 
 class OrderService {
@@ -28,6 +29,9 @@ class OrderService {
     required String clientType,
     required String? tableNumber,
     required String? roomNumber,
+
+    /// Fiche client rattachée. Optionnel : chaîne vide = non rattachée.
+    String clientId = '',
     required String createdBy,
     required String createdByName,
     required double subtotal,
@@ -120,6 +124,7 @@ class OrderService {
       'clientType': clientType,
       'tableNumber': tableNumber,
       'roomNumber': roomNumber,
+      'clientId': clientId.trim(),
       'createdBy': createdBy,
       'createdByName': createdByName,
       'status': 'sent',
@@ -347,7 +352,7 @@ class OrderService {
 
     final newSubtotal = activeItems.fold<double>(
       0,
-      (sum, item) => sum + item.totalPrice,
+      (total, item) => total + item.totalPrice,
     );
 
     final newTax = 0.0;
@@ -537,5 +542,43 @@ class OrderService {
       if (isForKitchen) 'kitchenStatus': 'cancelled',
       if (isForBar) 'barStatus': 'cancelled',
     });
+  }
+
+  /// =========================
+  /// ORDERS FOR CLIENT
+  /// =========================
+
+  /// Commandes rattachées à une fiche client.
+  ///
+  /// Requête simple `where('clientId')` + tri côté client : aucun index
+  /// composite Firestore requis (convention du projet).
+  Future<List<OrderModel>> ordersForClient({
+    String? establishmentId,
+    required String clientId,
+  }) async {
+    final resolvedEstablishmentId = (establishmentId ?? '').trim();
+
+    if (resolvedEstablishmentId.isEmpty) {
+      throw Exception('Établissement introuvable.');
+    }
+
+    final cleanClientId = clientId.trim();
+
+    if (cleanClientId.isEmpty) {
+      return <OrderModel>[];
+    }
+
+    final snapshot = await _ordersRef(
+      resolvedEstablishmentId,
+    ).where('clientId', isEqualTo: cleanClientId).get();
+
+    final orders = snapshot.docs
+        .map((doc) => OrderModel.fromMap(doc.data(), doc.id))
+        .toList();
+
+    // Commande la plus récente en premier.
+    orders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    return orders;
   }
 }

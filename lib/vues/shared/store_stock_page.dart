@@ -70,7 +70,7 @@ class StoreStockPage extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(_storeIcon(), size: 60, color: color.withOpacity(0.7)),
+                  Icon(_storeIcon(), size: 60, color: color.withValues(alpha: 0.7)),
                   const SizedBox(height: 12),
                   Text(
                     'Aucun stock enregistré pour ce magasin.',
@@ -85,14 +85,14 @@ class StoreStockPage extends StatelessWidget {
             return ListView.separated(
               padding: const EdgeInsets.all(12),
               itemCount: stocks.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
                 final item = stocks[index];
 
                 return Card(
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: color.withOpacity(0.12),
+                      backgroundColor: color.withValues(alpha: 0.12),
                       child: Icon(_storeIcon(), color: color),
                     ),
                     title: Text(

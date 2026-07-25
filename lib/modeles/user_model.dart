@@ -73,6 +73,7 @@ class UserModel {
         role == 'service_hygiene' ||
         role == 'hygiene' ||
         role == 'majordhomme' ||
+        role == 'receptionniste' ||
         role == 'gerante' ||
         role == 'comptable' ||
         role == 'proprietaire' ||
@@ -94,13 +95,46 @@ class UserModel {
     return role == 'serveur' ||
         role == 'gerante' ||
         role == 'comptable' ||
+        role == 'receptionniste' ||
         role == 'proprietaire' ||
         role == 'super_admin';
   }
 
-  factory UserModel.fromMap(Map<String, dynamic> map, String documentId) {
+  /// [establishmentModules] : le champ `modules` du document
+  /// `establishments/{establishmentId}` (l'ABONNEMENT de l'établissement).
+  ///
+  /// Règle d'accès effectif = accès du RÔLE/utilisateur ET abonnement de
+  /// l'établissement (intersection stricte : l'abonnement plafonne le rôle).
+  ///
+  /// - [establishmentModules] == null (paramètre non fourni) : comportement
+  ///   historique inchangé, seul le `modules` de l'utilisateur est pris en
+  ///   compte (rétrocompatibilité pour les appels existants).
+  /// - [establishmentModules] vide : fail-open, on considère TOUS les modules
+  ///   comme souscrits (un document établissement mal renseigné ne doit pas
+  ///   rendre l'app inutilisable).
+  /// - Rôles `super_admin` / `global_admin` : jamais plafonnés par
+  ///   l'abonnement (ils administrent la plateforme).
+  factory UserModel.fromMap(
+    Map<String, dynamic> map,
+    String documentId, {
+    Map<String, dynamic>? establishmentModules,
+  }) {
     final role = _normalizeRole(map['role']);
     final modules = Map<String, dynamic>.from(map['modules'] ?? {});
+
+    final bool applySubscription =
+        establishmentModules != null &&
+        establishmentModules.isNotEmpty &&
+        role != 'super_admin' &&
+        role != 'global_admin';
+
+    bool effectiveAccess(String key, bool byRole) {
+      final fromRole = _moduleValue(modules, key, byRole);
+      if (!applySubscription) {
+        return fromRole;
+      }
+      return fromRole && establishmentModules[key] == true;
+    }
 
     return UserModel(
       uid: documentId,
@@ -111,24 +145,14 @@ class UserModel {
       phone: (map['phone'] ?? '').toString().trim(),
       role: role,
       isActive: map['isActive'] != false,
-      canAccessRestaurant: _moduleValue(
-        modules,
+      canAccessRestaurant: effectiveAccess(
         'restaurant',
         _canAccessRestaurantByRole(role),
       ),
-      canAccessBar: _moduleValue(modules, 'bar', _canAccessBarByRole(role)),
-      canAccessHotel: _moduleValue(
-        modules,
-        'hotel',
-        _canAccessHotelByRole(role),
-      ),
-      canAccessStock: _moduleValue(
-        modules,
-        'stock',
-        _canAccessStockByRole(role),
-      ),
-      canAccessFiscalization: _moduleValue(
-        modules,
+      canAccessBar: effectiveAccess('bar', _canAccessBarByRole(role)),
+      canAccessHotel: effectiveAccess('hotel', _canAccessHotelByRole(role)),
+      canAccessStock: effectiveAccess('stock', _canAccessStockByRole(role)),
+      canAccessFiscalization: effectiveAccess(
         'fiscalization',
         _canAccessFiscalizationByRole(role),
       ),

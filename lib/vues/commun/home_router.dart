@@ -16,6 +16,7 @@ import 'package:takapp/vues/hygiene/majordome_home_page.dart';
 import 'package:takapp/vues/owner/owner_dashboard_page.dart';
 import 'package:takapp/vues/serveur/serveur_home_page.dart';
 import 'package:takapp/vues/bar/bar_home_page.dart';
+import 'package:takapp/vues/reception/reception_dashboard_page.dart';
 
 class HomeRouter extends StatelessWidget {
   const HomeRouter({super.key});
@@ -84,6 +85,12 @@ class HomeRouter extends StatelessWidget {
       case AppRoles.majordhomme:
         if (user.canAccessHotel) {
           return const MajordomeHomePage();
+        }
+        return const UnauthorizedPage();
+
+      case AppRoles.receptionniste:
+        if (user.canAccessHotel) {
+          return ReceptionDashboardPage(establishmentId: user.establishmentId);
         }
         return const UnauthorizedPage();
 

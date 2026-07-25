@@ -278,8 +278,8 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: isPaid
-            ? Colors.green.withOpacity(0.12)
-            : Colors.orange.withOpacity(0.12),
+            ? Colors.green.withValues(alpha: 0.12)
+            : Colors.orange.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -299,8 +299,8 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: ok
-            ? Colors.blue.withOpacity(0.12)
-            : Colors.red.withOpacity(0.10),
+            ? Colors.blue.withValues(alpha: 0.12)
+            : Colors.red.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
@@ -330,7 +330,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: statusFilter,
+                initialValue: statusFilter,
                 decoration: const InputDecoration(labelText: 'Statut'),
                 items: const [
                   DropdownMenuItem(value: 'all', child: Text('Tous')),
@@ -369,7 +369,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
             SizedBox(
               width: 180,
               child: DropdownButtonFormField<String>(
-                value: statusFilter,
+                initialValue: statusFilter,
                 decoration: const InputDecoration(labelText: 'Statut'),
                 items: const [
                   DropdownMenuItem(value: 'all', child: Text('Tous')),
@@ -554,7 +554,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
 
                   return ListView.separated(
                     itemCount: items.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       final item = items[index];
 

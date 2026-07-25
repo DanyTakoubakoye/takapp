@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/order_controller.dart';
+import 'package:takapp/modeles/client_model.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
+import 'package:takapp/services/client_service.dart';
 import 'package:takapp/services/menu_service.dart';
+import 'package:takapp/vues/commun/client_picker_sheet.dart';
+import 'package:takapp/vues/commun/module_visibility.dart';
 
 class MenuPresentationPage extends StatefulWidget {
   const MenuPresentationPage({super.key});
@@ -160,11 +164,14 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                 );
               }
 
-              final rawItems = List<MenuItemModel>.from(snapshot.data ?? [])
-                ..sort(
-                  (a, b) =>
-                      a.name.toLowerCase().compareTo(b.name.toLowerCase()),
-                );
+              final rawItems =
+                  List<MenuItemModel>.from(
+                      user.visibleMenuItems(snapshot.data ?? []),
+                    )
+                    ..sort(
+                      (a, b) =>
+                          a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+                    );
 
               final availableCategories =
                   <String>{
@@ -397,7 +404,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
       return Image.asset(
         adresse,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) {
+        errorBuilder: (_, _, _) {
           return const Center(child: Icon(Icons.image_outlined, size: 38));
         },
       );
@@ -407,7 +414,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
       return Image.network(
         adresse,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) {
+        errorBuilder: (_, _, _) {
           return const Center(child: Icon(Icons.image_outlined, size: 38));
         },
         loadingBuilder: (context, child, loadingProgress) {
@@ -420,7 +427,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
     return Image.asset(
       adresse,
       fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) {
+      errorBuilder: (_, _, _) {
         return const Center(child: Icon(Icons.image_outlined, size: 38));
       },
     );
@@ -448,7 +455,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
         boxShadow: [
           BoxShadow(
             blurRadius: 14,
-            color: Colors.black.withOpacity(0.18),
+            color: Colors.black.withValues(alpha: 0.18),
             offset: const Offset(0, 7),
           ),
         ],
@@ -642,6 +649,12 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
   final TextEditingController tableController = TextEditingController();
   final TextEditingController roomController = TextEditingController();
 
+  final ClientService _clientService = ClientService();
+
+  /// Fiche client rattachée. Vide = commande sans client (cas courant).
+  String _selectedClientId = '';
+  String _selectedClientName = '';
+
   String get establishmentId => widget.establishmentId.trim();
 
   @override
@@ -649,6 +662,75 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
     tableController.dispose();
     roomController.dispose();
     super.dispose();
+  }
+
+  /// Sélection facultative d'une fiche client.
+  ///
+  /// PIÈGE : le sheet doit être fermé avec `Navigator.pop(sheetContext, valeur)`
+  /// (géré dans ClientPickerSheet).
+  Future<void> _pickClient() async {
+    final selected = await showModalBottomSheet<ClientModel>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => ClientPickerSheet(
+        establishmentId: establishmentId,
+        service: _clientService,
+      ),
+    );
+
+    if (!mounted) return;
+    if (selected == null) return;
+
+    setState(() {
+      _selectedClientId = selected.id;
+      _selectedClientName = selected.name;
+    });
+  }
+
+  void _detachClient() {
+    setState(() {
+      _selectedClientId = '';
+      _selectedClientName = '';
+    });
+  }
+
+  /// Sélecteur discret : jamais bloquant, jamais obligatoire.
+  Widget _buildClientSelector(bool isSubmitting) {
+    if (_selectedClientId.isEmpty) {
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: TextButton.icon(
+          onPressed: isSubmitting ? null : _pickClient,
+          icon: const Icon(Icons.person_search, size: 18),
+          label: const Text('Rattacher un client (optionnel)'),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 4, 4, 4),
+      decoration: BoxDecoration(
+        color: Colors.green.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.person, size: 18, color: Colors.green),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Client : $_selectedClientName',
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+          IconButton(
+            tooltip: 'Détacher le client',
+            icon: const Icon(Icons.close, size: 18),
+            onPressed: isSubmitting ? null : _detachClient,
+          ),
+        ],
+      ),
+    );
   }
 
   double get totalAmount {
@@ -713,6 +795,7 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
       roomNumber: roomController.text.trim(),
       createdBy: user.uid,
       createdByName: user.name,
+      clientId: _selectedClientId,
     );
 
     if (!mounted) return;
@@ -733,11 +816,25 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
   @override
   Widget build(BuildContext context) {
     final orderController = context.watch<OrderController>();
+    final user = context.watch<AuthController>().currentUser;
 
     if (establishmentId.isEmpty) {
       return const Scaffold(
         body: Center(child: Text('Établissement introuvable.')),
       );
+    }
+
+    // Options du sélecteur limitées aux modules souscrits (identiques à
+    // l'origine pour un établissement abonné à tout).
+    final clientTypeOptions = <MapEntry<String, String>>[
+      const MapEntry('bar', 'Client Bar'),
+      const MapEntry('restaurant', 'Client Restaurant'),
+      const MapEntry('hotel', 'Client Hôtel'),
+    ].where((e) => user == null || user.canUseClientType(e.key)).toList();
+
+    if (clientTypeOptions.isNotEmpty &&
+        !clientTypeOptions.any((e) => e.key == clientType)) {
+      clientType = clientTypeOptions.first.key;
     }
 
     return Scaffold(
@@ -750,22 +847,19 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
             child: Column(
               children: [
                 DropdownButtonFormField<String>(
-                  value: clientType,
+                  initialValue: clientType,
                   decoration: const InputDecoration(
                     labelText: 'Type de client',
                     border: OutlineInputBorder(),
                   ),
-                  items: const [
-                    DropdownMenuItem(value: 'bar', child: Text('Client Bar')),
-                    DropdownMenuItem(
-                      value: 'restaurant',
-                      child: Text('Client Restaurant'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'hotel',
-                      child: Text('Client Hôtel'),
-                    ),
-                  ],
+                  items: clientTypeOptions
+                      .map(
+                        (e) => DropdownMenuItem(
+                          value: e.key,
+                          child: Text(e.value),
+                        ),
+                      )
+                      .toList(),
                   onChanged: orderController.isSubmitting
                       ? null
                       : (value) {
@@ -796,7 +890,7 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
                 Expanded(
                   child: ListView.separated(
                     itemCount: widget.lines.length,
-                    separatorBuilder: (_, __) => const Divider(),
+                    separatorBuilder: (_, _) => const Divider(),
                     itemBuilder: (context, index) {
                       final line = widget.lines[index];
 
@@ -827,6 +921,8 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 10),
+                _buildClientSelector(orderController.isSubmitting),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,

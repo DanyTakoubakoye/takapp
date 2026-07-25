@@ -158,7 +158,7 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
   double _selectedAmount(List<OrderItemModel> items) {
     return items
         .where((item) => _selectedItemIds.contains(item.id))
-        .fold<double>(0, (sum, item) => sum + item.totalPrice);
+        .fold<double>(0, (total, item) => total + item.totalPrice);
   }
 
   @override
@@ -225,7 +225,7 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
                     child: ListView.separated(
                       padding: const EdgeInsets.all(16),
                       itemCount: items.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      separatorBuilder: (_, _) => const SizedBox(height: 10),
                       itemBuilder: (context, index) {
                         final item = items[index];
                         final cancelable = _isItemCancelable(item, orderData);

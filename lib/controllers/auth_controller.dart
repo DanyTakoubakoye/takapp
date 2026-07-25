@@ -117,7 +117,6 @@ class AuthController extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      debugPrint('LOGIN ERROR = $e');
       _errorMessage = _cleanError(e);
       notifyListeners();
       return false;
@@ -135,8 +134,6 @@ class AuthController extends ChangeNotifier {
       await _authService.sendPasswordReset(email: email);
       return true;
     } on FirebaseAuthException catch (e) {
-      debugPrint('FirebaseAuthException code: ${e.code}');
-      debugPrint('FirebaseAuthException message: ${e.message}');
       _errorMessage = e.message ?? 'Erreur lors de l’envoi du mail';
       return false;
     } catch (e) {

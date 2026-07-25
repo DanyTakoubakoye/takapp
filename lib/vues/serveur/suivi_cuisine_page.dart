@@ -101,8 +101,9 @@ class SuiviCuisinePage extends StatelessWidget {
           ? const Center(child: Text('Utilisateur introuvable'))
           : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: FirebaseFirestore.instance
+                  .collection('establishments')
+                  .doc(establishmentId)
                   .collection('orders')
-                  .where('establishmentId', isEqualTo: establishmentId)
                   .where('createdBy', isEqualTo: user.uid)
                   .where('isForKitchen', isEqualTo: true)
                   .snapshots(),
@@ -316,7 +317,7 @@ class _CuisineColumn extends StatelessWidget {
                   ? const Center(child: Text('Aucune commande'))
                   : ListView.separated(
                       itemCount: orders.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 10),
+                      separatorBuilder: (_, _) => const SizedBox(height: 10),
                       itemBuilder: (context, index) {
                         final doc = orders[index];
                         final data = doc.data();
@@ -399,7 +400,9 @@ class _CuisineColumn extends StatelessWidget {
                                         vertical: 6,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.7),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.7,
+                                        ),
                                         borderRadius: BorderRadius.circular(20),
                                       ),
                                       child: Text(

@@ -16,13 +16,16 @@ import 'package:takapp/services/room_consumption_service.dart';
 import 'package:takapp/services/room_invoice_service.dart';
 import 'package:takapp/vues/gerante/recherche_facture_chambre_page.dart';
 
+import 'package:takapp/modeles/reservation_model.dart';
+
 class FacturationChambrePage extends StatefulWidget {
   final String establishmentId;
-
-  const FacturationChambrePage({super.key,
-   required this.establishmentId});
-  
-
+  final ReservationModel? reservation;
+  const FacturationChambrePage({
+    super.key,
+    required this.establishmentId,
+    this.reservation,
+  });
   @override
   State<FacturationChambrePage> createState() => _FacturationChambrePageState();
 }
@@ -32,6 +35,11 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   final RoomConsumptionService _consumptionService = RoomConsumptionService();
 
   String? currentInvoiceId;
+
+  /// Fiche client héritée de la réservation (check-out).
+  /// Vide si la facture est saisie à la main : comportement inchangé.
+  String _clientId = '';
+
   String _sellerIfu = '';
   String _sellerName = "";
   String get establishmentId => widget.establishmentId.trim();
@@ -401,6 +409,8 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
         return;
       }
 
+      if (!mounted) return;
+
       final user = context.read<AuthController>().currentUser;
 
       if (user == null) {
@@ -413,6 +423,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
       final invoice = RoomInvoiceModel(
         id: '',
         establishmentId: establishmentId,
+        clientId: _clientId,
         clientName: clientController.text.trim(),
         clientIfu: clientIfuController.text.trim(),
         clientAddress: clientAddressController.text.trim(),
@@ -671,7 +682,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<String>(
-                value: method,
+                initialValue: method,
                 decoration: const InputDecoration(
                   labelText: 'Mode de paiement',
                 ),
@@ -715,6 +726,8 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
                   return;
                 }
 
+                final navigator = Navigator.of(context);
+
                 await _service.payInvoice(
                   establishmentId: establishmentId,
                   invoiceId: invoiceId,
@@ -730,7 +743,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
                   paymentMethod = method;
                 });
 
-                Navigator.pop(context);
+                navigator.pop();
                 _showSnack('Paiement enregistré');
               },
               child: const Text('Valider'),
@@ -746,7 +759,31 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
     super.initState();
     _loadSellerIfu();
     _loadSellerName();
+
+    // Pré-remplissage depuis une réservation (check-out)
+    final resa = widget.reservation;
+    if (resa != null) {
+      _clientId = resa.clientId;
+      clientController.text = resa.clientName;
+      clientIfuController.text = resa.clientIfu;
+      clientAddressController.text = resa.clientAddress;
+      clientPhoneController.text = resa.clientPhone;
+      roomController.text = resa.assignedRoomNumber;
+      priceController.text = resa.pricePerNight > 0
+          ? resa.pricePerNight.toStringAsFixed(0)
+          : '';
+      startDate = resa.checkInDate;
+      endDate = resa.checkOutDate;
+
+      // Charger les consommations du séjour après le premier frame
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _loadConsumptionTotal();
+        }
+      });
+    }
   }
+
   @override
   void dispose() {
     clientController.dispose();
@@ -802,6 +839,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
       ),
     );
   }
+
   Future<void> _loadSellerIfu() async {
     final doc = await FirebaseFirestore.instance
         .collection('establishments')
@@ -817,7 +855,6 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
         .get();
     _sellerName = (doc.data()?['name'] ?? '').toString().trim();
   }
-
 
   Widget _buildDesktopLayout({required String establishmentId}) {
     return Padding(
@@ -936,7 +973,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              value: paymentMethod,
+              initialValue: paymentMethod,
               decoration: const InputDecoration(labelText: 'Mode de paiement'),
               items: const [
                 DropdownMenuItem(value: 'cash', child: Text('Espèces')),
@@ -962,7 +999,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              value: aibType,
+              initialValue: aibType,
               decoration: const InputDecoration(labelText: 'AIB'),
               items: const [
                 DropdownMenuItem(value: 'none', child: Text('Aucun AIB')),
@@ -1154,7 +1191,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.08),
+                  color: Colors.green.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(

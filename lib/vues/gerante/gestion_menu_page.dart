@@ -5,11 +5,15 @@ import 'package:csv/csv.dart' as csv;
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/modeles/menu_ingredient_model.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
 import 'package:takapp/modeles/stock_item_model.dart';
+import 'package:takapp/modeles/user_model.dart';
 import 'package:takapp/services/menu_admin_service.dart';
 import 'package:takapp/services/stock_item_service.dart';
+import 'package:takapp/vues/commun/module_visibility.dart';
 
 class GestionMenuPage extends StatefulWidget {
   final String establishmentId;
@@ -168,7 +172,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                   final items = snapshot.data ?? [];
 
                   return DropdownButtonFormField<StockItemModel>(
-                    value: selectedItem,
+                    initialValue: selectedItem,
                     isExpanded: true,
                     decoration: const InputDecoration(
                       labelText: 'Article de stock',
@@ -785,6 +789,23 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
 
     final isSmallScreen = MediaQuery.of(context).size.width < 900;
 
+    final user = context.watch<AuthController>().currentUser;
+    final canBar = user?.canAccessBar ?? true;
+    final canRestaurant = user?.canAccessRestaurant ?? true;
+
+    // On aligne l'état de rattachement de l'article sur les modules souscrits :
+    // un module non souscrit ne peut pas être coché, et l'article doit rester
+    // rattaché au module disponible. Abonné à tout ⇒ aucune coercition.
+    if (!canBar && isForBar) isForBar = false;
+    if (!canRestaurant && isForKitchen) isForKitchen = false;
+    if (!isForBar && !isForKitchen) {
+      if (canBar) {
+        isForBar = true;
+      } else if (canRestaurant) {
+        isForKitchen = true;
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(title: const Text('Gestion du menu')),
       body: Padding(
@@ -792,24 +813,30 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
         child: isSmallScreen
             ? Column(
                 children: [
-                  _buildFormCard(),
+                  _buildFormCard(canBar: canBar, canRestaurant: canRestaurant),
                   const SizedBox(height: 16),
-                  Expanded(child: _buildListCard()),
+                  Expanded(child: _buildListCard(user)),
                 ],
               )
             : Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(flex: 2, child: _buildFormCard()),
+                  Expanded(
+                    flex: 2,
+                    child: _buildFormCard(
+                      canBar: canBar,
+                      canRestaurant: canRestaurant,
+                    ),
+                  ),
                   const SizedBox(width: 16),
-                  Expanded(flex: 3, child: _buildListCard()),
+                  Expanded(flex: 3, child: _buildListCard(user)),
                 ],
               ),
       ),
     );
   }
 
-  Widget _buildFormCard() {
+  Widget _buildFormCard({required bool canBar, required bool canRestaurant}) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -868,24 +895,27 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                 },
                 title: const Text('Disponible'),
               ),
-              CheckboxListTile(
-                value: isForKitchen,
-                onChanged: (value) {
-                  setState(() {
-                    isForKitchen = value ?? false;
-                  });
-                },
-                title: const Text('Destiné à la cuisine'),
-              ),
-              CheckboxListTile(
-                value: isForBar,
-                onChanged: (value) {
-                  setState(() {
-                    isForBar = value ?? false;
-                  });
-                },
-                title: const Text('Destiné au bar'),
-              ),
+              // Un module non souscrit n'est pas proposé au rattachement.
+              if (canRestaurant)
+                CheckboxListTile(
+                  value: isForKitchen,
+                  onChanged: (value) {
+                    setState(() {
+                      isForKitchen = value ?? false;
+                    });
+                  },
+                  title: const Text('Destiné à la cuisine'),
+                ),
+              if (canBar)
+                CheckboxListTile(
+                  value: isForBar,
+                  onChanged: (value) {
+                    setState(() {
+                      isForBar = value ?? false;
+                    });
+                  },
+                  title: const Text('Destiné au bar'),
+                ),
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -989,7 +1019,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
     );
   }
 
-  Widget _buildListCard() {
+  Widget _buildListCard(UserModel? user) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -1004,7 +1034,11 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
               return Center(child: Text('Erreur : ${snapshot.error}'));
             }
 
-            final items = snapshot.data ?? [];
+            // On masque les articles d'un module non souscrit (ex. articles
+            // bar dans un établissement restaurant seul).
+            final items = user == null
+                ? (snapshot.data ?? [])
+                : user.visibleMenuItems(snapshot.data ?? []);
 
             if (items.isEmpty) {
               return const Center(child: Text('Aucun article enregistré.'));
@@ -1023,7 +1057,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                 Expanded(
                   child: ListView.separated(
                     itemCount: items.length,
-                    separatorBuilder: (_, __) => const Divider(),
+                    separatorBuilder: (_, _) => const Divider(),
                     itemBuilder: (context, index) {
                       final item = items[index];
 

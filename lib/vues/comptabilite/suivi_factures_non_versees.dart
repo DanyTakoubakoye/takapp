@@ -196,7 +196,7 @@ class _SuiviFacturesNonVerseesPageState
 
                   return ListView.separated(
                     itemCount: docs.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       final data = docs[index].data();
                       final total = ((data['total'] ?? 0) as num).toDouble();
@@ -319,7 +319,7 @@ class _SuiviFacturesNonVerseesPageState
 
                   return ListView.separated(
                     itemCount: docs.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       final data = docs[index].data();
                       final amount = ((data['amount'] ?? 0) as num).toDouble();

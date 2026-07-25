@@ -300,7 +300,7 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
 
                   return ListView.separated(
                     itemCount: docs.length,
-                    separatorBuilder: (_, __) => const Divider(),
+                    separatorBuilder: (_, _) => const Divider(),
                     itemBuilder: (context, index) {
                       final doc = docs[index];
 
@@ -380,7 +380,7 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
 
                   return ListView.separated(
                     itemCount: docs.length,
-                    separatorBuilder: (_, __) => const Divider(),
+                    separatorBuilder: (_, _) => const Divider(),
                     itemBuilder: (context, index) {
                       final doc = docs[index];
 
@@ -510,7 +510,7 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
 
                   return ListView.separated(
                     itemCount: docs.length,
-                    separatorBuilder: (_, __) => const Divider(),
+                    separatorBuilder: (_, _) => const Divider(),
                     itemBuilder: (context, index) {
                       final data = docs[index].data() as Map<String, dynamic>;
 

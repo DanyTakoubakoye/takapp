@@ -95,8 +95,6 @@ class _PointHebdomadairePageState extends State<PointHebdomadairePage> {
         _summary = result;
       });
     } catch (e) {
-      debugPrint('ERREUR POINT HEBDO: $e');
-
       if (!mounted) {
         return;
       }

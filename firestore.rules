@@ -1,77 +1,62 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-
     // ─────────────── HELPERS ───────────────
     function isSignedIn() {
       return request.auth != null;
     }
-
     function userDoc() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid));
     }
-
     function userRole() {
       return isSignedIn() && userDoc().data.role != null
         ? userDoc().data.role
         : '';
     }
-
     function userEstablishmentId() {
       return isSignedIn() && userDoc().data.establishmentId != null
         ? userDoc().data.establishmentId
         : '';
     }
-
     function hasAnyRole(roles) {
       return isSignedIn() && userRole() in roles;
     }
-
     function isSuperAdmin() {
       return userRole() == 'super_admin' || userRole() == 'global_admin';
     }
-
-    // proprietaire + super_admin/global_admin = "admin" côté serveur
     function isAdminOrOwner() {
       return hasAnyRole(['proprietaire', 'super_admin', 'global_admin']);
     }
-
     function isGerante() {
       return userRole() == 'gerante';
     }
-
     function isServeur() {
       return userRole() == 'serveur';
     }
-
     function isChefCuisine() {
       return userRole() == 'chef_cuisine';
     }
-
     function isBarman() {
       return userRole() == 'barman';
     }
-
     function isServiceHygiene() {
       return hasAnyRole(['service_hygiene', 'majordhomme']);
     }
-
     function isAccounting() {
       return userRole() == 'comptable';
     }
-
+    function isReceptionniste() {
+      return userRole() == 'receptionniste';
+    }
     function sameEstablishment(establishmentId) {
       return isSignedIn() && (
         isSuperAdmin() ||
         userEstablishmentId() == establishmentId
       );
     }
-
     function validStore(store) {
       return store in ['restaurant', 'hotel', 'bar', 'divers'];
     }
-
     function canReadStore(store) {
       return isSignedIn() && (
         isAdminOrOwner() ||
@@ -82,7 +67,6 @@ service cloud.firestore {
         (store == 'hotel' && isServiceHygiene())
       );
     }
-
     function canManageStore(store) {
       return isSignedIn() && (
         isAdminOrOwner() ||
@@ -91,6 +75,14 @@ service cloud.firestore {
         (store == 'restaurant' && isChefCuisine()) ||
         (store == 'bar' && isBarman()) ||
         (store == 'hotel' && isServiceHygiene())
+      );
+    }
+    function canManageHotel() {
+      return isSignedIn() && (
+        isGerante() ||
+        isAdminOrOwner() ||
+        isServiceHygiene() ||
+        isReceptionniste()
       );
     }
 
@@ -104,7 +96,6 @@ service cloud.firestore {
           resource.data.establishmentId == userEstablishmentId()
         )
       );
-
       allow create: if isSignedIn() && (
         isSuperAdmin() ||
         (
@@ -112,7 +103,6 @@ service cloud.firestore {
           request.resource.data.establishmentId == userEstablishmentId()
         )
       );
-
       allow update: if isSignedIn() && (
         request.auth.uid == userId ||
         isSuperAdmin() ||
@@ -122,7 +112,6 @@ service cloud.firestore {
           request.resource.data.establishmentId == resource.data.establishmentId
         )
       );
-
       allow delete: if isSuperAdmin() || (
         isAdminOrOwner() &&
         resource.data.establishmentId == userEstablishmentId()
@@ -147,6 +136,49 @@ service cloud.firestore {
       match /certilink_config/{docId} {
         allow read: if sameEstablishment(establishmentId);
         allow write: if sameEstablishment(establishmentId) &&
+          (isAdminOrOwner() || isGerante());
+      }
+
+      // Base clients partagée (hôtel, bar/restaurant, facturation)
+      match /clients/{clientId} {
+        allow read: if sameEstablishment(establishmentId);
+        allow create, update, delete: if sameEstablishment(establishmentId) && (
+          canManageHotel() || isServeur() || isAccounting()
+        );
+      }
+
+      // ─────────────── MODULE HÔTEL ───────────────
+      match /roomTypes/{typeId} {
+        allow read: if sameEstablishment(establishmentId);
+        allow create, update, delete: if sameEstablishment(establishmentId)
+          && canManageHotel();
+      }
+
+      match /rooms/{roomId} {
+        allow read: if sameEstablishment(establishmentId);
+        allow create, update, delete: if sameEstablishment(establishmentId)
+          && canManageHotel();
+      }
+
+      match /reservations/{reservationId} {
+        allow read: if sameEstablishment(establishmentId);
+        allow create, update, delete: if sameEstablishment(establishmentId)
+          && canManageHotel();
+      }
+
+      match /roomExtras/{extraId} {
+        allow read, create, update: if sameEstablishment(establishmentId) && (
+          isServeur() || isGerante() || isAccounting() || isAdminOrOwner() || isReceptionniste()
+        );
+        allow delete: if sameEstablishment(establishmentId) &&
+          (isAdminOrOwner() || isGerante());
+      }
+
+      match /roomInvoices/{id} {
+        allow read, create, update: if sameEstablishment(establishmentId) && (
+          isServeur() || isGerante() || isAccounting() || isAdminOrOwner() || isReceptionniste()
+        );
+        allow delete: if sameEstablishment(establishmentId) &&
           (isAdminOrOwner() || isGerante());
       }
 
@@ -175,7 +207,6 @@ service cloud.firestore {
         );
         allow delete: if sameEstablishment(establishmentId) &&
           (isAdminOrOwner() || isGerante());
-
         match /items/{itemId} {
           allow read: if sameEstablishment(establishmentId);
           allow create: if sameEstablishment(establishmentId) && (
@@ -216,14 +247,6 @@ service cloud.firestore {
           isGerante() || isAccounting() || isAdminOrOwner()
         );
         allow delete: if sameEstablishment(establishmentId) && isAdminOrOwner();
-      }
-
-      match /roomInvoices/{id} {
-        allow read, create, update: if sameEstablishment(establishmentId) && (
-          isServeur() || isGerante() || isAccounting() || isAdminOrOwner()
-        );
-        allow delete: if sameEstablishment(establishmentId) &&
-          (isAdminOrOwner() || isGerante());
       }
 
       match /stock_items/{itemId} {
@@ -274,7 +297,6 @@ service cloud.firestore {
         );
         allow delete: if sameEstablishment(establishmentId) &&
           (isAdminOrOwner() || isGerante());
-
         match /items/{itemId} {
           allow read: if sameEstablishment(establishmentId);
           allow create, update: if sameEstablishment(establishmentId) && (
@@ -295,7 +317,6 @@ service cloud.firestore {
         allow update, delete: if sameEstablishment(establishmentId) && (
           isGerante() || isAdminOrOwner()
         );
-
         match /items/{itemId} {
           allow read, create: if sameEstablishment(establishmentId) && (
             isGerante() || isServiceHygiene() || isAdminOrOwner()
@@ -356,18 +377,16 @@ service cloud.firestore {
         allow delete: if sameEstablishment(establishmentId) && isAdminOrOwner();
       }
 
-      // Filet interne : toute sous-collection non listée reste
-      // protégée par l'appartenance au tenant (jamais ouverte par défaut).
       // Filet interne : lecture seule pour les membres du tenant.
       // Toute ÉCRITURE doit passer par une règle explicite ci-dessus.
       match /{document=**} {
         allow read: if sameEstablishment(establishmentId);
       }
+    }
 
     // ─────────────── FILET FINAL : tout le reste refusé ───────────────
     match /{document=**} {
       allow read, write: if false;
     }
   }
-  }
-  }
+}

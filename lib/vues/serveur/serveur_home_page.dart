@@ -53,8 +53,6 @@ class _ServeurHomePageState extends State<ServeurHomePage> {
           serveurId: user.uid,
         );
       }
-
-      debugPrint('Notification mobile listener lancé pour serveur=${user.uid}');
     }
   }
 
@@ -228,7 +226,7 @@ class _ServeurHomePageState extends State<ServeurHomePage> {
 class _ServeurWelcomeCard extends StatelessWidget {
   final String name;
   final bool isMobile;
-  final establishmentName;
+  final String establishmentName;
 
   const _ServeurWelcomeCard({
     required this.name,
@@ -285,6 +283,11 @@ class _ServeurModulesGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthController>();
+    final canRestaurant = auth.canAccessRestaurant;
+    final canBar = auth.canAccessBar;
+    final canHotel = auth.canAccessHotel;
+
     final modules = [
       _ServeurModule(
         title: 'Commandes & Chambres',
@@ -296,12 +299,14 @@ class _ServeurModulesGrid extends StatelessWidget {
             title: 'Menu et Commande',
             subtitle: 'Prendre une commande restaurant, bar ou chambre',
             icon: Icons.restaurant_menu,
+            visible: canRestaurant || canBar,
             page: const MenuPresentationPage(),
           ),
           _ServeurAction(
             title: 'Consommations Chambre',
             subtitle: 'Facturer les consommations liées à une chambre',
             icon: Icons.hotel,
+            visible: canHotel,
             page: const FactureConsommationChambrePage(),
           ),
         ],
@@ -336,22 +341,43 @@ class _ServeurModulesGrid extends StatelessWidget {
             title: 'Suivi bar',
             subtitle: 'Voir l’état des commandes envoyées au bar',
             icon: Icons.local_bar,
+            visible: canBar,
             page: SuiviBarPage(establishmentId: establishmentId),
           ),
           _ServeurAction(
             title: 'Suivi cuisine',
             subtitle: 'Voir l’état des commandes envoyées en cuisine',
             icon: Icons.restaurant,
+            visible: canRestaurant,
             page: SuiviCuisinePage(establishmentId: establishmentId),
           ),
         ],
       ),
     ];
 
+    // On filtre les actions non souscrites, puis on retire les modules
+    // qui n'ont plus aucune action.
+    final visibleModules = <_ServeurModule>[];
+    for (final module in modules) {
+      final visibleActions =
+          module.actions.where((action) => action.visible).toList();
+      if (visibleActions.isEmpty) continue;
+
+      visibleModules.add(
+        _ServeurModule(
+          title: module.title,
+          subtitle: module.subtitle,
+          icon: module.icon,
+          color: module.color,
+          actions: visibleActions,
+        ),
+      );
+    }
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: modules.length,
+      itemCount: visibleModules.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: isMobile ? 1 : (isTablet ? 2 : 3),
         crossAxisSpacing: 14,
@@ -359,7 +385,7 @@ class _ServeurModulesGrid extends StatelessWidget {
         childAspectRatio: isMobile ? 2.25 : 1.55,
       ),
       itemBuilder: (context, index) {
-        return _ServeurModuleCard(module: modules[index]);
+        return _ServeurModuleCard(module: visibleModules[index]);
       },
     );
   }
@@ -527,7 +553,7 @@ class _ServeurActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: color.withOpacity(0.10),
+      color: color.withValues(alpha: 0.10),
       borderRadius: BorderRadius.circular(18),
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
@@ -541,7 +567,7 @@ class _ServeurActionCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: color.withOpacity(0.35)),
+            border: Border.all(color: color.withValues(alpha: 0.35)),
           ),
           child: Row(
             children: [
@@ -611,10 +637,14 @@ class _ServeurAction {
   final IconData icon;
   final Widget page;
 
+  /// L'action est masquée si l'établissement n'est pas abonné au module lié.
+  final bool visible;
+
   const _ServeurAction({
     required this.title,
     required this.subtitle,
     required this.icon,
     required this.page,
+    this.visible = true,
   });
 }

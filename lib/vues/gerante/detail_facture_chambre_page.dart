@@ -308,11 +308,11 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
 
     if (fiscalController.confirmResult != null &&
         !fiscalController.confirmResult!.hasError) {
-      await _reloadInvoice(context);
+      await _reloadInvoice(this.context);
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(this.context).showSnackBar(
         SnackBar(
           content: Text(
             'Facture certifiée avec Certilink Code MECeF : ${fiscalController.confirmResult!.codeMECeFDGI}',
@@ -320,7 +320,7 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
         ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(this.context).showSnackBar(
         SnackBar(
           content: Text(
             fiscalController.errorMessage ?? 'Échec de fiscalisation',
@@ -363,7 +363,7 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(

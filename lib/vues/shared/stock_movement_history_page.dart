@@ -34,7 +34,7 @@ class StockMovementHistoryPage extends StatelessWidget {
     final isSmall = MediaQuery.of(context).size.width < 800;
 
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(title: Text(title), backgroundColor: _storeColor()),
       body: StreamBuilder<List<StockMovementModel>>(
         stream: service.streamMovementsForStore(
           establishmentId: establishmentId,
@@ -58,7 +58,7 @@ class StockMovementHistoryPage extends StatelessWidget {
           return ListView.separated(
             padding: EdgeInsets.all(isSmall ? 12 : 16),
             itemCount: items.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            separatorBuilder: (_, _) => const SizedBox(height: 10),
             itemBuilder: (context, index) {
               final item = items[index];
               final isIn = item.movementType == 'in';
@@ -67,7 +67,7 @@ class StockMovementHistoryPage extends StatelessWidget {
               return Card(
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: color.withOpacity(0.12),
+                    backgroundColor: color.withValues(alpha: 0.12),
                     child: Icon(
                       isIn ? Icons.arrow_downward : Icons.arrow_upward,
                       color: color,

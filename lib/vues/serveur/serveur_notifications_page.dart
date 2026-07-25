@@ -82,7 +82,7 @@ class ServeurNotificationsPage extends StatelessWidget {
 
             return ListView.separated(
               itemCount: notifications.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              separatorBuilder: (_, _) => const SizedBox(height: 10),
               itemBuilder: (context, index) {
                 final doc = notifications[index];
                 final data = doc.data();
@@ -105,7 +105,7 @@ class ServeurNotificationsPage extends StatelessWidget {
                     leading: CircleAvatar(
                       backgroundColor: isRead
                           ? Colors.grey.shade300
-                          : Colors.blue.withOpacity(0.15),
+                          : Colors.blue.withValues(alpha: 0.15),
                       child: Icon(
                         Icons.notifications,
                         color: isRead ? Colors.grey : Colors.blue,

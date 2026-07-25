@@ -221,30 +221,30 @@ class ComptabiliteService {
     ).get();
 
     final double totalEntries = managerTransfersSnapshot.docs.fold<double>(0, (
-      sum,
+      total,
       doc,
     ) {
       final data = doc.data();
       final amount = ((data['amount'] ?? 0) as num).toDouble();
-      return sum + amount;
+      return total + amount;
     });
 
     final double totalExpenses = expensesSnapshot.docs.fold<double>(0, (
-      sum,
+      total,
       doc,
     ) {
       final data = doc.data();
       final amount = ((data['amount'] ?? 0) as num).toDouble();
-      return sum + amount;
+      return total + amount;
     });
 
     final double totalOpeningBalances = balancesSnapshot.docs.fold<double>(0, (
-      sum,
+      total,
       doc,
     ) {
       final data = doc.data();
       final amount = ((data['amount'] ?? 0) as num).toDouble();
-      return sum + amount;
+      return total + amount;
     });
 
     return {

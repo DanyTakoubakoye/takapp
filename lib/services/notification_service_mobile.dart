@@ -60,7 +60,7 @@ class NotificationService {
 
     final token = await _messaging.getToken();
 
-    print('FCM TOKEN = $token');
+    debugPrint('FCM TOKEN = $token');
 
     if (token == null || token.trim().isEmpty) return;
 
@@ -70,7 +70,7 @@ class NotificationService {
     }, SetOptions(merge: true));
 
     _messaging.onTokenRefresh.listen((newToken) async {
-      print('FCM TOKEN REFRESH = $newToken');
+      debugPrint('FCM TOKEN REFRESH = $newToken');
 
       await _firestore.collection('users').doc(user.uid).set({
         'fcmToken': newToken,
@@ -132,43 +132,41 @@ class NotificationService {
         .snapshots()
         .listen(
           (snapshot) async {
-            print('MOBILE NOTIFICATIONS SNAPSHOT size=${snapshot.docs.length}');
-
-            for (final d in snapshot.docs) {
-              print('DOC NOTIF id=${d.id} data=${d.data()}');
-            }
-
             if (snapshot.docs.isEmpty) return;
             if (_isPopupOpen) return;
-
             final doc = snapshot.docs.first;
             final data = doc.data();
-
             if (_alreadyShownNotificationIds.contains(doc.id)) return;
-
             _alreadyShownNotificationIds.add(doc.id);
-
             final title = (data['title'] ?? '').toString();
             final body = (data['body'] ?? '').toString();
             final source = (data['source'] ?? 'kitchen').toString();
 
-            await _showLocalNotificationFromFirestore(
-              notificationId: doc.id,
-              title: title,
-              body: body,
-              source: source,
-            );
-
-            WidgetsBinding.instance.addPostFrameCallback((_) async {
-              await _showInAppPopup(
+            try {
+              await _showLocalNotificationFromFirestore(
                 notificationId: doc.id,
                 title: title,
                 body: body,
+                source: source,
               );
+            } catch (e) {
+              debugPrint('Notif locale ignorée: $e');
+            }
+
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
+              try {
+                await _showInAppPopup(
+                  notificationId: doc.id,
+                  title: title,
+                  body: body,
+                );
+              } catch (e) {
+                debugPrint('Popup notif ignoré: $e');
+              }
             });
           },
-          onError: (error) {
-            print('SERVER NOTIFICATIONS LISTENER ERROR = $error');
+          onError: (error, stack) {
+            debugPrint('Server notifications listener error: $error');
           },
         );
   }
@@ -324,7 +322,7 @@ class NotificationService {
     final navigatorState = appNavigatorKey.currentState;
     final context = navigatorState?.overlay?.context;
 
-    print('SHOW POPUP context=${context != null} title=$title');
+    debugPrint('SHOW POPUP context=${context != null} title=$title');
 
     if (context == null) return;
 
@@ -334,7 +332,7 @@ class NotificationService {
       context: context,
       barrierDismissible: false,
       barrierLabel: 'Notification',
-      barrierColor: Colors.black.withOpacity(0.20),
+      barrierColor: Colors.black.withValues(alpha: 0.20),
       pageBuilder: (dialogContext, animation, secondaryAnimation) {
         return SafeArea(
           child: Align(

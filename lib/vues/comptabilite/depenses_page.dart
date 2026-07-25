@@ -259,7 +259,7 @@ class _DepensesPageState extends State<DepensesPage> {
             const SizedBox(height: 12),
 
             DropdownButtonFormField<String>(
-              value: selectedAccountType,
+              initialValue: selectedAccountType,
 
               decoration: const InputDecoration(
                 labelText: 'Type de compte',
@@ -389,7 +389,7 @@ class _DepensesPageState extends State<DepensesPage> {
                   return ListView.separated(
                     itemCount: expenses.length,
 
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
 
                     itemBuilder: (context, index) {
                       final expense = expenses[index];

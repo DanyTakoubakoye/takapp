@@ -8,7 +8,9 @@ import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/services/owner_dashboard_service.dart';
 import 'package:takapp/services/pdf_service.dart';
 import 'package:takapp/services/printer_service.dart';
+import 'package:takapp/vues/clients/clients_page.dart';
 import 'package:takapp/vues/comptabilite/soldes_precedents_page.dart';
+import 'package:takapp/vues/reception/reception_dashboard_page.dart';
 
 class OwnerDashboardPage extends StatefulWidget {
   final String establishmentId;
@@ -265,6 +267,8 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
       validatedByName: user.name,
     );
 
+    if (!mounted) return;
+
     final pdfService = context.read<PdfService>();
 
     final printerService = context.read<PrinterService>();
@@ -320,6 +324,37 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
           '${user.establishmentName.isNotEmpty == true ? user.establishmentName : 'TAKHOTEL'} - Propriétaire',
         ),
         actions: [
+          // Réception & Clients relèvent du module hôtel : masqués si
+          // l'établissement n'est pas abonné à l'hôtel.
+          if (auth.canAccessHotel)
+            IconButton(
+              tooltip: 'Réception',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ReceptionDashboardPage(
+                      establishmentId: establishmentId,
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.hotel),
+            ),
+          if (auth.canAccessHotel)
+            IconButton(
+              tooltip: 'Clients',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        ClientsPage(establishmentId: establishmentId),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.people_outline),
+            ),
           IconButton(
             onPressed: () => context.read<AuthController>().logout(),
             icon: const Icon(Icons.logout),
@@ -793,6 +828,7 @@ class _CreateTenantUserDialogState extends State<_CreateTenantUserDialog> {
     {'value': 'chef_cuisine', 'label': 'Chef cuisine'},
     {'value': 'service_hygiene', 'label': 'Service hygiène'},
     {'value': 'majordhomme', 'label': 'Majordhomme'},
+    {'value': 'receptionniste', 'label': 'Réceptionniste'},
   ];
 
   @override
@@ -870,7 +906,7 @@ class _CreateTenantUserDialogState extends State<_CreateTenantUserDialog> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: selectedRole,
+                initialValue: selectedRole,
                 decoration: const InputDecoration(labelText: 'Rôle'),
                 items: roles.map((role) {
                   return DropdownMenuItem<String>(

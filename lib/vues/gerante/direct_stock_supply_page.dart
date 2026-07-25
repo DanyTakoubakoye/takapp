@@ -102,9 +102,9 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
         reason: _reasonController.text.trim(),
       );
 
-      if (!success) {
-        if (!mounted) return;
+      if (!mounted) return;
 
+      if (!success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(controller.errorMessage ?? 'Erreur inconnue.'),
@@ -221,7 +221,7 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
                           ),
                           const SizedBox(height: 8),
                           DropdownButtonFormField<String>(
-                            value:
+                            initialValue:
                                 items.any(
                                   (item) => item.id == line.selectedItemId,
                                 )

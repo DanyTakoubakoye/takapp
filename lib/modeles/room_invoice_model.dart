@@ -7,6 +7,13 @@ class RoomInvoiceModel {
   final String establishmentId;
 
   /// Client
+  /// Référence vers la fiche client (`establishments/{eid}/clients`).
+  /// Vide si la facture n'est pas rattachée à une fiche.
+  final String clientId;
+
+  /// Données client figées à la facturation. Conservées EN PLUS du clientId :
+  /// une facture fiscalisée (CertiLink) est un document légal qui ne doit pas
+  /// changer rétroactivement si la fiche client est modifiée plus tard.
   final String clientName;
   final String clientIfu;
   final String clientAddress;
@@ -82,6 +89,7 @@ class RoomInvoiceModel {
 
     required this.establishmentId,
 
+    required this.clientId,
     required this.clientName,
     required this.clientIfu,
     required this.clientAddress,
@@ -171,6 +179,7 @@ class RoomInvoiceModel {
       'establishmentId': establishmentId,
 
       /// Client
+      'clientId': clientId,
       'clientName': clientName,
       'clientIfu': clientIfu,
       'clientAddress': clientAddress,
@@ -249,6 +258,8 @@ class RoomInvoiceModel {
       establishmentId: map['establishmentId']?.toString() ?? '',
 
       /// Client
+      clientId: map['clientId']?.toString() ?? '',
+
       clientName: map['clientName']?.toString() ?? '',
 
       clientIfu: map['clientIfu']?.toString() ?? '',
@@ -340,6 +351,7 @@ class RoomInvoiceModel {
     String? id,
     String? establishmentId,
 
+    String? clientId,
     String? clientName,
     String? clientIfu,
     String? clientAddress,
@@ -394,6 +406,8 @@ class RoomInvoiceModel {
       id: id ?? this.id,
 
       establishmentId: establishmentId ?? this.establishmentId,
+
+      clientId: clientId ?? this.clientId,
 
       clientName: clientName ?? this.clientName,
 

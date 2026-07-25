@@ -88,7 +88,7 @@ class EncaissementPage extends StatelessWidget {
 
             return ListView.separated(
               itemCount: orders.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
+              separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final order = orders[index];
 
@@ -259,7 +259,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             DropdownButtonFormField<String>(
-              value: selectedMethod,
+              initialValue: selectedMethod,
               decoration: const InputDecoration(labelText: 'Mode de paiement'),
               items: AppPaymentMethods.labels.entries
                   .map(

@@ -141,10 +141,6 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
       );
     }
 
-    final width = MediaQuery.of(context).size.width;
-
-    final isMobile = width < 900;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -236,7 +232,7 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
             const SizedBox(height: 12),
 
             DropdownButtonFormField<String>(
-              value: selectedType,
+              initialValue: selectedType,
 
               decoration: const InputDecoration(
                 labelText: 'Type de compte',
@@ -367,7 +363,7 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
                   return ListView.separated(
                     itemCount: balances.length,
 
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
 
                     itemBuilder: (context, index) {
                       final item = balances[index];

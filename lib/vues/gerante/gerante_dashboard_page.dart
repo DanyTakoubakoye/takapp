@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/vues/clients/clients_page.dart';
 import 'package:takapp/vues/gerante/enregistrer_serveur_page.dart';
 import 'package:takapp/vues/gerante/facturation_chambre_page.dart';
 import 'package:takapp/vues/gerante/gestion_menu_page.dart';
@@ -12,13 +13,16 @@ import 'package:takapp/vues/gerante/create_store_stock_page.dart';
 import 'package:takapp/vues/gerante/stock_management_page.dart';
 import 'package:takapp/vues/gerante/stock_request_list_page.dart';
 import 'package:takapp/vues/gerante/direct_stock_supply_page.dart';
+import 'package:takapp/vues/reception/reservations_page.dart';
+import 'package:takapp/vues/reception/room_types_page.dart';
+import 'package:takapp/vues/reception/rooms_board_page.dart';
+import 'package:takapp/vues/reception/rooms_page.dart';
 import 'package:takapp/vues/shared/low_stock_page.dart';
 import 'package:takapp/vues/shared/stock_item_registry_page.dart';
 
 class GeranteDashboardPage extends StatelessWidget {
   final String establishmentId;
-  const GeranteDashboardPage({super.key,
-  required this.establishmentId});
+  const GeranteDashboardPage({super.key, required this.establishmentId});
 
   @override
   Widget build(BuildContext context) {
@@ -131,6 +135,19 @@ class _GeranteModulesGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthController>();
+    final canRestaurant = auth.canAccessRestaurant;
+    final canBar = auth.canAccessBar;
+    final canHotel = auth.canAccessHotel;
+
+    // Magasins visibles dans l'écran « Stocks faibles » : seuls les modules
+    // souscrits. Établissement abonné à tout ⇒ les trois magasins.
+    final lowStockStores = <String>[
+      if (canHotel) 'hotel',
+      if (canRestaurant) 'restaurant',
+      if (canBar) 'bar',
+    ];
+
     final modules = [
       _GeranteModule(
         title: 'Stocks & Approvisionnements',
@@ -155,13 +172,14 @@ class _GeranteModulesGrid extends StatelessWidget {
             icon: Icons.warning_amber_rounded,
             pageBuilder: (_) => LowStockPage(
               establishmentId: establishmentId,
-              stores: const ['hotel', 'restaurant', 'bar'],
+              stores: lowStockStores,
               title: 'Stocks faibles',
             ),
           ),
           _GeranteAction(
             title: 'Approvisionner Restaurant',
             icon: Icons.restaurant,
+            visible: canRestaurant,
             pageBuilder: (_) => DirectStockSupplyPage(
               establishmentId: establishmentId,
               store: 'restaurant',
@@ -171,6 +189,7 @@ class _GeranteModulesGrid extends StatelessWidget {
           _GeranteAction(
             title: 'Approvisionner Bar',
             icon: Icons.local_bar,
+            visible: canBar,
             pageBuilder: (_) => DirectStockSupplyPage(
               establishmentId: establishmentId,
               store: 'bar',
@@ -180,6 +199,7 @@ class _GeranteModulesGrid extends StatelessWidget {
           _GeranteAction(
             title: 'Approvisionner Hôtel',
             icon: Icons.hotel,
+            visible: canHotel,
             pageBuilder: (_) => DirectStockSupplyPage(
               establishmentId: establishmentId,
               store: 'hotel',
@@ -226,16 +246,46 @@ class _GeranteModulesGrid extends StatelessWidget {
           ),
         ],
       ),
+
       _GeranteModule(
         title: 'Facturation & Chambres',
         subtitle: 'Factures, chambres et versement comptable',
         icon: Icons.hotel_outlined,
         color: Colors.indigo,
+        visible: canHotel,
         actions: [
+          _GeranteAction(
+            title: 'Réservations',
+            icon: Icons.event_available_outlined,
+            pageBuilder: (_) =>
+                ReservationsPage(establishmentId: establishmentId),
+          ),
+          _GeranteAction(
+            title: 'Clients',
+            icon: Icons.people_outline,
+            pageBuilder: (_) => ClientsPage(establishmentId: establishmentId),
+          ),
+          _GeranteAction(
+            title: 'Types de chambres',
+            icon: Icons.category_outlined,
+            pageBuilder: (_) => RoomTypesPage(establishmentId: establishmentId),
+          ),
+          _GeranteAction(
+            title: 'Chambres',
+            icon: Icons.meeting_room_outlined,
+            pageBuilder: (_) => RoomsPage(establishmentId: establishmentId),
+          ),
+          _GeranteAction(
+            title: 'Plan des chambres',
+            icon: Icons.grid_view_outlined,
+            pageBuilder: (_) =>
+                RoomsBoardPage(establishmentId: establishmentId),
+          ),
           _GeranteAction(
             title: 'Facturation chambres',
             icon: Icons.hotel,
-            pageBuilder: (_) => FacturationChambrePage(establishmentId: establishmentId),
+            pageBuilder: (_) =>
+                FacturationChambrePage(establishmentId: establishmentId),
           ),
           _GeranteAction(
             title: 'Liste des factures',
@@ -256,6 +306,7 @@ class _GeranteModulesGrid extends StatelessWidget {
         subtitle: 'Gestion du menu restaurant et bar',
         icon: Icons.restaurant_menu,
         color: Colors.green,
+        visible: canRestaurant || canBar,
         actions: [
           _GeranteAction(
             title: 'Gérer le menu',
@@ -267,10 +318,31 @@ class _GeranteModulesGrid extends StatelessWidget {
       ),
     ];
 
+    // On masque les modules non souscrits, on filtre les actions non
+    // souscrites, puis on retire les modules qui n'ont plus aucune action.
+    final visibleModules = <_GeranteModule>[];
+    for (final module in modules) {
+      if (!module.visible) continue;
+
+      final visibleActions =
+          module.actions.where((action) => action.visible).toList();
+      if (visibleActions.isEmpty) continue;
+
+      visibleModules.add(
+        _GeranteModule(
+          title: module.title,
+          subtitle: module.subtitle,
+          icon: module.icon,
+          color: module.color,
+          actions: visibleActions,
+        ),
+      );
+    }
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: modules.length,
+      itemCount: visibleModules.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: isMobile ? 1 : (isTablet ? 2 : 4),
         crossAxisSpacing: 14,
@@ -278,7 +350,7 @@ class _GeranteModulesGrid extends StatelessWidget {
         childAspectRatio: isMobile ? 2.25 : 1.45,
       ),
       itemBuilder: (context, index) {
-        return _GeranteModuleCard(module: modules[index]);
+        return _GeranteModuleCard(module: visibleModules[index]);
       },
     );
   }
@@ -446,7 +518,7 @@ class _GeranteActionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: color.withOpacity(0.10),
+      color: color.withValues(alpha: 0.10),
       borderRadius: BorderRadius.circular(18),
       child: InkWell(
         borderRadius: BorderRadius.circular(18),
@@ -460,7 +532,7 @@ class _GeranteActionCard extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: color.withOpacity(0.35)),
+            border: Border.all(color: color.withValues(alpha: 0.35)),
           ),
           child: Row(
             children: [
@@ -498,12 +570,16 @@ class _GeranteModule {
   final Color color;
   final List<_GeranteAction> actions;
 
+  /// Le module entier est masqué si l'établissement n'est pas abonné.
+  final bool visible;
+
   const _GeranteModule({
     required this.title,
     required this.subtitle,
     required this.icon,
     required this.color,
     required this.actions,
+    this.visible = true,
   });
 }
 
@@ -512,9 +588,13 @@ class _GeranteAction {
   final IconData icon;
   final WidgetBuilder pageBuilder;
 
+  /// L'action est masquée si l'établissement n'est pas abonné au module lié.
+  final bool visible;
+
   const _GeranteAction({
     required this.title,
     required this.icon,
     required this.pageBuilder,
+    this.visible = true,
   });
 }

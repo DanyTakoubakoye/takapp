@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/order_controller.dart';
+import 'package:takapp/modeles/client_model.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
+import 'package:takapp/modeles/user_model.dart';
+import 'package:takapp/services/client_service.dart';
 import 'package:takapp/services/menu_service.dart';
+import 'package:takapp/vues/commun/client_picker_sheet.dart';
+import 'package:takapp/vues/commun/module_visibility.dart';
 
 class NouvelleCommandePage extends StatefulWidget {
   const NouvelleCommandePage({super.key});
@@ -15,17 +20,92 @@ class NouvelleCommandePage extends StatefulWidget {
 class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
   final MenuService _menuService = MenuService();
 
+  final ClientService _clientService = ClientService();
+
   String clientType = 'restaurant';
 
   final TextEditingController tableController = TextEditingController();
 
   final TextEditingController roomController = TextEditingController();
 
+  /// Fiche client rattachée. Vide = commande sans client (cas courant).
+  String _selectedClientId = '';
+  String _selectedClientName = '';
+
   @override
   void dispose() {
     tableController.dispose();
     roomController.dispose();
     super.dispose();
+  }
+
+  /// Sélection facultative d'une fiche client.
+  ///
+  /// PIÈGE : le sheet doit être fermé avec `Navigator.pop(sheetContext, valeur)`
+  /// (géré dans ClientPickerSheet).
+  Future<void> _pickClient(String establishmentId) async {
+    final selected = await showModalBottomSheet<ClientModel>(
+      context: context,
+      isScrollControlled: true,
+      builder: (sheetContext) => ClientPickerSheet(
+        establishmentId: establishmentId,
+        service: _clientService,
+      ),
+    );
+
+    if (!mounted) return;
+    if (selected == null) return;
+
+    setState(() {
+      _selectedClientId = selected.id;
+      _selectedClientName = selected.name;
+    });
+  }
+
+  void _detachClient() {
+    setState(() {
+      _selectedClientId = '';
+      _selectedClientName = '';
+    });
+  }
+
+  /// Sélecteur discret : jamais bloquant, jamais obligatoire.
+  Widget _buildClientSelector(String establishmentId) {
+    if (_selectedClientId.isEmpty) {
+      return Align(
+        alignment: Alignment.centerLeft,
+        child: TextButton.icon(
+          onPressed: () => _pickClient(establishmentId),
+          icon: const Icon(Icons.person_search, size: 18),
+          label: const Text('Rattacher un client (optionnel)'),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 4, 4, 4),
+      decoration: BoxDecoration(
+        color: Colors.green.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.person, size: 18, color: Colors.green),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Client : $_selectedClientName',
+              style: const TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
+          IconButton(
+            tooltip: 'Détacher le client',
+            icon: const Icon(Icons.close, size: 18),
+            onPressed: _detachClient,
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _submitOrder(String establishmentId) async {
@@ -56,6 +136,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
       roomNumber: roomController.text.trim(),
       createdBy: user.uid,
       createdByName: user.name,
+      clientId: _selectedClientId,
     );
 
     if (!mounted) return;
@@ -70,6 +151,8 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
 
       setState(() {
         clientType = 'restaurant';
+        _selectedClientId = '';
+        _selectedClientName = '';
       });
     } else if (orderController.errorMessage != null) {
       ScaffoldMessenger.of(
@@ -120,6 +203,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
                   Expanded(
                     child: _buildArticlesCard(
                       context,
+                      user: user,
                       establishmentId: establishmentId,
                       isMobile: true,
                     ),
@@ -137,6 +221,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
                   padding: const EdgeInsets.all(16),
                   child: _buildArticlesCard(
                     context,
+                    user: user,
                     establishmentId: establishmentId,
                     isMobile: false,
                   ),
@@ -162,28 +247,42 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
 
   Widget _buildArticlesCard(
     BuildContext context, {
+    required UserModel user,
     required String establishmentId,
     required bool isMobile,
   }) {
+    // Options du sélecteur "Type de client" limitées aux modules souscrits.
+    // Un établissement abonné à tout conserve les trois options d'origine.
+    final clientTypeOptions = <MapEntry<String, String>>[
+      const MapEntry('bar', 'Client Bar'),
+      const MapEntry('restaurant', 'Client Restaurant'),
+      const MapEntry('hotel', 'Client Hôtel'),
+    ].where((e) => user.canUseClientType(e.key)).toList();
+
+    // Si le type courant n'est plus proposable, on bascule sur le premier
+    // disponible (assignation directe hors setState, comme ailleurs dans build).
+    if (clientTypeOptions.isNotEmpty &&
+        !clientTypeOptions.any((e) => e.key == clientType)) {
+      clientType = clientTypeOptions.first.key;
+    }
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             DropdownButtonFormField<String>(
-              value: clientType,
+              initialValue: clientType,
               decoration: const InputDecoration(
                 labelText: 'Type de client',
                 border: OutlineInputBorder(),
               ),
-              items: const [
-                DropdownMenuItem(value: 'bar', child: Text('Client Bar')),
-                DropdownMenuItem(
-                  value: 'restaurant',
-                  child: Text('Client Restaurant'),
-                ),
-                DropdownMenuItem(value: 'hotel', child: Text('Client Hôtel')),
-              ],
+              items: clientTypeOptions
+                  .map(
+                    (e) =>
+                        DropdownMenuItem(value: e.key, child: Text(e.value)),
+                  )
+                  .toList(),
               onChanged: (value) {
                 if (value == null) return;
 
@@ -224,11 +323,13 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
                     return Center(child: Text('Erreur: ${snapshot.error}'));
                   }
 
-                  final items = (snapshot.data ?? []).toList()
-                    ..sort(
-                      (a, b) =>
-                          a.name.toLowerCase().compareTo(b.name.toLowerCase()),
-                    );
+                  final items =
+                      user.visibleMenuItems(snapshot.data ?? []).toList()
+                        ..sort(
+                          (a, b) => a.name.toLowerCase().compareTo(
+                            b.name.toLowerCase(),
+                          ),
+                        );
 
                   if (items.isEmpty) {
                     return const Center(
@@ -238,7 +339,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
 
                   return ListView.separated(
                     itemCount: items.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    separatorBuilder: (_, _) => const SizedBox(height: 8),
                     itemBuilder: (context, index) {
                       final item = items[index];
 
@@ -343,7 +444,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
                 child: ListView.separated(
                   shrinkWrap: true,
                   itemCount: orderController.items.length,
-                  separatorBuilder: (_, __) => const Divider(height: 14),
+                  separatorBuilder: (_, _) => const Divider(height: 14),
                   itemBuilder: (context, index) {
                     final item = orderController.items[index];
 
@@ -395,6 +496,8 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
               'Total : ${orderController.total.toStringAsFixed(0)} FCFA',
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
+            const SizedBox(height: 6),
+            _buildClientSelector(establishmentId),
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
@@ -437,7 +540,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
                   ? const Center(child: Text('Aucun article ajouté.'))
                   : ListView.separated(
                       itemCount: orderController.items.length,
-                      separatorBuilder: (_, __) => const Divider(height: 16),
+                      separatorBuilder: (_, _) => const Divider(height: 16),
                       itemBuilder: (context, index) {
                         final item = orderController.items[index];
 
@@ -499,6 +602,8 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
                 ),
               ),
             ),
+            const SizedBox(height: 10),
+            _buildClientSelector(establishmentId),
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,

@@ -305,7 +305,7 @@ class _FactureConsommationChambrePageState
                     ),
                   ),
                   trailing: Text(
-                    "${line.total.toStringAsFixed(0)}",
+                    line.total.toStringAsFixed(0),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),

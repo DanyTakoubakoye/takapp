@@ -155,7 +155,7 @@ class _PendingPaymentsSection extends StatelessWidget {
 
                   return ListView.separated(
                     itemCount: payments.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 8),
+                    separatorBuilder: (_, _) => const SizedBox(height: 8),
                     itemBuilder: (context, index) {
                       final payment = payments[index];
                       final selected = handoverController.isSelected(
@@ -374,7 +374,7 @@ class _HandoverHistorySection extends StatelessWidget {
 
                   return ListView.separated(
                     itemCount: handovers.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
                     itemBuilder: (context, index) {
                       final handover = handovers[index];
 
@@ -408,7 +408,7 @@ class _HandoverHistorySection extends StatelessWidget {
                               decoration: BoxDecoration(
                                 color: _statusColor(
                                   handover.status,
-                                ).withOpacity(0.12),
+                                ).withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(

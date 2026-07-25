@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/vues/commun/module_visibility.dart';
 import 'package:takapp/vues/gerante/stock_request_list_page.dart';
 import 'package:takapp/vues/shared/store_stock_page.dart';
 
@@ -18,29 +21,34 @@ class StockManagementPage extends StatelessWidget {
       );
     }
 
-    final stores = [
-      _StoreCardData(
-        store: 'hotel',
-        title: 'Magasin Hôtel',
-        subtitle: 'Produits d’hygiène, entretien, consommables chambre',
-        icon: Icons.hotel,
-        color: Colors.teal,
-      ),
-      _StoreCardData(
-        store: 'restaurant',
-        title: 'Magasin Restaurant',
-        subtitle: 'Denrées, cuisine, matières premières',
-        icon: Icons.restaurant,
-        color: Colors.deepOrange,
-      ),
-      _StoreCardData(
-        store: 'bar',
-        title: 'Magasin Bar',
-        subtitle: 'Boissons, snacks, accessoires bar',
-        icon: Icons.local_bar,
-        color: Colors.indigo,
-      ),
-    ];
+    final user = context.watch<AuthController>().currentUser;
+
+    // Un magasin dont le module n'est pas souscrit ne doit pas apparaître.
+    // Établissement abonné à tout ⇒ les trois magasins restent affichés.
+    final stores =
+        [
+          _StoreCardData(
+            store: 'hotel',
+            title: 'Magasin Hôtel',
+            subtitle: 'Produits d’hygiène, entretien, consommables chambre',
+            icon: Icons.hotel,
+            color: Colors.teal,
+          ),
+          _StoreCardData(
+            store: 'restaurant',
+            title: 'Magasin Restaurant',
+            subtitle: 'Denrées, cuisine, matières premières',
+            icon: Icons.restaurant,
+            color: Colors.deepOrange,
+          ),
+          _StoreCardData(
+            store: 'bar',
+            title: 'Magasin Bar',
+            subtitle: 'Boissons, snacks, accessoires bar',
+            icon: Icons.local_bar,
+            color: Colors.indigo,
+          ),
+        ].where((s) => user == null || user.canSeeStore(s.store)).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -98,7 +106,7 @@ class StockManagementPage extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 24,
-                            backgroundColor: item.color.withOpacity(0.12),
+                            backgroundColor: item.color.withValues(alpha: 0.12),
                             child: Icon(item.icon, color: item.color),
                           ),
                           const SizedBox(height: 14),

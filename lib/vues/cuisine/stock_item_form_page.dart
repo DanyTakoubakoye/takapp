@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:excel/excel.dart' as xlsx;
 import 'package:excel2003/excel2003.dart';
@@ -473,7 +471,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
                               const SizedBox(height: 12),
                               if (isSmall) ...[
                                 DropdownButtonFormField<String>(
-                                  value: _selectedStore,
+                                  initialValue: _selectedStore,
                                   decoration: InputDecoration(
                                     labelText: 'Store',
                                     border: OutlineInputBorder(
@@ -507,7 +505,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
                                   children: [
                                     Expanded(
                                       child: DropdownButtonFormField<String>(
-                                        value: _selectedStore,
+                                        initialValue: _selectedStore,
                                         decoration: InputDecoration(
                                           labelText: 'Store',
                                           border: OutlineInputBorder(

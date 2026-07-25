@@ -2,9 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../services/store_stock_service.dart';
 
+import '../services/room_service.dart';
+
 class HygieneDailyService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final StoreStockService _stockService = StoreStockService();
+  final RoomService _roomService = RoomService();
 
   /// =========================
   /// HELPERS SAAS
@@ -89,7 +92,30 @@ class HygieneDailyService {
         performedBy: preparedBy,
         performedByName: preparedByName,
         reason: 'Préparation chambre $roomNumber',
+        allowNegative: true,
       );
+    }
+
+    // Libération automatique de la chambre.
+    // Si la chambre est "à nettoyer" (cleaning) — donc après un check-out —
+    // le ménage déclaré la remet "disponible" (available).
+    // Si elle est occupée (ménage en cours de séjour), on ne touche pas au statut.
+    // La libération est un bonus : si la chambre n'existe pas ou échoue,
+    // on ne fait pas échouer l'enregistrement du ménage.
+    try {
+      final room = await _roomService.findRoomByNumber(
+        establishmentId: establishmentId,
+        number: roomNumber,
+      );
+      if (room != null && room.status == 'cleaning') {
+        await _roomService.updateRoomStatus(
+          establishmentId: establishmentId,
+          roomId: room.id,
+          status: 'available',
+        );
+      }
+    } catch (_) {
+      // Libération ignorée en cas d'erreur : le ménage reste enregistré.
     }
   }
 
