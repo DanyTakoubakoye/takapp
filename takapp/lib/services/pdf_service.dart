@@ -8,7 +8,6 @@ import 'package:takapp/modeles/order_item_model.dart';
 import 'package:takapp/modeles/order_model.dart';
 import 'package:takapp/modeles/payment_model.dart';
 import 'package:takapp/modeles/server_handover_model.dart';
-import 'package:takapp/services/pdf_service.dart' as pdfService;
 
 class PdfService {
   /// =========================
