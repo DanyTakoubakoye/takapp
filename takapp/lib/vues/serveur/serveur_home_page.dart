@@ -7,6 +7,7 @@ import 'package:takapp/services/notification_service.dart';
 import 'package:takapp/vues/serveur/encaissement_page.dart';
 import 'package:takapp/vues/serveur/facture_consommation_chambre_page.dart';
 import 'package:takapp/vues/serveur/menu_presentation_page.dart';
+import 'package:takapp/vues/serveur/mes_factures_serveur_page.dart';
 import 'package:takapp/vues/serveur/serveur_notifications_page.dart';
 import 'package:takapp/vues/serveur/suivi_bar_page.dart';
 import 'package:takapp/vues/serveur/suivi_cuisine_page.dart';
@@ -322,6 +323,12 @@ class _ServeurModulesGrid extends StatelessWidget {
             subtitle: 'Encaisser les factures non payées',
             icon: Icons.payments_outlined,
             page: const EncaissementPage(),
+          ),
+          _ServeurAction(
+            title: 'Mes factures',
+            subtitle: 'Toutes mes factures : encaisser, fiscaliser, imprimer',
+            icon: Icons.receipt_long_outlined,
+            page: MesFacturesServeurPage(establishmentId: establishmentId),
           ),
           _ServeurAction(
             title: 'Versement à la gérante',

@@ -52,6 +52,9 @@ class OrderModel {
 
   /// Annulations
   final bool hasCancelledItems;
+  /// Fiscalisation (écrits sur la commande lors de la certification)
+  final bool isFiscalized;
+  final String fiscalStatus;
 
   const OrderModel({
     required this.id,
@@ -78,6 +81,8 @@ class OrderModel {
     required this.pendingSync,
     required this.syncError,
     required this.hasCancelledItems,
+    this.isFiscalized = false,
+    this.fiscalStatus = '',
   });
 
   factory OrderModel.fromMap(Map<String, dynamic> map, String documentId) {
@@ -147,6 +152,8 @@ class OrderModel {
       syncError: map['syncError'] == true,
 
       hasCancelledItems: map['hasCancelledItems'] == true,
+      isFiscalized: map['isFiscalized'] == true,
+      fiscalStatus: (map['fiscalStatus'] ?? '').toString(),
     );
   }
 
@@ -192,6 +199,8 @@ class OrderModel {
 
       /// Annulations
       'hasCancelledItems': hasCancelledItems,
+      'isFiscalized': isFiscalized,
+      'fiscalStatus': fiscalStatus,
     };
   }
 
@@ -220,6 +229,8 @@ class OrderModel {
     bool? pendingSync,
     bool? syncError,
     bool? hasCancelledItems,
+    bool? isFiscalized,
+    String? fiscalStatus,
   }) {
     return OrderModel(
       id: id ?? this.id,
@@ -269,6 +280,8 @@ class OrderModel {
       syncError: syncError ?? this.syncError,
 
       hasCancelledItems: hasCancelledItems ?? this.hasCancelledItems,
+      isFiscalized: isFiscalized ?? this.isFiscalized,
+      fiscalStatus: fiscalStatus ?? this.fiscalStatus,
     );
   }
 }

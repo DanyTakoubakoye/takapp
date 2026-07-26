@@ -63,6 +63,36 @@ class PaymentService {
           }).toList();
         });
   }
+  /// =========================
+  /// STREAM ALL ORDERS FOR SERVER (par jour)
+  /// =========================
+  /// Toutes les commandes créées par ce serveur pour un jour donné,
+  /// payées ou non, fiscalisées ou non. Triées du plus récent au plus ancien.
+  Stream<List<OrderModel>> streamOrdersForServerByDay({
+    required String establishmentId,
+    required String serveurId,
+    required DateTime day,
+  }) {
+    _validateEstablishmentId(establishmentId);
+
+    final startOfDay = DateTime(day.year, day.month, day.day);
+    final endOfDay = startOfDay.add(const Duration(days: 1));
+
+    return _ordersRef(establishmentId: establishmentId)
+        .where('createdBy', isEqualTo: serveurId)
+        .where(
+          'createdAt',
+          isGreaterThanOrEqualTo: Timestamp.fromDate(startOfDay),
+        )
+        .where('createdAt', isLessThan: Timestamp.fromDate(endOfDay))
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs
+              .map((doc) => OrderModel.fromMap(doc.data(), doc.id))
+              .toList();
+        });
+  }
 
   /// =========================
   /// REGISTER PAYMENT
