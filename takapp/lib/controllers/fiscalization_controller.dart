@@ -51,6 +51,7 @@ class FiscalizationController extends ChangeNotifier {
     required String establishmentId,
     required String invoiceId,
     required EmcfInvoiceRequestModel request,
+    bool persistToInvoice = true,
   }) async {
     if (establishmentId.trim().isEmpty) {
       errorMessage = 'Établissement introuvable.';
@@ -71,16 +72,17 @@ class FiscalizationController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _roomInvoiceService.markFiscalizationPending(
-        establishmentId: establishmentId,
-        invoiceId: invoiceId,
-        requestSnapshot: {
-          ...request.toMap(),
-          'fiscalProvider': 'certilink',
-          'source': 'takapp',
-        },
-      );
-
+      if (persistToInvoice) {
+        await _roomInvoiceService.markFiscalizationPending(
+          establishmentId: establishmentId,
+          invoiceId: invoiceId,
+          requestSnapshot: {
+            ...request.toMap(),
+            'fiscalProvider': 'certilink',
+            'source': 'takapp',
+          },
+        );
+      }
       final config = await _certilinkConfigService.getConfig(establishmentId);
 
       if (!config.enabled) {
@@ -116,20 +118,22 @@ class FiscalizationController extends ChangeNotifier {
         raw: response.raw,
       );
 
-      await _roomInvoiceService.markFiscalizationSuccess(
-        establishmentId: establishmentId,
-        invoiceId: invoiceId,
-        emcfUid: response.certilinkInvoiceId,
-        mecefCode: response.mecefCode,
-        nim: response.nim,
-        counter: response.counters,
-        machineDateTime:
-            response.certificationDate?.toIso8601String() ??
-            DateTime.now().toIso8601String(),
-        qrCode: response.qrCode,
-        rawCreateResponse: '',
-        rawConfirmResponse: jsonEncode(response.raw),
-      );
+      if (persistToInvoice) {
+        await _roomInvoiceService.markFiscalizationSuccess(
+          establishmentId: establishmentId,
+          invoiceId: invoiceId,
+          emcfUid: response.certilinkInvoiceId,
+          mecefCode: response.mecefCode,
+          nim: response.nim,
+          counter: response.counters,
+          machineDateTime:
+              response.certificationDate?.toIso8601String() ??
+              DateTime.now().toIso8601String(),
+          qrCode: response.qrCode,
+          rawCreateResponse: '',
+          rawConfirmResponse: jsonEncode(response.raw),
+        );
+      }
 
       notifyListeners();
       return true;
@@ -150,15 +154,17 @@ class FiscalizationController extends ChangeNotifier {
         },
       );
 
-      try {
-        await _roomInvoiceService.markFiscalizationFailed(
-          establishmentId: establishmentId,
-          invoiceId: invoiceId,
-          error: errorMessage ?? 'Erreur CertiLink',
-          rawResponse: jsonEncode(confirmResult?.raw ?? {}),
-        );
-      } catch (_) {
-        // On ne masque pas l'erreur principale.
+      if (persistToInvoice) {
+        try {
+          await _roomInvoiceService.markFiscalizationFailed(
+            establishmentId: establishmentId,
+            invoiceId: invoiceId,
+            error: errorMessage ?? 'Erreur CertiLink',
+            rawResponse: jsonEncode(confirmResult?.raw ?? {}),
+          );
+        } catch (_) {
+          // On ne masque pas l'erreur principale.
+        }
       }
 
       notifyListeners();

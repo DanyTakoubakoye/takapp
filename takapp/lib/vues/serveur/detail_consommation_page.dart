@@ -381,6 +381,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
         establishmentId: establishmentId,
         invoiceId: widget.order.id,
         request: request,
+        persistToInvoice: false,
       );
 
       if (!mounted) return;
