@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -8,6 +10,9 @@ import 'package:takapp/modeles/order_item_model.dart';
 import 'package:takapp/modeles/order_model.dart';
 import 'package:takapp/modeles/payment_model.dart';
 import 'package:takapp/modeles/server_handover_model.dart';
+
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class PdfService {
   /// =========================
@@ -737,6 +742,7 @@ class PdfService {
     String sellerIfu = '',
     String sellerAddress = '',
     String sellerPhone = '',
+    String logo = '',
 
     // Client
     required String clientName,
@@ -767,6 +773,7 @@ class PdfService {
     String fiscalRawCreateResponse = '',
   }) async {
     final pdf = pw.Document();
+    final Uint8List? logoBytes = await _loadLogoBytes(logo);
 
     // ---- Détail fiscal : CertiLink d'abord, sinon décomposition TTC 18% ----
     double ht;
@@ -816,23 +823,32 @@ class PdfService {
                 crossAxisAlignment: pw.CrossAxisAlignment.start,
                 children: [
                   // Bloc initiales (repli logo)
-                  pw.Container(
-                    width: 60,
-                    height: 60,
-                    alignment: pw.Alignment.center,
-                    decoration: pw.BoxDecoration(
-                      border: pw.Border.all(color: PdfColors.blueGrey400),
-                      borderRadius: pw.BorderRadius.circular(8),
-                    ),
-                    child: pw.Text(
-                      _initials(sellerName),
-                      style: pw.TextStyle(
-                        fontSize: 20,
-                        fontWeight: pw.FontWeight.bold,
-                        color: PdfColors.blueGrey800,
-                      ),
-                    ),
-                  ),
+                  logoBytes != null
+                      ? pw.Container(
+                          width: 60,
+                          height: 60,
+                          child: pw.Image(
+                            pw.MemoryImage(logoBytes),
+                            fit: pw.BoxFit.contain,
+                          ),
+                        )
+                      : pw.Container(
+                          width: 60,
+                          height: 60,
+                          alignment: pw.Alignment.center,
+                          decoration: pw.BoxDecoration(
+                            border: pw.Border.all(color: PdfColors.blueGrey400),
+                            borderRadius: pw.BorderRadius.circular(8),
+                          ),
+                          child: pw.Text(
+                            _initials(sellerName),
+                            style: pw.TextStyle(
+                              fontSize: 20,
+                              fontWeight: pw.FontWeight.bold,
+                              color: PdfColors.blueGrey800,
+                            ),
+                          ),
+                        ),
                   pw.SizedBox(width: 14),
                   pw.Expanded(
                     child: pw.Column(
@@ -1114,6 +1130,7 @@ class PdfService {
     required String sellerName,
     String sellerIfu = '',
     String sellerAddress = '',
+    String logo = '',
     required String clientName,
     String clientIfu = '',
     required String reference, // n° table ou chambre
@@ -1129,6 +1146,7 @@ class PdfService {
     String fiscalRawCreateResponse = '',
   }) async {
     final pdf = pw.Document();
+    final Uint8List? logoBytes = await _loadLogoBytes(logo);
 
     // Détail fiscal
     double ht;
@@ -1178,6 +1196,17 @@ class PdfService {
             crossAxisAlignment: pw.CrossAxisAlignment.stretch,
             mainAxisSize: pw.MainAxisSize.min,
             children: [
+              if (logoBytes != null)
+                pw.Center(
+                  child: pw.Container(
+                    height: 50,
+                    margin: const pw.EdgeInsets.only(bottom: 4),
+                    child: pw.Image(
+                      pw.MemoryImage(logoBytes),
+                      fit: pw.BoxFit.contain,
+                    ),
+                  ),
+                ),
               // En-tête
               pw.Center(
                 child: pw.Text(
@@ -1379,6 +1408,28 @@ class PdfService {
         ],
       ),
     );
+  }
+
+  /// Charge les octets d'un logo depuis la valeur du champ `logo` de
+  /// l'établissement. Gère gs://, https:// (Firebase Storage) et assets/.
+  /// Renvoie null si vide ou en cas d'erreur (→ repli sur les initiales).
+  Future<Uint8List?> _loadLogoBytes(String logo) async {
+    final ref = logo.trim();
+    if (ref.isEmpty) return null;
+    try {
+      if (ref.startsWith('gs://') || ref.startsWith('http')) {
+        final storageRef = FirebaseStorage.instance.refFromURL(ref);
+        return await storageRef.getData(5 * 1024 * 1024);
+      }
+      if (ref.startsWith('assets/')) {
+        final data = await rootBundle.load(ref);
+        return data.buffer.asUint8List();
+      }
+    } catch (e) {
+      debugPrint('LOGO ERROR: $e');
+      return null;
+    }
+    return null;
   }
 
   pw.Widget _ticketLine(String label, String value, {bool bold = false}) {

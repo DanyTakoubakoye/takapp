@@ -43,6 +43,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   String _sellerIfu = '';
   String _sellerName = "";
   String _sellerAddress = '';
+  String _sellerLogo = '';
   String get establishmentId => widget.establishmentId.trim();
 
   final TextEditingController clientController = TextEditingController();
@@ -177,6 +178,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
       sellerName: _sellerName,
       sellerIfu: _sellerIfu,
       sellerAddress: _sellerAddress,
+      logo: _sellerLogo,
       clientName: invoice.clientName,
       clientIfu: invoice.clientIfu,
       clientAddress: invoice.clientAddress,
@@ -198,7 +200,6 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
       fiscalDateTime: invoice.fiscalMachineDateTime,
       fiscalRawCreateResponse: invoice.fiscalRawConfirmResponse,
     );
-    
 
     await printer.printPdf(Uint8List.fromList(bytes));
   }
@@ -664,6 +665,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
       sellerName: _sellerName,
       sellerIfu: _sellerIfu,
       sellerAddress: _sellerAddress,
+      logo: _sellerLogo,
       clientName: clientController.text.trim(),
       clientIfu: clientIfuController.text.trim(),
       clientAddress: clientAddressController.text.trim(),
@@ -769,7 +771,6 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   void initState() {
     super.initState();
     _loadSellerInfo();
-    
 
     // Pré-remplissage depuis une réservation (check-out)
     final resa = widget.reservation;
@@ -862,6 +863,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
       _sellerName = (data['name'] ?? '').toString().trim();
       _sellerIfu = (data['ifu'] ?? '').toString().trim();
       _sellerAddress = _composeAddress(data);
+      _sellerLogo = (data['logo'] ?? '').toString().trim();
     });
   }
 
@@ -873,8 +875,6 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
     final parts = [address, city].where((e) => e.isNotEmpty).toList();
     return parts.join(', ');
   }
-
-  
 
   Widget _buildDesktopLayout({required String establishmentId}) {
     return Padding(

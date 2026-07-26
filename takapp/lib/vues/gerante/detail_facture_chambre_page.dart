@@ -33,6 +33,7 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
   String _sellerIfu = '';
   String _sellerName = "";
   String _sellerAddress = '';
+  String _sellerLogo = '';
   String get establishmentId => widget.establishmentId.trim();
 
   late RoomInvoiceModel currentInvoice;
@@ -73,8 +74,10 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
       final address = (data['address'] ?? '').toString().trim();
       final city = (data['city'] ?? '').toString().trim();
       _sellerAddress = [address, city].where((e) => e.isNotEmpty).join(', ');
+      _sellerLogo = (data['logo'] ?? '').toString().trim();
     });
   }
+
   Future<void> _reloadInvoice(BuildContext context) async {
     final establishmentId = _establishmentId(context);
 
@@ -120,6 +123,7 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
       sellerName: _sellerName,
       sellerIfu: _sellerIfu,
       sellerAddress: _sellerAddress,
+      logo: _sellerLogo,
       clientName: currentInvoice.clientName,
       clientIfu: currentInvoice.clientIfu,
       clientAddress: currentInvoice.clientAddress,
@@ -162,6 +166,7 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
       sellerName: _sellerName,
       sellerIfu: _sellerIfu,
       sellerAddress: _sellerAddress,
+      logo: _sellerLogo,
       clientName: currentInvoice.clientName,
       clientIfu: currentInvoice.clientIfu,
       clientAddress: currentInvoice.clientAddress,

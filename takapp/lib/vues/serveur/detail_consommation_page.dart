@@ -33,6 +33,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
   String _sellerIfu = '';
   String _sellerName = "";
   String _sellerAddress = '';
+  String _sellerLogo = '';
 
   final TextEditingController clientNameController = TextEditingController();
 
@@ -75,6 +76,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
       final address = (data['address'] ?? '').toString().trim();
       final city = (data['city'] ?? '').toString().trim();
       _sellerAddress = [address, city].where((e) => e.isNotEmpty).join(', ');
+      _sellerLogo = (data['logo'] ?? '').toString().trim();
     });
   }
 
@@ -243,6 +245,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
         sellerName: _sellerName,
         sellerIfu: _sellerIfu,
         sellerAddress: _sellerAddress,
+        logo: _sellerLogo,
         clientName: clientNameController.text.trim().isEmpty
             ? _clientLabel(widget.order)
             : clientNameController.text.trim(),
@@ -464,6 +467,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
         sellerName: _sellerName,
         sellerIfu: _sellerIfu,
         sellerAddress: _sellerAddress,
+        logo: _sellerLogo,
         clientName: clientNameController.text.trim().isEmpty
             ? _clientLabel(widget.order)
             : clientNameController.text.trim(),

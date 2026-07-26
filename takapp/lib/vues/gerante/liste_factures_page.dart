@@ -33,6 +33,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
   String _sellerIfu = '';
   String _sellerName = "";
   String _sellerAddress = "";
+  String _sellerLogo = '';
 
   bool _isSmallScreen(BuildContext context) =>
       MediaQuery.of(context).size.width < 800;
@@ -66,6 +67,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
       sellerName: _sellerName,
       sellerIfu: _sellerIfu,
       sellerAddress: _sellerAddress,
+      logo: _sellerLogo,
       clientName: item.clientName,
       clientIfu: item.clientIfu,
       clientAddress: item.clientAddress,
@@ -96,6 +98,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
       final address = (data['address'] ?? '').toString().trim();
       final city = (data['city'] ?? '').toString().trim();
       _sellerAddress = [address, city].where((e) => e.isNotEmpty).join(', ');
+      _sellerLogo = (data['logo'] ?? '').toString().trim();
     });
   }
 
@@ -120,6 +123,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
       sellerName: _sellerName,
       sellerIfu: _sellerIfu,
       sellerAddress: _sellerAddress,
+      logo: _sellerLogo,
       clientName: item.clientName,
       clientIfu: item.clientIfu,
       clientAddress: item.clientAddress,

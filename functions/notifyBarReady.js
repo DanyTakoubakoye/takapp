@@ -10,13 +10,22 @@ exports.notifyBarReady = onCall(
   async (request) => {
     try {
       const orderId = request.data.orderId;
+      const establishmentId = request.data.establishmentId;
 
       if (!orderId) {
         throw new HttpsError("invalid-argument", "orderId manquant.");
       }
+      if (!establishmentId) {
+        throw new HttpsError(
+          "invalid-argument",
+          "establishmentId manquant."
+        );
+      }
 
       const orderDoc = await admin
         .firestore()
+        .collection("establishments")
+        .doc(establishmentId)
         .collection("orders")
         .doc(orderId)
         .get();
@@ -33,7 +42,6 @@ exports.notifyBarReady = onCall(
       const roomNumber = orderData.roomNumber || "";
 
       let destinationLabel = `la commande ${orderNumber}`;
-
       if (clientType === "hotel" && roomNumber) {
         destinationLabel = `la chambre ${roomNumber}`;
       } else if (tableNumber) {
@@ -96,16 +104,21 @@ exports.notifyBarReady = onCall(
 
       const response = await admin.messaging().send(message);
 
-      await admin.firestore().collection("serverNotifications").add({
-        serveurId: serveurId,
-        orderId: orderId,
-        orderNumber: orderNumber,
-        title: "Commande bar prête",
-        body: `La commande de ${destinationLabel} est prête au bar.`,
-        isRead: false,
-        source: "bar",
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
+      await admin
+        .firestore()
+        .collection("establishments")
+        .doc(establishmentId)
+        .collection("serverNotifications")
+        .add({
+          serveurId: serveurId,
+          orderId: orderId,
+          orderNumber: orderNumber,
+          title: "Commande bar prête",
+          body: `La commande de ${destinationLabel} est prête au bar.`,
+          isRead: false,
+          source: "bar",
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
 
       console.log("Notification bar envoyée avec succès:", response);
 
@@ -115,11 +128,9 @@ exports.notifyBarReady = onCall(
       };
     } catch (error) {
       console.error("notifyBarReady error:", error);
-
       if (error instanceof HttpsError) {
         throw error;
       }
-
       throw new HttpsError(
         "internal",
         error.message || "Erreur envoi notification bar."
