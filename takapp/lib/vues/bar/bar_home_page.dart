@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/services/bar_service.dart';
+import 'package:takapp/services/notification_service_mobile.dart';
 import 'package:takapp/vues/bar/bar_stock_item_form_page.dart';
 import 'package:takapp/vues/bar/bar_menu_item_ingredients_form_page.dart';
 
@@ -60,6 +62,9 @@ class _BarHomePageState extends State<BarHomePage> {
         'bar_new_order',
         establishmentId: widget.establishmentId,
       );
+      if (!kIsWeb) {
+        NotificationService().playNewOrderSound(department: 'bar');
+      }
 
       // Notification navigateur
       showWebNotification(

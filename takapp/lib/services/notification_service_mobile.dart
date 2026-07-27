@@ -307,11 +307,55 @@ class NotificationService {
     final details = NotificationDetails(android: androidDetails);
 
     await _localNotifications.show(
-      id: DateTime.now().millisecondsSinceEpoch,
+      id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
       title: notification.title ?? 'Notification',
       body: notification.body ?? '',
       notificationDetails: details,
     );
+  }
+
+  /// Joue le son d'arrivée d'une nouvelle commande sur Android (natif).
+  /// Le son web est géré séparément par playWebNotificationSound.
+  /// [department] : 'kitchen' ou 'bar' — choisit le canal et le son.
+  Future<void> playNewOrderSound({required String department}) async {
+    debugPrint('SON DEBUG: playNewOrderSound APPELÉE, department=$department');
+    try {
+      final bool isBar = department == 'bar';
+      final channelId = isBar
+          ? 'new_bar_order_channel_v1'
+          : 'new_kitchen_order_channel_v1';
+      final channelName = isBar
+          ? 'Nouvelle commande bar'
+          : 'Nouvelle commande cuisine';
+      final channelDescription = isBar
+          ? 'Nouvelle commande pour le bar'
+          : 'Nouvelle commande pour la cuisine';
+      final AndroidNotificationSound sound = isBar
+          ? const RawResourceAndroidNotificationSound('bar_ready')
+          : const RawResourceAndroidNotificationSound('kitchen_ready');
+
+      final androidDetails = AndroidNotificationDetails(
+        channelId,
+        channelName,
+        channelDescription: channelDescription,
+        importance: Importance.max,
+        priority: Priority.high,
+        playSound: true,
+        sound: sound,
+      );
+      final details = NotificationDetails(android: androidDetails);
+
+      await _localNotifications.show(
+        id: DateTime.now().millisecondsSinceEpoch.remainder(100000),
+        title: channelName,
+        body: '',
+        notificationDetails: details,
+      );
+      debugPrint('SON DEBUG: _localNotifications.show TERMINÉ pour $channelId');
+    } catch (e, stack) {
+      debugPrint('SON DEBUG ERREUR: $e');
+      debugPrint('SON DEBUG STACK: $stack');
+    }
   }
 
   Future<void> _showInAppPopup({

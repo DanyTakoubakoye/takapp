@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
@@ -6,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:takapp/modeles/kitchen_order_model.dart';
 import 'package:takapp/modeles/order_item_model.dart';
 import 'package:takapp/services/cuisine_service.dart';
+import 'package:takapp/services/notification_service_mobile.dart';
 import 'package:takapp/vues/shared/store_stock_page.dart';
 import 'package:takapp/vues/shared/create_stock_request_page.dart';
 import 'package:takapp/vues/shared/stock_out_page.dart';
@@ -54,8 +56,14 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
 
         playWebNotificationSound(
           'kitchen_new_order',
-          establishmentId: widget.establishmentId,
+          establishmentId: widget.establishmentId, 
         );
+        debugPrint(
+          'SON DEBUG cuisine: kIsWeb=$kIsWeb, appel playNewOrderSound',
+        );
+        if (!kIsWeb) {
+          NotificationService().playNewOrderSound(department: 'kitchen');
+        }
 
         showWebNotification(
           title: 'Nouvelle commande cuisine',
