@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
@@ -438,6 +439,8 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
   late final TextEditingController _guestsController;
   late final TextEditingController _priceController;
   late final TextEditingController _noteController;
+  late final TextEditingController _checkInController;
+  late final TextEditingController _checkOutController;
 
   final ClientService _clientService = ClientService();
 
@@ -464,6 +467,8 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
     _guestsController = TextEditingController(text: '1');
     _priceController = TextEditingController();
     _noteController = TextEditingController();
+    _checkInController = TextEditingController();
+    _checkOutController = TextEditingController();
   }
 
   @override
@@ -474,6 +479,8 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
     _guestsController.dispose();
     _priceController.dispose();
     _noteController.dispose();
+    _checkInController.dispose();
+    _checkOutController.dispose();
     super.dispose();
   }
 
@@ -567,11 +574,15 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
     final now = DateTime.now();
     final picked = await showDateRangePicker(
       context: context,
-      firstDate: DateTime(now.year, now.month, now.day),
+      firstDate: DateTime(now.year, now.month - 1, now.day),
       lastDate: DateTime(now.year + 2),
       initialDateRange: (_checkIn != null && _checkOut != null)
           ? DateTimeRange(start: _checkIn!, end: _checkOut!)
           : null,
+      // La saisie clavier du picker Material n'ouvre qu'un pavé numérique
+      // (pas de « / ») : on la désactive ici, les champs texte du formulaire
+      // gèrent la frappe avec insertion automatique des séparateurs.
+      initialEntryMode: DatePickerEntryMode.calendarOnly,
     );
 
     if (picked != null) {
@@ -582,9 +593,47 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
           picked.start.day,
         );
         _checkOut = DateTime(picked.end.year, picked.end.month, picked.end.day);
+        _checkInController.text = _df.format(_checkIn!);
+        _checkOutController.text = _df.format(_checkOut!);
       });
       _refreshAvailability();
     }
+  }
+
+  /// Convertit « jj/mm/aaaa » en date, ou `null` si la saisie est incomplète
+  /// ou invalide (31/02/2026 est refusé grâce à `parseStrict`).
+  DateTime? _parseDate(String text) {
+    if (text.length != 10) return null;
+    try {
+      final d = _df.parseStrict(text);
+      return DateTime(d.year, d.month, d.day);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Widget _buildDateField({
+    required TextEditingController controller,
+    required String label,
+    required ValueChanged<DateTime?> onParsed,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: TextInputType.number,
+      inputFormatters: [_DateSlashFormatter()],
+      maxLength: 10,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: 'jj/mm/aaaa',
+        counterText: '',
+      ),
+      validator: (v) {
+        final text = (v ?? '').trim();
+        if (text.isEmpty) return null;
+        return _parseDate(text) == null ? 'Date invalide' : null;
+      },
+      onChanged: (value) => onParsed(_parseDate(value.trim())),
+    );
   }
 
   void _onTypeChanged(String? value) {
@@ -823,14 +872,36 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
                       (v == null || v.isEmpty) ? 'Choisissez un type' : null,
                 ),
                 const SizedBox(height: 10),
-                OutlinedButton.icon(
-                  onPressed: _pickDates,
-                  icon: const Icon(Icons.date_range),
-                  label: Text(
-                    (_checkIn != null && _checkOut != null)
-                        ? '${_df.format(_checkIn!)} → ${_df.format(_checkOut!)}'
-                        : 'Choisir les dates',
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _buildDateField(
+                        controller: _checkInController,
+                        label: 'Arrivée',
+                        onParsed: (d) {
+                          setState(() => _checkIn = d);
+                          _refreshAvailability();
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _buildDateField(
+                        controller: _checkOutController,
+                        label: 'Départ',
+                        onParsed: (d) {
+                          setState(() => _checkOut = d);
+                          _refreshAvailability();
+                        },
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Choisir au calendrier',
+                      onPressed: _pickDates,
+                      icon: const Icon(Icons.date_range),
+                    ),
+                  ],
                 ),
                 _buildAvailabilityHint(),
                 const SizedBox(height: 6),
@@ -898,6 +969,35 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
           label: Text(_isSaving ? 'Création...' : 'Créer'),
         ),
       ],
+    );
+  }
+}
+
+/// Insère automatiquement les « / » pendant la frappe d'une date (jj/mm/aaaa).
+///
+/// PIÈGE : le pavé numérique des téléphones n'expose pas le caractère « / »,
+/// la date était donc impossible à saisir au clavier. Ici l'utilisateur tape
+/// « 27072026 » et le champ affiche « 27/07/2026 ». Les séparateurs collés/
+/// tapés à la main sont ignorés puis réinsérés au bon endroit.
+class _DateSlashFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final digits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+    final capped = digits.length > 8 ? digits.substring(0, 8) : digits;
+
+    final buffer = StringBuffer();
+    for (var i = 0; i < capped.length; i++) {
+      if (i == 2 || i == 4) buffer.write('/');
+      buffer.write(capped[i]);
+    }
+    final text = buffer.toString();
+
+    return TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
     );
   }
 }

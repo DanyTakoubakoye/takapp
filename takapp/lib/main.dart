@@ -35,6 +35,8 @@ import 'package:takapp/services/printer_service.dart';
 
 import 'package:takapp/vues/commun/home_router.dart';
 
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -119,8 +121,9 @@ class MyApp extends StatelessWidget {
         ),
 
         ChangeNotifierProxyProvider<
-            GeranteHandoverService,
-            GeranteHandoverController>(
+          GeranteHandoverService,
+          GeranteHandoverController
+        >(
           create: (context) =>
               GeranteHandoverController(context.read<GeranteHandoverService>()),
           update: (context, service, previous) =>
@@ -128,8 +131,9 @@ class MyApp extends StatelessWidget {
         ),
 
         ChangeNotifierProxyProvider<
-            ComptabiliteService,
-            ComptabiliteController>(
+          ComptabiliteService,
+          ComptabiliteController
+        >(
           create: (context) =>
               ComptabiliteController(context.read<ComptabiliteService>()),
           update: (context, service, previous) =>
@@ -137,8 +141,9 @@ class MyApp extends StatelessWidget {
         ),
 
         ChangeNotifierProxyProvider<
-            OwnerDashboardService,
-            OwnerDashboardController>(
+          OwnerDashboardService,
+          OwnerDashboardController
+        >(
           create: (context) =>
               OwnerDashboardController(context.read<OwnerDashboardService>()),
           update: (context, service, previous) =>
@@ -150,6 +155,13 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'TAKHOTEL',
         theme: AppTheme.lightTheme,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('fr', 'FR')],
+        locale: const Locale('fr', 'FR'),
         home: const HomeRouter(),
       ),
     );

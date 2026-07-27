@@ -53,6 +53,8 @@ dependencies:
   certilink_flutter_sdk:
     path: ../../Certilink/certilink_flutter_sdk
   firebase_storage: ^13.4.5
+  flutter_localizations:
+    sdk: flutter
   
 flutter_launcher_icons:
   android: true
