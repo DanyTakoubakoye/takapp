@@ -60,8 +60,6 @@ class NotificationService {
 
     final token = await _messaging.getToken();
 
-    debugPrint('FCM TOKEN = $token');
-
     if (token == null || token.trim().isEmpty) return;
 
     await _firestore.collection('users').doc(user.uid).set({
@@ -70,8 +68,6 @@ class NotificationService {
     }, SetOptions(merge: true));
 
     _messaging.onTokenRefresh.listen((newToken) async {
-      debugPrint('FCM TOKEN REFRESH = $newToken');
-
       await _firestore.collection('users').doc(user.uid).set({
         'fcmToken': newToken,
         'lastTokenUpdate': FieldValue.serverTimestamp(),
@@ -130,45 +126,36 @@ class NotificationService {
         .where('isRead', isEqualTo: false)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .listen(
-          (snapshot) async {
-            if (snapshot.docs.isEmpty) return;
-            if (_isPopupOpen) return;
-            final doc = snapshot.docs.first;
-            final data = doc.data();
-            if (_alreadyShownNotificationIds.contains(doc.id)) return;
-            _alreadyShownNotificationIds.add(doc.id);
-            final title = (data['title'] ?? '').toString();
-            final body = (data['body'] ?? '').toString();
-            final source = (data['source'] ?? 'kitchen').toString();
+        .listen((snapshot) async {
+          if (snapshot.docs.isEmpty) return;
+          if (_isPopupOpen) return;
+          final doc = snapshot.docs.first;
+          final data = doc.data();
+          if (_alreadyShownNotificationIds.contains(doc.id)) return;
+          _alreadyShownNotificationIds.add(doc.id);
+          final title = (data['title'] ?? '').toString();
+          final body = (data['body'] ?? '').toString();
+          final source = (data['source'] ?? 'kitchen').toString();
 
+          try {
+            await _showLocalNotificationFromFirestore(
+              notificationId: doc.id,
+              title: title,
+              body: body,
+              source: source,
+            );
+          } catch (e) {}
+
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
             try {
-              await _showLocalNotificationFromFirestore(
+              await _showInAppPopup(
                 notificationId: doc.id,
                 title: title,
                 body: body,
-                source: source,
               );
-            } catch (e) {
-              debugPrint('Notif locale ignorée: $e');
-            }
-
-            WidgetsBinding.instance.addPostFrameCallback((_) async {
-              try {
-                await _showInAppPopup(
-                  notificationId: doc.id,
-                  title: title,
-                  body: body,
-                );
-              } catch (e) {
-                debugPrint('Popup notif ignoré: $e');
-              }
-            });
-          },
-          onError: (error, stack) {
-            debugPrint('Server notifications listener error: $error');
-          },
-        );
+            } catch (e) {}
+          });
+        }, onError: (error, stack) {});
   }
 
   void stopServerNotificationListener() {
@@ -318,7 +305,6 @@ class NotificationService {
   /// Le son web est géré séparément par playWebNotificationSound.
   /// [department] : 'kitchen' ou 'bar' — choisit le canal et le son.
   Future<void> playNewOrderSound({required String department}) async {
-    debugPrint('SON DEBUG: playNewOrderSound APPELÉE, department=$department');
     try {
       final bool isBar = department == 'bar';
       final channelId = isBar
@@ -351,11 +337,7 @@ class NotificationService {
         body: '',
         notificationDetails: details,
       );
-      debugPrint('SON DEBUG: _localNotifications.show TERMINÉ pour $channelId');
-    } catch (e, stack) {
-      debugPrint('SON DEBUG ERREUR: $e');
-      debugPrint('SON DEBUG STACK: $stack');
-    }
+    } catch (e) {}
   }
 
   Future<void> _showInAppPopup({
@@ -365,8 +347,6 @@ class NotificationService {
   }) async {
     final navigatorState = appNavigatorKey.currentState;
     final context = navigatorState?.overlay?.context;
-
-    debugPrint('SHOW POPUP context=${context != null} title=$title');
 
     if (context == null) return;
 

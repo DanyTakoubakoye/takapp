@@ -56,11 +56,9 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
 
         playWebNotificationSound(
           'kitchen_new_order',
-          establishmentId: widget.establishmentId, 
+          establishmentId: widget.establishmentId,
         );
-        debugPrint(
-          'SON DEBUG cuisine: kIsWeb=$kIsWeb, appel playNewOrderSound',
-        );
+
         if (!kIsWeb) {
           NotificationService().playNewOrderSound(department: 'kitchen');
         }
@@ -73,9 +71,7 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
         );
 
         _showNewOrderPopup(orderNumber, clientLabel);
-      } catch (e) {
-        debugPrint('Notif cuisine ignorée: $e');
-      }
+      } catch (e) {}
     }
   }
 
@@ -930,7 +926,6 @@ class _KitchenOrderCard extends StatelessWidget {
     final serveurId = (data['createdBy'] ?? '').toString().trim();
 
     if (serveurId.isEmpty) {
-      debugPrint('Impossible de créer la notification : createdBy vide.');
       return;
     }
 
