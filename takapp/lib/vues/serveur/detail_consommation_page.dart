@@ -778,40 +778,66 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                     const SizedBox(height: 16),
 
                     if (_isSmall)
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: (isPrintingOrPaying)
-                              ? null
-                              : () {
-                                  if (isFiscalized) {
-                                    _printFiscalizedInvoice(
+                      Column(
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton.icon(
+                              onPressed: (isPrintingOrPaying)
+                                  ? null
+                                  : () {
+                                      if (isFiscalized) {
+                                        _printFiscalizedInvoice(
+                                          activeItems,
+                                          orderDoc,
+                                        );
+                                      } else {
+                                        _fiscalize(activeItems, orderDoc);
+                                      }
+                                    },
+                              icon: isPrintingOrPaying
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Icon(
+                                      isFiscalized
+                                          ? Icons.verified_outlined
+                                          : Icons.verified,
+                                    ),
+                              label: Text(
+                                isFiscalized
+                                    ? 'Imprimer facture normalisée'
+                                    : 'Fiscaliser',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: (isPrintingOrPaying)
+                                  ? null
+                                  : () => _printNormalInvoice(
                                       activeItems,
                                       orderDoc,
-                                    );
-                                  } else {
-                                    _fiscalize(activeItems, orderDoc);
-                                  }
-                                },
-                          icon: isPrintingOrPaying
-                              ? const SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Icon(
-                                  isFiscalized
-                                      ? Icons.verified_outlined
-                                      : Icons.verified,
-                                ),
-                          label: Text(
-                            isFiscalized
-                                ? 'Imprimer facture normalisée'
-                                : 'Fiscaliser',
+                                    ),
+                              icon: isPrintingOrPaying
+                                  ? const SizedBox(
+                                      width: 18,
+                                      height: 18,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : const Icon(Icons.print_outlined),
+                              label: const Text('Imprimer facture simple'),
+                            ),
                           ),
-                        ),
+                        ],
                       )
                     else
                       Row(
