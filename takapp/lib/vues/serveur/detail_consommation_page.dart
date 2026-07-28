@@ -596,312 +596,321 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                   .where((item) => item['isCancelled'] != true)
                   .toList();
 
-              return SingleChildScrollView(
-                padding: EdgeInsets.all(_isSmall ? 12 : 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (isFiscalized)
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        margin: const EdgeInsets.only(bottom: 14),
-                        decoration: BoxDecoration(
-                          color: Colors.green.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.green),
+              return SafeArea(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.fromLTRB(
+                    _isSmall ? 12 : 16,
+                    _isSmall ? 12 : 16,
+                    _isSmall ? 12 : 16,
+                    32,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (isFiscalized)
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          margin: const EdgeInsets.only(bottom: 14),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.green),
+                          ),
+                          child: const Text(
+                            'FACTURE CERTIFIEE',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
                         ),
-                        child: const Text(
-                          'FACTURE CERTIFIEE',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _sectionTitle('Informations générales'),
+                              _infoRow(
+                                'Commande',
+                                widget.order.orderNumber,
+                                bold: true,
+                              ),
+                              _infoRow(
+                                'Date',
+                                _formatDate(widget.order.createdAt),
+                              ),
+                              _infoRow('Client', _clientLabel(widget.order)),
+                              _infoRow(
+                                'Type',
+                                widget.order.clientType.toUpperCase(),
+                              ),
+                              _infoRow(
+                                'Montant',
+                                '${widget.order.total.toStringAsFixed(0)} FCFA',
+                                bold: true,
+                              ),
+                            ],
                           ),
                         ),
                       ),
 
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _sectionTitle('Informations générales'),
-                            _infoRow(
-                              'Commande',
-                              widget.order.orderNumber,
-                              bold: true,
-                            ),
-                            _infoRow(
-                              'Date',
-                              _formatDate(widget.order.createdAt),
-                            ),
-                            _infoRow('Client', _clientLabel(widget.order)),
-                            _infoRow(
-                              'Type',
-                              widget.order.clientType.toUpperCase(),
-                            ),
-                            _infoRow(
-                              'Montant',
-                              '${widget.order.total.toStringAsFixed(0)} FCFA',
-                              bold: true,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                      const SizedBox(height: 12),
 
-                    const SizedBox(height: 12),
-
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _sectionTitle('Informations client (facultatives)'),
-
-                            TextField(
-                              controller: clientNameController,
-                              decoration: const InputDecoration(
-                                labelText: 'Nom du client',
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _sectionTitle(
+                                'Informations client (facultatives)',
                               ),
-                            ),
 
-                            const SizedBox(height: 12),
-
-                            TextField(
-                              controller: clientAddressController,
-                              decoration: const InputDecoration(
-                                labelText: 'Adresse du client',
-                              ),
-                            ),
-
-                            const SizedBox(height: 12),
-
-                            TextField(
-                              controller: clientIfuController,
-                              decoration: const InputDecoration(
-                                labelText: 'IFU du client',
-                              ),
-                            ),
-
-                            const SizedBox(height: 12),
-
-                            DropdownButtonFormField<String>(
-                              initialValue: selectedPaymentMethod,
-                              decoration: const InputDecoration(
-                                labelText: 'Mode de paiement',
-                              ),
-                              items: AppPaymentMethods.labels.entries
-                                  .map(
-                                    (entry) => DropdownMenuItem<String>(
-                                      value: entry.key,
-                                      child: Text(entry.value),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: (value) {
-                                if (value == null) {
-                                  return;
-                                }
-
-                                setState(() {
-                                  selectedPaymentMethod = value;
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _sectionTitle('Articles consommés'),
-
-                            ...activeItems.map((item) {
-                              final quantity = (item['quantity'] ?? 0) as int;
-
-                              final unitPrice =
-                                  (item['unitPrice'] ?? 0) as double;
-
-                              final total = (item['total'] ?? 0) as double;
-
-                              return Card(
-                                margin: const EdgeInsets.only(bottom: 10),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        item['name']?.toString() ?? '',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-
-                                      const SizedBox(height: 6),
-
-                                      Text('Qté : $quantity'),
-
-                                      Text(
-                                        'P.U : ${unitPrice.toStringAsFixed(0)} FCFA',
-                                      ),
-
-                                      Text(
-                                        'Total : ${total.toStringAsFixed(0)} FCFA',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                              TextField(
+                                controller: clientNameController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Nom du client',
                                 ),
-                              );
-                            }),
-                          ],
+                              ),
+
+                              const SizedBox(height: 12),
+
+                              TextField(
+                                controller: clientAddressController,
+                                decoration: const InputDecoration(
+                                  labelText: 'Adresse du client',
+                                ),
+                              ),
+
+                              const SizedBox(height: 12),
+
+                              TextField(
+                                controller: clientIfuController,
+                                decoration: const InputDecoration(
+                                  labelText: 'IFU du client',
+                                ),
+                              ),
+
+                              const SizedBox(height: 12),
+
+                              DropdownButtonFormField<String>(
+                                initialValue: selectedPaymentMethod,
+                                decoration: const InputDecoration(
+                                  labelText: 'Mode de paiement',
+                                ),
+                                items: AppPaymentMethods.labels.entries
+                                    .map(
+                                      (entry) => DropdownMenuItem<String>(
+                                        value: entry.key,
+                                        child: Text(entry.value),
+                                      ),
+                                    )
+                                    .toList(),
+                                onChanged: (value) {
+                                  if (value == null) {
+                                    return;
+                                  }
+
+                                  setState(() {
+                                    selectedPaymentMethod = value;
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
 
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 12),
 
-                    if (_isSmall)
-                      Column(
-                        children: [
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: (isPrintingOrPaying)
-                                  ? null
-                                  : () {
-                                      if (isFiscalized) {
-                                        _printFiscalizedInvoice(
-                                          activeItems,
-                                          orderDoc,
-                                        );
-                                      } else {
-                                        _fiscalize(activeItems, orderDoc);
-                                      }
-                                    },
-                              icon: isPrintingOrPaying
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : Icon(
-                                      isFiscalized
-                                          ? Icons.verified_outlined
-                                          : Icons.verified,
-                                    ),
-                              label: Text(
-                                isFiscalized
-                                    ? 'Imprimer facture normalisée'
-                                    : 'Fiscaliser',
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            width: double.infinity,
-                            child: OutlinedButton.icon(
-                              onPressed: (isPrintingOrPaying)
-                                  ? null
-                                  : () => _printNormalInvoice(
-                                      activeItems,
-                                      orderDoc,
-                                    ),
-                              icon: isPrintingOrPaying
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : const Icon(Icons.print_outlined),
-                              label: const Text('Imprimer facture simple'),
-                            ),
-                          ),
-                        ],
-                      )
-                    else
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton.icon(
-                              onPressed: (isPrintingOrPaying)
-                                  ? null
-                                  : () {
-                                      if (isFiscalized) {
-                                        _printFiscalizedInvoice(
-                                          activeItems,
-                                          orderDoc,
-                                        );
-                                      } else {
-                                        _fiscalize(activeItems, orderDoc);
-                                      }
-                                    },
-                              icon: isPrintingOrPaying
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : Icon(
-                                      isFiscalized
-                                          ? Icons.verified_outlined
-                                          : Icons.verified,
-                                    ),
-                              label: Text(
-                                isFiscalized
-                                    ? 'Imprimer facture normalisée'
-                                    : 'Fiscaliser',
-                              ),
-                            ),
-                          ),
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _sectionTitle('Articles consommés'),
 
-                          const SizedBox(width: 12),
+                              ...activeItems.map((item) {
+                                final quantity = (item['quantity'] ?? 0) as int;
 
-                          Expanded(
-                            child: OutlinedButton.icon(
-                              onPressed: (isPrintingOrPaying)
-                                  ? null
-                                  : () => _printNormalInvoice(
-                                      activeItems,
-                                      orderDoc,
+                                final unitPrice =
+                                    (item['unitPrice'] ?? 0) as double;
+
+                                final total = (item['total'] ?? 0) as double;
+
+                                return Card(
+                                  margin: const EdgeInsets.only(bottom: 10),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item['name']?.toString() ?? '',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+
+                                        const SizedBox(height: 6),
+
+                                        Text('Qté : $quantity'),
+
+                                        Text(
+                                          'P.U : ${unitPrice.toStringAsFixed(0)} FCFA',
+                                        ),
+
+                                        Text(
+                                          'Total : ${total.toStringAsFixed(0)} FCFA',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                              icon: isPrintingOrPaying
-                                  ? const SizedBox(
-                                      width: 18,
-                                      height: 18,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    )
-                                  : const Icon(Icons.print_outlined),
-                              label: const Text('Imprimer facture simple'),
-                            ),
+                                  ),
+                                );
+                              }),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
-                  ],
+
+                      const SizedBox(height: 16),
+
+                      if (_isSmall)
+                        Column(
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton.icon(
+                                onPressed: (isPrintingOrPaying)
+                                    ? null
+                                    : () {
+                                        if (isFiscalized) {
+                                          _printFiscalizedInvoice(
+                                            activeItems,
+                                            orderDoc,
+                                          );
+                                        } else {
+                                          _fiscalize(activeItems, orderDoc);
+                                        }
+                                      },
+                                icon: isPrintingOrPaying
+                                    ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Icon(
+                                        isFiscalized
+                                            ? Icons.verified_outlined
+                                            : Icons.verified,
+                                      ),
+                                label: Text(
+                                  isFiscalized
+                                      ? 'Imprimer facture normalisée'
+                                      : 'Fiscaliser',
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              width: double.infinity,
+                              child: OutlinedButton.icon(
+                                onPressed: (isPrintingOrPaying)
+                                    ? null
+                                    : () => _printNormalInvoice(
+                                        activeItems,
+                                        orderDoc,
+                                      ),
+                                icon: isPrintingOrPaying
+                                    ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Icon(Icons.print_outlined),
+                                label: const Text('Imprimer facture simple'),
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                onPressed: (isPrintingOrPaying)
+                                    ? null
+                                    : () {
+                                        if (isFiscalized) {
+                                          _printFiscalizedInvoice(
+                                            activeItems,
+                                            orderDoc,
+                                          );
+                                        } else {
+                                          _fiscalize(activeItems, orderDoc);
+                                        }
+                                      },
+                                icon: isPrintingOrPaying
+                                    ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : Icon(
+                                        isFiscalized
+                                            ? Icons.verified_outlined
+                                            : Icons.verified,
+                                      ),
+                                label: Text(
+                                  isFiscalized
+                                      ? 'Imprimer facture normalisée'
+                                      : 'Fiscaliser',
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(width: 12),
+
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: (isPrintingOrPaying)
+                                    ? null
+                                    : () => _printNormalInvoice(
+                                        activeItems,
+                                        orderDoc,
+                                      ),
+                                icon: isPrintingOrPaying
+                                    ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Icon(Icons.print_outlined),
+                                label: const Text('Imprimer facture simple'),
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
                 ),
               );
             },

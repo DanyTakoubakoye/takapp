@@ -250,16 +250,19 @@ class ReservationService {
     return _col(establishmentId: resolved).snapshots().map((snapshot) {
       final list = snapshot.docs
           .map((doc) => ReservationModel.fromMap(doc.id, doc.data()))
+          // a. Masquer les réservations annulées et terminées (checked_out)
+          .where((r) => r.status != 'cancelled' && r.status != 'checked_out')
           .toList();
 
-      // Tri par date d'arrivée (plus proche d'abord)
+      // b. Tri par date de création décroissante (récentes en haut,
+      //    anciennes en bas). Repli sur checkInDate si createdAt absent.
       list.sort((a, b) {
-        final ad = a.checkInDate;
-        final bd = b.checkInDate;
+        final ad = a.createdAt ?? a.checkInDate;
+        final bd = b.createdAt ?? b.checkInDate;
         if (ad == null && bd == null) return 0;
         if (ad == null) return 1;
         if (bd == null) return -1;
-        return ad.compareTo(bd);
+        return bd.compareTo(ad); // décroissant
       });
 
       return list;
