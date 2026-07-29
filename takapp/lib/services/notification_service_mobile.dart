@@ -101,6 +101,7 @@ class NotificationService {
       priority: Priority.high,
       playSound: true,
       sound: sound,
+      fullScreenIntent: true,
     );
 
     final details = NotificationDetails(android: androidDetails);
@@ -289,6 +290,7 @@ class NotificationService {
       priority: Priority.high,
       playSound: true,
       sound: sound,
+      fullScreenIntent: true,
     );
 
     final details = NotificationDetails(android: androidDetails);
@@ -328,6 +330,7 @@ class NotificationService {
         priority: Priority.high,
         playSound: true,
         sound: sound,
+        fullScreenIntent: true,
       );
       final details = NotificationDetails(android: androidDetails);
 
