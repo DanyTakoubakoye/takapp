@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:takapp/services/menu_ingredient_service.dart';
 
+import 'package:excel/excel.dart' as xlsx;
+import 'package:file_picker/file_picker.dart';
+
 class MenuItemIngredientsFormPage extends StatefulWidget {
   final String establishmentId;
 
@@ -135,6 +138,221 @@ class _MenuItemIngredientsFormPageState
     }
   }
 
+  /// Normalise un nom pour le matching (minuscules + espaces compactés).
+  String _norm(String s) =>
+      s.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+
+  Future<void> _importFromExcel(
+    List<DocumentSnapshot<Map<String, dynamic>>> menuItems,
+    List<DocumentSnapshot<Map<String, dynamic>>> stockItems,
+  ) async {
+    if (establishmentId.isEmpty) {
+      _showMessage('Établissement introuvable.');
+      return;
+    }
+
+    // 1. Choisir le fichier
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['xlsx'],
+      withData: true,
+    );
+    if (result == null || result.files.isEmpty) return;
+
+    final bytes = result.files.first.bytes;
+    if (bytes == null) {
+      _showMessage('Impossible de lire le fichier.');
+      return;
+    }
+
+    setState(() => isSaving = true);
+
+    try {
+      // 2. Index des noms → id (normalisés)
+      final menuByName = <String, String>{}; // nom -> menuItemId
+      final menuNameById = <String, String>{}; // menuItemId -> nom affiché
+      for (final doc in menuItems) {
+        final name = (doc.data()?['name'] ?? '').toString();
+        if (name.trim().isEmpty) continue;
+        menuByName[_norm(name)] = doc.id;
+        menuNameById[doc.id] = name;
+      }
+
+      final stockByName = <String, DocumentSnapshot<Map<String, dynamic>>>{};
+      for (final doc in stockItems) {
+        final name = (doc.data()?['name'] ?? '').toString();
+        if (name.trim().isEmpty) continue;
+        stockByName[_norm(name)] = doc;
+      }
+
+      // 3. Lire l'Excel
+      final excel = xlsx.Excel.decodeBytes(bytes);
+      if (excel.tables.isEmpty) {
+        _showMessage('Fichier Excel vide.');
+        return;
+      }
+      final sheet = excel.tables.values.first;
+      final rows = sheet.rows;
+      if (rows.length < 2) {
+        _showMessage('Le fichier ne contient aucune ligne de données.');
+        return;
+      }
+
+      // 4. Regrouper par plat : menuItemId -> liste d'ingrédients
+      final recipes = <String, List<Map<String, dynamic>>>{};
+      final platsNonTrouves = <String>{};
+      final ingredientsNonTrouves = <String>{};
+      int lignesIgnorees = 0;
+
+      // On saute la ligne d'en-tête (index 0)
+      for (var i = 1; i < rows.length; i++) {
+        final row = rows[i];
+        if (row.length < 3) {
+          lignesIgnorees++;
+          continue;
+        }
+
+        final platName = (row[0]?.value ?? '').toString().trim();
+        final ingName = (row[1]?.value ?? '').toString().trim();
+        final qtyRaw = (row[2]?.value ?? '').toString().trim();
+
+        // Ligne vide → on ignore silencieusement
+        if (platName.isEmpty && ingName.isEmpty && qtyRaw.isEmpty) continue;
+
+        final quantity = int.tryParse(qtyRaw);
+        if (platName.isEmpty ||
+            ingName.isEmpty ||
+            quantity == null ||
+            quantity <= 0) {
+          lignesIgnorees++;
+          continue;
+        }
+
+        final menuId = menuByName[_norm(platName)];
+        if (menuId == null) {
+          platsNonTrouves.add(platName);
+          continue;
+        }
+
+        final stockDoc = stockByName[_norm(ingName)];
+        if (stockDoc == null) {
+          ingredientsNonTrouves.add(ingName);
+          continue;
+        }
+
+        final data = stockDoc.data() ?? {};
+        recipes.putIfAbsent(menuId, () => []).add({
+          'itemId': stockDoc.id,
+          'itemName': data['name'] ?? '',
+          'quantity': quantity,
+          'store': data['store'] ?? 'restaurant',
+          'unit': data['unit'] ?? '',
+        });
+      }
+
+      // 5. Enregistrer chaque recette (remplacement)
+      int importes = 0;
+      for (final entry in recipes.entries) {
+        await _service.updateMenuItemIngredients(
+          establishmentId: establishmentId,
+          menuItemId: entry.key,
+          ingredients: entry.value,
+        );
+        importes++;
+      }
+
+      if (!mounted) return;
+
+      // 6. Rapport
+      await _showImportReport(
+        importes: importes,
+        platsNonTrouves: platsNonTrouves.toList()..sort(),
+        ingredientsNonTrouves: ingredientsNonTrouves.toList()..sort(),
+        lignesIgnorees: lignesIgnorees,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      _showMessage('Erreur lors de l\'import : $e');
+    } finally {
+      if (mounted) setState(() => isSaving = false);
+    }
+  }
+
+  Future<void> _showImportReport({
+    required int importes,
+    required List<String> platsNonTrouves,
+    required List<String> ingredientsNonTrouves,
+    required int lignesIgnorees,
+  }) async {
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Rapport d\'import'),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    '$importes recette(s) importée(s)',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              if (lignesIgnorees > 0) ...[
+                const SizedBox(height: 8),
+                Text('$lignesIgnorees ligne(s) ignorée(s) (incomplètes).'),
+              ],
+              if (platsNonTrouves.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                const Text(
+                  'Plats non trouvés :',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                ...platsNonTrouves.map((p) => Text('• $p')),
+              ],
+              if (ingredientsNonTrouves.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                const Text(
+                  'Ingrédients non trouvés :',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                ...ingredientsNonTrouves.map((i) => Text('• $i')),
+              ],
+              if (platsNonTrouves.isNotEmpty ||
+                  ingredientsNonTrouves.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                const Text(
+                  'Vérifiez que ces noms correspondent exactement à ceux '
+                  'saisis dans l\'application.',
+                  style: TextStyle(fontStyle: FontStyle.italic, fontSize: 12),
+                ),
+              ],
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showMessage(String message) {
     ScaffoldMessenger.of(
       context,
@@ -209,7 +427,8 @@ class _MenuItemIngredientsFormPageState
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _header(context),
+                              _header(context, menuItems, stockItems),
+                              _formatHint(),
                               const SizedBox(height: 20),
                               DropdownButtonFormField<String>(
                                 initialValue:
@@ -323,7 +542,11 @@ class _MenuItemIngredientsFormPageState
     );
   }
 
-  Widget _header(BuildContext context) {
+  Widget _header(
+    BuildContext context,
+    List<DocumentSnapshot<Map<String, dynamic>>> menuItems,
+    List<DocumentSnapshot<Map<String, dynamic>>> stockItems,
+  ) {
     return Row(
       children: [
         Container(
@@ -343,7 +566,58 @@ class _MenuItemIngredientsFormPageState
             ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
           ),
         ),
+        OutlinedButton.icon(
+          onPressed: isSaving
+              ? null
+              : () => _importFromExcel(menuItems, stockItems),
+          icon: const Icon(Icons.upload_file),
+          label: const Text('Importer Excel'),
+        ),
       ],
+    );
+  }
+
+  Widget _formatHint() {
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.deepOrange.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.deepOrange.withValues(alpha: 0.25)),
+      ),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Format Excel attendu',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 8),
+          Text('Une ligne par ingrédient (le nom du plat est répété).'),
+          SizedBox(height: 8),
+          Text('Colonnes :'),
+          SizedBox(height: 4),
+          Text(
+            'plat | ingredient | quantite',
+            style: TextStyle(fontFamily: 'monospace'),
+          ),
+          SizedBox(height: 8),
+          Text('Exemple :'),
+          SizedBox(height: 4),
+          Text(
+            'Poulet braisé | Poulet | 1\n'
+            'Poulet braisé | Oignon | 2',
+            style: TextStyle(fontFamily: 'monospace'),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'Les noms des plats et ingrédients doivent déjà exister '
+            'dans l\'application.',
+            style: TextStyle(fontStyle: FontStyle.italic, fontSize: 12),
+          ),
+        ],
+      ),
     );
   }
 
