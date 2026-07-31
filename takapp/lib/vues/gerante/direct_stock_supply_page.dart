@@ -21,10 +21,13 @@ class DirectStockSupplyPage extends StatefulWidget {
   State<DirectStockSupplyPage> createState() => _DirectStockSupplyPageState();
 }
 
+final StockItemService _service = StockItemService();
+
 class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
   final TextEditingController _reasonController = TextEditingController(
     text: 'Approvisionnement direct gérante',
   );
+  late final Stream<List<StockItemModel>> _itemsStream;
 
   final List<_SupplyLineInput> _lines = [_SupplyLineInput()];
 
@@ -126,6 +129,16 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    _itemsStream = _service.streamItems(
+      establishmentId: establishmentId,
+      store: widget.store,
+    );
+  }
+
+  @override
   void dispose() {
     _reasonController.dispose();
 
@@ -138,7 +151,6 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
 
   @override
   Widget build(BuildContext context) {
-    final service = StockItemService();
     final controller = context.watch<StoreStockController>();
     final color = _storeColor();
     final isSmall = MediaQuery.of(context).size.width < 800;
@@ -152,10 +164,7 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: StreamBuilder<List<StockItemModel>>(
-        stream: service.streamItems(
-          establishmentId: establishmentId,
-          store: widget.store,
-        ),
+        stream: _itemsStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

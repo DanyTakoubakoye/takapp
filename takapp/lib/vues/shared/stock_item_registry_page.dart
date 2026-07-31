@@ -5,6 +5,9 @@ import 'package:takapp/modeles/stock_item_model.dart';
 import 'package:takapp/services/stock_item_service.dart';
 import 'package:takapp/vues/commun/module_visibility.dart';
 
+import 'package:excel/excel.dart' as xlsx;
+import 'package:file_picker/file_picker.dart';
+
 class StockItemRegistryPage extends StatefulWidget {
   final String establishmentId;
 
@@ -78,6 +81,211 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
         setState(() => _isSaving = false);
       }
     }
+  }
+
+  /// Normalise pour comparaison (minuscules + espaces compactés, sans accents gênants).
+  String _norm(String s) =>
+      s.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+
+  /// Convertit le libellé magasin (FR ou EN) vers la clé interne, ou null si inconnu.
+  String? _resolveStore(String raw) {
+    switch (_norm(raw)) {
+      case 'hotel':
+      case 'hôtel':
+        return 'hotel';
+      case 'restaurant':
+        return 'restaurant';
+      case 'bar':
+        return 'bar';
+      default:
+        return null;
+    }
+  }
+
+  /// Retrouve la catégorie exacte (telle que dans _categories) à partir d'un texte, ou null.
+  String? _resolveCategory(String raw) {
+    final n = _norm(raw);
+    for (final c in _categories) {
+      if (_norm(c) == n) return c;
+    }
+    return null;
+  }
+
+  Future<void> _importFromExcel() async {
+    if (widget.establishmentId.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Établissement introuvable.')),
+      );
+      return;
+    }
+
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['xlsx'],
+      withData: true,
+    );
+    if (result == null || result.files.isEmpty) return;
+
+    final bytes = result.files.first.bytes;
+    if (bytes == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Impossible de lire le fichier.')),
+      );
+      return;
+    }
+
+    setState(() => _isSaving = true);
+
+    try {
+      final excel = xlsx.Excel.decodeBytes(bytes);
+      if (excel.tables.isEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Fichier Excel vide.')));
+        return;
+      }
+      final sheet = excel.tables.values.first;
+      final rows = sheet.rows;
+      if (rows.length < 2) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Aucune ligne de données.')),
+        );
+        return;
+      }
+
+      int importes = 0;
+      final lignesRejetees = <String>[];
+      int lignesIgnorees = 0;
+
+      // Ligne 0 = en-tête, on commence à 1
+      for (var i = 1; i < rows.length; i++) {
+        final row = rows[i];
+        if (row.length < 4) {
+          lignesIgnorees++;
+          continue;
+        }
+
+        final name = (row[0]?.value ?? '').toString().trim();
+        final categoryRaw = (row[1]?.value ?? '').toString().trim();
+        final unit = (row[2]?.value ?? '').toString().trim();
+        final storeRaw = (row[3]?.value ?? '').toString().trim();
+
+        // Ligne totalement vide → ignorée silencieusement
+        if (name.isEmpty &&
+            categoryRaw.isEmpty &&
+            unit.isEmpty &&
+            storeRaw.isEmpty) {
+          continue;
+        }
+
+        if (name.isEmpty || unit.isEmpty) {
+          lignesRejetees.add('Ligne ${i + 1} : nom ou unité manquant.');
+          continue;
+        }
+
+        final category = _resolveCategory(categoryRaw);
+        if (category == null) {
+          lignesRejetees.add(
+            'Ligne ${i + 1} ($name) : catégorie inconnue « $categoryRaw ».',
+          );
+          continue;
+        }
+
+        final store = _resolveStore(storeRaw);
+        if (store == null) {
+          lignesRejetees.add(
+            'Ligne ${i + 1} ($name) : magasin inconnu « $storeRaw ».',
+          );
+          continue;
+        }
+
+        await _service.createItem(
+          establishmentId: widget.establishmentId,
+          name: name,
+          category: category,
+          unit: unit,
+          store: store,
+        );
+        importes++;
+      }
+
+      if (!mounted) return;
+
+      await _showImportReport(
+        importes: importes,
+        lignesRejetees: lignesRejetees,
+        lignesIgnorees: lignesIgnorees,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erreur lors de l\'import : $e')));
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  Future<void> _showImportReport({
+    required int importes,
+    required List<String> lignesRejetees,
+    required int lignesIgnorees,
+  }) async {
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Rapport d\'import'),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                  const SizedBox(width: 8),
+                  Text(
+                    '$importes article(s) créé(s)',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              if (lignesIgnorees > 0) ...[
+                const SizedBox(height: 8),
+                Text('$lignesIgnorees ligne(s) vide(s) ignorée(s).'),
+              ],
+              if (lignesRejetees.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                const Text(
+                  'Lignes rejetées :',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                ...lignesRejetees.map((l) => Text('• $l')),
+                const SizedBox(height: 12),
+                const Text(
+                  'Catégories valides : voir la liste du formulaire. '
+                  'Magasins valides : Hôtel, Restaurant, Bar.',
+                  style: TextStyle(fontStyle: FontStyle.italic, fontSize: 12),
+                ),
+              ],
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   Color _categoryColor(String category) {
@@ -363,6 +571,54 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                 ],
               ),
               const SizedBox(height: 18),
+              OutlinedButton.icon(
+                onPressed: _isSaving ? null : _importFromExcel,
+                icon: const Icon(Icons.upload_file),
+                label: const Text('Importer depuis Excel'),
+              ),
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withValues(alpha: 0.06),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
+                ),
+                child: const Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Format Excel attendu',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    Text('Colonnes :'),
+                    SizedBox(height: 4),
+                    Text(
+                      'name | category | unit | store',
+                      style: TextStyle(fontFamily: 'monospace'),
+                    ),
+                    SizedBox(height: 8),
+                    Text('Exemple :'),
+                    SizedBox(height: 4),
+                    Text(
+                      'Riz | Céréales | sac | restaurant\n'
+                      'Coca | Boissons | bouteille | Bar',
+                      style: TextStyle(fontFamily: 'monospace'),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'La catégorie doit exister dans la liste. '
+                      'Le magasin : Hôtel, Restaurant ou Bar.',
+                      style: TextStyle(
+                        fontStyle: FontStyle.italic,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
               TextFormField(
                 controller: _nameController,
                 textCapitalization: TextCapitalization.words,
@@ -630,8 +886,8 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                                         vertical: 5,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.blueGrey.withValues(alpha: 
-                                          0.10,
+                                        color: Colors.blueGrey.withValues(
+                                          alpha: 0.10,
                                         ),
                                         borderRadius: BorderRadius.circular(30),
                                       ),
@@ -650,7 +906,9 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                                         vertical: 5,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: storeColor.withValues(alpha: 0.10),
+                                        color: storeColor.withValues(
+                                          alpha: 0.10,
+                                        ),
                                         borderRadius: BorderRadius.circular(30),
                                       ),
                                       child: Row(
