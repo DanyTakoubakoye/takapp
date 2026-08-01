@@ -29,6 +29,8 @@ class NotificationService {
   // ⚠️ Nouveaux IDs de channel
   static const String kitchenChannelId = 'kitchen_ready_channel_v6';
   static const String barChannelId = 'bar_ready_channel_v6';
+  static const String newKitchenOrderChannelId = 'new_kitchen_order_channel_v2';
+  static const String newBarOrderChannelId = 'new_bar_order_channel_v2';
 
   /// Référence vers la sous-collection serverNotifications du tenant
   CollectionReference<Map<String, dynamic>> _notificationsRef(
@@ -221,7 +223,7 @@ class NotificationService {
       sound: RawResourceAndroidNotificationSound('bar_ready'),
     );
     const newKitchenOrderChannel = AndroidNotificationChannel(
-      'new_kitchen_order_channel_v1',
+      newKitchenOrderChannelId,
       'Nouvelle commande cuisine',
       description: 'Notifications nouvelle commande cuisine',
       importance: Importance.max,
@@ -230,7 +232,7 @@ class NotificationService {
     );
 
     const newBarOrderChannel = AndroidNotificationChannel(
-      'new_bar_order_channel_v1',
+      newBarOrderChannelId,
       'Nouvelle commande bar',
       description: 'Notifications nouvelle commande bar',
       importance: Importance.max,
@@ -261,12 +263,12 @@ class NotificationService {
     AndroidNotificationSound sound;
 
     if (source == 'bar_new_order') {
-      channelId = 'new_bar_order_channel_v1';
+      channelId = newBarOrderChannelId;
       channelName = 'Nouvelle commande bar';
       channelDescription = 'Nouvelle commande pour le bar';
       sound = const RawResourceAndroidNotificationSound('bar_ready');
     } else if (source == 'kitchen_new_order') {
-      channelId = 'new_kitchen_order_channel_v1';
+      channelId = newKitchenOrderChannelId;
       channelName = 'Nouvelle commande cuisine';
       channelDescription = 'Nouvelle commande pour la cuisine';
       sound = const RawResourceAndroidNotificationSound('kitchen_ready');
@@ -309,9 +311,7 @@ class NotificationService {
   Future<void> playNewOrderSound({required String department}) async {
     try {
       final bool isBar = department == 'bar';
-      final channelId = isBar
-          ? 'new_bar_order_channel_v1'
-          : 'new_kitchen_order_channel_v1';
+      final channelId = isBar ? newBarOrderChannelId : newKitchenOrderChannelId;
       final channelName = isBar
           ? 'Nouvelle commande bar'
           : 'Nouvelle commande cuisine';

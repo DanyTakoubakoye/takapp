@@ -27,6 +27,8 @@ class CreateStockRequestPage extends StatefulWidget {
 class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
   final TextEditingController _noteController = TextEditingController();
   final List<_RequestLineInput> _lines = [_RequestLineInput()];
+  final StockItemService _itemService = StockItemService();
+  late final Stream<List<StockItemModel>> _itemsStream;
 
   Color _storeColor() {
     switch (widget.store) {
@@ -145,6 +147,14 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _itemsStream = _itemService.streamItems(
+      establishmentId: widget.establishmentId,
+    );
+  }
+
+  @override
   void dispose() {
     _noteController.dispose();
     for (final line in _lines) {
@@ -155,7 +165,6 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
 
   @override
   Widget build(BuildContext context) {
-    final itemService = StockItemService();
     final requestController = context.watch<StockRequestController>();
     final color = _storeColor();
     final isSmall = MediaQuery.of(context).size.width < 800;
@@ -163,9 +172,7 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: StreamBuilder<List<StockItemModel>>(
-        stream: itemService.streamItems(
-          establishmentId: widget.establishmentId,
-        ),
+        stream: _itemsStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

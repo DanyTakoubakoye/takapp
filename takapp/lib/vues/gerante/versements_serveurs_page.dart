@@ -237,144 +237,154 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
 
     return Scaffold(
       appBar: AppBar(title: Text('Versement - ${widget.handover.serveurName}')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        'Montant déclaré : ${widget.handover.declaredAmount.toStringAsFixed(0)} FCFA',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: validatedAmountController,
-                      keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        labelText: 'Montant constaté',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Expanded(
-              child: Card(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: FutureBuilder<List<PaymentModel>>(
-                    future: geranteService.getPaymentsForHandover(
-                      establishmentId: establishmentId,
-                      paymentIds: widget.handover.paymentIds,
-                    ),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      if (snapshot.hasError) {
-                        return Center(child: Text('Erreur: ${snapshot.error}'));
-                      }
-
-                      final payments = snapshot.data ?? [];
-
-                      if (payments.isEmpty) {
-                        return const Center(
-                          child: Text('Aucun paiement trouvé.'),
-                        );
-                      }
-
-                      return ListView.separated(
-                        itemCount: payments.length,
-                        separatorBuilder: (_, _) => const Divider(),
-                        itemBuilder: (context, index) {
-                          final payment = payments[index];
-
-                          final alreadyValidated = widget
-                              .handover
-                              .validatedPaymentIds
-                              .contains(payment.id);
-
-                          final alreadyRejected = widget
-                              .handover
-                              .rejectedPaymentIds
-                              .contains(payment.id);
-
-                          return CheckboxListTile(
-                            value: selectedPaymentIds.contains(payment.id),
-                            onChanged: (alreadyValidated || alreadyRejected)
-                                ? null
-                                : (value) {
-                                    setState(() {
-                                      if (value == true) {
-                                        selectedPaymentIds.add(payment.id);
-                                      } else {
-                                        selectedPaymentIds.remove(payment.id);
-                                      }
-                                    });
-                                  },
-                            title: Text(payment.orderNumber),
-                            subtitle: Text(
-                              '${payment.method} • ${payment.amount.toStringAsFixed(0)} FCFA'
-                              '${alreadyValidated ? " • déjà validée" : ""}'
-                              '${alreadyRejected ? " • rejetée" : ""}',
-                            ),
-                          );
-                        },
-                      );
-                    },
+                  child: Column(
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Montant déclaré : ${widget.handover.declaredAmount.toStringAsFixed(0)} FCFA',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: validatedAmountController,
+                        keyboardType: TextInputType.number,
+                        decoration: const InputDecoration(
+                          labelText: 'Montant constaté',
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: selectedPaymentIds.isEmpty ? null : _reject,
-                    child: const Text('Rejeter sélection'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: selectedPaymentIds.isEmpty ? null : _validate,
-                    child: const Text('Valider sélection'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () async {
-                      final payments = await geranteService
-                          .getPaymentsForHandover(
-                            establishmentId: establishmentId,
-                            paymentIds: widget.handover.paymentIds,
+              const SizedBox(height: 12),
+              Expanded(
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: FutureBuilder<List<PaymentModel>>(
+                      future: geranteService.getPaymentsForHandover(
+                        establishmentId: establishmentId,
+                        paymentIds: widget.handover.paymentIds,
+                      ),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
                           );
+                        }
 
-                      final bytes = await pdfService.buildManagerValidationPdf(
-                        handover: widget.handover,
-                        payments: payments,
-                      );
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Text('Erreur: ${snapshot.error}'),
+                          );
+                        }
 
-                      await printerService.printPdf(Uint8List.fromList(bytes));
-                    },
-                    icon: const Icon(Icons.print_outlined),
-                    label: const Text('Imprimer'),
+                        final payments = snapshot.data ?? [];
+
+                        if (payments.isEmpty) {
+                          return const Center(
+                            child: Text('Aucun paiement trouvé.'),
+                          );
+                        }
+
+                        return ListView.separated(
+                          itemCount: payments.length,
+                          separatorBuilder: (_, _) => const Divider(),
+                          itemBuilder: (context, index) {
+                            final payment = payments[index];
+
+                            final alreadyValidated = widget
+                                .handover
+                                .validatedPaymentIds
+                                .contains(payment.id);
+
+                            final alreadyRejected = widget
+                                .handover
+                                .rejectedPaymentIds
+                                .contains(payment.id);
+
+                            return CheckboxListTile(
+                              value: selectedPaymentIds.contains(payment.id),
+                              onChanged: (alreadyValidated || alreadyRejected)
+                                  ? null
+                                  : (value) {
+                                      setState(() {
+                                        if (value == true) {
+                                          selectedPaymentIds.add(payment.id);
+                                        } else {
+                                          selectedPaymentIds.remove(payment.id);
+                                        }
+                                      });
+                                    },
+                              title: Text(payment.orderNumber),
+                              subtitle: Text(
+                                '${payment.method} • ${payment.amount.toStringAsFixed(0)} FCFA'
+                                '${alreadyValidated ? " • déjà validée" : ""}'
+                                '${alreadyRejected ? " • rejetée" : ""}',
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: selectedPaymentIds.isEmpty ? null : _reject,
+                      child: const Text('Rejeter sélection'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: selectedPaymentIds.isEmpty ? null : _validate,
+                      child: const Text('Valider sélection'),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        final payments = await geranteService
+                            .getPaymentsForHandover(
+                              establishmentId: establishmentId,
+                              paymentIds: widget.handover.paymentIds,
+                            );
+
+                        final bytes = await pdfService
+                            .buildManagerValidationPdf(
+                              handover: widget.handover,
+                              payments: payments,
+                            );
+
+                        await printerService.printPdf(
+                          Uint8List.fromList(bytes),
+                        );
+                      },
+                      icon: const Icon(Icons.print_outlined),
+                      label: const Text('Imprimer'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

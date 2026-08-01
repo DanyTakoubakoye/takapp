@@ -26,6 +26,8 @@ class StockOutPage extends StatefulWidget {
 class _StockOutPageState extends State<StockOutPage> {
   final TextEditingController _reasonController = TextEditingController();
   final List<_StockOutLineInput> _lines = [_StockOutLineInput()];
+  final StoreStockService _stockService = StoreStockService();
+  late final Stream<List<StoreStockModel>> _stocksStream;
 
   Color _storeColor() {
     switch (widget.store) {
@@ -44,6 +46,10 @@ class _StockOutPageState extends State<StockOutPage> {
   void initState() {
     super.initState();
     _reasonController.text = widget.defaultReason;
+    _stocksStream = _stockService.streamStocksForStore(
+      establishmentId: widget.establishmentId,
+      store: widget.store,
+    );
   }
 
   Future<void> _submit(List<StoreStockModel> stocks) async {
@@ -154,7 +160,6 @@ class _StockOutPageState extends State<StockOutPage> {
 
   @override
   Widget build(BuildContext context) {
-    final stockService = StoreStockService();
     final stockController = context.watch<StoreStockController>();
     final color = _storeColor();
     final isSmall = MediaQuery.of(context).size.width < 800;
@@ -162,10 +167,7 @@ class _StockOutPageState extends State<StockOutPage> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: StreamBuilder<List<StoreStockModel>>(
-        stream: stockService.streamStocksForStore(
-          establishmentId: widget.establishmentId,
-          store: widget.store,
-        ),
+        stream: _stocksStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

@@ -19,6 +19,8 @@ class _MenuItemIngredientsFormPageState
     extends State<MenuItemIngredientsFormPage> {
   final MenuIngredientService _service = MenuIngredientService();
   final _formKey = GlobalKey<FormState>();
+  late final Stream<QuerySnapshot<Map<String, dynamic>>> _menuItemsStream;
+  late final Stream<QuerySnapshot<Map<String, dynamic>>> _stockItemsStream;
 
   String? selectedMenuItemId;
   final List<_IngredientLine> ingredientLines = [_IngredientLine()];
@@ -26,6 +28,16 @@ class _MenuItemIngredientsFormPageState
   bool isSaving = false;
 
   String get establishmentId => widget.establishmentId.trim();
+  @override
+  void initState() {
+    super.initState();
+    _menuItemsStream = _service.streamKitchenMenuItems(
+      establishmentId: establishmentId,
+    );
+    _stockItemsStream = _service.streamRestaurantStockItems(
+      establishmentId: establishmentId,
+    );
+  }
 
   @override
   void dispose() {
@@ -377,9 +389,7 @@ class _MenuItemIngredientsFormPageState
     return Scaffold(
       appBar: AppBar(title: const Text('Composition articles cuisine')),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: _service.streamKitchenMenuItems(
-          establishmentId: establishmentId,
-        ),
+        stream: _menuItemsStream,
         builder: (context, menuSnapshot) {
           if (menuSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -394,9 +404,7 @@ class _MenuItemIngredientsFormPageState
           final menuItems = menuSnapshot.data?.docs ?? [];
 
           return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: _service.streamRestaurantStockItems(
-              establishmentId: establishmentId,
-            ),
+            stream: _stockItemsStream,
             builder: (context, stockSnapshot) {
               if (stockSnapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
