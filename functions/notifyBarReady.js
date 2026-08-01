@@ -96,7 +96,7 @@ exports.notifyBarReady = onCall(
         android: {
           priority: "high",
           notification: {
-            channelId: "bar_ready_channel_v6",
+            channelId: "bar_ready_channel_v7",
             sound: "bar_ready",
           },
         },

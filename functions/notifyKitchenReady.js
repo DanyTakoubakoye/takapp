@@ -88,7 +88,7 @@ exports.notifyKitchenReady = onCall(
         android: {
           priority: "high",
           notification: {
-            channelId: "kitchen_ready_channel_v6",
+            channelId: "kitchen_ready_channel_v7",
             sound: "kitchen_ready",
           },
         },

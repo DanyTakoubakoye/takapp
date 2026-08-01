@@ -27,10 +27,10 @@ class NotificationService {
   String _currentEstablishmentId = '';
 
   // ⚠️ Nouveaux IDs de channel
-  static const String kitchenChannelId = 'kitchen_ready_channel_v6';
-  static const String barChannelId = 'bar_ready_channel_v6';
-  static const String newKitchenOrderChannelId = 'new_kitchen_order_channel_v2';
-  static const String newBarOrderChannelId = 'new_bar_order_channel_v2';
+  static const String kitchenChannelId = 'kitchen_ready_channel_v7';
+  static const String barChannelId = 'bar_ready_channel_v7';
+  static const String newKitchenOrderChannelId = 'new_kitchen_order_channel_v3';
+  static const String newBarOrderChannelId = 'new_bar_order_channel_v3';
 
   /// Référence vers la sous-collection serverNotifications du tenant
   CollectionReference<Map<String, dynamic>> _notificationsRef(

@@ -133,7 +133,7 @@ exports.notifyDepartmentsNewOrder = onDocumentCreated(
               android: {
                 priority: "high",
                 notification: {
-                  channelId: "new_kitchen_order_channel_v2",
+                  channelId: "new_kitchen_order_channel_v3",
                   sound: "kitchen_ready",
                 },
               },
@@ -184,7 +184,7 @@ exports.notifyDepartmentsNewOrder = onDocumentCreated(
               android: {
                 priority: "high",
                 notification: {
-                  channelId: "new_bar_order_channel_v2",
+                  channelId: "new_bar_order_channel_v3",
                   sound: "bar_ready",
                 },
               },
