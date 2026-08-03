@@ -94,6 +94,7 @@ class MenuIngredientService {
     required String menuItemId,
     required List<Map<String, dynamic>> ingredients,
     String? composition,
+    bool? allowsFreeAccompaniment,
   }) async {
     if (establishmentId.trim().isEmpty) {
       throw Exception('Établissement introuvable.');
@@ -113,6 +114,9 @@ class MenuIngredientService {
     // On n'écrit la composition que si elle est fournie (non null).
     if (composition != null) {
       data['composition'] = composition.trim();
+    }
+    if (allowsFreeAccompaniment != null) {
+      data['allowsFreeAccompaniment'] = allowsFreeAccompaniment;
     }
     await _menuItemsCol(
       establishmentId: establishmentId,

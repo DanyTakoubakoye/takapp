@@ -28,6 +28,7 @@ class _MenuItemIngredientsFormPageState
   final List<_IngredientLine> ingredientLines = [_IngredientLine()];
 
   bool isSaving = false;
+  bool _allowsFreeAccompaniment = false;
 
   String get establishmentId => widget.establishmentId.trim();
   @override
@@ -129,6 +130,7 @@ class _MenuItemIngredientsFormPageState
         menuItemId: selectedMenuItemId!,
         ingredients: ingredients,
         composition: _compositionController.text,
+        allowsFreeAccompaniment: _allowsFreeAccompaniment,
       );
 
       if (!mounted) return;
@@ -138,6 +140,7 @@ class _MenuItemIngredientsFormPageState
       setState(() {
         selectedMenuItemId = null;
         _compositionController.clear();
+        _allowsFreeAccompaniment = false;
 
         for (final line in ingredientLines) {
           line.quantityController.dispose();
@@ -565,6 +568,10 @@ class _MenuItemIngredientsFormPageState
                                               (doc?.data()?['composition'] ??
                                                       '')
                                                   .toString();
+                                          _allowsFreeAccompaniment =
+                                              (doc?.data()?['allowsFreeAccompaniment'] ??
+                                                  false) ==
+                                              true;
                                         });
                                       },
                                 validator: (value) {
@@ -586,6 +593,26 @@ class _MenuItemIngredientsFormPageState
                                   border: OutlineInputBorder(),
                                   prefixIcon: Icon(Icons.notes_outlined),
                                 ),
+                              ),
+                              const SizedBox(height: 12),
+                              CheckboxListTile(
+                                value: _allowsFreeAccompaniment,
+                                onChanged: isSaving
+                                    ? null
+                                    : (value) {
+                                        setState(() {
+                                          _allowsFreeAccompaniment =
+                                              value ?? false;
+                                        });
+                                      },
+                                title: const Text(
+                                  'Donne droit à un accompagnement gratuit',
+                                ),
+                                subtitle: const Text(
+                                  'Le client pourra choisir 1 accompagnement offert.',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                                contentPadding: EdgeInsets.zero,
                               ),
                               const SizedBox(height: 24),
                               Row(
