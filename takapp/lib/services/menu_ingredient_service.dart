@@ -118,4 +118,35 @@ class MenuIngredientService {
       'syncError': false,
     });
   }
+
+  /// Crée un plat cuisine (article menu) sans prix.
+  /// Le chef définit le nom ; la gérante fixera le prix ensuite.
+  Future<void> createKitchenMenuItem({
+    required String establishmentId,
+    required String name,
+  }) async {
+    if (establishmentId.trim().isEmpty) {
+      throw Exception('Établissement introuvable.');
+    }
+    if (name.trim().isEmpty) {
+      throw Exception('Nom du plat obligatoire.');
+    }
+    final docRef = _menuItemsCol(establishmentId: establishmentId).doc();
+    await docRef.set({
+      'id': docRef.id,
+      'establishmentId': establishmentId,
+      'name': name.trim(),
+      'composition': '',
+      'category': 'plat',
+      'price': 0,
+      'isAvailable': true,
+      'isForKitchen': true,
+      'isForBar': false,
+      'ingredients': <Map<String, dynamic>>[],
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+      'pendingSync': false,
+      'syncError': false,
+    });
+  }
 }

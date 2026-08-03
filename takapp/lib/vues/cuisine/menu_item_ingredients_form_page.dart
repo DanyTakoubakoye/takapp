@@ -19,6 +19,7 @@ class _MenuItemIngredientsFormPageState
     extends State<MenuItemIngredientsFormPage> {
   final MenuIngredientService _service = MenuIngredientService();
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _newDishController = TextEditingController();
   late final Stream<QuerySnapshot<Map<String, dynamic>>> _menuItemsStream;
   late final Stream<QuerySnapshot<Map<String, dynamic>>> _stockItemsStream;
 
@@ -44,6 +45,7 @@ class _MenuItemIngredientsFormPageState
     for (final line in ingredientLines) {
       line.quantityController.dispose();
     }
+    _newDishController.dispose();
     super.dispose();
   }
 
@@ -147,6 +149,29 @@ class _MenuItemIngredientsFormPageState
       if (mounted) {
         setState(() => isSaving = false);
       }
+    }
+  }
+
+  Future<void> _createDish() async {
+    final name = _newDishController.text.trim();
+    if (name.isEmpty) {
+      _showMessage('Saisissez le nom du plat.');
+      return;
+    }
+    setState(() => isSaving = true);
+    try {
+      await _service.createKitchenMenuItem(
+        establishmentId: establishmentId,
+        name: name,
+      );
+      _newDishController.clear();
+      if (!mounted) return;
+      _showMessage('Plat « $name » créé. Vous pouvez maintenant le composer.');
+    } catch (e) {
+      if (!mounted) return;
+      _showMessage('Erreur : $e');
+    } finally {
+      if (mounted) setState(() => isSaving = false);
     }
   }
 
@@ -437,6 +462,73 @@ class _MenuItemIngredientsFormPageState
                             children: [
                               _header(context, menuItems, stockItems),
                               _formatHint(),
+                              const SizedBox(height: 20),
+                              Card(
+                                color: Colors.deepOrange.withValues(
+                                  alpha: 0.04,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                  side: BorderSide(
+                                    color: Colors.deepOrange.withValues(
+                                      alpha: 0.3,
+                                    ),
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(14),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        'Créer un nouveau plat',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      const Text(
+                                        'Le prix sera fixé par la gérante.',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.black54,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: TextField(
+                                              controller: _newDishController,
+                                              enabled: !isSaving,
+                                              textCapitalization:
+                                                  TextCapitalization.words,
+                                              decoration: const InputDecoration(
+                                                labelText: 'Nom du plat',
+                                                hintText: 'Ex : Poulet braisé',
+                                                border: OutlineInputBorder(),
+                                                prefixIcon: Icon(
+                                                  Icons.restaurant,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          ElevatedButton.icon(
+                                            onPressed: isSaving
+                                                ? null
+                                                : _createDish,
+                                            icon: const Icon(Icons.add),
+                                            label: const Text('Créer'),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                               const SizedBox(height: 20),
                               DropdownButtonFormField<String>(
                                 initialValue:

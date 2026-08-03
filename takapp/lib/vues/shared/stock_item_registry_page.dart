@@ -25,15 +25,37 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
 
   final _formKey = GlobalKey<FormState>();
 
+  /// Derniers articles connus (mis à jour par le StreamBuilder).
+  /// Sert à détecter les doublons lors de l'import Excel.
+  List<StockItemModel> _currentItems = [];
+
   final List<String> _categories = [
     'Céréales',
     'Boissons',
     'Condiments',
-    'Viandes et poissons',
+    'Viandes',
     'Légumes et fruits',
     'Produits laitiers',
     'Produits d’entretien',
     'Consommables hôtel',
+    'Poissons',
+    'Accompagnements',
+    'Pain',
+    'Pains',
+    'viande',
+    'poisson',
+    'fromage',
+    'Hamberger',
+    'Condiments',
+    'pate',
+    'sauce',
+    'Sauce',
+    'Sauces',
+    'œuf',
+    'couverture',
+    'consommable',
+    'reutilisable',
+    'Viandes et poissons',
     'Autres',
   ];
 
@@ -156,8 +178,18 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
         return;
       }
 
+      // Clés des articles déjà existants : nom|catégorie|magasin (normalisés).
+      // Permet de sauter les doublons sans arrêter l'import.
+      final clesExistantes = <String>{};
+      for (final it in _currentItems) {
+        clesExistantes.add(
+          '${_norm(it.name)}|${_norm(it.category)}|${_norm(it.store)}',
+        );
+      }
+
       int importes = 0;
       final lignesRejetees = <String>[];
+      final doublonsIgnores = <String>[];
       int lignesIgnorees = 0;
 
       // Ligne 0 = en-tête, on commence à 1
@@ -202,6 +234,16 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
           continue;
         }
 
+        // Doublon : même nom + même catégorie + même magasin.
+        // Vérifie à la fois les articles déjà en base ET ceux déjà importés
+        // dans ce même fichier. On saute sans arrêter l'import.
+        final cle = '${_norm(name)}|${_norm(category)}|${_norm(store)}';
+        if (clesExistantes.contains(cle)) {
+          doublonsIgnores.add('$name ($category, ${_storeLabel(store)})');
+          continue;
+        }
+        clesExistantes.add(cle);
+
         await _service.createItem(
           establishmentId: widget.establishmentId,
           name: name,
@@ -217,6 +259,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
       await _showImportReport(
         importes: importes,
         lignesRejetees: lignesRejetees,
+        doublonsIgnores: doublonsIgnores,
         lignesIgnorees: lignesIgnorees,
       );
     } catch (e) {
@@ -232,6 +275,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
   Future<void> _showImportReport({
     required int importes,
     required List<String> lignesRejetees,
+    required List<String> doublonsIgnores,
     required int lignesIgnorees,
   }) async {
     await showDialog<void>(
@@ -256,6 +300,18 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
               if (lignesIgnorees > 0) ...[
                 const SizedBox(height: 8),
                 Text('$lignesIgnorees ligne(s) vide(s) ignorée(s).'),
+              ],
+              if (doublonsIgnores.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                const Text(
+                  'Articles déjà existants (ignorés) :',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.orange,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                ...doublonsIgnores.map((d) => Text('• $d')),
               ],
               if (lignesRejetees.isNotEmpty) ...[
                 const SizedBox(height: 12),
@@ -412,6 +468,9 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
               final items = (snapshot.data ?? [])
                   .where((it) => user == null || user.canSeeStore(it.store))
                   .toList();
+
+              // Mémorise les articles courants pour la détection de doublons à l'import.
+              _currentItems = items;
 
               return LayoutBuilder(
                 builder: (context, constraints) {
@@ -815,131 +874,144 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                   ),
                 )
               else
-                ListView.separated(
-                  itemCount: items.length,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  separatorBuilder: (_, _) => const SizedBox(height: 10),
-                  itemBuilder: (context, index) {
-                    final item = items[index];
-                    final color = _categoryColor(item.category);
-                    final icon = _categoryIcon(item.category);
-                    final storeColor = _storeColor(item.store);
-                    final storeIcon = _storeIcon(item.store);
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 520),
+                  child: Scrollbar(
+                    thumbVisibility: true,
+                    child: ListView.separated(
+                      itemCount: items.length,
+                      shrinkWrap: true,
+                      separatorBuilder: (_, _) => const SizedBox(height: 10),
+                      itemBuilder: (context, index) {
+                        final item = items[index];
+                        final color = _categoryColor(item.category);
+                        final icon = _categoryIcon(item.category);
+                        final storeColor = _storeColor(item.store);
+                        final storeIcon = _storeIcon(item.store);
 
-                    return Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.grey.shade200),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 46,
-                            height: 46,
-                            decoration: BoxDecoration(
-                              color: color.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                            child: Icon(icon, color: color),
+                        return Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.grey.shade200),
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  item.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 15.5,
-                                  ),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 46,
+                                height: 46,
+                                decoration: BoxDecoration(
+                                  color: color.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
-                                const SizedBox(height: 4),
-                                Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
+                                child: Icon(icon, color: color),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 5,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: color.withValues(alpha: 0.10),
-                                        borderRadius: BorderRadius.circular(30),
-                                      ),
-                                      child: Text(
-                                        item.category,
-                                        style: TextStyle(
-                                          color: color,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 12.5,
-                                        ),
+                                    Text(
+                                      item.name,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 15.5,
                                       ),
                                     ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 5,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: Colors.blueGrey.withValues(
-                                          alpha: 0.10,
-                                        ),
-                                        borderRadius: BorderRadius.circular(30),
-                                      ),
-                                      child: Text(
-                                        'Unité : ${item.unit}',
-                                        style: const TextStyle(
-                                          color: Colors.black87,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 12.5,
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 10,
-                                        vertical: 5,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: storeColor.withValues(
-                                          alpha: 0.10,
-                                        ),
-                                        borderRadius: BorderRadius.circular(30),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            storeIcon,
-                                            size: 14,
-                                            color: storeColor,
+                                    const SizedBox(height: 4),
+                                    Wrap(
+                                      spacing: 8,
+                                      runSpacing: 8,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 5,
                                           ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            _storeLabel(item.store),
+                                          decoration: BoxDecoration(
+                                            color: color.withValues(
+                                              alpha: 0.10,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              30,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            item.category,
                                             style: TextStyle(
-                                              color: storeColor,
+                                              color: color,
                                               fontWeight: FontWeight.w600,
                                               fontSize: 12.5,
                                             ),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 5,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.blueGrey.withValues(
+                                              alpha: 0.10,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              30,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            'Unité : ${item.unit}',
+                                            style: const TextStyle(
+                                              color: Colors.black87,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 12.5,
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                            vertical: 5,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: storeColor.withValues(
+                                              alpha: 0.10,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              30,
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                storeIcon,
+                                                size: 14,
+                                                color: storeColor,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                _storeLabel(item.store),
+                                                style: TextStyle(
+                                                  color: storeColor,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 12.5,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    );
-                  },
+                        );
+                      },
+                    ),
+                  ),
                 ),
             ],
           ),
