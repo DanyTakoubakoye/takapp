@@ -20,6 +20,8 @@ class OrderItemModel {
   final String cancelledByName;
   final String cancellationReason;
 
+  final String accompanimentName;
+
   const OrderItemModel({
     required this.id,
     required this.establishmentId,
@@ -35,6 +37,7 @@ class OrderItemModel {
     this.cancelledBy = '',
     this.cancelledByName = '',
     this.cancellationReason = '',
+    this.accompanimentName = '',
   });
 
   factory OrderItemModel.fromMap(Map<String, dynamic> map, {String id = ''}) {
@@ -61,6 +64,8 @@ class OrderItemModel {
       quantity: toInt(map['quantity']),
       unitPrice: toDouble(map['unitPrice']),
       totalPrice: toDouble(map['totalPrice']),
+
+      accompanimentName: (map['accompanimentName'] ?? '').toString(),
 
       note: (map['note'] ?? '').toString(),
 
@@ -104,6 +109,7 @@ class OrderItemModel {
       'cancelledBy': cancelledBy,
       'cancelledByName': cancelledByName,
       'cancellationReason': cancellationReason,
+      'accompanimentName': accompanimentName,
     };
   }
 
@@ -127,6 +133,7 @@ class OrderItemModel {
     String? cancelledBy,
     String? cancelledByName,
     String? cancellationReason,
+    String? accompanimentName,
   }) {
     return OrderItemModel(
       id: id ?? this.id,
@@ -153,6 +160,7 @@ class OrderItemModel {
       cancelledByName: cancelledByName ?? this.cancelledByName,
 
       cancellationReason: cancellationReason ?? this.cancellationReason,
+      accompanimentName: accompanimentName ?? this.accompanimentName,
     );
   }
 }

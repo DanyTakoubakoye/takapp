@@ -36,6 +36,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
   bool isAvailable = true;
   bool isForKitchen = false;
   bool isForBar = true;
+  bool allowsFreeAccompaniment = false;
   bool isSaving = false;
   bool isImporting = false;
 
@@ -115,7 +116,10 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
         // MODE FIXER LE PRIX : on ne change que le prix du plat existant.
         await _service.updateMenuItem(
           establishmentId: establishmentId,
-          item: _selectedExistingItem!.copyWith(price: price),
+          item: _selectedExistingItem!.copyWith(
+            price: price,
+            allowsFreeAccompaniment: allowsFreeAccompaniment,
+          ),
         );
       } else {
         // MODE CRÉATION : nouveau plat complet.
@@ -129,6 +133,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
           isAvailable: isAvailable,
           isForKitchen: isForKitchen,
           isForBar: isForBar,
+          allowsFreeAccompaniment: allowsFreeAccompaniment,
           ingredients: List<MenuIngredientModel>.from(_ingredients),
         );
         await _service.addMenuItem(
@@ -148,6 +153,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
         isForBar = true;
         _ingredients.clear();
         _selectedExistingItem = null;
+        allowsFreeAccompaniment = false;
       });
 
       if (!mounted) return;
@@ -893,6 +899,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                     isAvailable = item.isAvailable;
                     isForKitchen = item.isForKitchen;
                     isForBar = item.isForBar;
+                    allowsFreeAccompaniment = item.allowsFreeAccompaniment;
                   });
                 },
                 fieldViewBuilder:
@@ -922,6 +929,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                                       compositionController.clear();
                                       priceController.clear();
                                       _ingredients.clear();
+                                      allowsFreeAccompaniment = false;
                                     });
                                   },
                                 )
@@ -1004,6 +1012,19 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                   title: const Text('Destiné au bar'),
                 ),
               const SizedBox(height: 12),
+              CheckboxListTile(
+                value: allowsFreeAccompaniment,
+                onChanged: (value) {
+                  setState(() {
+                    allowsFreeAccompaniment = value ?? false;
+                  });
+                },
+                title: const Text('Donne droit à un accompagnement gratuit'),
+                subtitle: const Text(
+                  'Le client pourra choisir 1 accompagnement offert.',
+                  style: TextStyle(fontSize: 12),
+                ),
+              ),
               Row(
                 children: [
                   const Expanded(

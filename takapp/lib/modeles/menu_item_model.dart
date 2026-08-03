@@ -12,6 +12,7 @@ class MenuItemModel {
   final bool isForKitchen;
   final bool isForBar;
   final List<MenuIngredientModel> ingredients;
+  final bool allowsFreeAccompaniment;
 
   const MenuItemModel({
     required this.id,
@@ -23,6 +24,7 @@ class MenuItemModel {
     required this.isAvailable,
     required this.isForKitchen,
     required this.isForBar,
+    this.allowsFreeAccompaniment = false,
     this.adresse,
     this.ingredients = const [],
   });
@@ -47,11 +49,14 @@ class MenuItemModel {
       isAvailable: map['isAvailable'] == true,
       isForKitchen: map['isForKitchen'] == true,
       isForBar: map['isForBar'] == true,
+      allowsFreeAccompaniment: map['allowsFreeAccompaniment'] == true,
       ingredients: rawIngredients
           .whereType<Map>()
           .map((e) => MenuIngredientModel.fromMap(Map<String, dynamic>.from(e)))
           .toList(),
+      
     );
+    
   }
 
   Map<String, dynamic> toMap() {
@@ -65,6 +70,7 @@ class MenuItemModel {
       'isAvailable': isAvailable,
       'isForKitchen': isForKitchen,
       'isForBar': isForBar,
+      'allowsFreeAccompaniment': allowsFreeAccompaniment,
       'ingredients': ingredients.map((e) => e.toMap()).toList(),
     };
   }
@@ -93,6 +99,7 @@ class MenuItemModel {
     bool? isAvailable,
     bool? isForKitchen,
     bool? isForBar,
+    bool? allowsFreeAccompaniment,
     List<MenuIngredientModel>? ingredients,
   }) {
     return MenuItemModel(
@@ -106,6 +113,8 @@ class MenuItemModel {
       isAvailable: isAvailable ?? this.isAvailable,
       isForKitchen: isForKitchen ?? this.isForKitchen,
       isForBar: isForBar ?? this.isForBar,
+      allowsFreeAccompaniment:
+          allowsFreeAccompaniment ?? this.allowsFreeAccompaniment,
       ingredients: ingredients ?? this.ingredients,
     );
   }
