@@ -20,6 +20,7 @@ class _MenuItemIngredientsFormPageState
   final MenuIngredientService _service = MenuIngredientService();
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _newDishController = TextEditingController();
+  final TextEditingController _compositionController = TextEditingController();
   late final Stream<QuerySnapshot<Map<String, dynamic>>> _menuItemsStream;
   late final Stream<QuerySnapshot<Map<String, dynamic>>> _stockItemsStream;
 
@@ -46,6 +47,7 @@ class _MenuItemIngredientsFormPageState
       line.quantityController.dispose();
     }
     _newDishController.dispose();
+    _compositionController.dispose();
     super.dispose();
   }
 
@@ -126,6 +128,7 @@ class _MenuItemIngredientsFormPageState
         establishmentId: establishmentId,
         menuItemId: selectedMenuItemId!,
         ingredients: ingredients,
+        composition: _compositionController.text,
       );
 
       if (!mounted) return;
@@ -134,6 +137,7 @@ class _MenuItemIngredientsFormPageState
 
       setState(() {
         selectedMenuItemId = null;
+        _compositionController.clear();
 
         for (final line in ingredientLines) {
           line.quantityController.dispose();
@@ -553,6 +557,14 @@ class _MenuItemIngredientsFormPageState
                                     : (value) {
                                         setState(() {
                                           selectedMenuItemId = value;
+                                          final doc = _findDocById(
+                                            menuItems,
+                                            value,
+                                          );
+                                          _compositionController.text =
+                                              (doc?.data()?['composition'] ??
+                                                      '')
+                                                  .toString();
                                         });
                                       },
                                 validator: (value) {
@@ -561,6 +573,19 @@ class _MenuItemIngredientsFormPageState
                                   }
                                   return null;
                                 },
+                              ),
+                              const SizedBox(height: 20),
+                              TextField(
+                                controller: _compositionController,
+                                enabled: !isSaving,
+                                maxLines: 2,
+                                decoration: const InputDecoration(
+                                  labelText: 'Composition (optionnel)',
+                                  hintText:
+                                      'Laissez vide pour afficher la liste des ingrédients',
+                                  border: OutlineInputBorder(),
+                                  prefixIcon: Icon(Icons.notes_outlined),
+                                ),
                               ),
                               const SizedBox(height: 24),
                               Row(

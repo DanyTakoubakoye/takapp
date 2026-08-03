@@ -166,12 +166,11 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
 
               final rawItems =
                   List<MenuItemModel>.from(
-                      user.visibleMenuItems(snapshot.data ?? []),
-                    )
-                    ..sort(
-                      (a, b) =>
-                          a.name.toLowerCase().compareTo(b.name.toLowerCase()),
-                    );
+                    user.visibleMenuItems(snapshot.data ?? []),
+                  )..sort(
+                    (a, b) =>
+                        a.name.toLowerCase().compareTo(b.name.toLowerCase()),
+                  );
 
               final availableCategories =
                   <String>{
@@ -439,7 +438,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 700;
 
-    final composition = item.composition.trim();
+    final composition = item.displayComposition;
     final hasComposition = composition.isNotEmpty;
 
     return AnimatedContainer(

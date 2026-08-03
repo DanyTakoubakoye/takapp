@@ -68,6 +68,19 @@ class MenuItemModel {
       'ingredients': ingredients.map((e) => e.toMap()).toList(),
     };
   }
+  /// Composition à afficher : le texte saisi manuellement s'il existe,
+  /// sinon la liste des noms d'ingrédients séparés par des virgules.
+  /// Calculé à l'affichage — rien n'est stocké, donc toujours à jour.
+  String get displayComposition {
+    if (composition.trim().isNotEmpty) {
+      return composition.trim();
+    }
+    final noms = ingredients
+        .map((i) => i.itemName.trim())
+        .where((n) => n.isNotEmpty)
+        .toList();
+    return noms.join(', ');
+  }
 
   MenuItemModel copyWith({
     String? id,

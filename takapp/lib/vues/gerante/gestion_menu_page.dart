@@ -39,6 +39,13 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
   bool isSaving = false;
   bool isImporting = false;
 
+  /// Plat existant sélectionné dans l'Autocomplete.
+  /// null = mode création (nouveau plat) ; renseigné = mode "fixer le prix".
+  MenuItemModel? _selectedExistingItem;
+
+  /// Liste des plats existants, mise à jour par le stream de la liste.
+  List<MenuItemModel> _existingItems = [];
+
   final List<MenuIngredientModel> _ingredients = [];
 
   String get establishmentId => widget.establishmentId.trim();
@@ -94,7 +101,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
       return;
     }
 
-    if (_ingredients.isEmpty) {
+    if (_selectedExistingItem == null && _ingredients.isEmpty) {
       _showSnack('Veuillez définir au moins un ingrédient pour cet article.');
       return;
     }
@@ -104,20 +111,31 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
     });
 
     try {
-      final item = MenuItemModel(
-        id: '',
-        establishmentId: establishmentId,
-        name: name,
-        composition: composition,
-        category: category,
-        price: price,
-        isAvailable: isAvailable,
-        isForKitchen: isForKitchen,
-        isForBar: isForBar,
-        ingredients: List<MenuIngredientModel>.from(_ingredients),
-      );
-
-      await _service.addMenuItem(establishmentId: establishmentId, item: item);
+      if (_selectedExistingItem != null) {
+        // MODE FIXER LE PRIX : on ne change que le prix du plat existant.
+        await _service.updateMenuItem(
+          establishmentId: establishmentId,
+          item: _selectedExistingItem!.copyWith(price: price),
+        );
+      } else {
+        // MODE CRÉATION : nouveau plat complet.
+        final item = MenuItemModel(
+          id: '',
+          establishmentId: establishmentId,
+          name: name,
+          composition: composition,
+          category: category,
+          price: price,
+          isAvailable: isAvailable,
+          isForKitchen: isForKitchen,
+          isForBar: isForBar,
+          ingredients: List<MenuIngredientModel>.from(_ingredients),
+        );
+        await _service.addMenuItem(
+          establishmentId: establishmentId,
+          item: item,
+        );
+      }
 
       nameController.clear();
       categoryController.clear();
@@ -129,6 +147,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
         isForKitchen = false;
         isForBar = true;
         _ingredients.clear();
+        _selectedExistingItem = null;
       });
 
       if (!mounted) return;
@@ -851,16 +870,84 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                 ),
               ),
               const SizedBox(height: 16),
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nom de l’article',
-                  prefixIcon: Icon(Icons.fastfood_outlined),
-                ),
+              Autocomplete<MenuItemModel>(
+                displayStringForOption: (item) => item.name,
+                optionsBuilder: (TextEditingValue value) {
+                  final query = value.text.trim().toLowerCase();
+                  if (query.isEmpty) {
+                    return _existingItems;
+                  }
+                  return _existingItems.where(
+                    (it) => it.name.toLowerCase().contains(query),
+                  );
+                },
+                onSelected: (item) {
+                  setState(() {
+                    _selectedExistingItem = item;
+                    nameController.text = item.name;
+                    categoryController.text = item.category;
+                    compositionController.text = item.composition;
+                    priceController.text = item.price > 0
+                        ? item.price.toStringAsFixed(0)
+                        : '';
+                    isAvailable = item.isAvailable;
+                    isForKitchen = item.isForKitchen;
+                    isForBar = item.isForBar;
+                  });
+                },
+                fieldViewBuilder:
+                    (context, textController, focusNode, onSubmitted) {
+                      // Synchronise le controller interne de l'Autocomplete
+                      // avec notre nameController.
+                      textController.text = nameController.text;
+                      return TextField(
+                        controller: textController,
+                        focusNode: focusNode,
+                        decoration: InputDecoration(
+                          labelText: 'Nom de l’article',
+                          prefixIcon: const Icon(Icons.fastfood_outlined),
+                          helperText: _selectedExistingItem == null
+                              ? 'Tapez un nouveau nom, ou choisissez un plat existant'
+                              : 'Plat existant : seul le prix est modifiable',
+                          suffixIcon: _selectedExistingItem != null
+                              ? IconButton(
+                                  tooltip: 'Nouveau plat',
+                                  icon: const Icon(Icons.close),
+                                  onPressed: () {
+                                    setState(() {
+                                      _selectedExistingItem = null;
+                                      nameController.clear();
+                                      textController.clear();
+                                      categoryController.clear();
+                                      compositionController.clear();
+                                      priceController.clear();
+                                      _ingredients.clear();
+                                    });
+                                  },
+                                )
+                              : null,
+                        ),
+                        onChanged: (text) {
+                          nameController.text = text;
+                          // Si l'utilisateur modifie le texte à la main,
+                          // on repasse en mode création.
+                          if (_selectedExistingItem != null &&
+                              text.trim().toLowerCase() !=
+                                  _selectedExistingItem!.name
+                                      .trim()
+                                      .toLowerCase()) {
+                            setState(() {
+                              _selectedExistingItem = null;
+                            });
+                          }
+                        },
+                      );
+                    },
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: compositionController,
+                enabled: _selectedExistingItem == null,
                 decoration: const InputDecoration(
                   labelText: 'Composition (texte libre)',
                   prefixIcon: Icon(Icons.notes_outlined),
@@ -1039,6 +1126,8 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
             final items = user == null
                 ? (snapshot.data ?? [])
                 : user.visibleMenuItems(snapshot.data ?? []);
+            // Mémorise les plats existants pour l'Autocomplete du formulaire.
+            _existingItems = snapshot.data ?? [];
 
             if (items.isEmpty) {
               return const Center(child: Text('Aucun article enregistré.'));

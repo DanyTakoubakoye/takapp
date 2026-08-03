@@ -93,30 +93,30 @@ class MenuIngredientService {
     required String establishmentId,
     required String menuItemId,
     required List<Map<String, dynamic>> ingredients,
+    String? composition,
   }) async {
     if (establishmentId.trim().isEmpty) {
       throw Exception('Établissement introuvable.');
     }
-
     if (menuItemId.trim().isEmpty) {
       throw Exception('Identifiant menu invalide.');
     }
-
     final normalizedIngredients = ingredients.map((ingredient) {
       return {...ingredient, 'establishmentId': establishmentId};
     }).toList();
-
+    final data = <String, dynamic>{
+      'ingredients': normalizedIngredients,
+      'updatedAt': FieldValue.serverTimestamp(),
+      'pendingSync': false,
+      'syncError': false,
+    };
+    // On n'écrit la composition que si elle est fournie (non null).
+    if (composition != null) {
+      data['composition'] = composition.trim();
+    }
     await _menuItemsCol(
       establishmentId: establishmentId,
-    ).doc(menuItemId).update({
-      'ingredients': normalizedIngredients,
-
-      'updatedAt': FieldValue.serverTimestamp(),
-
-      'pendingSync': false,
-
-      'syncError': false,
-    });
+    ).doc(menuItemId).update(data);
   }
 
   /// Crée un plat cuisine (article menu) sans prix.
