@@ -88,13 +88,35 @@ class MenuIngredientService {
   /// =========================
   /// UPDATE MENU INGREDIENTS
   /// =========================
-
+/// Enregistre uniquement l'URL de la photo d'un plat (sans toucher aux
+  /// ingrédients). Utilisé par le sélecteur de photo côté chef.
+  Future<void> updateMenuItemImage({
+    required String establishmentId,
+    required String menuItemId,
+    required String adresse,
+  }) async {
+    if (establishmentId.trim().isEmpty) {
+      throw Exception('Établissement introuvable.');
+    }
+    if (menuItemId.trim().isEmpty) {
+      throw Exception('Identifiant menu invalide.');
+    }
+    await _menuItemsCol(
+      establishmentId: establishmentId,
+    ).doc(menuItemId).update({
+      'adresse': adresse,
+      'updatedAt': FieldValue.serverTimestamp(),
+      'pendingSync': false,
+      'syncError': false,
+    });
+  }
   Future<void> updateMenuItemIngredients({
     required String establishmentId,
     required String menuItemId,
     required List<Map<String, dynamic>> ingredients,
     String? composition,
     bool? allowsFreeAccompaniment,
+    String? adresse,
   }) async {
     if (establishmentId.trim().isEmpty) {
       throw Exception('Établissement introuvable.');
@@ -117,6 +139,9 @@ class MenuIngredientService {
     }
     if (allowsFreeAccompaniment != null) {
       data['allowsFreeAccompaniment'] = allowsFreeAccompaniment;
+    }
+    if (adresse != null) {
+      data['adresse'] = adresse;
     }
     await _menuItemsCol(
       establishmentId: establishmentId,

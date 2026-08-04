@@ -5,6 +5,8 @@ import 'package:takapp/services/menu_ingredient_service.dart';
 import 'package:excel/excel.dart' as xlsx;
 import 'package:file_picker/file_picker.dart';
 
+import 'package:takapp/vues/shared/menu_photo_picker.dart';
+
 class MenuItemIngredientsFormPage extends StatefulWidget {
   final String establishmentId;
 
@@ -42,6 +44,7 @@ class _MenuItemIngredientsFormPageState
   late final Stream<QuerySnapshot<Map<String, dynamic>>> _stockItemsStream;
 
   String? selectedMenuItemId;
+  String _selectedItemAdresse = '';
   final List<_IngredientLine> ingredientLines = [_IngredientLine()];
 
   bool isSaving = false;
@@ -95,6 +98,23 @@ class _MenuItemIngredientsFormPageState
     }
 
     return null;
+  }
+
+  Future<void> _savePhotoUrl(String url) async {
+    if (selectedMenuItemId == null) return;
+    try {
+      await _service.updateMenuItemImage(
+        establishmentId: establishmentId,
+        menuItemId: selectedMenuItemId!,
+        adresse: url,
+      );
+      if (!mounted) return;
+      setState(() => _selectedItemAdresse = url);
+      _showMessage('Photo enregistrée.');
+    } catch (e) {
+      if (!mounted) return;
+      _showMessage('Erreur enregistrement photo : $e');
+    }
   }
 
   Future<void> _save(
@@ -612,6 +632,9 @@ class _MenuItemIngredientsFormPageState
                                               (doc?.data()?['composition'] ??
                                                       '')
                                                   .toString();
+                                          _selectedItemAdresse =
+                                              (doc?.data()?['adresse'] ?? '')
+                                                  .toString();
                                           _allowsFreeAccompaniment =
                                               (doc?.data()?['allowsFreeAccompaniment'] ??
                                                   false) ==
@@ -638,6 +661,26 @@ class _MenuItemIngredientsFormPageState
                                   prefixIcon: Icon(Icons.notes_outlined),
                                 ),
                               ),
+                              if (selectedMenuItemId != null) ...[
+                                const SizedBox(height: 16),
+                                const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    'Photo du plat',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                MenuPhotoPicker(
+                                  establishmentId: establishmentId,
+                                  menuItemId: selectedMenuItemId!,
+                                  currentImageUrl: _selectedItemAdresse,
+                                  onUploaded: _savePhotoUrl,
+                                ),
+                              ],
                               const SizedBox(height: 12),
                               CheckboxListTile(
                                 value: _allowsFreeAccompaniment,
