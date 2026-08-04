@@ -240,6 +240,18 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
     activeItemId = null;
   }
 
+  // =========================
+  // COULEURS DU THÈME (luxe & paix : crème + bleu nuit + or)
+  // =========================
+  static const Color _navy = Color(0xFF1B3A5B); // bleu nuit
+  static const Color _gold = Color(0xFFB8935A); // or / laiton
+  static const Color _bg = Color(0xFFF5F1E8); // crème / ivoire
+  static const Color _cardBg = Color(0xFFFDFBF6); // blanc cassé
+  static const Color _imageBg = Color(0xFFECE6D8); // fond vignette
+  static const Color _border = Color(0xFFE4DECF); // hairline
+  static const Color _textSecondary = Color(0xFF8A8578);
+  static const Color _textMuted = Color(0xFFB0AA9A);
+
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthController>();
@@ -270,10 +282,13 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
       },
       behavior: HitTestBehavior.deferToChild,
       child: Scaffold(
-        backgroundColor: const Color(0xFF4E342E),
+        backgroundColor: _bg,
         appBar: AppBar(
-          title: const Text('Présentation du menu'),
-          backgroundColor: const Color(0xFF3E2723),
+          title: const Text('Notre menu'),
+          backgroundColor: _bg,
+          foregroundColor: _navy,
+          elevation: 0,
+          surfaceTintColor: Colors.transparent,
         ),
         body: SafeArea(
           child: StreamBuilder<List<MenuItemModel>>(
@@ -283,7 +298,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                 return Column(
                   children: [
                     _buildTopSearchZone(),
-                    _buildCategoryDropdown(const ['Toutes']),
+                    _buildCategoryPills(const ['Toutes']),
                     const Expanded(
                       child: Center(child: CircularProgressIndicator()),
                     ),
@@ -295,12 +310,12 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                 return Column(
                   children: [
                     _buildTopSearchZone(),
-                    _buildCategoryDropdown(const ['Toutes']),
+                    _buildCategoryPills(const ['Toutes']),
                     Expanded(
                       child: Center(
                         child: Text(
                           'Erreur : ${snapshot.error}',
-                          style: const TextStyle(color: Colors.white),
+                          style: const TextStyle(color: _textSecondary),
                         ),
                       ),
                     ),
@@ -316,7 +331,6 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                         a.name.toLowerCase().compareTo(b.name.toLowerCase()),
                   );
 
-              // Les accompagnements cuisine disponibles (pour le sélecteur).
               final kitchenAccompaniments = rawItems
                   .where((it) => _isAccompaniment(it) && it.isForKitchen)
                   .toList();
@@ -341,12 +355,12 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                 return Column(
                   children: [
                     _buildTopSearchZone(),
-                    _buildCategoryDropdown(availableCategories),
+                    _buildCategoryPills(availableCategories),
                     const Expanded(
                       child: Center(
                         child: Text(
                           'Aucun article disponible.',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: _textSecondary),
                         ),
                       ),
                     ),
@@ -378,14 +392,14 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
               return Column(
                 children: [
                   _buildTopSearchZone(),
-                  _buildStickyCategoryZone(availableCategories),
+                  _buildCategoryPills(availableCategories),
                   Expanded(
                     child: Stack(
                       children: [
                         ListView(
                           key: _menuListKey,
                           controller: _scrollController,
-                          padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
+                          padding: const EdgeInsets.fromLTRB(16, 4, 16, 110),
                           children: [
                             ...groupedItems.entries.map(
                               (entry) => _buildCategorySection(
@@ -420,19 +434,29 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
 
   Widget _buildTopSearchZone() {
     return Container(
-      padding: const EdgeInsets.all(12),
-      color: const Color(0xFF3E2723),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+      color: _bg,
       child: TextField(
         controller: searchController,
         onChanged: (value) => setState(() => searchText = value),
+        style: const TextStyle(color: _navy, fontSize: 14),
         decoration: InputDecoration(
-          hintText: 'Rechercher un article ou une catégorie...',
+          hintText: 'Rechercher un plat…',
+          hintStyle: const TextStyle(color: _textMuted, fontSize: 13),
           filled: true,
-          fillColor: Colors.white,
-          prefixIcon: const Icon(Icons.search),
+          fillColor: _cardBg,
+          prefixIcon: const Icon(Icons.search, color: _textMuted, size: 19),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: _border),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: _border),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: _navy, width: 1.4),
           ),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 14,
@@ -443,37 +467,45 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
     );
   }
 
-  Widget _buildStickyCategoryZone(List<String> categories) {
+  /// Onglets de catégories en pills défilant horizontalement.
+  Widget _buildCategoryPills(List<String> categories) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-      color: const Color(0xFF3E2723),
-      child: _buildCategoryDropdown(categories),
-    );
-  }
-
-  Widget _buildCategoryDropdown(List<String> categories) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: selectedCategory,
-          isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down),
-          items: categories.map((category) {
-            return DropdownMenuItem<String>(
-              value: category,
-              child: Text(category),
+      color: _bg,
+      padding: const EdgeInsets.only(bottom: 12),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
+          children: categories.map((category) {
+            final isActive = category == selectedCategory;
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: GestureDetector(
+                onTap: () => setState(() => selectedCategory = category),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: isActive ? _navy : _cardBg,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: isActive ? _navy : _border),
+                  ),
+                  child: Text(
+                    category,
+                    style: TextStyle(
+                      color: isActive ? _bg : _textSecondary,
+                      fontSize: 13,
+                      fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+                    ),
+                  ),
+                ),
+              ),
             );
           }).toList(),
-          onChanged: (value) {
-            if (value == null) return;
-            setState(() => selectedCategory = value);
-          },
         ),
       ),
     );
@@ -493,13 +525,12 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
     List<MenuItemModel> kitchenAccompaniments,
   ) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth < 700;
-    final crossAxisCount = isMobile
-        ? 1
-        : screenWidth < 1100
+    // 2 cartes par ligne sur mobile ; davantage sur grand écran.
+    final crossAxisCount = screenWidth < 600
+        ? 2
+        : screenWidth < 1000
         ? 3
         : 4;
-    final childAspectRatio = isMobile ? 1.55 : 0.78;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -508,30 +539,22 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
         Text(
           category.toUpperCase(),
           style: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+            color: _gold,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1.2,
           ),
         ),
-        const SizedBox(height: 10),
-        Container(
-          width: double.infinity,
-          height: 5,
-          decoration: BoxDecoration(
-            color: Colors.black87,
-            borderRadius: BorderRadius.circular(20),
-          ),
-        ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         GridView.builder(
           itemCount: items.length,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 18,
-            mainAxisSpacing: 18,
-            childAspectRatio: childAspectRatio,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 0.70,
           ),
           itemBuilder: (context, index) {
             return _buildItemCard(items[index], kitchenAccompaniments);
@@ -583,194 +606,230 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
   ) {
     final selected = _isSelected(item);
     final showQuantityBox = activeItemId == item.id;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth < 700;
     final composition = item.displayComposition;
     final hasComposition = composition.isNotEmpty;
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 220),
-      padding: const EdgeInsets.all(12),
+      duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
-        color: selected ? const Color(0xFFFFE0B2) : Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        color: _cardBg,
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: selected ? const Color(0xFFBF7B30) : Colors.transparent,
-          width: 2,
+          color: selected ? _navy : _border,
+          width: selected ? 2 : 0.8,
         ),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 14,
-            color: Colors.black.withValues(alpha: 0.18),
-            offset: const Offset(0, 7),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                if (item.allowsFreeAccompaniment) {
-                  _openAccompanimentSheet(item, kitchenAccompaniments);
-                } else {
-                  _toggleItem(item);
-                }
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: isMobile ? 72 : 95,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: _buildMenuImage(item, isMobile),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    item.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () {
+          if (item.allowsFreeAccompaniment) {
+            _openAccompanimentSheet(item, kitchenAccompaniments);
+          } else {
+            _toggleItem(item);
+          }
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Grande photo en haut, avec pastille de sélection
+            Stack(
+              children: [
+                Container(
+                  height: 96,
+                  width: double.infinity,
+                  color: _imageBg,
+                  child: _buildMenuImage(item, true),
+                ),
+                if (selected)
+                  Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        color: _navy,
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                      child: const Icon(Icons.check, size: 14, color: _bg),
                     ),
                   ),
-                  if (item.allowsFreeAccompaniment) ...[
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.rice_bowl_outlined,
-                          size: 14,
-                          color: Color(0xFF8D6E63),
+              ],
+            ),
+            // Texte
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: _navy,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                    if (hasComposition) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        composition,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: _textSecondary,
+                          fontSize: 11,
+                          height: 1.3,
                         ),
-                        const SizedBox(width: 4),
-                        Flexible(
-                          child: Text(
-                            'Accompagnement offert',
-                            style: TextStyle(
-                              color: Colors.brown.shade400,
-                              fontSize: 11.5,
-                              fontStyle: FontStyle.italic,
+                      ),
+                    ],
+                    if (item.allowsFreeAccompaniment) ...[
+                      const SizedBox(height: 5),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.rice_bowl_outlined,
+                            size: 11,
+                            color: _gold,
+                          ),
+                          const SizedBox(width: 3),
+                          Flexible(
+                            child: Text(
+                              'Accompagnement offert',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: _gold,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
+                          ),
+                        ],
+                      ),
+                    ],
+                    const Spacer(),
+                    // Prix + bouton d'ajout
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Text(
+                              item.price.toStringAsFixed(0),
+                              style: const TextStyle(
+                                color: _gold,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(width: 2),
+                            const Text(
+                              'FCFA',
+                              style: TextStyle(
+                                color: Color(0xFFC4A878),
+                                fontSize: 10,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: selected ? _navy : Colors.transparent,
+                            borderRadius: BorderRadius.circular(7),
+                            border: Border.all(
+                              color: selected ? _navy : const Color(0xFFC9C0AC),
+                            ),
+                          ),
+                          child: Icon(
+                            selected ? Icons.check : Icons.add,
+                            size: 14,
+                            color: selected ? _bg : _textSecondary,
                           ),
                         ),
                       ],
                     ),
-                  ],
-                  if (hasComposition) ...[
-                    const SizedBox(height: 6),
-                    Text(
-                      composition,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.black54,
-                        fontSize: 13,
-                        height: 1.25,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 6),
-                  Text(
-                    '${item.price.toStringAsFixed(0)} FCFA',
-                    style: const TextStyle(color: Colors.black87, fontSize: 14),
-                  ),
-                  const SizedBox(height: 10),
-                  if (selected)
-                    Container(
-                      margin: const EdgeInsets.only(top: 8),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF5D4037),
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Text(
-                        'Sélectionné • Qté ${_quantityOf(item)}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
+                    // Boîte quantité (si carte active)
+                    if (showQuantityBox) ...[
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 4,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: _bg,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                if (item.allowsFreeAccompaniment) {
+                                  _removeLastAccompaniedUnit(item);
+                                } else {
+                                  _decreaseQuantity(item);
+                                }
+                              },
+                              style: IconButton.styleFrom(
+                                backgroundColor: _cardBg,
+                                shape: const CircleBorder(),
+                                padding: const EdgeInsets.all(4),
+                                minimumSize: const Size(28, 28),
+                              ),
+                              icon: const Icon(
+                                Icons.remove,
+                                size: 15,
+                                color: _navy,
+                              ),
+                            ),
+                            Text(
+                              '${_quantityOf(item)}',
+                              style: const TextStyle(
+                                color: _navy,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                if (item.allowsFreeAccompaniment) {
+                                  _openAccompanimentSheet(
+                                    item,
+                                    kitchenAccompaniments,
+                                  );
+                                } else {
+                                  _increaseQuantity(item);
+                                }
+                              },
+                              style: IconButton.styleFrom(
+                                backgroundColor: _navy,
+                                shape: const CircleBorder(),
+                                padding: const EdgeInsets.all(4),
+                                minimumSize: const Size(28, 28),
+                              ),
+                              icon: const Icon(Icons.add, size: 15, color: _bg),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-          if (showQuantityBox) ...[
-            const SizedBox(height: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              decoration: BoxDecoration(
-                color: const Color(0xFF3E2723),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      if (item.allowsFreeAccompaniment) {
-                        _removeLastAccompaniedUnit(item);
-                      } else {
-                        _decreaseQuantity(item);
-                      }
-                    },
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(8),
-                      minimumSize: const Size(36, 36),
-                    ),
-                    icon: const Icon(
-                      Icons.remove,
-                      size: 18,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Expanded(
-                    child: Center(
-                      child: Text(
-                        '${_quantityOf(item)}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      if (item.allowsFreeAccompaniment) {
-                        _openAccompanimentSheet(item, kitchenAccompaniments);
-                      } else {
-                        _increaseQuantity(item);
-                      }
-                    },
-                    style: IconButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      shape: const CircleBorder(),
-                      padding: const EdgeInsets.all(8),
-                      minimumSize: const Size(36, 36),
-                    ),
-                    icon: const Icon(Icons.add, size: 18, color: Colors.black),
-                  ),
-                ],
+                    ],
+                  ],
+                ),
               ),
             ),
           ],
-        ],
+        ),
       ),
     );
   }
@@ -781,38 +840,65 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
   }) {
     final totalSelected = _totalSelectedCount;
     final totalAmount = _totalAmount(allItems);
-    return ElevatedButton.icon(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF3E2723),
-        foregroundColor: Colors.white,
-        elevation: 10,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
-      onPressed: () async {
-        final lines = _buildSelectedLines(allItems);
-        final orderConfirmed = await Navigator.push<bool>(
-          context,
-          MaterialPageRoute(
-            builder: (_) =>
-                _OrderRecapPage(establishmentId: establishmentId, lines: lines),
+    return Material(
+      color: _navy,
+      borderRadius: BorderRadius.circular(14),
+      elevation: 6,
+      shadowColor: _navy.withValues(alpha: 0.4),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: () async {
+          final lines = _buildSelectedLines(allItems);
+          final orderConfirmed = await Navigator.push<bool>(
+            context,
+            MaterialPageRoute(
+              builder: (_) => _OrderRecapPage(
+                establishmentId: establishmentId,
+                lines: lines,
+              ),
+            ),
+          );
+          if (orderConfirmed == true && mounted) {
+            setState(() {
+              _clearAllSelection();
+            });
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 15),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.receipt_long_outlined, color: _bg, size: 20),
+                  const SizedBox(width: 10),
+                  Text(
+                    'Récapitulatif ($totalSelected)',
+                    style: const TextStyle(
+                      color: _bg,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              Text(
+                '${totalAmount.toStringAsFixed(0)} FCFA',
+                style: const TextStyle(
+                  color: Color(0xFFD9B87A),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
-        );
-        if (orderConfirmed == true && mounted) {
-          setState(() {
-            _clearAllSelection();
-          });
-        }
-      },
-      icon: const Icon(Icons.receipt_long_outlined),
-      label: Text(
-        'Voir le récapitulatif ($totalSelected) • ${totalAmount.toStringAsFixed(0)} FCFA',
+        ),
       ),
     );
   }
 }
 
-/// Une unité d'un plat à accompagnement, avec l'accompagnement gratuit choisi.
 class _AccompaniedUnit {
   final MenuItemModel dish;
   final String accompanimentName;
@@ -1006,7 +1092,7 @@ class _AccompanimentSheetState extends State<_AccompanimentSheet> {
                   flex: 2,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3E2723),
+                      backgroundColor: const Color(0xFF1B3A5B),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
