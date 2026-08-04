@@ -1036,6 +1036,16 @@ class _KitchenOrderCard extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(item.name),
+                                  Text(item.name),
+                                  if (item.accompanimentName.trim().isNotEmpty)
+                                    Text(
+                                      'Accompagnement : ${item.accompanimentName}',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF8D6E63),
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
                                   if (item.note.trim().isNotEmpty)
                                     Text(
                                       'Note : ${item.note}',
