@@ -14,6 +14,7 @@ import 'package:takapp/modeles/user_model.dart';
 import 'package:takapp/services/menu_admin_service.dart';
 import 'package:takapp/services/stock_item_service.dart';
 import 'package:takapp/vues/commun/module_visibility.dart';
+import 'package:takapp/vues/shared/menu_photo_picker.dart';
 
 class GestionMenuPage extends StatefulWidget {
   final String establishmentId;
@@ -169,6 +170,25 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
           isSaving = false;
         });
       }
+    }
+  }
+
+  /// Enregistre immédiatement l'URL de la photo dans le plat sélectionné.
+  Future<void> _savePhotoUrl(String url) async {
+    final item = _selectedExistingItem;
+    if (item == null) return;
+    try {
+      final updated = item.copyWith(adresse: url);
+      await _service.updateMenuItem(
+        establishmentId: establishmentId,
+        item: updated,
+      );
+      if (!mounted) return;
+      setState(() => _selectedExistingItem = updated);
+      _showSnack('Photo enregistrée.');
+    } catch (e) {
+      if (!mounted) return;
+      _showSnack('Erreur enregistrement photo : $e');
     }
   }
 
@@ -980,6 +1000,23 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                   prefixIcon: Icon(Icons.payments_outlined),
                 ),
               ),
+              if (_selectedExistingItem != null) ...[
+                const SizedBox(height: 16),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Photo du plat',
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                MenuPhotoPicker(
+                  establishmentId: establishmentId,
+                  menuItemId: _selectedExistingItem!.id,
+                  currentImageUrl: _selectedExistingItem!.adresse,
+                  onUploaded: _savePhotoUrl,
+                ),
+              ],
               const SizedBox(height: 16),
               SwitchListTile(
                 value: isAvailable,

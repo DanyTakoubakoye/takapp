@@ -36,17 +36,16 @@ class _MenuPhotoPickerState extends State<MenuPhotoPicker> {
       return;
     }
     try {
-      final file = await _service.pickImage(source: source);
-      if (file == null) return; // annulé
+      final bytes = await _service.pickImageBytes(source: source);
+      if (bytes == null) return; // annulé
 
       setState(() => _uploading = true);
 
       final url = await _service.uploadMenuItemImage(
         establishmentId: widget.establishmentId,
         menuItemId: widget.menuItemId,
-        imageFile: file,
+        imageBytes: bytes,
       );
-
       if (!mounted) return;
       setState(() {
         _localUrl = url;
