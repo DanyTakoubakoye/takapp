@@ -32,16 +32,44 @@ class OrderController extends ChangeNotifier {
   // AJOUT ITEM
   // =========================
 
-  void addMenuItem(MenuItemModel menuItem) {
-    final index = _items.indexWhere((e) => e.menuItemId == menuItem.id);
-
+  void addMenuItem(MenuItemModel menuItem, {String accompanimentName = ''}) {
     final targetDepartment = menuItem.isForKitchen ? 'kitchen' : 'bar';
     const Uuid uuid = Uuid();
 
+    // Plat avec accompagnement : chaque unité est une ligne individuelle
+    // (jamais de regroupement), car chaque unité a son propre accompagnement.
+    if (menuItem.allowsFreeAccompaniment) {
+      _items.add(
+        OrderItemModel(
+          id: uuid.v4(),
+          establishmentId: '',
+          menuItemId: menuItem.id,
+          name: menuItem.name,
+          quantity: 1,
+          unitPrice: menuItem.price,
+          totalPrice: menuItem.price,
+          note: '',
+          targetDepartment: targetDepartment,
+          accompanimentName: accompanimentName,
+          isCancelled: false,
+          cancelledAt: null,
+          cancelledBy: '',
+          cancelledByName: '',
+          cancellationReason: '',
+        ),
+      );
+      notifyListeners();
+      return;
+    }
+
+    // Article normal (sans accompagnement) : comportement inchangé,
+    // regroupement par menuItemId.
+    final index = _items.indexWhere(
+      (e) => e.menuItemId == menuItem.id && e.accompanimentName.isEmpty,
+    );
     if (index >= 0) {
       final existing = _items[index];
       final newQuantity = existing.quantity + 1;
-
       _items[index] = existing.copyWith(
         quantity: newQuantity,
         totalPrice: newQuantity * existing.unitPrice,
@@ -50,10 +78,7 @@ class OrderController extends ChangeNotifier {
       _items.add(
         OrderItemModel(
           id: uuid.v4(),
-
-          /// establishmentId renseigné au submitOrder (le panier est un brouillon local)
           establishmentId: '',
-
           menuItemId: menuItem.id,
           name: menuItem.name,
           quantity: 1,
@@ -61,7 +86,6 @@ class OrderController extends ChangeNotifier {
           totalPrice: menuItem.price,
           note: '',
           targetDepartment: targetDepartment,
-
           isCancelled: false,
           cancelledAt: null,
           cancelledBy: '',
@@ -70,7 +94,6 @@ class OrderController extends ChangeNotifier {
         ),
       );
     }
-
     notifyListeners();
   }
 
@@ -125,6 +148,32 @@ class OrderController extends ChangeNotifier {
     _items.clear();
     _errorMessage = null;
     notifyListeners();
+  }
+
+  // =========================
+  // INCREMENT / DECREMENT PAR LIGNE (lignes individuelles avec accompagnement)
+  // =========================
+  void removeLineById(String lineId) {
+    _items.removeWhere((e) => e.id == lineId);
+    notifyListeners();
+  }
+
+  /// Ajoute une nouvelle ligne pour le même plat avec un accompagnement donné.
+  /// Utilisé pour "ajouter une autre unité" d'un plat à accompagnement.
+  void addAccompaniedLine(MenuItemModel menuItem, String accompanimentName) {
+    addMenuItem(menuItem, accompanimentName: accompanimentName);
+  }
+
+  /// Nombre total d'unités d'un plat (toutes lignes confondues).
+  int quantityOfMenuItem(String menuItemId) {
+    return _items
+        .where((e) => e.menuItemId == menuItemId)
+        .fold(0, (sum, e) => sum + e.quantity);
+  }
+
+  /// Les lignes individuelles d'un plat donné (pour les plats à accompagnement).
+  List<OrderItemModel> linesOfMenuItem(String menuItemId) {
+    return _items.where((e) => e.menuItemId == menuItemId).toList();
   }
 
   // =========================
