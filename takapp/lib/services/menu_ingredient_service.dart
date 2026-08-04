@@ -128,6 +128,7 @@ class MenuIngredientService {
   Future<void> createKitchenMenuItem({
     required String establishmentId,
     required String name,
+    String category = 'plat',
   }) async {
     if (establishmentId.trim().isEmpty) {
       throw Exception('Établissement introuvable.');
@@ -141,7 +142,7 @@ class MenuIngredientService {
       'establishmentId': establishmentId,
       'name': name.trim(),
       'composition': '',
-      'category': 'plat',
+      'category': category.trim().isEmpty ? 'plat' : category.trim(),
       'price': 0,
       'isAvailable': true,
       'isForKitchen': true,

@@ -19,7 +19,6 @@ class MenuPresentationPage extends StatefulWidget {
 class _MenuPresentationPageState extends State<MenuPresentationPage> {
   final TextEditingController searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-
   final PageStorageKey _menuListKey = const PageStorageKey(
     'menu_presentation_list',
   );
@@ -30,7 +29,13 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
   String selectedCategory = 'Toutes';
   String? activeItemId;
 
+  /// Articles SANS accompagnement : regroupés par quantité (comportement d'origine).
   final Map<String, int> selectedQuantities = {};
+
+  /// Plats AVEC accompagnement : une entrée par unité, chacune avec son
+  /// accompagnement gratuit choisi. Les portions payantes sont, elles,
+  /// ajoutées comme des articles normaux dans selectedQuantities.
+  final List<_AccompaniedUnit> accompaniedUnits = [];
 
   @override
   void dispose() {
@@ -39,6 +44,20 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
     super.dispose();
   }
 
+  /// Normalise pour comparer les catégories (minuscules + espaces compactés).
+  String _norm(String s) =>
+      s.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+
+  /// Un item est un accompagnement si sa catégorie est "Accompagnements"
+  /// (singulier ou pluriel, insensible casse/espaces).
+  bool _isAccompaniment(MenuItemModel item) {
+    final c = _norm(item.category);
+    return c == 'accompagnements' || c == 'accompagnement';
+  }
+
+  // =========================
+  // SÉLECTION — ARTICLES NORMAUX (inchangé)
+  // =========================
   void _toggleItem(MenuItemModel item) {
     setState(() {
       selectedQuantities.putIfAbsent(item.id, () => 1);
@@ -56,7 +75,6 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
   void _decreaseQuantity(MenuItemModel item) {
     setState(() {
       final current = selectedQuantities[item.id] ?? 0;
-
       if (current <= 1) {
         selectedQuantities.remove(item.id);
         if (activeItemId == item.id) activeItemId = null;
@@ -67,32 +85,159 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
     });
   }
 
-  int _quantityOf(MenuItemModel item) => selectedQuantities[item.id] ?? 0;
+  // =========================
+  // SÉLECTION — PLATS À ACCOMPAGNEMENT
+  // =========================
 
-  bool _isSelected(MenuItemModel item) =>
-      selectedQuantities.containsKey(item.id);
+  /// Ouvre le sélecteur d'accompagnement pour une unité du plat.
+  /// [accompaniments] = liste des menuItems catégorie Accompagnements du même
+  /// département (cuisine ici).
+  Future<void> _openAccompanimentSheet(
+    MenuItemModel dish,
+    List<MenuItemModel> accompaniments,
+  ) async {
+    if (accompaniments.isEmpty) {
+      // Aucun accompagnement disponible : on ajoute quand même l'unité,
+      // sans accompagnement (le plat reste commandable).
+      setState(() {
+        accompaniedUnits.add(
+          _AccompaniedUnit(dish: dish, accompanimentName: ''),
+        );
+        activeItemId = dish.id;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Aucun accompagnement disponible. Plat ajouté sans accompagnement.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final result = await showModalBottomSheet<_AccompanimentResult>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+      ),
+      builder: (sheetContext) =>
+          _AccompanimentSheet(dish: dish, accompaniments: accompaniments),
+    );
+
+    if (!mounted) return;
+    if (result == null) return; // annulé
+
+    setState(() {
+      // 1. L'unité du plat avec son accompagnement gratuit
+      accompaniedUnits.add(
+        _AccompaniedUnit(
+          dish: dish,
+          accompanimentName: result.freeAccompanimentName,
+        ),
+      );
+      // 2. Les portions payantes = articles normaux ajoutés au panier
+      result.paidExtras.forEach((extraId, qty) {
+        if (qty > 0) {
+          selectedQuantities[extraId] =
+              (selectedQuantities[extraId] ?? 0) + qty;
+        }
+      });
+      activeItemId = dish.id;
+    });
+  }
+
+  /// Retire la dernière unité d'un plat à accompagnement.
+  void _removeLastAccompaniedUnit(MenuItemModel dish) {
+    setState(() {
+      final index = accompaniedUnits.lastIndexWhere(
+        (u) => u.dish.id == dish.id,
+      );
+      if (index >= 0) {
+        accompaniedUnits.removeAt(index);
+      }
+      if (!accompaniedUnits.any((u) => u.dish.id == dish.id) &&
+          activeItemId == dish.id) {
+        activeItemId = null;
+      }
+    });
+  }
+
+  int _accompaniedCountOf(MenuItemModel dish) =>
+      accompaniedUnits.where((u) => u.dish.id == dish.id).length;
+
+  // =========================
+  // COMPTAGE / SÉLECTION COMBINÉS
+  // =========================
+  int _quantityOf(MenuItemModel item) {
+    if (item.allowsFreeAccompaniment) {
+      return _accompaniedCountOf(item);
+    }
+    return selectedQuantities[item.id] ?? 0;
+  }
+
+  bool _isSelected(MenuItemModel item) {
+    if (item.allowsFreeAccompaniment) {
+      return _accompaniedCountOf(item) > 0;
+    }
+    return selectedQuantities.containsKey(item.id);
+  }
+
+  bool get _hasAnySelection =>
+      selectedQuantities.isNotEmpty || accompaniedUnits.isNotEmpty;
 
   double _totalAmount(List<MenuItemModel> allItems) {
     double total = 0;
-
+    // Articles normaux + portions payantes (dans selectedQuantities)
     for (final item in allItems) {
       final qty = selectedQuantities[item.id] ?? 0;
       if (qty > 0) total += item.price * qty;
     }
-
+    // Plats à accompagnement (chaque unité au prix du plat)
+    for (final unit in accompaniedUnits) {
+      total += unit.dish.price;
+    }
     return total;
   }
 
+  int get _totalSelectedCount {
+    final normals = selectedQuantities.values.fold<int>(
+      0,
+      (sum, qty) => sum + qty,
+    );
+    return normals + accompaniedUnits.length;
+  }
+
   List<_SelectedMenuLine> _buildSelectedLines(List<MenuItemModel> allItems) {
-    return allItems
-        .where((item) => (selectedQuantities[item.id] ?? 0) > 0)
-        .map(
-          (item) => _SelectedMenuLine(
-            item: item,
-            quantity: selectedQuantities[item.id]!,
-          ),
-        )
-        .toList();
+    final lines = <_SelectedMenuLine>[];
+
+    // Articles normaux + portions payantes
+    for (final item in allItems) {
+      final qty = selectedQuantities[item.id] ?? 0;
+      if (qty > 0) {
+        lines.add(_SelectedMenuLine(item: item, quantity: qty));
+      }
+    }
+
+    // Plats à accompagnement : une ligne par unité (avec accompagnement)
+    for (final unit in accompaniedUnits) {
+      lines.add(
+        _SelectedMenuLine(
+          item: unit.dish,
+          quantity: 1,
+          accompanimentName: unit.accompanimentName,
+        ),
+      );
+    }
+
+    return lines;
+  }
+
+  void _clearAllSelection() {
+    selectedQuantities.clear();
+    accompaniedUnits.clear();
+    activeItemId = null;
   }
 
   @override
@@ -107,7 +252,6 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
     }
 
     final establishmentId = user.establishmentId.trim();
-
     if (establishmentId.isEmpty) {
       return const Scaffold(
         body: Center(child: Text('Établissement introuvable.')),
@@ -172,6 +316,11 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                         a.name.toLowerCase().compareTo(b.name.toLowerCase()),
                   );
 
+              // Les accompagnements cuisine disponibles (pour le sélecteur).
+              final kitchenAccompaniments = rawItems
+                  .where((it) => _isAccompaniment(it) && it.isForKitchen)
+                  .toList();
+
               final availableCategories =
                   <String>{
                     'Toutes',
@@ -208,16 +357,13 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
               final filteredItems =
                   rawItems.where((item) {
                     final query = searchText.toLowerCase();
-
                     final matchesSearch =
                         item.name.toLowerCase().contains(query) ||
                         item.category.toLowerCase().contains(query);
-
                     final matchesCategory =
                         selectedCategory == 'Toutes' ||
                         item.category.toLowerCase() ==
                             selectedCategory.toLowerCase();
-
                     return matchesSearch && matchesCategory;
                   }).toList()..sort((a, b) {
                     final catCompare = a.category.toLowerCase().compareTo(
@@ -242,12 +388,15 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                           padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
                           children: [
                             ...groupedItems.entries.map(
-                              (entry) =>
-                                  _buildCategorySection(entry.key, entry.value),
+                              (entry) => _buildCategorySection(
+                                entry.key,
+                                entry.value,
+                                kitchenAccompaniments,
+                              ),
                             ),
                           ],
                         ),
-                        if (selectedQuantities.isNotEmpty)
+                        if (_hasAnySelection)
                           Positioned(
                             left: 16,
                             right: 16,
@@ -332,24 +481,24 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
 
   Map<String, List<MenuItemModel>> _groupByCategory(List<MenuItemModel> items) {
     final map = <String, List<MenuItemModel>>{};
-
     for (final item in items) {
       map.putIfAbsent(item.category, () => []).add(item);
     }
-
     return map;
   }
 
-  Widget _buildCategorySection(String category, List<MenuItemModel> items) {
+  Widget _buildCategorySection(
+    String category,
+    List<MenuItemModel> items,
+    List<MenuItemModel> kitchenAccompaniments,
+  ) {
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 700;
-
     final crossAxisCount = isMobile
         ? 1
         : screenWidth < 1100
         ? 3
         : 4;
-
     final childAspectRatio = isMobile ? 1.55 : 0.78;
 
     return Column(
@@ -385,7 +534,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
             childAspectRatio: childAspectRatio,
           ),
           itemBuilder: (context, index) {
-            return _buildItemCard(items[index]);
+            return _buildItemCard(items[index], kitchenAccompaniments);
           },
         ),
       ],
@@ -394,11 +543,9 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
 
   Widget _buildMenuImage(MenuItemModel item, bool isMobile) {
     final adresse = (item.adresse ?? '').trim();
-
     if (adresse.isEmpty) {
       return const Center(child: Icon(Icons.image_outlined, size: 38));
     }
-
     if (adresse.startsWith('assets/')) {
       return Image.asset(
         adresse,
@@ -408,7 +555,6 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
         },
       );
     }
-
     if (adresse.startsWith('http://') || adresse.startsWith('https://')) {
       return Image.network(
         adresse,
@@ -422,7 +568,6 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
         },
       );
     }
-
     return Image.asset(
       adresse,
       fit: BoxFit.cover,
@@ -432,12 +577,14 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
     );
   }
 
-  Widget _buildItemCard(MenuItemModel item) {
+  Widget _buildItemCard(
+    MenuItemModel item,
+    List<MenuItemModel> kitchenAccompaniments,
+  ) {
     final selected = _isSelected(item);
     final showQuantityBox = activeItemId == item.id;
     final screenWidth = MediaQuery.of(context).size.width;
     final isMobile = screenWidth < 700;
-
     final composition = item.displayComposition;
     final hasComposition = composition.isNotEmpty;
 
@@ -465,7 +612,13 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
           Expanded(
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
-              onTap: () => _toggleItem(item),
+              onTap: () {
+                if (item.allowsFreeAccompaniment) {
+                  _openAccompanimentSheet(item, kitchenAccompaniments);
+                } else {
+                  _toggleItem(item);
+                }
+              },
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -490,6 +643,29 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                       fontSize: 15,
                     ),
                   ),
+                  if (item.allowsFreeAccompaniment) ...[
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.rice_bowl_outlined,
+                          size: 14,
+                          color: Color(0xFF8D6E63),
+                        ),
+                        const SizedBox(width: 4),
+                        Flexible(
+                          child: Text(
+                            'Accompagnement offert',
+                            style: TextStyle(
+                              color: Colors.brown.shade400,
+                              fontSize: 11.5,
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                   if (hasComposition) ...[
                     const SizedBox(height: 6),
                     Text(
@@ -543,7 +719,13 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
               child: Row(
                 children: [
                   IconButton(
-                    onPressed: () => _decreaseQuantity(item),
+                    onPressed: () {
+                      if (item.allowsFreeAccompaniment) {
+                        _removeLastAccompaniedUnit(item);
+                      } else {
+                        _decreaseQuantity(item);
+                      }
+                    },
                     style: IconButton.styleFrom(
                       backgroundColor: Colors.white,
                       shape: const CircleBorder(),
@@ -569,7 +751,13 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () => _increaseQuantity(item),
+                    onPressed: () {
+                      if (item.allowsFreeAccompaniment) {
+                        _openAccompanimentSheet(item, kitchenAccompaniments);
+                      } else {
+                        _increaseQuantity(item);
+                      }
+                    },
                     style: IconButton.styleFrom(
                       backgroundColor: Colors.white,
                       shape: const CircleBorder(),
@@ -591,13 +779,8 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
     required String establishmentId,
     required List<MenuItemModel> allItems,
   }) {
-    final totalSelected = selectedQuantities.values.fold<int>(
-      0,
-      (sum, qty) => sum + qty,
-    );
-
+    final totalSelected = _totalSelectedCount;
     final totalAmount = _totalAmount(allItems);
-
     return ElevatedButton.icon(
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFF3E2723),
@@ -608,7 +791,6 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
       ),
       onPressed: () async {
         final lines = _buildSelectedLines(allItems);
-
         final orderConfirmed = await Navigator.push<bool>(
           context,
           MaterialPageRoute(
@@ -616,17 +798,242 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                 _OrderRecapPage(establishmentId: establishmentId, lines: lines),
           ),
         );
-
         if (orderConfirmed == true && mounted) {
           setState(() {
-            selectedQuantities.clear();
-            activeItemId = null;
+            _clearAllSelection();
           });
         }
       },
       icon: const Icon(Icons.receipt_long_outlined),
       label: Text(
         'Voir le récapitulatif ($totalSelected) • ${totalAmount.toStringAsFixed(0)} FCFA',
+      ),
+    );
+  }
+}
+
+/// Une unité d'un plat à accompagnement, avec l'accompagnement gratuit choisi.
+class _AccompaniedUnit {
+  final MenuItemModel dish;
+  final String accompanimentName;
+  _AccompaniedUnit({required this.dish, required this.accompanimentName});
+}
+
+/// Résultat du sélecteur d'accompagnement.
+class _AccompanimentResult {
+  final String freeAccompanimentName;
+  final Map<String, int> paidExtras; // menuItemId accompagnement -> quantité
+  _AccompanimentResult({
+    required this.freeAccompanimentName,
+    required this.paidExtras,
+  });
+}
+
+/// Feuille modale de choix d'accompagnement.
+class _AccompanimentSheet extends StatefulWidget {
+  final MenuItemModel dish;
+  final List<MenuItemModel> accompaniments;
+
+  const _AccompanimentSheet({required this.dish, required this.accompaniments});
+
+  @override
+  State<_AccompanimentSheet> createState() => _AccompanimentSheetState();
+}
+
+class _AccompanimentSheetState extends State<_AccompanimentSheet> {
+  String? _freeChoiceId;
+  final Map<String, int> _paidExtras = {};
+
+  @override
+  Widget build(BuildContext context) {
+    final media = MediaQuery.of(context);
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 16,
+        bottom: media.viewInsets.bottom + 16,
+      ),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: media.size.height * 0.8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 44,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              widget.dish.name,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              'Choisissez 1 accompagnement offert',
+              style: TextStyle(color: Colors.brown.shade400, fontSize: 13),
+            ),
+            const SizedBox(height: 14),
+            Flexible(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // --- Accompagnement offert (choix unique) ---
+                    ...widget.accompaniments.map((acc) {
+                      final isSelected = _freeChoiceId == acc.id;
+                      return Card(
+                        elevation: 0,
+                        margin: const EdgeInsets.only(bottom: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: isSelected
+                                ? const Color(0xFFBF7B30)
+                                : Colors.grey.shade300,
+                            width: isSelected ? 2 : 1,
+                          ),
+                        ),
+                        color: isSelected
+                            ? const Color(0xFFFFF3E0)
+                            : Colors.white,
+                        child: ListTile(
+                          onTap: () {
+                            setState(() => _freeChoiceId = acc.id);
+                          },
+                          leading: Icon(
+                            isSelected
+                                ? Icons.check_circle
+                                : Icons.circle_outlined,
+                            color: isSelected
+                                ? const Color(0xFFBF7B30)
+                                : Colors.grey,
+                          ),
+                          title: Text(acc.name),
+                          subtitle: const Text(
+                            'Offert',
+                            style: TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12.5,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+
+                    const SizedBox(height: 8),
+                    const Divider(),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Portions supplémentaires (payantes)',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.brown.shade700,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // --- Portions payantes (+/- par accompagnement) ---
+                    ...widget.accompaniments.map((acc) {
+                      final qty = _paidExtras[acc.id] ?? 0;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(acc.name),
+                                  Text(
+                                    '${acc.price.toStringAsFixed(0)} FCFA / portion',
+                                    style: TextStyle(
+                                      color: Colors.grey.shade600,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: qty > 0
+                                  ? () => setState(() {
+                                      _paidExtras[acc.id] = qty - 1;
+                                    })
+                                  : null,
+                              icon: const Icon(Icons.remove_circle_outline),
+                            ),
+                            Text(
+                              '$qty',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () => setState(() {
+                                _paidExtras[acc.id] = qty + 1;
+                              }),
+                              icon: const Icon(Icons.add_circle_outline),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Annuler'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  flex: 2,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF3E2723),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                    ),
+                    onPressed: () {
+                      // L'accompagnement gratuit est optionnel : si rien n'est
+                      // choisi, on valide quand même (accompagnement vide).
+                      String freeName = '';
+                      if (_freeChoiceId != null) {
+                        freeName = widget.accompaniments
+                            .firstWhere((a) => a.id == _freeChoiceId)
+                            .name;
+                      }
+                      Navigator.pop(
+                        context,
+                        _AccompanimentResult(
+                          freeAccompanimentName: freeName,
+                          paidExtras: Map<String, int>.from(_paidExtras),
+                        ),
+                      );
+                    },
+                    child: const Text('Valider'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -644,13 +1051,11 @@ class _OrderRecapPage extends StatefulWidget {
 
 class _OrderRecapPageState extends State<_OrderRecapPage> {
   String clientType = 'restaurant';
-
   final TextEditingController tableController = TextEditingController();
   final TextEditingController roomController = TextEditingController();
 
   final ClientService _clientService = ClientService();
 
-  /// Fiche client rattachée. Vide = commande sans client (cas courant).
   String _selectedClientId = '';
   String _selectedClientName = '';
 
@@ -663,10 +1068,6 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
     super.dispose();
   }
 
-  /// Sélection facultative d'une fiche client.
-  ///
-  /// PIÈGE : le sheet doit être fermé avec `Navigator.pop(sheetContext, valeur)`
-  /// (géré dans ClientPickerSheet).
   Future<void> _pickClient() async {
     final selected = await showModalBottomSheet<ClientModel>(
       context: context,
@@ -676,10 +1077,8 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
         service: _clientService,
       ),
     );
-
     if (!mounted) return;
     if (selected == null) return;
-
     setState(() {
       _selectedClientId = selected.id;
       _selectedClientName = selected.name;
@@ -693,7 +1092,6 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
     });
   }
 
-  /// Sélecteur discret : jamais bloquant, jamais obligatoire.
   Widget _buildClientSelector(bool isSubmitting) {
     if (_selectedClientId.isEmpty) {
       return Align(
@@ -705,7 +1103,6 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
         ),
       );
     }
-
     return Container(
       padding: const EdgeInsets.fromLTRB(12, 4, 4, 4),
       decoration: BoxDecoration(
@@ -774,7 +1171,6 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
     }
 
     final existingItems = List.of(orderController.items);
-
     for (final item in existingItems) {
       for (int i = 0; i < item.quantity; i++) {
         orderController.decrementItem(item.menuItemId);
@@ -783,7 +1179,10 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
 
     for (final line in widget.lines) {
       for (int i = 0; i < line.quantity; i++) {
-        orderController.addMenuItem(line.item);
+        orderController.addMenuItem(
+          line.item,
+          accompanimentName: line.accompanimentName,
+        );
       }
     }
 
@@ -798,12 +1197,10 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
     );
 
     if (!mounted) return;
-
     if (success) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Commande envoyée avec succès.')),
       );
-
       Navigator.pop(context, true);
     } else if (orderController.errorMessage != null) {
       ScaffoldMessenger.of(
@@ -823,8 +1220,6 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
       );
     }
 
-    // Options du sélecteur limitées aux modules souscrits (identiques à
-    // l'origine pour un établissement abonné à tout).
     final clientTypeOptions = <MapEntry<String, String>>[
       const MapEntry('bar', 'Client Bar'),
       const MapEntry('restaurant', 'Client Restaurant'),
@@ -892,14 +1287,41 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
                     separatorBuilder: (_, _) => const Divider(),
                     itemBuilder: (context, index) {
                       final line = widget.lines[index];
-
+                      final hasAcc = line.accompanimentName.trim().isNotEmpty;
                       return ListTile(
                         title: Text(
                           line.item.name,
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        subtitle: Text(
-                          '${line.item.category} • ${line.item.price.toStringAsFixed(0)} FCFA x ${line.quantity}',
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '${line.item.category} • ${line.item.price.toStringAsFixed(0)} FCFA x ${line.quantity}',
+                            ),
+                            if (hasAcc)
+                              Padding(
+                                padding: const EdgeInsets.only(top: 2),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.rice_bowl_outlined,
+                                      size: 13,
+                                      color: Color(0xFF8D6E63),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Accompagnement : ${line.accompanimentName} (offert)',
+                                      style: TextStyle(
+                                        color: Colors.brown.shade400,
+                                        fontSize: 12,
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                          ],
                         ),
                         trailing: Text(
                           '${line.totalPrice.toStringAsFixed(0)} FCFA',
@@ -958,8 +1380,11 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
 class _SelectedMenuLine {
   final MenuItemModel item;
   final int quantity;
-
-  const _SelectedMenuLine({required this.item, required this.quantity});
-
+  final String accompanimentName;
+  const _SelectedMenuLine({
+    required this.item,
+    required this.quantity,
+    this.accompanimentName = '',
+  });
   double get totalPrice => item.price * quantity;
 }

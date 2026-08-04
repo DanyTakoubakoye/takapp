@@ -20,6 +20,23 @@ class _MenuItemIngredientsFormPageState
   final MenuIngredientService _service = MenuIngredientService();
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _newDishController = TextEditingController();
+  final List<String> _dishCategories = const [
+    'Viandes',
+    'plat',
+    'Volailles',
+    'Pates',
+    'Accompagnements',
+    'Fruits de mer',
+    'Spécialités africaines',
+    'Burger et Sandwichs',
+    'Etrées libanaises',
+    'Entrées froides',
+    'Pizzas',
+    'Fast food',
+    'Desserts',
+    'Autres',
+  ];
+  String _newDishCategory = 'plat';
   final TextEditingController _compositionController = TextEditingController();
   late final Stream<QuerySnapshot<Map<String, dynamic>>> _menuItemsStream;
   late final Stream<QuerySnapshot<Map<String, dynamic>>> _stockItemsStream;
@@ -170,6 +187,7 @@ class _MenuItemIngredientsFormPageState
       await _service.createKitchenMenuItem(
         establishmentId: establishmentId,
         name: name,
+        category: _newDishCategory,
       );
       _newDishController.clear();
       if (!mounted) return;
@@ -531,6 +549,32 @@ class _MenuItemIngredientsFormPageState
                                             label: const Text('Créer'),
                                           ),
                                         ],
+                                      ),
+                                      const SizedBox(height: 10),
+                                      DropdownButtonFormField<String>(
+                                        initialValue: _newDishCategory,
+                                        decoration: const InputDecoration(
+                                          labelText: 'Catégorie',
+                                          border: OutlineInputBorder(),
+                                          prefixIcon: Icon(
+                                            Icons.category_outlined,
+                                          ),
+                                          isDense: true,
+                                        ),
+                                        items: _dishCategories.map((cat) {
+                                          return DropdownMenuItem<String>(
+                                            value: cat,
+                                            child: Text(cat),
+                                          );
+                                        }).toList(),
+                                        onChanged: isSaving
+                                            ? null
+                                            : (value) {
+                                                if (value == null) return;
+                                                setState(() {
+                                                  _newDishCategory = value;
+                                                });
+                                              },
                                       ),
                                     ],
                                   ),
