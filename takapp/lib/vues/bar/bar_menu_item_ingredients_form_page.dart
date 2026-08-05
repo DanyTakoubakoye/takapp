@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:takapp/services/menu_ingredient_service.dart';
+import 'package:takapp/vues/shared/menu_photo_picker.dart';
 
 import 'package:excel/excel.dart' as xlsx;
 import 'package:file_picker/file_picker.dart';
@@ -24,29 +25,40 @@ class _BarMenuItemIngredientsFormPageState
 
   final _formKey = GlobalKey<FormState>();
 
+  final TextEditingController _newDishController = TextEditingController();
+  final TextEditingController _compositionController = TextEditingController();
+
+  final List<String> _dishCategories = const [
+    'boisson',
+    'Cocktails',
+    'Bières',
+    'Vins',
+    'Jus',
+    'Sodas',
+    'Eaux',
+    'Spiritueux',
+    'Sans alcool',
+  ];
+  String _newDishCategory = 'boisson';
+
   String? selectedMenuItemId;
+  String _selectedItemAdresse = '';
 
   final List<_IngredientLine> ingredientLines = [_IngredientLine()];
 
   bool isSaving = false;
 
-  /// =========================
-  /// HELPERS SAAS
-  /// =========================
-
   String get establishmentId => widget.establishmentId;
+
   @override
   void dispose() {
     for (final line in ingredientLines) {
       line.quantityController.dispose();
     }
-
+    _newDishController.dispose();
+    _compositionController.dispose();
     super.dispose();
   }
-
-  /// =========================
-  /// ADD LINE
-  /// =========================
 
   void _addIngredientLine() {
     setState(() {
@@ -54,25 +66,15 @@ class _BarMenuItemIngredientsFormPageState
     });
   }
 
-  /// =========================
-  /// REMOVE LINE
-  /// =========================
-
   void _removeIngredientLine(int index) {
     if (ingredientLines.length == 1) {
       return;
     }
-
     setState(() {
       ingredientLines[index].quantityController.dispose();
-
       ingredientLines.removeAt(index);
     });
   }
-
-  /// =========================
-  /// FIND DOC
-  /// =========================
 
   DocumentSnapshot<Map<String, dynamic>>? _findDocById(
     List<DocumentSnapshot<Map<String, dynamic>>> docs,
@@ -81,32 +83,69 @@ class _BarMenuItemIngredientsFormPageState
     if (id == null) {
       return null;
     }
-
     for (final doc in docs) {
       if (doc.id == id) {
         return doc;
       }
     }
-
     return null;
   }
 
-  /// =========================
-  /// SAVE
-  /// =========================
+  /// Crée un nouveau cocktail / article bar (sans prix).
+  Future<void> _createDish() async {
+    final name = _newDishController.text.trim();
+    if (name.isEmpty) {
+      _showMessage('Saisissez le nom du cocktail.');
+      return;
+    }
+    setState(() => isSaving = true);
+    try {
+      await _service.createBarMenuItem(
+        establishmentId: establishmentId,
+        name: name,
+        category: _newDishCategory,
+      );
+      _newDishController.clear();
+      if (!mounted) return;
+      _showMessage(
+        'Cocktail « $name » créé. Vous pouvez maintenant le composer.',
+      );
+    } catch (e) {
+      if (!mounted) return;
+      _showMessage('Erreur : $e');
+    } finally {
+      if (mounted) setState(() => isSaving = false);
+    }
+  }
+
+  /// Enregistre immédiatement l'URL de la photo dans l'article sélectionné.
+  Future<void> _savePhotoUrl(String url) async {
+    if (selectedMenuItemId == null) return;
+    try {
+      await _service.updateMenuItemImage(
+        establishmentId: establishmentId,
+        menuItemId: selectedMenuItemId!,
+        adresse: url,
+      );
+      if (!mounted) return;
+      setState(() => _selectedItemAdresse = url);
+      _showMessage('Photo enregistrée.');
+    } catch (e) {
+      if (!mounted) return;
+      _showMessage('Erreur enregistrement photo : $e');
+    }
+  }
 
   Future<void> _save(
     List<DocumentSnapshot<Map<String, dynamic>>> stockItems,
   ) async {
     if (establishmentId.trim().isEmpty) {
       _showMessage('Établissement introuvable.');
-
       return;
     }
 
     if (selectedMenuItemId == null) {
       _showMessage('Veuillez choisir un cocktail ou article du bar.');
-
       return;
     }
 
@@ -121,7 +160,6 @@ class _BarMenuItemIngredientsFormPageState
 
       if (stockItem == null) {
         _showMessage('Veuillez choisir tous les ingrédients.');
-
         return;
       }
 
@@ -131,22 +169,15 @@ class _BarMenuItemIngredientsFormPageState
 
       if (quantity == null || quantity <= 0) {
         _showMessage('Chaque quantité doit être un nombre entier positif.');
-
         return;
       }
 
       ingredients.add({
         'itemId': stockItem.id,
-
         'itemName': data['name'] ?? '',
-
         'quantity': quantity,
-
         'store': data['store'] ?? 'bar',
-
         'unit': data['unit'] ?? '',
-
-        /// SAAS
         'establishmentId': establishmentId,
       });
     }
@@ -158,10 +189,9 @@ class _BarMenuItemIngredientsFormPageState
     try {
       await _service.updateMenuItemIngredients(
         establishmentId: establishmentId,
-
         menuItemId: selectedMenuItemId!,
-
         ingredients: ingredients,
+        composition: _compositionController.text,
       );
 
       if (!mounted) return;
@@ -170,6 +200,8 @@ class _BarMenuItemIngredientsFormPageState
 
       setState(() {
         selectedMenuItemId = null;
+        _compositionController.clear();
+        _selectedItemAdresse = '';
 
         for (final line in ingredientLines) {
           line.quantityController.dispose();
@@ -440,23 +472,14 @@ class _BarMenuItemIngredientsFormPageState
     );
   }
 
-  /// =========================
-  /// SHOW MESSAGE
-  /// =========================
-
   void _showMessage(String message) {
     ScaffoldMessenger.of(
       context,
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  /// =========================
-  /// DOC NAME
-  /// =========================
-
   String _docName(DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
-
     return (data['name'] ?? '').toString();
   }
 
@@ -473,215 +496,327 @@ class _BarMenuItemIngredientsFormPageState
 
     return Scaffold(
       appBar: AppBar(title: const Text('Composition cocktails bar')),
+      body: SafeArea(
+        child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+          stream: _service.streamBarMenuItems(establishmentId: establishmentId),
+          builder: (context, menuSnapshot) {
+            if (menuSnapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-      body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-        stream: _service.streamBarMenuItems(establishmentId: establishmentId),
+            if (menuSnapshot.hasError) {
+              return Center(
+                child: Text('Erreur menuItems : ${menuSnapshot.error}'),
+              );
+            }
 
-        builder: (context, menuSnapshot) {
-          if (menuSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+            final menuItems = menuSnapshot.data?.docs ?? [];
 
-          if (menuSnapshot.hasError) {
-            return Center(
-              child: Text('Erreur menuItems : ${menuSnapshot.error}'),
-            );
-          }
+            return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+              stream: _service.streamBarStockItems(
+                establishmentId: establishmentId,
+              ),
+              builder: (context, stockSnapshot) {
+                if (stockSnapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-          final menuItems = menuSnapshot.data?.docs ?? [];
+                if (stockSnapshot.hasError) {
+                  return Center(
+                    child: Text('Erreur stock_items : ${stockSnapshot.error}'),
+                  );
+                }
 
-          return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-            stream: _service.streamBarStockItems(
-              establishmentId: establishmentId,
-            ),
+                final stockItems = stockSnapshot.data?.docs ?? [];
 
-            builder: (context, stockSnapshot) {
-              if (stockSnapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              }
+                return SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 950),
+                      child: Card(
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(18),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _header(context, menuItems, stockItems),
+                                _formatHint(),
 
-              if (stockSnapshot.hasError) {
-                return Center(
-                  child: Text('Erreur stock_items : ${stockSnapshot.error}'),
-                );
-              }
+                                const SizedBox(height: 20),
 
-              final stockItems = stockSnapshot.data?.docs ?? [];
-
-              return SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-
-                child: Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 950),
-
-                    child: Card(
-                      elevation: 3,
-
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-
-                      child: Padding(
-                        padding: const EdgeInsets.all(18),
-
-                        child: Form(
-                          key: _formKey,
-
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-
-                            children: [
-                              _header(context, menuItems, stockItems),
-                              _formatHint(),
-
-                              const SizedBox(height: 20),
-
-                              DropdownButtonFormField<String>(
-                                initialValue:
-                                    menuItems.any((doc) {
-                                      return doc.id == selectedMenuItemId;
-                                    })
-                                    ? selectedMenuItemId
-                                    : null,
-
-                                decoration: const InputDecoration(
-                                  labelText: 'Cocktail / article du bar',
-
-                                  border: OutlineInputBorder(),
-
-                                  prefixIcon: Icon(Icons.local_bar_outlined),
-                                ),
-
-                                items: menuItems.map((doc) {
-                                  return DropdownMenuItem<String>(
-                                    value: doc.id,
-
-                                    child: Text(_docName(doc)),
-                                  );
-                                }).toList(),
-
-                                onChanged: isSaving
-                                    ? null
-                                    : (value) {
-                                        setState(() {
-                                          selectedMenuItemId = value;
-                                        });
-                                      },
-
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Veuillez choisir un article du bar';
-                                  }
-
-                                  return null;
-                                },
-                              ),
-
-                              const SizedBox(height: 24),
-
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      'Ingrédients du bar',
-
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium
-                                          ?.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                // Bloc création d'un nouveau cocktail
+                                Card(
+                                  color: Colors.blueGrey.withValues(
+                                    alpha: 0.04,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(14),
+                                    side: BorderSide(
+                                      color: Colors.blueGrey.withValues(
+                                        alpha: 0.3,
+                                      ),
                                     ),
                                   ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(14),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        const Text(
+                                          'Créer un nouveau cocktail',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        const Text(
+                                          'Le prix sera fixé par la gérante.',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.black54,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: TextField(
+                                                controller: _newDishController,
+                                                enabled: !isSaving,
+                                                textCapitalization:
+                                                    TextCapitalization.words,
+                                                decoration:
+                                                    const InputDecoration(
+                                                      labelText:
+                                                          'Nom du cocktail',
+                                                      hintText: 'Ex : Mojito',
+                                                      border:
+                                                          OutlineInputBorder(),
+                                                      prefixIcon: Icon(
+                                                        Icons.local_bar,
+                                                      ),
+                                                    ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 10),
+                                            ElevatedButton.icon(
+                                              onPressed: isSaving
+                                                  ? null
+                                                  : _createDish,
+                                              icon: const Icon(Icons.add),
+                                              label: const Text('Créer'),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        DropdownButtonFormField<String>(
+                                          initialValue: _newDishCategory,
+                                          decoration: const InputDecoration(
+                                            labelText: 'Catégorie',
+                                            border: OutlineInputBorder(),
+                                            prefixIcon: Icon(
+                                              Icons.category_outlined,
+                                            ),
+                                            isDense: true,
+                                          ),
+                                          items: _dishCategories.map((cat) {
+                                            return DropdownMenuItem<String>(
+                                              value: cat,
+                                              child: Text(cat),
+                                            );
+                                          }).toList(),
+                                          onChanged: isSaving
+                                              ? null
+                                              : (value) {
+                                                  if (value == null) return;
+                                                  setState(() {
+                                                    _newDishCategory = value;
+                                                  });
+                                                },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
 
-                                  ElevatedButton.icon(
-                                    onPressed: isSaving
-                                        ? null
-                                        : _addIngredientLine,
+                                const SizedBox(height: 20),
 
-                                    icon: const Icon(Icons.add),
+                                DropdownButtonFormField<String>(
+                                  initialValue:
+                                      menuItems.any((doc) {
+                                        return doc.id == selectedMenuItemId;
+                                      })
+                                      ? selectedMenuItemId
+                                      : null,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Cocktail / article du bar',
+                                    border: OutlineInputBorder(),
+                                    prefixIcon: Icon(Icons.local_bar_outlined),
+                                  ),
+                                  items: menuItems.map((doc) {
+                                    return DropdownMenuItem<String>(
+                                      value: doc.id,
+                                      child: Text(_docName(doc)),
+                                    );
+                                  }).toList(),
+                                  onChanged: isSaving
+                                      ? null
+                                      : (value) {
+                                          setState(() {
+                                            selectedMenuItemId = value;
+                                            final doc = _findDocById(
+                                              menuItems,
+                                              value,
+                                            );
+                                            _compositionController.text =
+                                                (doc?.data()?['composition'] ??
+                                                        '')
+                                                    .toString();
+                                            _selectedItemAdresse =
+                                                (doc?.data()?['adresse'] ?? '')
+                                                    .toString();
+                                          });
+                                        },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Veuillez choisir un article du bar';
+                                    }
+                                    return null;
+                                  },
+                                ),
 
-                                    label: const Text('Ajouter'),
+                                const SizedBox(height: 20),
+
+                                TextField(
+                                  controller: _compositionController,
+                                  enabled: !isSaving,
+                                  maxLines: 2,
+                                  decoration: const InputDecoration(
+                                    labelText: 'Composition (optionnel)',
+                                    hintText:
+                                        'Laissez vide pour afficher la liste des ingrédients',
+                                    border: OutlineInputBorder(),
+                                    prefixIcon: Icon(Icons.notes_outlined),
+                                  ),
+                                ),
+
+                                if (selectedMenuItemId != null) ...[
+                                  const SizedBox(height: 16),
+                                  const Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      'Photo du cocktail',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  MenuPhotoPicker(
+                                    establishmentId: establishmentId,
+                                    menuItemId: selectedMenuItemId!,
+                                    currentImageUrl: _selectedItemAdresse,
+                                    onUploaded: _savePhotoUrl,
                                   ),
                                 ],
-                              ),
 
-                              const SizedBox(height: 12),
+                                const SizedBox(height: 24),
 
-                              ...List.generate(ingredientLines.length, (index) {
-                                return _ingredientRow(
-                                  index: index,
-
-                                  stockItems: stockItems,
-
-                                  isSmallScreen: isSmallScreen,
-                                );
-                              }),
-
-                              const SizedBox(height: 24),
-
-                              SizedBox(
-                                width: double.infinity,
-
-                                child: ElevatedButton.icon(
-                                  onPressed: isSaving
-                                      ? null
-                                      : () => _save(stockItems),
-
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blueGrey.shade800,
-
-                                    foregroundColor: Colors.white,
-
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 16,
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        'Ingrédients du bar',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium
+                                            ?.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                      ),
                                     ),
-
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(14),
+                                    ElevatedButton.icon(
+                                      onPressed: isSaving
+                                          ? null
+                                          : _addIngredientLine,
+                                      icon: const Icon(Icons.add),
+                                      label: const Text('Ajouter'),
                                     ),
-                                  ),
+                                  ],
+                                ),
 
-                                  icon: isSaving
-                                      ? const SizedBox(
-                                          width: 18,
+                                const SizedBox(height: 12),
 
-                                          height: 18,
+                                ...List.generate(ingredientLines.length, (
+                                  index,
+                                ) {
+                                  return _ingredientRow(
+                                    index: index,
+                                    stockItems: stockItems,
+                                    isSmallScreen: isSmallScreen,
+                                  );
+                                }),
 
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
+                                const SizedBox(height: 24),
 
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                      : const Icon(Icons.save),
-
-                                  label: Text(
-                                    isSaving
-                                        ? 'Enregistrement...'
-                                        : 'Valider la composition du cocktail',
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton.icon(
+                                    onPressed: isSaving
+                                        ? null
+                                        : () => _save(stockItems),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blueGrey.shade800,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                    ),
+                                    icon: isSaving
+                                        ? const SizedBox(
+                                            width: 18,
+                                            height: 18,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : const Icon(Icons.save),
+                                    label: Text(
+                                      isSaving
+                                          ? 'Enregistrement...'
+                                          : 'Valider la composition du cocktail',
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              );
-            },
-          );
-        },
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }
-
-  /// =========================
-  /// HEADER
-  /// =========================
 
   Widget _header(
     BuildContext context,
@@ -718,15 +853,9 @@ class _BarMenuItemIngredientsFormPageState
     );
   }
 
-  /// =========================
-  /// INGREDIENT ROW
-  /// =========================
-
   Widget _ingredientRow({
     required int index,
-
     required List<DocumentSnapshot<Map<String, dynamic>>> stockItems,
-
     required bool isSmallScreen,
   }) {
     final line = ingredientLines[index];
@@ -738,29 +867,20 @@ class _BarMenuItemIngredientsFormPageState
           })
           ? line.selectedStockItemId
           : null,
-
       decoration: InputDecoration(
         labelText: 'Ingrédient ${index + 1}',
-
         border: const OutlineInputBorder(),
-
         prefixIcon: const Icon(Icons.liquor_outlined),
       ),
-
       items: stockItems.map((doc) {
         final data = doc.data() ?? {};
-
         final name = (data['name'] ?? '').toString();
-
         final unit = (data['unit'] ?? '').toString();
-
         return DropdownMenuItem<String>(
           value: doc.id,
-
           child: Text('$name - $unit'),
         );
       }).toList(),
-
       onChanged: isSaving
           ? null
           : (value) {
@@ -768,89 +888,64 @@ class _BarMenuItemIngredientsFormPageState
                 line.selectedStockItemId = value;
               });
             },
-
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Choisissez un ingrédient';
         }
-
         return null;
       },
     );
 
     final quantityField = TextFormField(
       controller: line.quantityController,
-
       enabled: !isSaving,
-
       keyboardType: TextInputType.number,
-
       decoration: const InputDecoration(
         labelText: 'Quantité',
-
         border: OutlineInputBorder(),
-
         prefixIcon: Icon(Icons.numbers),
       ),
-
       validator: (value) {
         final quantity = int.tryParse((value ?? '').trim());
-
         if (quantity == null || quantity <= 0) {
           return 'Quantité invalide';
         }
-
         return null;
       },
     );
 
     final deleteButton = IconButton(
       tooltip: 'Retirer cette ligne',
-
       onPressed: ingredientLines.length == 1 || isSaving
           ? null
           : () => _removeIngredientLine(index),
-
       icon: const Icon(Icons.delete_outline, color: Colors.red),
     );
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-
       padding: const EdgeInsets.all(12),
-
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-
         borderRadius: BorderRadius.circular(14),
-
         border: Border.all(color: Colors.grey.shade300),
       ),
-
       child: isSmallScreen
           ? Column(
               children: [
                 ingredientDropdown,
-
                 const SizedBox(height: 12),
-
                 quantityField,
-
                 Align(alignment: Alignment.centerRight, child: deleteButton),
               ],
             )
           : Row(
               crossAxisAlignment: CrossAxisAlignment.start,
-
               children: [
                 Expanded(flex: 3, child: ingredientDropdown),
-
                 const SizedBox(width: 12),
-
                 Expanded(child: quantityField),
-
                 const SizedBox(width: 8),
-
                 deleteButton,
               ],
             ),
@@ -860,6 +955,5 @@ class _BarMenuItemIngredientsFormPageState
 
 class _IngredientLine {
   String? selectedStockItemId;
-
   final TextEditingController quantityController = TextEditingController();
 }

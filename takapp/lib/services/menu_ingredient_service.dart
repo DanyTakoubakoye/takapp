@@ -88,7 +88,7 @@ class MenuIngredientService {
   /// =========================
   /// UPDATE MENU INGREDIENTS
   /// =========================
-/// Enregistre uniquement l'URL de la photo d'un plat (sans toucher aux
+  /// Enregistre uniquement l'URL de la photo d'un plat (sans toucher aux
   /// ingrédients). Utilisé par le sélecteur de photo côté chef.
   Future<void> updateMenuItemImage({
     required String establishmentId,
@@ -110,6 +110,7 @@ class MenuIngredientService {
       'syncError': false,
     });
   }
+
   Future<void> updateMenuItemIngredients({
     required String establishmentId,
     required String menuItemId,
@@ -146,6 +147,38 @@ class MenuIngredientService {
     await _menuItemsCol(
       establishmentId: establishmentId,
     ).doc(menuItemId).update(data);
+  }
+
+  /// Crée un article bar (cocktail) sans prix.
+  /// Le barman définit le nom ; la gérante fixera le prix ensuite.
+  Future<void> createBarMenuItem({
+    required String establishmentId,
+    required String name,
+    String category = 'boisson',
+  }) async {
+    if (establishmentId.trim().isEmpty) {
+      throw Exception('Établissement introuvable.');
+    }
+    if (name.trim().isEmpty) {
+      throw Exception('Nom du cocktail obligatoire.');
+    }
+    final docRef = _menuItemsCol(establishmentId: establishmentId).doc();
+    await docRef.set({
+      'id': docRef.id,
+      'establishmentId': establishmentId,
+      'name': name.trim(),
+      'composition': '',
+      'category': category.trim().isEmpty ? 'boisson' : category.trim(),
+      'price': 0,
+      'isAvailable': true,
+      'isForKitchen': false,
+      'isForBar': true,
+      'ingredients': <Map<String, dynamic>>[],
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+      'pendingSync': false,
+      'syncError': false,
+    });
   }
 
   /// Crée un plat cuisine (article menu) sans prix.

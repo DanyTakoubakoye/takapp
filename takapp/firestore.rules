@@ -182,21 +182,48 @@ service cloud.firestore {
           (isAdminOrOwner() || isGerante());
       }
 
-      match /menuItems/{itemId} {
-        allow read: if sameEstablishment(establishmentId);
-        allow create, delete: if sameEstablishment(establishmentId) &&
-          (isAdminOrOwner() || isGerante());
-        allow update: if sameEstablishment(establishmentId) && (
-          isAdminOrOwner() ||
-          isGerante() ||
-          (
-            isChefCuisine() &&
-            request.resource.data.diff(resource.data).changedKeys()
-              .hasOnly(['ingredients', 'updatedAt', 'pendingSync', 'syncError'])
-          )
-        );
-      }
+    match /menuItems/{itemId} {
+          allow read: if sameEstablishment(establishmentId);
 
+          // Création : gérante/admin sans restriction.
+          // Le chef peut créer un plat CUISINE uniquement, sans prix (0).
+          // Le barman peut créer un article BAR uniquement, sans prix (0).
+          allow create: if sameEstablishment(establishmentId) && (
+            isAdminOrOwner() ||
+            isGerante() ||
+            (
+              isChefCuisine() &&
+              request.resource.data.isForKitchen == true &&
+              request.resource.data.isForBar == false &&
+              request.resource.data.price == 0
+            ) ||
+            (
+              isBarman() &&
+              request.resource.data.isForBar == true &&
+              request.resource.data.isForKitchen == false &&
+              request.resource.data.price == 0
+            )
+          );
+
+          // Suppression : réservée à la gérante/admin.
+          allow delete: if sameEstablishment(establishmentId) &&
+            (isAdminOrOwner() || isGerante());
+
+          allow update: if sameEstablishment(establishmentId) && (
+            isAdminOrOwner() ||
+            isGerante() ||
+            (
+              isChefCuisine() &&
+              request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly(['ingredients', 'composition', 'allowsFreeAccompaniment', 'adresse', 'updatedAt', 'pendingSync', 'syncError'])
+            ) ||
+            (
+              isBarman() &&
+              request.resource.data.diff(resource.data).changedKeys()
+                .hasOnly(['ingredients', 'composition', 'adresse', 'updatedAt', 'pendingSync', 'syncError'])
+            )
+          );
+        }
       match /orders/{orderId} {
         allow read: if sameEstablishment(establishmentId);
         allow create: if sameEstablishment(establishmentId) && (
