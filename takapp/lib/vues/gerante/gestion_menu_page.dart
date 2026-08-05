@@ -853,30 +853,40 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Gestion du menu')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: isSmallScreen
-            ? Column(
-                children: [
-                  _buildFormCard(canBar: canBar, canRestaurant: canRestaurant),
-                  const SizedBox(height: 16),
-                  Expanded(child: _buildListCard(user)),
-                ],
-              )
-            : Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: _buildFormCard(
-                      canBar: canBar,
-                      canRestaurant: canRestaurant,
-                    ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: isSmallScreen
+              ? SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      _buildFormCard(
+                        canBar: canBar,
+                        canRestaurant: canRestaurant,
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.6,
+                        child: _buildListCard(user),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(flex: 3, child: _buildListCard(user)),
-                ],
-              ),
+                )
+              : Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 2,
+                      child: _buildFormCard(
+                        canBar: canBar,
+                        canRestaurant: canRestaurant,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(flex: 3, child: _buildListCard(user)),
+                  ],
+                ),
+        ),
       ),
     );
   }
