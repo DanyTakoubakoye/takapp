@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import 'package:takapp/core/constants/bar_categories.dart';
 import 'package:takapp/services/menu_ingredient_service.dart';
 import 'package:takapp/vues/shared/menu_photo_picker.dart';
 
@@ -28,22 +29,11 @@ class _BarMenuItemIngredientsFormPageState
   final TextEditingController _newDishController = TextEditingController();
   final TextEditingController _compositionController = TextEditingController();
 
-  final List<String> _dishCategories = const [
-    'boisson',
-    'Cocktails',
-    'Bières',
-    'Vins',
-    'Spiritueux',
-    'Jus',
-    'Jus natures',
-    'Smoothies',
-    'Sirop',
-    'Boissons chaudes',
-    'Sodas',
-    'Eaux',
-    'Sans alcool',
-  ];
-  String _newDishCategory = 'boisson';
+  /// Catégories du bar (catalogue partagé) : les sous-catégories comme
+  /// « Cocktails alcoolisés » et « Sans alcool » sont affichées indentées
+  /// sous leur catégorie parente « Cocktails ».
+  final List<String> _dishCategories = BarCategories.all;
+  String _newDishCategory = BarCategories.boisson;
 
   late final Stream<QuerySnapshot<Map<String, dynamic>>> _menuItemsStream;
   late final Stream<QuerySnapshot<Map<String, dynamic>>> _stockItemsStream;
@@ -645,9 +635,27 @@ class _BarMenuItemIngredientsFormPageState
                                             isDense: true,
                                           ),
                                           items: _dishCategories.map((cat) {
+                                            final isChild =
+                                                BarCategories.parentOf(cat) !=
+                                                null;
                                             return DropdownMenuItem<String>(
                                               value: cat,
-                                              child: Text(cat),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  if (isChild) ...[
+                                                    const SizedBox(width: 14),
+                                                    const Icon(
+                                                      Icons
+                                                          .subdirectory_arrow_right,
+                                                      size: 14,
+                                                      color: Colors.black45,
+                                                    ),
+                                                    const SizedBox(width: 4),
+                                                  ],
+                                                  Text(cat),
+                                                ],
+                                              ),
                                             );
                                           }).toList(),
                                           onChanged: isSaving

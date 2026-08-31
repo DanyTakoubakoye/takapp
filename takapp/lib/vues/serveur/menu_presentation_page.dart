@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/order_controller.dart';
 import 'package:takapp/modeles/client_model.dart';
+import 'package:takapp/core/constants/bar_categories.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
 import 'package:takapp/services/client_service.dart';
 import 'package:takapp/services/menu_service.dart';
@@ -47,6 +48,17 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
   /// Normalise pour comparer les catégories (minuscules + espaces compactés).
   String _norm(String s) =>
       s.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+
+  /// Clé de tri des catégories : une sous-catégorie est triée juste après sa
+  /// catégorie parente (« Cocktails », puis « Cocktails alcoolisés », puis
+  /// « Sans alcool ») au lieu d'être dispersée dans l'ordre alphabétique.
+  String _categorySortKey(String category) {
+    final parent = BarCategories.parentOf(category);
+
+    if (parent == null) return _norm(category);
+
+    return '${_norm(parent)} ~ ${_norm(category)}';
+  }
 
   /// Un item est un accompagnement si sa catégorie est "Accompagnements"
   /// (singulier ou pluriel, insensible casse/espaces).
@@ -335,16 +347,20 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                   .where((it) => _isAccompaniment(it) && it.isForKitchen)
                   .toList();
 
+              // Les sous-catégories (ex. « Cocktails alcoolisés », « Sans
+              // alcool ») font aussi apparaître leur catégorie parente
+              // (« Cocktails »), qui regroupe alors les deux.
               final availableCategories =
                   <String>{
                     'Toutes',
-                    ...rawItems
-                        .map((e) => e.category.trim())
-                        .where((category) => category.isNotEmpty),
+                    for (final item in rawItems) ...[
+                      if (item.category.trim().isNotEmpty) item.category.trim(),
+                      ?BarCategories.parentOf(item.category),
+                    ],
                   }.toList()..sort((a, b) {
                     if (a == 'Toutes') return -1;
                     if (b == 'Toutes') return 1;
-                    return a.toLowerCase().compareTo(b.toLowerCase());
+                    return _categorySortKey(a).compareTo(_categorySortKey(b));
                   });
 
               if (!availableCategories.contains(selectedCategory)) {
@@ -376,8 +392,10 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                         item.category.toLowerCase().contains(query);
                     final matchesCategory =
                         selectedCategory == 'Toutes' ||
-                        item.category.toLowerCase() ==
-                            selectedCategory.toLowerCase();
+                        BarCategories.belongsTo(
+                          item.category,
+                          selectedCategory,
+                        );
                     return matchesSearch && matchesCategory;
                   }).toList()..sort((a, b) {
                     final catCompare = a.category.toLowerCase().compareTo(
@@ -537,7 +555,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
       children: [
         const SizedBox(height: 18),
         Text(
-          category.toUpperCase(),
+          BarCategories.displayLabel(category).toUpperCase(),
           style: const TextStyle(
             color: _gold,
             fontSize: 11,
