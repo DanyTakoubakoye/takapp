@@ -778,6 +778,14 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
       'drink',
       'drinks',
       'jus',
+      'jus nature',
+      'jus natures',
+      'smoothie',
+      'smoothies',
+      'sirop',
+      'sirops',
+      'boisson chaude',
+      'boissons chaudes',
       'vin',
       'bière',
       'biere',
@@ -785,6 +793,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
       'soda',
       'eau',
       'whisky',
+      'spiritueux',
       'alcool',
     ].contains(cat)) {
       return (false, true);

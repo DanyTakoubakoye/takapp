@@ -33,10 +33,14 @@ class _BarMenuItemIngredientsFormPageState
     'Cocktails',
     'Bières',
     'Vins',
+    'Spiritueux',
     'Jus',
+    'Jus natures',
+    'Smoothies',
+    'Sirop',
+    'Boissons chaudes',
     'Sodas',
     'Eaux',
-    'Spiritueux',
     'Sans alcool',
   ];
   String _newDishCategory = 'boisson';
