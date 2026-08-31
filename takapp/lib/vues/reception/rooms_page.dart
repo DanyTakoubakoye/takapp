@@ -20,7 +20,21 @@ class _RoomsPageState extends State<RoomsPage> {
   final RoomService _roomService = RoomService();
   final RoomTypeService _typeService = RoomTypeService();
 
+  // Créés une seule fois : recréés dans build(), ils relanceraient
+  // l'abonnement à chaque rebuild et remettraient l'écran en chargement.
+  late final Stream<List<RoomTypeModel>> _roomTypesStream;
+  late final Stream<List<RoomModel>> _roomsStream;
+
   String get establishmentId => widget.establishmentId.trim();
+
+  @override
+  void initState() {
+    super.initState();
+    _roomTypesStream = _typeService.streamRoomTypes(
+      establishmentId: establishmentId,
+    );
+    _roomsStream = _roomService.streamRooms(establishmentId: establishmentId);
+  }
 
   void _showMessage(String message) {
     if (!mounted) return;
@@ -127,7 +141,7 @@ class _RoomsPageState extends State<RoomsPage> {
 
     // On écoute les types pour alimenter le formulaire et détecter s'il faut en créer.
     return StreamBuilder<List<RoomTypeModel>>(
-      stream: _typeService.streamRoomTypes(establishmentId: establishmentId),
+      stream: _roomTypesStream,
       builder: (context, typesSnapshot) {
         final types = typesSnapshot.data ?? [];
 
@@ -139,7 +153,7 @@ class _RoomsPageState extends State<RoomsPage> {
             label: const Text('Ajouter une chambre'),
           ),
           body: StreamBuilder<List<RoomModel>>(
-            stream: _roomService.streamRooms(establishmentId: establishmentId),
+            stream: _roomsStream,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());

@@ -29,6 +29,11 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
   /// Sert à détecter les doublons lors de l'import Excel.
   List<StockItemModel> _currentItems = [];
 
+  /// Créé une seule fois : le formulaire vit dans le StreamBuilder, donc un
+  /// stream recréé à chaque rebuild détruirait les champs de saisie (le
+  /// clavier s'ouvrait puis se refermait aussitôt).
+  late final Stream<List<StockItemModel>> _itemsStream;
+
   final List<String> _categories = [
     'Céréales',
     'Boissons',
@@ -430,6 +435,14 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _itemsStream = _service.streamItems(
+      establishmentId: widget.establishmentId,
+    );
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _unitController.dispose();
@@ -460,9 +473,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
         color: const Color(0xfff5f7fb),
         child: SafeArea(
           child: StreamBuilder<List<StockItemModel>>(
-            stream: _service.streamItems(
-              establishmentId: widget.establishmentId,
-            ),
+            stream: _itemsStream,
             builder: (context, snapshot) {
               // On masque les articles d'un magasin non souscrit.
               final items = (snapshot.data ?? [])

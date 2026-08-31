@@ -17,7 +17,19 @@ class RoomTypesPage extends StatefulWidget {
 class _RoomTypesPageState extends State<RoomTypesPage> {
   final RoomTypeService _service = RoomTypeService();
 
+  // Créé une seule fois : recréé dans build(), il relancerait l'abonnement à
+  // chaque rebuild et remettrait l'écran en chargement.
+  late final Stream<List<RoomTypeModel>> _roomTypesStream;
+
   String get establishmentId => widget.establishmentId.trim();
+
+  @override
+  void initState() {
+    super.initState();
+    _roomTypesStream = _service.streamRoomTypes(
+      establishmentId: establishmentId,
+    );
+  }
 
   void _showMessage(String message) {
     if (!mounted) return;
@@ -94,7 +106,7 @@ class _RoomTypesPageState extends State<RoomTypesPage> {
         label: const Text('Ajouter un type'),
       ),
       body: StreamBuilder<List<RoomTypeModel>>(
-        stream: _service.streamRoomTypes(establishmentId: establishmentId),
+        stream: _roomTypesStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

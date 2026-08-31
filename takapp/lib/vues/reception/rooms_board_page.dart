@@ -22,7 +22,17 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
   final RoomService _roomService = RoomService();
   final ReservationService _reservationService = ReservationService();
 
+  // Créé une seule fois : recréé dans build(), il relancerait l'abonnement à
+  // chaque rebuild et remettrait l'écran en chargement.
+  late final Stream<List<RoomModel>> _roomsStream;
+
   String get establishmentId => widget.establishmentId.trim();
+
+  @override
+  void initState() {
+    super.initState();
+    _roomsStream = _roomService.streamRooms(establishmentId: establishmentId);
+  }
 
   void _showMessage(String message) {
     if (!mounted) return;
@@ -324,7 +334,7 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Plan des chambres')),
       body: StreamBuilder<List<RoomModel>>(
-        stream: _roomService.streamRooms(establishmentId: establishmentId),
+        stream: _roomsStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

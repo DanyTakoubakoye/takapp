@@ -31,6 +31,18 @@ class _ClientPickerSheetState extends State<ClientPickerSheet> {
 
   String _query = '';
 
+  // Créé une seule fois : chaque frappe dans la recherche déclenche un
+  // setState, et un stream recréé remettrait la liste en chargement.
+  late final Stream<List<ClientModel>> _clientsStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _clientsStream = widget.service.streamClients(
+      establishmentId: widget.establishmentId,
+    );
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -93,9 +105,7 @@ class _ClientPickerSheetState extends State<ClientPickerSheet> {
             ),
             Expanded(
               child: StreamBuilder<List<ClientModel>>(
-                stream: widget.service.streamClients(
-                  establishmentId: widget.establishmentId,
-                ),
+                stream: _clientsStream,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());

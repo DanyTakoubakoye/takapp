@@ -21,7 +21,17 @@ class _ClientsPageState extends State<ClientsPage> {
 
   String _query = '';
 
+  // Créé une seule fois : chaque frappe dans la recherche déclenche un
+  // setState, et un stream recréé remettrait la liste en chargement.
+  late final Stream<List<ClientModel>> _clientsStream;
+
   String get establishmentId => widget.establishmentId.trim();
+
+  @override
+  void initState() {
+    super.initState();
+    _clientsStream = _service.streamClients(establishmentId: establishmentId);
+  }
 
   @override
   void dispose() {
@@ -178,7 +188,7 @@ class _ClientsPageState extends State<ClientsPage> {
           ),
           Expanded(
             child: StreamBuilder<List<ClientModel>>(
-              stream: _service.streamClients(establishmentId: establishmentId),
+              stream: _clientsStream,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());

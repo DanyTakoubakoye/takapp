@@ -32,6 +32,25 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
   String _selectedClientId = '';
   String _selectedClientName = '';
 
+  // L'établissement n'est connu qu'au build (AuthController) : on mémorise le
+  // stream et on ne le recrée que s'il change vraiment. Sinon chaque frappe
+  // dans « Table » / « Chambre » relancerait l'abonnement et remettrait le
+  // menu en chargement.
+  String? _menuStreamEstablishmentId;
+  Stream<List<MenuItemModel>>? _menuItemsStream;
+
+  Stream<List<MenuItemModel>> _menuStreamFor(String establishmentId) {
+    if (_menuStreamEstablishmentId != establishmentId ||
+        _menuItemsStream == null) {
+      _menuStreamEstablishmentId = establishmentId;
+      _menuItemsStream = _menuService.getAvailableMenuItems(
+        establishmentId: establishmentId,
+      );
+    }
+
+    return _menuItemsStream!;
+  }
+
   @override
   void dispose() {
     tableController.dispose();
@@ -311,9 +330,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
             const SizedBox(height: 16),
             Expanded(
               child: StreamBuilder<List<MenuItemModel>>(
-                stream: _menuService.getAvailableMenuItems(
-                  establishmentId: establishmentId,
-                ),
+                stream: _menuStreamFor(establishmentId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());

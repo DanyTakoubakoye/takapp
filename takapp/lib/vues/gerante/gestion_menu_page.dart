@@ -50,6 +50,12 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
 
   final List<MenuIngredientModel> _ingredients = [];
 
+  /// Streams créés une seule fois : les recréer dans build() relancerait
+  /// l'abonnement à chaque frappe du formulaire et remettrait la liste (ou le
+  /// dropdown du dialogue) en chargement.
+  late final Stream<List<MenuItemModel>> _menuItemsStream;
+  late final Stream<List<StockItemModel>> _stockItemsStream;
+
   String get establishmentId => widget.establishmentId.trim();
 
   @override
@@ -59,6 +65,10 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
     _service = MenuAdminService(establishmentId: establishmentId);
 
     _stockItemService = StockItemService(establishmentId: establishmentId);
+
+    _menuItemsStream = _service.streamMenuItems();
+
+    _stockItemsStream = _stockItemService.streamItems();
   }
 
   @override
@@ -212,7 +222,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               StreamBuilder<List<StockItemModel>>(
-                stream: _stockItemService.streamItems(),
+                stream: _stockItemsStream,
                 builder: (context, snapshot) {
                   final items = snapshot.data ?? [];
 
@@ -1179,7 +1189,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: StreamBuilder<List<MenuItemModel>>(
-          stream: _service.streamMenuItems(),
+          stream: _menuItemsStream,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());

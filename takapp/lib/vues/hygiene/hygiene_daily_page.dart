@@ -20,7 +20,17 @@ class HygieneDailyPage extends StatefulWidget {
 class _HygieneDailyPageState extends State<HygieneDailyPage> {
   final RoomService _roomService = RoomService();
 
+  // Le stream est créé une seule fois : le recréer dans build() relancerait
+  // l'abonnement à chaque rebuild et remettrait le StreamBuilder en attente.
+  late final Stream<List<RoomModel>> _roomsStream;
+
   String get establishmentId => widget.establishmentId.trim();
+
+  @override
+  void initState() {
+    super.initState();
+    _roomsStream = _roomService.streamRooms(establishmentId: establishmentId);
+  }
 
   String _statusLabel(String status) {
     switch (status) {
@@ -114,7 +124,7 @@ class _HygieneDailyPageState extends State<HygieneDailyPage> {
         ],
       ),
       body: StreamBuilder<List<RoomModel>>(
-        stream: _roomService.streamRooms(establishmentId: establishmentId),
+        stream: _roomsStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -261,12 +271,21 @@ class _CleaningFormSheetState extends State<_CleaningFormSheet> {
   final TextEditingController _noteController = TextEditingController();
   final List<_HygieneLineInput> _lines = [_HygieneLineInput()];
 
+  // build() dépend de MediaQuery.viewInsets : sans ce cache, l'ouverture du
+  // clavier recréerait le stream, détruirait les champs et refermerait
+  // aussitôt le clavier.
+  late final Stream<List<StoreStockModel>> _stocksStream;
+
   String get establishmentId => widget.establishmentId.trim();
 
   @override
   void initState() {
     super.initState();
     _roomController = TextEditingController(text: widget.initialRoomNumber);
+    _stocksStream = _stockService.streamStocksForStore(
+      establishmentId: establishmentId,
+      store: 'hotel',
+    );
   }
 
   @override
@@ -388,10 +407,7 @@ class _CleaningFormSheetState extends State<_CleaningFormSheet> {
       child: ConstrainedBox(
         constraints: BoxConstraints(maxHeight: maxHeight),
         child: StreamBuilder<List<StoreStockModel>>(
-          stream: _stockService.streamStocksForStore(
-            establishmentId: establishmentId,
-            store: 'hotel',
-          ),
+          stream: _stocksStream,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Padding(

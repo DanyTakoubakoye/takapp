@@ -41,6 +41,9 @@ class _BarMenuItemIngredientsFormPageState
   ];
   String _newDishCategory = 'boisson';
 
+  late final Stream<QuerySnapshot<Map<String, dynamic>>> _menuItemsStream;
+  late final Stream<QuerySnapshot<Map<String, dynamic>>> _stockItemsStream;
+
   String? selectedMenuItemId;
   String _selectedItemAdresse = '';
 
@@ -48,7 +51,18 @@ class _BarMenuItemIngredientsFormPageState
 
   bool isSaving = false;
 
-  String get establishmentId => widget.establishmentId;
+  String get establishmentId => widget.establishmentId.trim();
+
+  @override
+  void initState() {
+    super.initState();
+    _menuItemsStream = _service.streamBarMenuItems(
+      establishmentId: establishmentId,
+    );
+    _stockItemsStream = _service.streamBarStockItems(
+      establishmentId: establishmentId,
+    );
+  }
 
   @override
   void dispose() {
@@ -498,7 +512,7 @@ class _BarMenuItemIngredientsFormPageState
       appBar: AppBar(title: const Text('Composition cocktails bar')),
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-          stream: _service.streamBarMenuItems(establishmentId: establishmentId),
+          stream: _menuItemsStream,
           builder: (context, menuSnapshot) {
             if (menuSnapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
@@ -513,9 +527,7 @@ class _BarMenuItemIngredientsFormPageState
             final menuItems = menuSnapshot.data?.docs ?? [];
 
             return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-              stream: _service.streamBarStockItems(
-                establishmentId: establishmentId,
-              ),
+              stream: _stockItemsStream,
               builder: (context, stockSnapshot) {
                 if (stockSnapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());

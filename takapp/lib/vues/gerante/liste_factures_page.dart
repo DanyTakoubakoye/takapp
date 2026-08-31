@@ -30,6 +30,11 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
   String statusFilter = 'all';
 
   String get establishmentId => widget.establishmentId.trim();
+
+  // Créé une seule fois : chaque frappe dans la recherche déclenche un
+  // setState, et un stream recréé remettrait la liste en chargement.
+  late final Stream<List<RoomInvoiceModel>> _invoicesStream;
+
   String _sellerIfu = '';
   String _sellerName = "";
   String _sellerAddress = "";
@@ -41,6 +46,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
   @override
   void initState() {
     super.initState();
+    _invoicesStream = _service.streamInvoices(establishmentId: establishmentId);
     _loadSellerInfo();
   }
 
@@ -534,9 +540,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
             const SizedBox(height: 12),
             Expanded(
               child: StreamBuilder<List<RoomInvoiceModel>>(
-                stream: _service.streamInvoices(
-                  establishmentId: establishmentId,
-                ),
+                stream: _invoicesStream,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());

@@ -26,6 +26,24 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
 
   final ComptabiliteService service = ComptabiliteService();
 
+  // L'établissement n'est connu qu'au build : on mémorise le stream et on ne
+  // le recrée que s'il change. Sinon chaque frappe dans le formulaire
+  // relancerait l'abonnement et remettrait la liste en chargement.
+  String? _balancesStreamEstablishmentId;
+  Stream<List<AccountBalanceModel>>? _balancesStream;
+
+  Stream<List<AccountBalanceModel>> _balancesStreamFor(String establishmentId) {
+    if (_balancesStreamEstablishmentId != establishmentId ||
+        _balancesStream == null) {
+      _balancesStreamEstablishmentId = establishmentId;
+      _balancesStream = service.streamOpeningBalances(
+        establishmentId: establishmentId,
+      );
+    }
+
+    return _balancesStream!;
+  }
+
   @override
   void dispose() {
     amountController.dispose();
@@ -341,9 +359,7 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
 
             Expanded(
               child: StreamBuilder<List<AccountBalanceModel>>(
-                stream: service.streamOpeningBalances(
-                  establishmentId: establishmentId,
-                ),
+                stream: _balancesStreamFor(establishmentId),
 
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {

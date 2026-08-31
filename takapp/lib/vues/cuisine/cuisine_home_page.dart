@@ -31,6 +31,27 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
   bool _isFirstSnapshot = true;
   bool _isPopupOpen = false;
 
+  // L'établissement n'est connu qu'au build (AuthController) : on mémorise le
+  // stream et on ne le recrée que s'il change vraiment. Sinon chaque rebuild
+  // relancerait l'abonnement et remettrait l'écran en chargement.
+  String? _ordersStreamEstablishmentId;
+  Stream<List<KitchenOrderModel>>? _ordersStream;
+
+  Stream<List<KitchenOrderModel>> _ordersStreamFor(
+    CuisineService cuisineService,
+    String establishmentId,
+  ) {
+    if (_ordersStreamEstablishmentId != establishmentId ||
+        _ordersStream == null) {
+      _ordersStreamEstablishmentId = establishmentId;
+      _ordersStream = cuisineService.streamKitchenOrders(
+        establishmentId: establishmentId,
+      );
+    }
+
+    return _ordersStream!;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -187,9 +208,7 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: StreamBuilder<List<KitchenOrderModel>>(
-          stream: cuisineService.streamKitchenOrders(
-            establishmentId: establishmentId,
-          ),
+          stream: _ordersStreamFor(cuisineService, establishmentId),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());

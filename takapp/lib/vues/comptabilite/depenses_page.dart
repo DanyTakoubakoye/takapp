@@ -28,6 +28,27 @@ class _DepensesPageState extends State<DepensesPage> {
 
   List<String> get accountTypes => AccountTypes.all;
 
+  // L'établissement n'est connu qu'au build : on mémorise le stream et on ne
+  // le recrée que s'il change. Sinon chaque frappe dans le formulaire
+  // relancerait l'abonnement et remettrait la liste en chargement.
+  String? _expensesStreamEstablishmentId;
+  Stream<List<ExpenseModel>>? _expensesStream;
+
+  Stream<List<ExpenseModel>> _expensesStreamFor(
+    ComptabiliteService comptaService,
+    String establishmentId,
+  ) {
+    if (_expensesStreamEstablishmentId != establishmentId ||
+        _expensesStream == null) {
+      _expensesStreamEstablishmentId = establishmentId;
+      _expensesStream = comptaService.streamExpenses(
+        establishmentId: establishmentId,
+      );
+    }
+
+    return _expensesStream!;
+  }
+
   @override
   void dispose() {
     labelController.dispose();
@@ -365,9 +386,7 @@ class _DepensesPageState extends State<DepensesPage> {
 
             Expanded(
               child: StreamBuilder<List<ExpenseModel>>(
-                stream: comptaService.streamExpenses(
-                  establishmentId: establishmentId,
-                ),
+                stream: _expensesStreamFor(comptaService, establishmentId),
 
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {

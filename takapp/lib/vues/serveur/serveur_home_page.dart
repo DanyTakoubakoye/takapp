@@ -26,6 +26,48 @@ class _ServeurHomePageState extends State<ServeurHomePage> {
       ServerNotificationService();
 
   String? _listeningUserId;
+
+  // L'établissement / l'utilisateur ne sont connus qu'au build : on mémorise
+  // les streams et on ne les recrée que s'ils changent vraiment. Sinon chaque
+  // rebuild relancerait les abonnements et ferait clignoter l'écran.
+  String? _establishmentStreamKey;
+  Stream<DocumentSnapshot<Map<String, dynamic>>>? _establishmentStream;
+
+  String? _notificationsStreamKey;
+  Stream<QuerySnapshot<Map<String, dynamic>>>? _notificationsStream;
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> _establishmentStreamFor(
+    String establishmentId,
+  ) {
+    if (_establishmentStreamKey != establishmentId ||
+        _establishmentStream == null) {
+      _establishmentStreamKey = establishmentId;
+      _establishmentStream = FirebaseFirestore.instance
+          .collection('establishments')
+          .doc(establishmentId)
+          .snapshots();
+    }
+
+    return _establishmentStream!;
+  }
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> _notificationsStreamFor(
+    String establishmentId,
+    String serveurId,
+  ) {
+    final key = '$establishmentId/$serveurId';
+
+    if (_notificationsStreamKey != key || _notificationsStream == null) {
+      _notificationsStreamKey = key;
+      _notificationsStream = notificationService.streamNotificationsForServer(
+        establishmentId: establishmentId,
+        serveurId: serveurId,
+      );
+    }
+
+    return _notificationsStream!;
+  }
+
   String _getEstablishmentName(Map<String, dynamic>? data) {
     if (data == null) return 'TAKHOTEL';
 
@@ -113,10 +155,7 @@ class _ServeurHomePageState extends State<ServeurHomePage> {
     }
 
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-      stream: FirebaseFirestore.instance
-          .collection('establishments')
-          .doc(establishmentId)
-          .snapshots(),
+      stream: _establishmentStreamFor(establishmentId),
       builder: (context, establishmentSnapshot) {
         final establishmentData = establishmentSnapshot.data?.data();
         final establishmentName = _getEstablishmentName(establishmentData);
@@ -133,10 +172,7 @@ class _ServeurHomePageState extends State<ServeurHomePage> {
             ),
             actions: [
               StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: notificationService.streamNotificationsForServer(
-                  establishmentId: establishmentId,
-                  serveurId: user.uid,
-                ),
+                stream: _notificationsStreamFor(establishmentId, user.uid),
                 builder: (context, snapshot) {
                   int unreadCount = 0;
 

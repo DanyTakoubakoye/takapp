@@ -30,9 +30,23 @@ class _BarHomePageState extends State<BarHomePage> {
   bool _isFirstSnapshot = true;
   bool _isPopupOpen = false;
 
+  final BarService _barService = BarService();
+
+  // Créés une seule fois : recréés dans build(), ils relanceraient
+  // l'abonnement / la lecture à chaque rebuild et feraient clignoter l'écran.
+  late final Stream<QuerySnapshot<Map<String, dynamic>>> _barOrdersStream;
+  late final Future<DocumentSnapshot<Map<String, dynamic>>> _establishmentFuture;
+
   @override
   void initState() {
     super.initState();
+    _barOrdersStream = _barService.streamBarOrders(
+      establishmentId: widget.establishmentId,
+    );
+    _establishmentFuture = FirebaseFirestore.instance
+        .collection('establishments')
+        .doc(widget.establishmentId)
+        .get();
     // Débloque le son dès le premier clic de l'utilisateur dans la page
     unlockWebSoundAfterUserInteraction();
   }
@@ -160,16 +174,13 @@ class _BarHomePageState extends State<BarHomePage> {
     final establishmentId = widget.establishmentId;
     final auth = context.watch<AuthController>();
     final user = auth.currentUser;
-    final barService = BarService();
+    final barService = _barService;
     final isMobile = MediaQuery.of(context).size.width < 900;
 
     return Scaffold(
       appBar: AppBar(
         title: FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-          future: FirebaseFirestore.instance
-              .collection('establishments')
-              .doc(establishmentId)
-              .get(),
+          future: _establishmentFuture,
           builder: (context, snapshot) {
             final name = (snapshot.data?.data()?['name'] ?? '')
                 .toString()
@@ -189,9 +200,7 @@ class _BarHomePageState extends State<BarHomePage> {
           : Padding(
               padding: const EdgeInsets.all(12),
               child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: barService.streamBarOrders(
-                  establishmentId: establishmentId,
-                ),
+                stream: _barOrdersStream,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());

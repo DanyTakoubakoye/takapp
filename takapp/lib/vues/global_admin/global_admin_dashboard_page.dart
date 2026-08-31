@@ -20,6 +20,16 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
 
   bool isSaving = false;
 
+  // Créé une seule fois : recréé dans build(), il relancerait l'abonnement à
+  // chaque rebuild et remettrait la liste en chargement.
+  late final Stream<QuerySnapshot<Map<String, dynamic>>> _establishmentsStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _establishmentsStream = _firestore.collection('establishments').snapshots();
+  }
+
   static const List<String> fallbackModules = [
     'restaurant',
     'bar',
@@ -253,7 +263,7 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
             const SizedBox(height: 16),
             Expanded(
               child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
-                stream: _firestore.collection('establishments').snapshots(),
+                stream: _establishmentsStream,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
