@@ -354,7 +354,8 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                   <String>{
                     'Toutes',
                     for (final item in rawItems) ...[
-                      if (item.category.trim().isNotEmpty) item.category.trim(),
+                      if (BarCategories.canonical(item.category).isNotEmpty)
+                        BarCategories.canonical(item.category),
                       ?BarCategories.parentOf(item.category),
                     ],
                   }.toList()..sort((a, b) {

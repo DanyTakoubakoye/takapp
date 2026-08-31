@@ -2,7 +2,8 @@
 ///
 /// Certaines catégories sont des SOUS-CATÉGORIES rattachées à une catégorie
 /// parente. Exemple : « Cocktails alcoolisés » et « Sans alcool » sont les
-/// deux sous-catégories de « Cocktails ».
+/// deux sous-catégories de « Cocktails », et « Cognacs », « Vodkas »… sont
+/// celles de « Spiritueux ».
 ///
 /// En base, un article de menu ne stocke qu'une seule chaîne dans son champ
 /// `category` (la sous-catégorie quand il y en a une). Le rattachement au
@@ -20,11 +21,27 @@ class BarCategories {
 
   static const sansAlcool = 'Sans alcool';
 
+  static const shots = 'Shots et shots composés';
+
   static const bieres = 'Bières';
 
-  static const vins = 'Vins';
+  static const bulles = 'Bulles';
+
+  static const vinsEtChampagnes = 'Vins et Champagnes';
 
   static const spiritueux = 'Spiritueux';
+
+  static const cognacs = 'Cognacs';
+
+  static const vodkas = 'Vodkas';
+
+  static const bettersAnisees = 'Betters/Anisées';
+
+  static const rhumGinTequila = 'Rhum/Gin-Tequila';
+
+  static const liqueursCremes = 'Liqueurs crèmes';
+
+  static const whiskeys = 'Whiskeys';
 
   static const jus = 'Jus';
 
@@ -48,8 +65,10 @@ class BarCategories {
   static const List<String> parents = [
     boisson,
     cocktails,
+    shots,
     bieres,
-    vins,
+    bulles,
+    vinsEtChampagnes,
     spiritueux,
     jus,
     jusNatures,
@@ -63,7 +82,20 @@ class BarCategories {
   /// Sous-catégories, par catégorie parente, dans l'ordre d'affichage.
   static const Map<String, List<String>> children = {
     cocktails: [cocktailsAlcoolises, sansAlcool],
+    spiritueux: [
+      cognacs,
+      vodkas,
+      bettersAnisees,
+      rhumGinTequila,
+      liqueursCremes,
+      whiskeys,
+    ],
   };
+
+  /// Anciens libellés encore stockés en base, rattachés à leur libellé
+  /// actuel. Évite de devoir migrer les articles déjà saisis quand une
+  /// catégorie est renommée (« Vins » → « Vins et Champagnes »).
+  static const Map<String, String> legacyLabels = {'vins': vinsEtChampagnes};
 
   /// Toutes les catégories sélectionnables (parents + sous-catégories),
   /// à plat et dans l'ordre d'affichage.
@@ -79,10 +111,15 @@ class BarCategories {
   static String normalize(String value) =>
       value.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
 
+  /// Libellé actuel de [category] : les anciens libellés renommés sont
+  /// remplacés par le nouveau, les autres sont renvoyés tels quels.
+  static String canonical(String category) =>
+      legacyLabels[normalize(category)] ?? category.trim();
+
   /// Catégorie parente de [category], ou `null` si c'est une catégorie de
   /// premier niveau (ou une catégorie libre inconnue du catalogue).
   static String? parentOf(String category) {
-    final cat = normalize(category);
+    final cat = normalize(canonical(category));
 
     for (final entry in children.entries) {
       for (final child in entry.value) {
@@ -95,7 +132,7 @@ class BarCategories {
 
   /// Sous-catégories de [category] (liste vide si elle n'en a pas).
   static List<String> childrenOf(String category) {
-    final cat = normalize(category);
+    final cat = normalize(canonical(category));
 
     for (final entry in children.entries) {
       if (normalize(entry.key) == cat) return entry.value;
@@ -105,11 +142,11 @@ class BarCategories {
   }
 
   /// `true` si [category] est [parent] lui-même ou l'une de ses
-  /// sous-catégories. Sert au filtrage : choisir « Cocktails » doit
-  /// remonter aussi les « Cocktails alcoolisés » et les « Sans alcool ».
+  /// sous-catégories. Sert au filtrage : choisir « Spiritueux » doit
+  /// remonter aussi les « Cognacs », « Vodkas »…
   static bool belongsTo(String category, String parent) {
-    final cat = normalize(category);
-    final par = normalize(parent);
+    final cat = normalize(canonical(category));
+    final par = normalize(canonical(parent));
 
     if (cat == par) return true;
 
@@ -121,10 +158,11 @@ class BarCategories {
   /// Libellé complet d'une catégorie : « Cocktails › Sans alcool » pour une
   /// sous-catégorie, le libellé seul sinon.
   static String displayLabel(String category) {
-    final parent = parentOf(category);
+    final label = canonical(category);
+    final parent = parentOf(label);
 
-    if (parent == null) return category;
+    if (parent == null) return label;
 
-    return '$parent › ${category.trim()}';
+    return '$parent › $label';
   }
 }
