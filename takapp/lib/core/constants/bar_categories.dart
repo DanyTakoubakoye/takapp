@@ -2,8 +2,9 @@
 ///
 /// Certaines catégories sont des SOUS-CATÉGORIES rattachées à une catégorie
 /// parente. Exemple : « Cocktails alcoolisés » et « Sans alcool » sont les
-/// deux sous-catégories de « Cocktails », et « Cognacs », « Vodkas »… sont
-/// celles de « Spiritueux ».
+/// deux sous-catégories de « Cocktails », « Cognacs », « Vodkas »… celles de
+/// « Spiritueux », et « Vins rouges », « Champagnes »… celles de « Vins et
+/// Champagnes ».
 ///
 /// En base, un article de menu ne stocke qu'une seule chaîne dans son champ
 /// `category` (la sous-catégorie quand il y en a une). Le rattachement au
@@ -28,6 +29,14 @@ class BarCategories {
   static const bulles = 'Bulles';
 
   static const vinsEtChampagnes = 'Vins et Champagnes';
+
+  static const vinsRouges = 'Vins rouges';
+
+  static const vinsBlancs = 'Vins blancs';
+
+  static const roses = 'Rosés';
+
+  static const champagnes = 'Champagnes';
 
   static const spiritueux = 'Spiritueux';
 
@@ -82,6 +91,7 @@ class BarCategories {
   /// Sous-catégories, par catégorie parente, dans l'ordre d'affichage.
   static const Map<String, List<String>> children = {
     cocktails: [cocktailsAlcoolises, sansAlcool],
+    vinsEtChampagnes: [vinsRouges, vinsBlancs, roses, champagnes],
     spiritueux: [
       cognacs,
       vodkas,
