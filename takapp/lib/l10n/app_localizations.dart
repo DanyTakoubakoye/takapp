@@ -1752,6 +1752,90 @@ abstract class AppLocalizations {
   /// **'Facture fiscalisée avec certilink. Code MECeF : {code}'**
   String invoiceFiscalizedWithCode(String code);
 
+  /// No description provided for @paymentCash.
+  ///
+  /// In fr, this message translates to:
+  /// **'Espèces'**
+  String get paymentCash;
+
+  /// No description provided for @paymentMobileMoney.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mobile Money'**
+  String get paymentMobileMoney;
+
+  /// No description provided for @paymentCard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Carte bancaire'**
+  String get paymentCard;
+
+  /// No description provided for @paymentBankTransfer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Virement bancaire'**
+  String get paymentBankTransfer;
+
+  /// No description provided for @paymentMixed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement mixte'**
+  String get paymentMixed;
+
+  /// No description provided for @paymentCredit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vente à crédit'**
+  String get paymentCredit;
+
+  /// No description provided for @paymentBeninResto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bénin Resto'**
+  String get paymentBeninResto;
+
+  /// No description provided for @accountCash.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cash'**
+  String get accountCash;
+
+  /// No description provided for @accountMobileMoney.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mobile Money'**
+  String get accountMobileMoney;
+
+  /// No description provided for @accountBankTransfer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Banque'**
+  String get accountBankTransfer;
+
+  /// No description provided for @accountCard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Carte Bancaire'**
+  String get accountCard;
+
+  /// No description provided for @accountCredit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Crédit'**
+  String get accountCredit;
+
+  /// No description provided for @accountBeninResto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bénin Resto'**
+  String get accountBeninResto;
+
+  /// No description provided for @accountMixed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement Mixte'**
+  String get accountMixed;
+
   /// No description provided for @clientDisabled.
   ///
   /// In fr, this message translates to:

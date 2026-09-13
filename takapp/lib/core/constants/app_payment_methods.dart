@@ -1,3 +1,5 @@
+import 'package:takapp/l10n/app_localizations.dart';
+
 class AppPaymentMethods {
   /// =========================
   /// MODES DE PAIEMENT
@@ -32,9 +34,15 @@ class AppPaymentMethods {
   ];
 
   /// =========================
-  /// LABELS UI
+  /// LABELS POUR LES DOCUMENTS
   /// =========================
-
+  ///
+  /// Volontairement en français et indépendants de la langue de
+  /// l'utilisateur : ces libellés partent dans les factures imprimées, dont
+  /// le contenu ne doit pas changer selon qui clique sur « imprimer ».
+  ///
+  /// Pour l'AFFICHAGE, utiliser [label]. L'ordre de cette map définit aussi
+  /// l'ordre des menus déroulants : ne pas le modifier sans raison.
   static const labels = {
     cash: 'Espèces',
 
@@ -90,11 +98,39 @@ class AppPaymentMethods {
   }
 
   /// =========================
-  /// LABEL D’UN MODE
+  /// LABEL D’UN MODE (DOCUMENTS)
   /// =========================
 
   static String getLabel(String method) {
     return labels[method] ?? method;
+  }
+
+  /// =========================
+  /// LABEL D’UN MODE (AFFICHAGE)
+  /// =========================
+  ///
+  /// La clé reste technique ('cash', 'mobile_money'…) : c'est elle qui est
+  /// stockée en base. Seul son rendu est localisé. Un mode inconnu est
+  /// renvoyé tel quel plutôt que masqué.
+  static String label(AppLocalizations l10n, String method) {
+    switch (method) {
+      case cash:
+        return l10n.paymentCash;
+      case mobileMoney:
+        return l10n.paymentMobileMoney;
+      case card:
+        return l10n.paymentCard;
+      case bankTransfer:
+        return l10n.paymentBankTransfer;
+      case mixed:
+        return l10n.paymentMixed;
+      case credit:
+        return l10n.paymentCredit;
+      case beninResto:
+        return l10n.paymentBeninResto;
+      default:
+        return method;
+    }
   }
 
   /// =========================

@@ -987,6 +987,48 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get paymentCash => 'Espèces';
+
+  @override
+  String get paymentMobileMoney => 'Mobile Money';
+
+  @override
+  String get paymentCard => 'Carte bancaire';
+
+  @override
+  String get paymentBankTransfer => 'Virement bancaire';
+
+  @override
+  String get paymentMixed => 'Paiement mixte';
+
+  @override
+  String get paymentCredit => 'Vente à crédit';
+
+  @override
+  String get paymentBeninResto => 'Bénin Resto';
+
+  @override
+  String get accountCash => 'Cash';
+
+  @override
+  String get accountMobileMoney => 'Mobile Money';
+
+  @override
+  String get accountBankTransfer => 'Banque';
+
+  @override
+  String get accountCard => 'Carte Bancaire';
+
+  @override
+  String get accountCredit => 'Crédit';
+
+  @override
+  String get accountBeninResto => 'Bénin Resto';
+
+  @override
+  String get accountMixed => 'Paiement Mixte';
+
+  @override
   String get clientDisabled => 'Client désactivé.';
 
   @override

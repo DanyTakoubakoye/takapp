@@ -324,11 +324,14 @@ class _PaymentDialogState extends State<_PaymentDialog> {
               decoration: InputDecoration(
                 labelText: l10n.paymentMethodLabel,
               ),
-              items: AppPaymentMethods.labels.entries
+              // On itère sur `labels.keys` et non sur `all` : les deux
+              // contiennent les mêmes modes mais dans un ordre différent,
+              // et l'ordre du déroulant ne doit pas changer.
+              items: AppPaymentMethods.labels.keys
                   .map(
-                    (entry) => DropdownMenuItem<String>(
-                      value: entry.key,
-                      child: Text(entry.value),
+                    (method) => DropdownMenuItem<String>(
+                      value: method,
+                      child: Text(AppPaymentMethods.label(l10n, method)),
                     ),
                   )
                   .toList(),

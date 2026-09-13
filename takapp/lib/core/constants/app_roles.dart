@@ -1,3 +1,5 @@
+import 'package:takapp/l10n/app_localizations.dart';
+
 class AppRoles {
   /// =========================
   /// ROLES SAAS
@@ -32,8 +34,11 @@ class AppRoles {
   ];
 
   /// =========================
-  /// LABELS UI
+  /// LABELS DE REPLI
   /// =========================
+  ///
+  /// Conservés en français pour les usages hors interface. Pour
+  /// l'AFFICHAGE, utiliser [label].
   static const labels = {
     globalAdmin: 'Administrateur global',
     superAdmin: 'Super Administrateur',
@@ -84,10 +89,45 @@ class AppRoles {
   };
 
   /// =========================
-  /// LABEL ROLE
+  /// LABEL ROLE (REPLI)
   /// =========================
   static String getLabel(String role) {
     return labels[role] ?? role;
+  }
+
+  /// =========================
+  /// LABEL ROLE (AFFICHAGE)
+  /// =========================
+  ///
+  /// Le rôle reste une valeur technique ('gerante', 'chef_cuisine'…)
+  /// stockée en base et comparée partout : seul son rendu est localisé.
+  static String label(AppLocalizations l10n, String role) {
+    switch (role) {
+      case globalAdmin:
+        return l10n.roleGlobalAdmin;
+      case superAdmin:
+        return l10n.roleSuperAdmin;
+      case proprietaire:
+        return l10n.roleOwner;
+      case gerante:
+        return l10n.roleManager;
+      case comptable:
+        return l10n.roleAccountant;
+      case chefCuisine:
+        return l10n.roleHeadChef;
+      case serveur:
+        return l10n.roleWaiter;
+      case hygiene:
+        return l10n.roleHousekeeping;
+      case barman:
+        return l10n.roleBartender;
+      case majordhomme:
+        return l10n.roleButler;
+      case receptionniste:
+        return l10n.roleReceptionist;
+      default:
+        return role;
+    }
   }
 
   /// =========================

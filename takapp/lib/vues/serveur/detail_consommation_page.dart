@@ -748,11 +748,13 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                                 decoration: InputDecoration(
                                   labelText: l10n.paymentMethodLabel,
                                 ),
-                                items: AppPaymentMethods.labels.entries
+                                items: AppPaymentMethods.labels.keys
                                     .map(
-                                      (entry) => DropdownMenuItem<String>(
-                                        value: entry.key,
-                                        child: Text(entry.value),
+                                      (method) => DropdownMenuItem<String>(
+                                        value: method,
+                                        child: Text(
+                                          AppPaymentMethods.label(l10n, method),
+                                        ),
                                       ),
                                     )
                                     .toList(),

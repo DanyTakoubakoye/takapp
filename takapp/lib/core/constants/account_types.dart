@@ -1,3 +1,5 @@
+import 'package:takapp/l10n/app_localizations.dart';
+
 class AccountTypes {
   /// =========================
   /// TYPES DE COMPTES
@@ -32,9 +34,14 @@ class AccountTypes {
   ];
 
   /// =========================
-  /// LABELS UI
+  /// LABELS DE REPLI
   /// =========================
-
+  ///
+  /// Conservés en français pour les usages hors interface (documents,
+  /// exports). Pour l'AFFICHAGE, utiliser [label].
+  ///
+  /// Le vocabulaire comptable diffère volontairement de celui de la caisse :
+  /// ici « Banque » là où AppPaymentMethods dit « Virement bancaire ».
   static const labels = {
     cash: 'Cash',
 
@@ -88,11 +95,37 @@ class AccountTypes {
   }
 
   /// =========================
-  /// LABEL D’UN TYPE
+  /// LABEL D’UN TYPE (REPLI)
   /// =========================
 
   static String getLabel(String type) {
     return labels[type] ?? type;
+  }
+
+  /// =========================
+  /// LABEL D’UN TYPE (AFFICHAGE)
+  /// =========================
+  ///
+  /// La clé reste technique : seul son rendu est localisé.
+  static String label(AppLocalizations l10n, String type) {
+    switch (type) {
+      case cash:
+        return l10n.accountCash;
+      case mobileMoney:
+        return l10n.accountMobileMoney;
+      case bankTransfer:
+        return l10n.accountBankTransfer;
+      case card:
+        return l10n.accountCard;
+      case credit:
+        return l10n.accountCredit;
+      case beninResto:
+        return l10n.accountBeninResto;
+      case mixed:
+        return l10n.accountMixed;
+      default:
+        return type;
+    }
   }
 
   /// =========================

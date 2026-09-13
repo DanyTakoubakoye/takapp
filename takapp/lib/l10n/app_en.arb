@@ -687,6 +687,22 @@
     }
   },
 
+  "paymentCash": "Cash",
+  "paymentMobileMoney": "Mobile Money",
+  "paymentCard": "Bank card",
+  "paymentBankTransfer": "Bank transfer",
+  "paymentMixed": "Mixed payment",
+  "paymentCredit": "Credit sale",
+  "paymentBeninResto": "Bénin Resto",
+
+  "accountCash": "Cash",
+  "accountMobileMoney": "Mobile Money",
+  "accountBankTransfer": "Bank",
+  "accountCard": "Bank card",
+  "accountCredit": "Credit",
+  "accountBeninResto": "Bénin Resto",
+  "accountMixed": "Mixed payment",
+
   "clientDisabled": "Client disabled.",
   "clientAdded": "Client added.",
 
