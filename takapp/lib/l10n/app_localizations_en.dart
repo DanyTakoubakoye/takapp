@@ -1305,6 +1305,182 @@ class AppLocalizationsEn extends AppLocalizations {
   String get specificPriceHint => 'Leave empty = type price';
 
   @override
+  String get reservationStatusConfirmed => 'Confirmed';
+
+  @override
+  String get reservationStatusCheckedIn => 'Checked in';
+
+  @override
+  String get reservationStatusCheckedOut => 'Checked out';
+
+  @override
+  String get reservationStatusCancelled => 'Cancelled';
+
+  @override
+  String get cancelReservationConfirmTitle => 'Cancel this reservation?';
+
+  @override
+  String cancelReservationConfirmBody(String client) {
+    return '$client\'s reservation will be marked as cancelled.';
+  }
+
+  @override
+  String get actionCancelReservation => 'Cancel the reservation';
+
+  @override
+  String get reservationCancelled => 'Reservation cancelled.';
+
+  @override
+  String noFreeRoomOfType(String type) {
+    return 'No free room for the type \"$type\". Free up or prepare a room first.';
+  }
+
+  @override
+  String assignRoomTo(String client) {
+    return 'Assign a room to $client';
+  }
+
+  @override
+  String floorLabel(String floor) {
+    return 'Floor $floor';
+  }
+
+  @override
+  String checkInDone(String number) {
+    return 'Check-in completed: room $number.';
+  }
+
+  @override
+  String get actionCheckIn => 'Check-in';
+
+  @override
+  String get newReservation => 'New reservation';
+
+  @override
+  String get noReservation =>
+      'No reservation yet.\nCreate one with the + button.';
+
+  @override
+  String roomShortSuffix(String number) {
+    return ' · Rm. $number';
+  }
+
+  @override
+  String nightsCount(String nights) {
+    return '$nights night(s)';
+  }
+
+  @override
+  String get editReservationTitle => 'Edit reservation';
+
+  @override
+  String get dateHintDdMmYyyy => 'dd/mm/yyyy';
+
+  @override
+  String get invalidDate => 'Invalid date';
+
+  @override
+  String get pickStayDates => 'Choose the stay dates.';
+
+  @override
+  String get phoneOptionalLabel => 'Phone (optional)';
+
+  @override
+  String get ifuOptionalLabel => 'IFU (optional, for the invoice)';
+
+  @override
+  String get labelArrival => 'Arrival';
+
+  @override
+  String get labelDeparture => 'Departure';
+
+  @override
+  String get pickFromCalendar => 'Pick from calendar';
+
+  @override
+  String get pricePerNightShortLabel => 'Price / night';
+
+  @override
+  String get noteOptionalLabel => 'Note (optional)';
+
+  @override
+  String get reservationUpdated => 'Reservation updated.';
+
+  @override
+  String totalWithNights(String amount, String nights) {
+    return 'Total: $amount FCFA ($nights night(s))';
+  }
+
+  @override
+  String get chooseExistingClient => 'Choose an existing client';
+
+  @override
+  String attachedClient(String name) {
+    return 'Attached client: $name';
+  }
+
+  @override
+  String get detachRecord => 'Detach record';
+
+  @override
+  String get checkingAvailability => 'Checking availability...';
+
+  @override
+  String get typeFullOnPeriod =>
+      'Type fully booked for this period (you can force).';
+
+  @override
+  String roomsAvailableCount(String count) {
+    return '$count room(s) available.';
+  }
+
+  @override
+  String get typeFullTitle => 'Type fully booked';
+
+  @override
+  String get typeFullBody =>
+      'No room of this type is available for this period. Do you want to force the reservation anyway?';
+
+  @override
+  String get actionNo => 'No';
+
+  @override
+  String get actionForce => 'Force';
+
+  @override
+  String get guestsLabel => 'Guests';
+
+  @override
+  String get reservationCreated => 'Reservation created.';
+
+  @override
+  String get creatingInProgress => 'Creating...';
+
+  @override
+  String get actionCreate => 'Create';
+
+  @override
+  String get chooseClient => 'Choose a client';
+
+  @override
+  String get searchLabel => 'Search';
+
+  @override
+  String get searchNameOrPhoneHint => 'Name or phone';
+
+  @override
+  String get noClientRecord =>
+      'No client record.\nYou can enter the client manually.';
+
+  @override
+  String get noClientMatches => 'No client matches this search.';
+
+  @override
+  String ifuPrefix(String ifu) {
+    return 'IFU $ifu';
+  }
+
+  @override
   String get clientDisabled => 'Client disabled.';
 
   @override

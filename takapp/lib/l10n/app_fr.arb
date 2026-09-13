@@ -898,6 +898,142 @@
   "specificPriceLabel": "Prix spécifique (optionnel)",
   "specificPriceHint": "Laisser vide = prix du type",
 
+  "reservationStatusConfirmed": "Confirmée",
+  "reservationStatusCheckedIn": "Arrivée",
+  "reservationStatusCheckedOut": "Partie",
+  "reservationStatusCancelled": "Annulée",
+
+  "cancelReservationConfirmTitle": "Annuler cette réservation ?",
+  "cancelReservationConfirmBody": "La réservation de {client} sera marquée annulée.",
+  "@cancelReservationConfirmBody": {
+    "placeholders": {
+      "client": {
+        "type": "String"
+      }
+    }
+  },
+  "actionBack": "Retour",
+  "actionCancelReservation": "Annuler la réservation",
+  "reservationCancelled": "Réservation annulée.",
+  "noFreeRoomOfType": "Aucune chambre libre pour le type « {type} ». Libérez ou préparez une chambre d’abord.",
+  "@noFreeRoomOfType": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "assignRoomTo": "Attribuer une chambre à {client}",
+  "@assignRoomTo": {
+    "placeholders": {
+      "client": {
+        "type": "String"
+      }
+    }
+  },
+  "floorLabel": "Étage {floor}",
+  "@floorLabel": {
+    "placeholders": {
+      "floor": {
+        "type": "String"
+      }
+    }
+  },
+  "checkInDone": "Check-in effectué : chambre {number}.",
+  "@checkInDone": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCheckIn": "Check-in",
+  "newReservation": "Nouvelle réservation",
+  "noReservation": "Aucune réservation.\nCréez-en une avec le bouton +.",
+  "roomShortSuffix": " · Ch. {number}",
+  "@roomShortSuffix": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "nightsCount": "{nights} nuit(s)",
+  "@nightsCount": {
+    "placeholders": {
+      "nights": {
+        "type": "String"
+      }
+    }
+  },
+
+  "editReservationTitle": "Modifier la réservation",
+  "dateHintDdMmYyyy": "jj/mm/aaaa",
+  "invalidDate": "Date invalide",
+  "pickStayDates": "Choisissez les dates du séjour.",
+  "phoneOptionalLabel": "Téléphone (optionnel)",
+  "ifuOptionalLabel": "IFU (optionnel, pour la facture)",
+  "labelArrival": "Arrivée",
+  "labelDeparture": "Départ",
+  "pickFromCalendar": "Choisir au calendrier",
+  "pricePerNightShortLabel": "Prix / nuit",
+  "noteOptionalLabel": "Note (optionnel)",
+  "reservationUpdated": "Réservation modifiée.",
+  "totalWithNights": "Total : {amount} FCFA ({nights} nuit(s))",
+  "@totalWithNights": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "nights": {
+        "type": "String"
+      }
+    }
+  },
+
+  "chooseExistingClient": "Choisir un client existant",
+  "attachedClient": "Client rattaché : {name}",
+  "@attachedClient": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "detachRecord": "Détacher la fiche",
+  "checkingAvailability": "Vérification de la disponibilité...",
+  "typeFullOnPeriod": "Type complet sur cette période (vous pourrez forcer).",
+  "roomsAvailableCount": "{count} chambre(s) disponible(s).",
+  "@roomsAvailableCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "typeFullTitle": "Type complet",
+  "typeFullBody": "Aucune chambre de ce type n’est disponible sur cette période. Voulez-vous forcer la réservation malgré tout ?",
+  "actionNo": "Non",
+  "actionForce": "Forcer",
+  "guestsLabel": "Personnes",
+  "reservationCreated": "Réservation créée.",
+  "creatingInProgress": "Création...",
+  "actionCreate": "Créer",
+
+  "chooseClient": "Choisir un client",
+  "searchLabel": "Rechercher",
+  "searchNameOrPhoneHint": "Nom ou téléphone",
+  "noClientRecord": "Aucune fiche client.\nVous pouvez saisir le client à la main.",
+  "noClientMatches": "Aucun client ne correspond à cette recherche.",
+  "ifuPrefix": "IFU {ifu}",
+  "@ifuPrefix": {
+    "placeholders": {
+      "ifu": {
+        "type": "String"
+      }
+    }
+  },
+
   "clientDisabled": "Client désactivé.",
   "clientAdded": "Client ajouté.",
 

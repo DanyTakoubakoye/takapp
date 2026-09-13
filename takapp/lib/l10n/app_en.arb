@@ -892,6 +892,142 @@
   "specificPriceLabel": "Specific price (optional)",
   "specificPriceHint": "Leave empty = type price",
 
+  "reservationStatusConfirmed": "Confirmed",
+  "reservationStatusCheckedIn": "Checked in",
+  "reservationStatusCheckedOut": "Checked out",
+  "reservationStatusCancelled": "Cancelled",
+
+  "cancelReservationConfirmTitle": "Cancel this reservation?",
+  "cancelReservationConfirmBody": "{client}'s reservation will be marked as cancelled.",
+  "@cancelReservationConfirmBody": {
+    "placeholders": {
+      "client": {
+        "type": "String"
+      }
+    }
+  },
+  "actionBack": "Back",
+  "actionCancelReservation": "Cancel the reservation",
+  "reservationCancelled": "Reservation cancelled.",
+  "noFreeRoomOfType": "No free room for the type \"{type}\". Free up or prepare a room first.",
+  "@noFreeRoomOfType": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "assignRoomTo": "Assign a room to {client}",
+  "@assignRoomTo": {
+    "placeholders": {
+      "client": {
+        "type": "String"
+      }
+    }
+  },
+  "floorLabel": "Floor {floor}",
+  "@floorLabel": {
+    "placeholders": {
+      "floor": {
+        "type": "String"
+      }
+    }
+  },
+  "checkInDone": "Check-in completed: room {number}.",
+  "@checkInDone": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCheckIn": "Check-in",
+  "newReservation": "New reservation",
+  "noReservation": "No reservation yet.\nCreate one with the + button.",
+  "roomShortSuffix": " · Rm. {number}",
+  "@roomShortSuffix": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "nightsCount": "{nights} night(s)",
+  "@nightsCount": {
+    "placeholders": {
+      "nights": {
+        "type": "String"
+      }
+    }
+  },
+
+  "editReservationTitle": "Edit reservation",
+  "dateHintDdMmYyyy": "dd/mm/yyyy",
+  "invalidDate": "Invalid date",
+  "pickStayDates": "Choose the stay dates.",
+  "phoneOptionalLabel": "Phone (optional)",
+  "ifuOptionalLabel": "IFU (optional, for the invoice)",
+  "labelArrival": "Arrival",
+  "labelDeparture": "Departure",
+  "pickFromCalendar": "Pick from calendar",
+  "pricePerNightShortLabel": "Price / night",
+  "noteOptionalLabel": "Note (optional)",
+  "reservationUpdated": "Reservation updated.",
+  "totalWithNights": "Total: {amount} FCFA ({nights} night(s))",
+  "@totalWithNights": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "nights": {
+        "type": "String"
+      }
+    }
+  },
+
+  "chooseExistingClient": "Choose an existing client",
+  "attachedClient": "Attached client: {name}",
+  "@attachedClient": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "detachRecord": "Detach record",
+  "checkingAvailability": "Checking availability...",
+  "typeFullOnPeriod": "Type fully booked for this period (you can force).",
+  "roomsAvailableCount": "{count} room(s) available.",
+  "@roomsAvailableCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "typeFullTitle": "Type fully booked",
+  "typeFullBody": "No room of this type is available for this period. Do you want to force the reservation anyway?",
+  "actionNo": "No",
+  "actionForce": "Force",
+  "guestsLabel": "Guests",
+  "reservationCreated": "Reservation created.",
+  "creatingInProgress": "Creating...",
+  "actionCreate": "Create",
+
+  "chooseClient": "Choose a client",
+  "searchLabel": "Search",
+  "searchNameOrPhoneHint": "Name or phone",
+  "noClientRecord": "No client record.\nYou can enter the client manually.",
+  "noClientMatches": "No client matches this search.",
+  "ifuPrefix": "IFU {ifu}",
+  "@ifuPrefix": {
+    "placeholders": {
+      "ifu": {
+        "type": "String"
+      }
+    }
+  },
+
   "clientDisabled": "Client disabled.",
   "clientAdded": "Client added.",
 

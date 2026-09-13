@@ -56,16 +56,18 @@ class _ReservationsPageState extends State<ReservationsPage> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  String _statusLabel(String status) {
+  /// Les statuts sont des valeurs techniques stockées en base : seul leur
+  /// libellé est traduit.
+  String _statusLabel(AppLocalizations l10n, String status) {
     switch (status) {
       case 'confirmed':
-        return 'Confirmée';
+        return l10n.reservationStatusConfirmed;
       case 'checked_in':
-        return 'Arrivée';
+        return l10n.reservationStatusCheckedIn;
       case 'checked_out':
-        return 'Partie';
+        return l10n.reservationStatusCheckedOut;
       case 'cancelled':
-        return 'Annulée';
+        return l10n.reservationStatusCancelled;
       default:
         return status;
     }
@@ -100,7 +102,7 @@ class _ReservationsPageState extends State<ReservationsPage> {
 
   Future<void> _openForm(List<RoomTypeModel> types) async {
     if (types.isEmpty) {
-      _showMessage('Créez d\'abord au moins un type de chambre.');
+      _showMessage(AppLocalizations.of(context).createRoomTypeFirst);
       return;
     }
 
@@ -121,21 +123,21 @@ class _ReservationsPageState extends State<ReservationsPage> {
   }
 
   Future<void> _confirmCancel(ReservationModel resa) async {
+    final l10n = AppLocalizations.of(context);
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Annuler cette réservation ?'),
-        content: Text(
-          'La réservation de ${resa.clientName} sera marquée annulée.',
-        ),
+        title: Text(l10n.cancelReservationConfirmTitle),
+        content: Text(l10n.cancelReservationConfirmBody(resa.clientName)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Retour'),
+            child: Text(l10n.actionBack),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Annuler la réservation'),
+            child: Text(l10n.actionCancelReservation),
           ),
         ],
       ),
@@ -148,13 +150,15 @@ class _ReservationsPageState extends State<ReservationsPage> {
         establishmentId: establishmentId,
         reservationId: resa.id,
       );
-      _showMessage('Réservation annulée.');
+      _showMessage(l10n.reservationCancelled);
     } catch (e) {
-      _showMessage('Erreur : $e');
+      _showMessage(l10n.errorPrefixed(localizedError(l10n, e)));
     }
   }
 
   Future<void> _doCheckIn(ReservationModel resa) async {
+    final l10n = AppLocalizations.of(context);
+
     // Charger les chambres libres du type réservé
     List<RoomModel> rooms;
     try {
@@ -163,15 +167,12 @@ class _ReservationsPageState extends State<ReservationsPage> {
         roomTypeId: resa.roomTypeId,
       );
     } catch (e) {
-      _showMessage('Erreur : $e');
+      _showMessage(l10n.errorPrefixed(localizedError(l10n, e)));
       return;
     }
 
     if (rooms.isEmpty) {
-      _showMessage(
-        'Aucune chambre libre pour le type "${resa.roomTypeName}". '
-        'Libérez ou préparez une chambre d\'abord.',
-      );
+      _showMessage(l10n.noFreeRoomOfType(resa.roomTypeName));
       return;
     }
 
@@ -188,7 +189,7 @@ class _ReservationsPageState extends State<ReservationsPage> {
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  'Attribuer une chambre à ${resa.clientName}',
+                  l10n.assignRoomTo(resa.clientName),
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -198,10 +199,10 @@ class _ReservationsPageState extends State<ReservationsPage> {
               ...rooms.map((room) {
                 return ListTile(
                   leading: const Icon(Icons.meeting_room, color: Colors.green),
-                  title: Text('Chambre ${room.number}'),
+                  title: Text(l10n.labelRoom(room.number)),
                   subtitle: Text(
                     room.floor.isNotEmpty
-                        ? 'Étage ${room.floor}'
+                        ? l10n.floorLabel(room.floor)
                         : room.roomTypeName,
                   ),
                   onTap: () {
@@ -226,31 +227,34 @@ class _ReservationsPageState extends State<ReservationsPage> {
         roomNumber: selected.number,
       );
       if (!mounted) return;
-      _showMessage('Check-in effectué : chambre ${selected.number}.');
+      _showMessage(l10n.checkInDone(selected.number));
     } catch (e) {
       if (!mounted) return;
-      _showMessage('ERREUR CHECK-IN: $e');
+      _showMessage(l10n.errorPrefixed(localizedError(l10n, e)));
     }
   }
 
   Future<void> _doCheckOut(ReservationModel resa) async {
+    final l10n = AppLocalizations.of(context);
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Check-out'),
+        title: Text(l10n.checkOutTitle),
         content: Text(
-          'Confirmer le départ de ${resa.clientName} '
-          '(chambre ${resa.assignedRoomNumber}) ?\n\n'
-          'La chambre passera "à nettoyer".',
+          l10n.checkOutConfirmBody(
+            resa.clientName,
+            resa.assignedRoomNumber,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Annuler'),
+            child: Text(l10n.commonCancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Confirmer le départ'),
+            child: Text(l10n.actionConfirmDeparture),
           ),
         ],
       ),
@@ -264,31 +268,31 @@ class _ReservationsPageState extends State<ReservationsPage> {
         reservationId: resa.id,
       );
       if (!mounted) return;
-      _showMessage('Check-out effectué.');
+      _showMessage(l10n.checkOutDone);
 
       // Proposer la facturation (optionnelle)
       _proposeFacturation(resa);
     } catch (e) {
-      _showMessage('Erreur : $e');
+      _showMessage(l10n.errorPrefixed(localizedError(l10n, e)));
     }
   }
 
   Future<void> _proposeFacturation(ReservationModel resa) async {
+    final l10n = AppLocalizations.of(context);
+
     final goToBilling = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Facturer le séjour ?'),
-        content: Text(
-          'Voulez-vous établir la facture de ${resa.clientName} maintenant ?',
-        ),
+        title: Text(l10n.billStayTitle),
+        content: Text(l10n.billStayBody(resa.clientName)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Plus tard'),
+            child: Text(l10n.actionLater),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Facturer'),
+            child: Text(l10n.actionBill),
           ),
         ],
       ),
@@ -309,9 +313,11 @@ class _ReservationsPageState extends State<ReservationsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -321,11 +327,11 @@ class _ReservationsPageState extends State<ReservationsPage> {
         final types = typesSnapshot.data ?? [];
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Réservations')),
+          appBar: AppBar(title: Text(l10n.tileReservationsTitle)),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () => _openForm(types),
             icon: const Icon(Icons.add),
-            label: const Text('Nouvelle réservation'),
+            label: Text(l10n.newReservation),
           ),
           body: StreamBuilder<List<ReservationModel>>(
             stream: _reservationsStream,
@@ -336,19 +342,20 @@ class _ReservationsPageState extends State<ReservationsPage> {
 
               if (snapshot.hasError) {
                 return Center(
-                  child: SelectableText('Erreur : ${snapshot.error}'),
+                  child: SelectableText(
+                    l10n.errorPrefixed('${snapshot.error}'),
+                  ),
                 );
               }
 
               final reservations = snapshot.data ?? [];
 
               if (reservations.isEmpty) {
-                return const Center(
+                return Center(
                   child: Padding(
-                    padding: EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(24),
                     child: Text(
-                      'Aucune réservation.\n'
-                      'Créez-en une avec le bouton +.',
+                      l10n.noReservation,
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -386,12 +393,12 @@ class _ReservationsPageState extends State<ReservationsPage> {
                       ),
                       subtitle: Text(
                         '${resa.roomTypeName}'
-                        '${resa.assignedRoomNumber.isNotEmpty ? ' · Ch. ${resa.assignedRoomNumber}' : ''}'
-                        '\n$dates · ${resa.numberOfNights} nuit(s)'
-                        '\n${resa.roomTotal.toStringAsFixed(0)} FCFA · ${_statusLabel(resa.status)}',
+                        '${resa.assignedRoomNumber.isNotEmpty ? l10n.roomShortSuffix(resa.assignedRoomNumber) : ''}'
+                        '\n$dates · ${l10n.nightsCount('${resa.numberOfNights}')}'
+                        '\n${resa.roomTotal.toStringAsFixed(0)} FCFA · ${_statusLabel(l10n, resa.status)}',
                       ),
                       isThreeLine: true,
-                      trailing: _buildTrailing(resa),
+                      trailing: _buildTrailing(l10n, resa),
                     ),
                   );
                 },
@@ -403,7 +410,7 @@ class _ReservationsPageState extends State<ReservationsPage> {
     );
   }
 
-  Widget? _buildTrailing(ReservationModel resa) {
+  Widget? _buildTrailing(AppLocalizations l10n, ReservationModel resa) {
     if (resa.status == 'confirmed') {
       return Row(
         mainAxisSize: MainAxisSize.min,
@@ -411,16 +418,16 @@ class _ReservationsPageState extends State<ReservationsPage> {
           TextButton.icon(
             onPressed: () => _doCheckIn(resa),
             icon: const Icon(Icons.login, size: 18),
-            label: const Text('Check-in'),
+            label: Text(l10n.actionCheckIn),
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == 'edit') _openEditForm(resa);
               if (value == 'cancel') _confirmCancel(resa);
             },
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'edit', child: Text('Modifier')),
-              PopupMenuItem(value: 'cancel', child: Text('Annuler')),
+            itemBuilder: (_) => [
+              PopupMenuItem(value: 'edit', child: Text(l10n.actionEdit)),
+              PopupMenuItem(value: 'cancel', child: Text(l10n.commonCancel)),
             ],
           ),
         ],
@@ -434,16 +441,16 @@ class _ReservationsPageState extends State<ReservationsPage> {
           TextButton.icon(
             onPressed: () => _doCheckOut(resa),
             icon: const Icon(Icons.logout, size: 18),
-            label: const Text('Check-out'),
+            label: Text(l10n.checkOutTitle),
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
               if (value == 'edit') _openEditForm(resa);
               if (value == 'bill') _proposeFacturation(resa);
             },
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'edit', child: Text('Modifier')),
-              PopupMenuItem(value: 'bill', child: Text('Facturer')),
+            itemBuilder: (_) => [
+              PopupMenuItem(value: 'edit', child: Text(l10n.actionEdit)),
+              PopupMenuItem(value: 'bill', child: Text(l10n.actionBill)),
             ],
           ),
         ],
@@ -568,13 +575,14 @@ class _EditReservationDialogState extends State<_EditReservationDialog> {
       maxLength: 10,
       decoration: InputDecoration(
         labelText: label,
-        hintText: 'jj/mm/aaaa',
+        hintText: AppLocalizations.of(context).dateHintDdMmYyyy,
         counterText: '',
       ),
       validator: (v) {
+        final l10n = AppLocalizations.of(context);
         final text = (v ?? '').trim();
-        if (text.isEmpty) return 'Obligatoire';
-        return _parseDate(text) == null ? 'Date invalide' : null;
+        if (text.isEmpty) return l10n.fieldRequired;
+        return _parseDate(text) == null ? l10n.invalidDate : null;
       },
       onChanged: (value) => onParsed(_parseDate(value.trim())),
     );
@@ -608,12 +616,15 @@ class _EditReservationDialogState extends State<_EditReservationDialog> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+
+    final l10n = AppLocalizations.of(context);
+
     if (_checkIn == null || _checkOut == null) {
-      widget.onDone('Choisissez les dates du séjour.');
+      widget.onDone(l10n.pickStayDates);
       return;
     }
     if (!_checkOut!.isAfter(_checkIn!)) {
-      widget.onDone('La date de départ doit être après l\'arrivée.');
+      widget.onDone(l10n.errCheckOutAfterCheckIn);
       return;
     }
 
@@ -637,23 +648,24 @@ class _EditReservationDialogState extends State<_EditReservationDialog> {
       );
       if (!mounted) return;
       Navigator.of(context).pop();
-      widget.onDone('Réservation modifiée.');
+      widget.onDone(l10n.reservationUpdated);
     } catch (e) {
       if (!mounted) return;
       setState(() => _isSaving = false);
-      widget.onDone('Erreur : $e');
+      widget.onDone(l10n.errorPrefixed(localizedError(l10n, e)));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final price =
         double.tryParse(_priceController.text.trim()) ??
         widget.reservation.pricePerNight;
     final total = _nights > 0 ? price * _nights : 0;
 
     return AlertDialog(
-      title: const Text('Modifier la réservation'),
+      title: Text(l10n.editReservationTitle),
       content: SizedBox(
         width: 460,
         child: Form(
@@ -665,29 +677,30 @@ class _EditReservationDialogState extends State<_EditReservationDialog> {
               children: [
                 Text(
                   '${widget.reservation.roomTypeName}'
-                  '${widget.reservation.assignedRoomNumber.isNotEmpty ? ' · Ch. ${widget.reservation.assignedRoomNumber}' : ''}',
+                  '${widget.reservation.assignedRoomNumber.isNotEmpty ? l10n.roomShortSuffix(widget.reservation.assignedRoomNumber) : ''}',
                   style: const TextStyle(color: Colors.black54),
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(labelText: 'Nom du client'),
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Obligatoire' : null,
+                  decoration: InputDecoration(labelText: l10n.clientNameLabel),
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? l10n.fieldRequired
+                      : null,
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    labelText: 'Téléphone (optionnel)',
+                  decoration: InputDecoration(
+                    labelText: l10n.phoneOptionalLabel,
                   ),
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: _ifuController,
-                  decoration: const InputDecoration(
-                    labelText: 'IFU (optionnel, pour la facture)',
+                  decoration: InputDecoration(
+                    labelText: l10n.ifuOptionalLabel,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -697,7 +710,7 @@ class _EditReservationDialogState extends State<_EditReservationDialog> {
                     Expanded(
                       child: _buildDateField(
                         controller: _checkInController,
-                        label: 'Arrivée',
+                        label: l10n.labelArrival,
                         onParsed: (d) => setState(() => _checkIn = d),
                       ),
                     ),
@@ -705,12 +718,12 @@ class _EditReservationDialogState extends State<_EditReservationDialog> {
                     Expanded(
                       child: _buildDateField(
                         controller: _checkOutController,
-                        label: 'Départ',
+                        label: l10n.labelDeparture,
                         onParsed: (d) => setState(() => _checkOut = d),
                       ),
                     ),
                     IconButton(
-                      tooltip: 'Choisir au calendrier',
+                      tooltip: l10n.pickFromCalendar,
                       onPressed: _pickDates,
                       icon: const Icon(Icons.date_range),
                     ),
@@ -720,22 +733,26 @@ class _EditReservationDialogState extends State<_EditReservationDialog> {
                 TextFormField(
                   controller: _priceController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Prix / nuit'),
+                  decoration: InputDecoration(
+                    labelText: l10n.pricePerNightShortLabel,
+                  ),
                   onChanged: (_) => setState(() {}),
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: _noteController,
-                  decoration: const InputDecoration(
-                    labelText: 'Note (optionnel)',
+                  decoration: InputDecoration(
+                    labelText: l10n.noteOptionalLabel,
                   ),
                   maxLines: 2,
                 ),
                 const SizedBox(height: 12),
                 if (_nights > 0)
                   Text(
-                    'Total : ${total.toStringAsFixed(0)} FCFA '
-                    '($_nights nuit(s))',
+                    l10n.totalWithNights(
+                      total.toStringAsFixed(0),
+                      '$_nights',
+                    ),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -749,7 +766,7 @@ class _EditReservationDialogState extends State<_EditReservationDialog> {
       actions: [
         TextButton(
           onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
-          child: const Text('Annuler'),
+          child: Text(l10n.commonCancel),
         ),
         ElevatedButton.icon(
           onPressed: _isSaving ? null : _save,
@@ -760,7 +777,7 @@ class _EditReservationDialogState extends State<_EditReservationDialog> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.save),
-          label: Text(_isSaving ? 'Enregistrement...' : 'Enregistrer'),
+          label: Text(_isSaving ? l10n.savingInProgress : l10n.actionSave),
         ),
       ],
     );
@@ -874,11 +891,13 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
   }
 
   Widget _buildClientSelector() {
+    final l10n = AppLocalizations.of(context);
+
     if (_selectedClientId.isEmpty) {
       return OutlinedButton.icon(
         onPressed: _pickClient,
         icon: const Icon(Icons.person_search),
-        label: const Text('Choisir un client existant'),
+        label: Text(l10n.chooseExistingClient),
       );
     }
 
@@ -894,12 +913,12 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Client rattaché : $_selectedClientName',
+              l10n.attachedClient(_selectedClientName),
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
           ),
           IconButton(
-            tooltip: 'Détacher la fiche',
+            tooltip: l10n.detachRecord,
             icon: const Icon(Icons.close, size: 18),
             onPressed: _detachClient,
           ),
@@ -962,13 +981,15 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
       maxLength: 10,
       decoration: InputDecoration(
         labelText: label,
-        hintText: 'jj/mm/aaaa',
+        hintText: AppLocalizations.of(context).dateHintDdMmYyyy,
         counterText: '',
       ),
       validator: (v) {
         final text = (v ?? '').trim();
         if (text.isEmpty) return null;
-        return _parseDate(text) == null ? 'Date invalide' : null;
+        return _parseDate(text) == null
+            ? AppLocalizations.of(context).invalidDate
+            : null;
       },
       onChanged: (value) => onParsed(_parseDate(value.trim())),
     );
@@ -1021,12 +1042,15 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
 
   Future<void> _save({bool force = false}) async {
     if (!_formKey.currentState!.validate()) return;
+
+    final l10n = AppLocalizations.of(context);
+
     if (_selectedType == null) {
-      widget.onDone('Choisissez un type de chambre.');
+      widget.onDone(l10n.pickRoomType);
       return;
     }
     if (_checkIn == null || _checkOut == null) {
-      widget.onDone('Choisissez les dates du séjour.');
+      widget.onDone(l10n.pickStayDates);
       return;
     }
 
@@ -1059,7 +1083,7 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
 
       if (!mounted) return;
       Navigator.of(context).pop();
-      widget.onDone('Réservation créée.');
+      widget.onDone(l10n.reservationCreated);
     } catch (e) {
       if (!mounted) return;
       setState(() => _isSaving = false);
@@ -1073,29 +1097,27 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
       if (!force && isTypeFull) {
         _proposeForce();
       } else {
-        final l10n = AppLocalizations.of(context);
         widget.onDone(l10n.errorPrefixed(localizedError(l10n, e)));
       }
     }
   }
 
   Future<void> _proposeForce() async {
+    final l10n = AppLocalizations.of(context);
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Type complet'),
-        content: const Text(
-          'Aucune chambre de ce type n\'est disponible sur cette période. '
-          'Voulez-vous forcer la réservation malgré tout ?',
-        ),
+        title: Text(l10n.typeFullTitle),
+        content: Text(l10n.typeFullBody),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Non'),
+            child: Text(l10n.actionNo),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Forcer'),
+            child: Text(l10n.actionForce),
           ),
         ],
       ),
@@ -1107,18 +1129,20 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
   }
 
   Widget _buildAvailabilityHint() {
+    final l10n = AppLocalizations.of(context);
+
     if (_checkingAvailability) {
-      return const Padding(
-        padding: EdgeInsets.symmetric(vertical: 6),
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
           children: [
-            SizedBox(
+            const SizedBox(
               width: 14,
               height: 14,
               child: CircularProgressIndicator(strokeWidth: 2),
             ),
-            SizedBox(width: 8),
-            Text('Vérification de la disponibilité...'),
+            const SizedBox(width: 8),
+            Text(l10n.checkingAvailability),
           ],
         ),
       );
@@ -1140,8 +1164,8 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
           Expanded(
             child: Text(
               complete
-                  ? 'Type complet sur cette période (vous pourrez forcer).'
-                  : '$_availableCount chambre(s) disponible(s).',
+                  ? l10n.typeFullOnPeriod
+                  : l10n.roomsAvailableCount('$_availableCount'),
               style: TextStyle(
                 color: complete ? Colors.red : Colors.green,
                 fontWeight: FontWeight.w600,
@@ -1155,6 +1179,7 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final type = _selectedType;
     final total = (type != null && _nights > 0)
         ? (double.tryParse(_priceController.text.trim()) ?? type.basePrice) *
@@ -1162,7 +1187,7 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
         : 0;
 
     return AlertDialog(
-      title: const Text('Nouvelle réservation'),
+      title: Text(l10n.newReservation),
       content: SizedBox(
         width: 460,
         child: Form(
@@ -1176,44 +1201,46 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(labelText: 'Nom du client'),
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Obligatoire' : null,
+                  decoration: InputDecoration(labelText: l10n.clientNameLabel),
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? l10n.fieldRequired
+                      : null,
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    labelText: 'Téléphone (optionnel)',
+                  decoration: InputDecoration(
+                    labelText: l10n.phoneOptionalLabel,
                   ),
                 ),
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: _ifuController,
-                  decoration: const InputDecoration(
-                    labelText: 'IFU (optionnel, pour la facture)',
+                  decoration: InputDecoration(
+                    labelText: l10n.ifuOptionalLabel,
                   ),
                 ),
                 const SizedBox(height: 10),
                 DropdownButtonFormField<String>(
                   initialValue: _selectedTypeId,
-                  decoration: const InputDecoration(
-                    labelText: 'Type de chambre',
-                  ),
+                  decoration: InputDecoration(labelText: l10n.roomTypeLabel),
                   items: widget.types
                       .map(
                         (t) => DropdownMenuItem<String>(
                           value: t.id,
                           child: Text(
-                            '${t.name} (${t.basePrice.toStringAsFixed(0)} FCFA)',
+                            l10n.roomTypeOption(
+                              t.name,
+                              t.basePrice.toStringAsFixed(0),
+                            ),
                           ),
                         ),
                       )
                       .toList(),
                   onChanged: _onTypeChanged,
                   validator: (v) =>
-                      (v == null || v.isEmpty) ? 'Choisissez un type' : null,
+                      (v == null || v.isEmpty) ? l10n.chooseRoomType : null,
                 ),
                 const SizedBox(height: 10),
                 Row(
@@ -1222,7 +1249,7 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
                     Expanded(
                       child: _buildDateField(
                         controller: _checkInController,
-                        label: 'Arrivée',
+                        label: l10n.labelArrival,
                         onParsed: (d) {
                           setState(() => _checkIn = d);
                           _refreshAvailability();
@@ -1233,7 +1260,7 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
                     Expanded(
                       child: _buildDateField(
                         controller: _checkOutController,
-                        label: 'Départ',
+                        label: l10n.labelDeparture,
                         onParsed: (d) {
                           setState(() => _checkOut = d);
                           _refreshAvailability();
@@ -1241,7 +1268,7 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
                       ),
                     ),
                     IconButton(
-                      tooltip: 'Choisir au calendrier',
+                      tooltip: l10n.pickFromCalendar,
                       onPressed: _pickDates,
                       icon: const Icon(Icons.date_range),
                     ),
@@ -1255,8 +1282,8 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
                       child: TextFormField(
                         controller: _guestsController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Personnes',
+                        decoration: InputDecoration(
+                          labelText: l10n.guestsLabel,
                         ),
                       ),
                     ),
@@ -1265,8 +1292,8 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
                       child: TextFormField(
                         controller: _priceController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Prix / nuit',
+                        decoration: InputDecoration(
+                          labelText: l10n.pricePerNightShortLabel,
                         ),
                         onChanged: (_) => setState(() {}),
                       ),
@@ -1276,16 +1303,18 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
                 const SizedBox(height: 10),
                 TextFormField(
                   controller: _noteController,
-                  decoration: const InputDecoration(
-                    labelText: 'Note (optionnel)',
+                  decoration: InputDecoration(
+                    labelText: l10n.noteOptionalLabel,
                   ),
                   maxLines: 2,
                 ),
                 const SizedBox(height: 12),
                 if (_nights > 0)
                   Text(
-                    'Total : ${total.toStringAsFixed(0)} FCFA '
-                    '($_nights nuit(s))',
+                    l10n.totalWithNights(
+                      total.toStringAsFixed(0),
+                      '$_nights',
+                    ),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -1299,7 +1328,7 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
       actions: [
         TextButton(
           onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
-          child: const Text('Annuler'),
+          child: Text(l10n.commonCancel),
         ),
         ElevatedButton.icon(
           onPressed: _isSaving ? null : () => _save(),
@@ -1310,7 +1339,7 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.save),
-          label: Text(_isSaving ? 'Création...' : 'Créer'),
+          label: Text(_isSaving ? l10n.creatingInProgress : l10n.actionCreate),
         ),
       ],
     );
@@ -1404,13 +1433,17 @@ class _ClientPickerSheetState extends State<_ClientPickerSheet> {
 
     if (client.phone.isNotEmpty) parts.add(client.phone);
 
-    if (client.ifu.isNotEmpty) parts.add('IFU ${client.ifu}');
+    if (client.ifu.isNotEmpty) {
+      parts.add(AppLocalizations.of(context).ifuPrefix(client.ifu));
+    }
 
     return parts.join(' · ');
   }
 
   @override
   Widget build(BuildContext sheetContext) {
+    final l10n = AppLocalizations.of(sheetContext);
+
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
@@ -1421,7 +1454,7 @@ class _ClientPickerSheetState extends State<_ClientPickerSheet> {
           children: [
             const SizedBox(height: 14),
             Text(
-              'Choisir un client',
+              l10n.chooseClient,
               style: Theme.of(
                 sheetContext,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -1431,11 +1464,11 @@ class _ClientPickerSheetState extends State<_ClientPickerSheet> {
               child: TextField(
                 controller: _searchController,
                 autofocus: true,
-                decoration: const InputDecoration(
-                  labelText: 'Rechercher',
-                  hintText: 'Nom ou téléphone',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.searchLabel,
+                  hintText: l10n.searchNameOrPhoneHint,
+                  prefixIcon: const Icon(Icons.search),
+                  border: const OutlineInputBorder(),
                 ),
                 onChanged: (value) => setState(() => _query = value),
               ),
@@ -1450,19 +1483,20 @@ class _ClientPickerSheetState extends State<_ClientPickerSheet> {
 
                   if (snapshot.hasError) {
                     return Center(
-                      child: SelectableText('Erreur : ${snapshot.error}'),
+                      child: SelectableText(
+                        l10n.errorPrefixed('${snapshot.error}'),
+                      ),
                     );
                   }
 
                   final clients = snapshot.data ?? [];
 
                   if (clients.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: Padding(
-                        padding: EdgeInsets.all(24),
+                        padding: const EdgeInsets.all(24),
                         child: Text(
-                          'Aucune fiche client.\n'
-                          'Vous pouvez saisir le client à la main.',
+                          l10n.noClientRecord,
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -1472,11 +1506,11 @@ class _ClientPickerSheetState extends State<_ClientPickerSheet> {
                   final filtered = _filter(clients);
 
                   if (filtered.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: Padding(
-                        padding: EdgeInsets.all(24),
+                        padding: const EdgeInsets.all(24),
                         child: Text(
-                          'Aucun client ne correspond à cette recherche.',
+                          l10n.noClientMatches,
                           textAlign: TextAlign.center,
                         ),
                       ),

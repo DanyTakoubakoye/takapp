@@ -1113,7 +1113,7 @@ abstract class AppLocalizations {
   /// No description provided for @actionBack.
   ///
   /// In fr, this message translates to:
-  /// **'Revenir'**
+  /// **'Retour'**
   String get actionBack;
 
   /// No description provided for @actionPickedUp.
@@ -2350,6 +2350,306 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Laisser vide = prix du type'**
   String get specificPriceHint;
+
+  /// No description provided for @reservationStatusConfirmed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmée'**
+  String get reservationStatusConfirmed;
+
+  /// No description provided for @reservationStatusCheckedIn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Arrivée'**
+  String get reservationStatusCheckedIn;
+
+  /// No description provided for @reservationStatusCheckedOut.
+  ///
+  /// In fr, this message translates to:
+  /// **'Partie'**
+  String get reservationStatusCheckedOut;
+
+  /// No description provided for @reservationStatusCancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annulée'**
+  String get reservationStatusCancelled;
+
+  /// No description provided for @cancelReservationConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler cette réservation ?'**
+  String get cancelReservationConfirmTitle;
+
+  /// No description provided for @cancelReservationConfirmBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'La réservation de {client} sera marquée annulée.'**
+  String cancelReservationConfirmBody(String client);
+
+  /// No description provided for @actionCancelReservation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler la réservation'**
+  String get actionCancelReservation;
+
+  /// No description provided for @reservationCancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservation annulée.'**
+  String get reservationCancelled;
+
+  /// No description provided for @noFreeRoomOfType.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune chambre libre pour le type « {type} ». Libérez ou préparez une chambre d’abord.'**
+  String noFreeRoomOfType(String type);
+
+  /// No description provided for @assignRoomTo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Attribuer une chambre à {client}'**
+  String assignRoomTo(String client);
+
+  /// No description provided for @floorLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Étage {floor}'**
+  String floorLabel(String floor);
+
+  /// No description provided for @checkInDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Check-in effectué : chambre {number}.'**
+  String checkInDone(String number);
+
+  /// No description provided for @actionCheckIn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Check-in'**
+  String get actionCheckIn;
+
+  /// No description provided for @newReservation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle réservation'**
+  String get newReservation;
+
+  /// No description provided for @noReservation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune réservation.\nCréez-en une avec le bouton +.'**
+  String get noReservation;
+
+  /// No description provided for @roomShortSuffix.
+  ///
+  /// In fr, this message translates to:
+  /// **' · Ch. {number}'**
+  String roomShortSuffix(String number);
+
+  /// No description provided for @nightsCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{nights} nuit(s)'**
+  String nightsCount(String nights);
+
+  /// No description provided for @editReservationTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier la réservation'**
+  String get editReservationTitle;
+
+  /// No description provided for @dateHintDdMmYyyy.
+  ///
+  /// In fr, this message translates to:
+  /// **'jj/mm/aaaa'**
+  String get dateHintDdMmYyyy;
+
+  /// No description provided for @invalidDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date invalide'**
+  String get invalidDate;
+
+  /// No description provided for @pickStayDates.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez les dates du séjour.'**
+  String get pickStayDates;
+
+  /// No description provided for @phoneOptionalLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Téléphone (optionnel)'**
+  String get phoneOptionalLabel;
+
+  /// No description provided for @ifuOptionalLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'IFU (optionnel, pour la facture)'**
+  String get ifuOptionalLabel;
+
+  /// No description provided for @labelArrival.
+  ///
+  /// In fr, this message translates to:
+  /// **'Arrivée'**
+  String get labelArrival;
+
+  /// No description provided for @labelDeparture.
+  ///
+  /// In fr, this message translates to:
+  /// **'Départ'**
+  String get labelDeparture;
+
+  /// No description provided for @pickFromCalendar.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir au calendrier'**
+  String get pickFromCalendar;
+
+  /// No description provided for @pricePerNightShortLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prix / nuit'**
+  String get pricePerNightShortLabel;
+
+  /// No description provided for @noteOptionalLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Note (optionnel)'**
+  String get noteOptionalLabel;
+
+  /// No description provided for @reservationUpdated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservation modifiée.'**
+  String get reservationUpdated;
+
+  /// No description provided for @totalWithNights.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total : {amount} FCFA ({nights} nuit(s))'**
+  String totalWithNights(String amount, String nights);
+
+  /// No description provided for @chooseExistingClient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir un client existant'**
+  String get chooseExistingClient;
+
+  /// No description provided for @attachedClient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Client rattaché : {name}'**
+  String attachedClient(String name);
+
+  /// No description provided for @detachRecord.
+  ///
+  /// In fr, this message translates to:
+  /// **'Détacher la fiche'**
+  String get detachRecord;
+
+  /// No description provided for @checkingAvailability.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérification de la disponibilité...'**
+  String get checkingAvailability;
+
+  /// No description provided for @typeFullOnPeriod.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type complet sur cette période (vous pourrez forcer).'**
+  String get typeFullOnPeriod;
+
+  /// No description provided for @roomsAvailableCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} chambre(s) disponible(s).'**
+  String roomsAvailableCount(String count);
+
+  /// No description provided for @typeFullTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type complet'**
+  String get typeFullTitle;
+
+  /// No description provided for @typeFullBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune chambre de ce type n’est disponible sur cette période. Voulez-vous forcer la réservation malgré tout ?'**
+  String get typeFullBody;
+
+  /// No description provided for @actionNo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non'**
+  String get actionNo;
+
+  /// No description provided for @actionForce.
+  ///
+  /// In fr, this message translates to:
+  /// **'Forcer'**
+  String get actionForce;
+
+  /// No description provided for @guestsLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Personnes'**
+  String get guestsLabel;
+
+  /// No description provided for @reservationCreated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservation créée.'**
+  String get reservationCreated;
+
+  /// No description provided for @creatingInProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Création...'**
+  String get creatingInProgress;
+
+  /// No description provided for @actionCreate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer'**
+  String get actionCreate;
+
+  /// No description provided for @chooseClient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir un client'**
+  String get chooseClient;
+
+  /// No description provided for @searchLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher'**
+  String get searchLabel;
+
+  /// No description provided for @searchNameOrPhoneHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom ou téléphone'**
+  String get searchNameOrPhoneHint;
+
+  /// No description provided for @noClientRecord.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune fiche client.\nVous pouvez saisir le client à la main.'**
+  String get noClientRecord;
+
+  /// No description provided for @noClientMatches.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun client ne correspond à cette recherche.'**
+  String get noClientMatches;
+
+  /// No description provided for @ifuPrefix.
+  ///
+  /// In fr, this message translates to:
+  /// **'IFU {ifu}'**
+  String ifuPrefix(String ifu);
 
   /// No description provided for @clientDisabled.
   ///
