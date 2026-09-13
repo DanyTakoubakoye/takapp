@@ -1206,6 +1206,552 @@ abstract class AppLocalizations {
   /// **'Montant reçu'**
   String get amountReceived;
 
+  /// No description provided for @roomConsumptionInvoiceTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facture Consommation Chambre'**
+  String get roomConsumptionInvoiceTitle;
+
+  /// No description provided for @noConsumptionForPeriod.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune consommation trouvée pour cette période.'**
+  String get noConsumptionForPeriod;
+
+  /// No description provided for @roomNumberLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro chambre'**
+  String get roomNumberLabel;
+
+  /// No description provided for @startDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date début'**
+  String get startDate;
+
+  /// No description provided for @endDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date fin'**
+  String get endDate;
+
+  /// No description provided for @actionShow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Afficher'**
+  String get actionShow;
+
+  /// No description provided for @pickBothDates.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez choisir les dates de début et de fin.'**
+  String get pickBothDates;
+
+  /// No description provided for @startDateBeforeEndDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'La date de début doit être antérieure ou égale à la date de fin.'**
+  String get startDateBeforeEndDate;
+
+  /// No description provided for @handoverTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Versement à la gérante'**
+  String get handoverTitle;
+
+  /// No description provided for @paymentsToHandOver.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiements à verser'**
+  String get paymentsToHandOver;
+
+  /// No description provided for @selectionAmount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélection : {amount} FCFA'**
+  String selectionAmount(String amount);
+
+  /// No description provided for @noPaymentAvailableForHandover.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun paiement disponible pour versement.'**
+  String get noPaymentAvailableForHandover;
+
+  /// No description provided for @handoverDeclared.
+  ///
+  /// In fr, this message translates to:
+  /// **'Versement déclaré avec succès.'**
+  String get handoverDeclared;
+
+  /// No description provided for @clearSelection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vider la sélection'**
+  String get clearSelection;
+
+  /// No description provided for @declareHandover.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déclarer le versement'**
+  String get declareHandover;
+
+  /// No description provided for @statusValidated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Validé'**
+  String get statusValidated;
+
+  /// No description provided for @statusRejected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rejeté'**
+  String get statusRejected;
+
+  /// No description provided for @handoverHistory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Historique des versements'**
+  String get handoverHistory;
+
+  /// No description provided for @noHandoverRecorded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun versement enregistré.'**
+  String get noHandoverRecorded;
+
+  /// No description provided for @includedPayments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiements inclus : {count}'**
+  String includedPayments(String count);
+
+  /// No description provided for @actionPrint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Imprimer'**
+  String get actionPrint;
+
+  /// No description provided for @attachClientOptional.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rattacher un client (optionnel)'**
+  String get attachClientOptional;
+
+  /// No description provided for @detachClient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Détacher le client'**
+  String get detachClient;
+
+  /// No description provided for @orderSentSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande envoyée avec succès.'**
+  String get orderSentSuccess;
+
+  /// No description provided for @newOrderTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle commande'**
+  String get newOrderTitle;
+
+  /// No description provided for @labelRestaurantClient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Client Restaurant'**
+  String get labelRestaurantClient;
+
+  /// No description provided for @labelHotelClient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Client Hôtel'**
+  String get labelHotelClient;
+
+  /// No description provided for @clientTypeLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type de client'**
+  String get clientTypeLabel;
+
+  /// No description provided for @tableNumberLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro de table'**
+  String get tableNumberLabel;
+
+  /// No description provided for @roomNumberFieldLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro de chambre'**
+  String get roomNumberFieldLabel;
+
+  /// No description provided for @noItemAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun article disponible.'**
+  String get noItemAvailable;
+
+  /// No description provided for @actionAdd.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter'**
+  String get actionAdd;
+
+  /// No description provided for @cartTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Panier'**
+  String get cartTitle;
+
+  /// No description provided for @noItemAdded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun article ajouté.'**
+  String get noItemAdded;
+
+  /// No description provided for @actionSendOrder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoyer la commande'**
+  String get actionSendOrder;
+
+  /// No description provided for @subtotalLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sous-total : {amount} FCFA'**
+  String subtotalLine(String amount);
+
+  /// No description provided for @serveurSpaceTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Espace serveur - {establishment}'**
+  String serveurSpaceTitle(String establishment);
+
+  /// No description provided for @welcomeName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bienvenue {name}'**
+  String welcomeName(String name);
+
+  /// No description provided for @serveurSpaceSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Espace de prise de commande et de suivi serveur'**
+  String get serveurSpaceSubtitle;
+
+  /// No description provided for @moduleOrdersRoomsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commandes & Chambres'**
+  String get moduleOrdersRoomsTitle;
+
+  /// No description provided for @moduleOrdersRoomsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prendre les commandes et gérer les consommations chambre'**
+  String get moduleOrdersRoomsSubtitle;
+
+  /// No description provided for @actionMenuOrderTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Menu et Commande'**
+  String get actionMenuOrderTitle;
+
+  /// No description provided for @actionMenuOrderSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prendre une commande restaurant, bar ou chambre'**
+  String get actionMenuOrderSubtitle;
+
+  /// No description provided for @actionRoomConsumptionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Consommations Chambre'**
+  String get actionRoomConsumptionTitle;
+
+  /// No description provided for @actionRoomConsumptionSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facturer les consommations liées à une chambre'**
+  String get actionRoomConsumptionSubtitle;
+
+  /// No description provided for @modulePaymentsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiements & Versements'**
+  String get modulePaymentsTitle;
+
+  /// No description provided for @modulePaymentsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaisser les factures et remettre les fonds'**
+  String get modulePaymentsSubtitle;
+
+  /// No description provided for @actionCollectSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaisser les factures non payées'**
+  String get actionCollectSubtitle;
+
+  /// No description provided for @actionMyInvoicesSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toutes mes factures : encaisser, fiscaliser, imprimer'**
+  String get actionMyInvoicesSubtitle;
+
+  /// No description provided for @actionHandoverSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remettre les encaissements à la gérante'**
+  String get actionHandoverSubtitle;
+
+  /// No description provided for @moduleTrackingTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suivi Préparation'**
+  String get moduleTrackingTitle;
+
+  /// No description provided for @moduleTrackingSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suivre l’avancement des commandes bar et cuisine'**
+  String get moduleTrackingSubtitle;
+
+  /// No description provided for @actionSuiviBarSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir l’état des commandes envoyées au bar'**
+  String get actionSuiviBarSubtitle;
+
+  /// No description provided for @actionSuiviCuisineSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir l’état des commandes envoyées en cuisine'**
+  String get actionSuiviCuisineSubtitle;
+
+  /// No description provided for @categoryAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toutes'**
+  String get categoryAll;
+
+  /// No description provided for @menuTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notre menu'**
+  String get menuTitle;
+
+  /// No description provided for @searchDishHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher un plat…'**
+  String get searchDishHint;
+
+  /// No description provided for @noAccompanimentAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun accompagnement disponible. Plat ajouté sans accompagnement.'**
+  String get noAccompanimentAvailable;
+
+  /// No description provided for @freeAccompaniment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accompagnement offert'**
+  String get freeAccompaniment;
+
+  /// No description provided for @chooseOneFreeAccompaniment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez 1 accompagnement offert'**
+  String get chooseOneFreeAccompaniment;
+
+  /// No description provided for @labelFree.
+  ///
+  /// In fr, this message translates to:
+  /// **'Offert'**
+  String get labelFree;
+
+  /// No description provided for @paidExtraPortions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Portions supplémentaires (payantes)'**
+  String get paidExtraPortions;
+
+  /// No description provided for @orderRecapTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Récapitulatif de la commande'**
+  String get orderRecapTitle;
+
+  /// No description provided for @sendingInProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoi en cours...'**
+  String get sendingInProgress;
+
+  /// No description provided for @confirmAndSend.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer et envoyer'**
+  String get confirmAndSend;
+
+  /// No description provided for @recapWithCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Récapitulatif ({count})'**
+  String recapWithCount(String count);
+
+  /// No description provided for @pricePerPortion.
+  ///
+  /// In fr, this message translates to:
+  /// **'{price} FCFA / portion'**
+  String pricePerPortion(String price);
+
+  /// No description provided for @accompanimentLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accompagnement : {name} (offert)'**
+  String accompanimentLine(String name);
+
+  /// No description provided for @consumptionDetailsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Détails de la Consommation'**
+  String get consumptionDetailsTitle;
+
+  /// No description provided for @certifiedInvoiceBadge.
+  ///
+  /// In fr, this message translates to:
+  /// **'FACTURE CERTIFIEE'**
+  String get certifiedInvoiceBadge;
+
+  /// No description provided for @generalInformation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Informations générales'**
+  String get generalInformation;
+
+  /// No description provided for @labelOrders.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commandes'**
+  String get labelOrders;
+
+  /// No description provided for @labelOrder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande'**
+  String get labelOrder;
+
+  /// No description provided for @labelDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date'**
+  String get labelDate;
+
+  /// No description provided for @labelType.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type'**
+  String get labelType;
+
+  /// No description provided for @labelAmount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant'**
+  String get labelAmount;
+
+  /// No description provided for @clientInfoOptional.
+  ///
+  /// In fr, this message translates to:
+  /// **'Informations client (facultatives)'**
+  String get clientInfoOptional;
+
+  /// No description provided for @clientNameLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom du client'**
+  String get clientNameLabel;
+
+  /// No description provided for @clientAddressLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse du client'**
+  String get clientAddressLabel;
+
+  /// No description provided for @clientIfuLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'IFU du client'**
+  String get clientIfuLabel;
+
+  /// No description provided for @consumedItems.
+  ///
+  /// In fr, this message translates to:
+  /// **'Articles consommés'**
+  String get consumedItems;
+
+  /// No description provided for @simpleInvoicePrinted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facture simple imprimée et encaissement enregistré.'**
+  String get simpleInvoicePrinted;
+
+  /// No description provided for @normalizedInvoicePrinted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facture normalisée imprimée et encaissement enregistré.'**
+  String get normalizedInvoicePrinted;
+
+  /// No description provided for @invoiceAlreadyCertified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette facture est déjà certifiée.'**
+  String get invoiceAlreadyCertified;
+
+  /// No description provided for @fiscalizeInvoiceFirst.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fiscalisez d’abord la facture.'**
+  String get fiscalizeInvoiceFirst;
+
+  /// No description provided for @fillEstablishmentIfuFirst.
+  ///
+  /// In fr, this message translates to:
+  /// **'Renseignez d’abord l’IFU de l’établissement (console admin).'**
+  String get fillEstablishmentIfuFirst;
+
+  /// No description provided for @actionPrintNormalizedInvoice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Imprimer facture normalisée'**
+  String get actionPrintNormalizedInvoice;
+
+  /// No description provided for @actionPrintSimpleInvoice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Imprimer facture simple'**
+  String get actionPrintSimpleInvoice;
+
+  /// No description provided for @quantityLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Qté : {quantity}'**
+  String quantityLine(String quantity);
+
+  /// No description provided for @unitPriceLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'P.U : {price} FCFA'**
+  String unitPriceLine(String price);
+
+  /// No description provided for @invoiceFiscalizedWithCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facture fiscalisée avec certilink. Code MECeF : {code}'**
+  String invoiceFiscalizedWithCode(String code);
+
   /// No description provided for @clientDisabled.
   ///
   /// In fr, this message translates to:

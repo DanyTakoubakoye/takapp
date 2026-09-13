@@ -17,18 +17,17 @@ class VersementGerantePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
     final handoverService = context.read<HandoverService>();
     final user = auth.currentUser;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Versement à la gérante')),
+      appBar: AppBar(title: Text(l10n.handoverTitle)),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final bool isMobile = constraints.maxWidth < 900;
@@ -108,6 +107,7 @@ class _PendingPaymentsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final handoverController = context.watch<HandoverController>();
 
     return Card(
@@ -120,12 +120,14 @@ class _PendingPaymentsSection extends StatelessWidget {
               runSpacing: 8,
               children: [
                 Text(
-                  'Paiements à verser',
+                  l10n.paymentsToHandOver,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 if (handoverController.selectedPayments.isNotEmpty)
                   Text(
-                    'Sélection : ${handoverController.selectedTotal.toStringAsFixed(0)} FCFA',
+                    l10n.selectionAmount(
+                      handoverController.selectedTotal.toStringAsFixed(0),
+                    ),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
               ],
@@ -143,14 +145,16 @@ class _PendingPaymentsSection extends StatelessWidget {
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text('Erreur: ${snapshot.error}'));
+                    return Center(
+                      child: Text(l10n.errorPrefixed('${snapshot.error}')),
+                    );
                   }
 
                   final payments = snapshot.data ?? [];
 
                   if (payments.isEmpty) {
-                    return const Center(
-                      child: Text('Aucun paiement disponible pour versement.'),
+                    return Center(
+                      child: Text(l10n.noPaymentAvailableForHandover),
                     );
                   }
 
@@ -214,13 +218,9 @@ class _PendingPaymentsSection extends StatelessWidget {
 
                   if (success) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Versement déclaré avec succès.'),
-                      ),
+                      SnackBar(content: Text(l10n.handoverDeclared)),
                     );
                   } else if (handoverController.hasError) {
-                    final l10n = AppLocalizations.of(context);
-
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(handoverController.errorText(l10n)!),
@@ -239,7 +239,7 @@ class _PendingPaymentsSection extends StatelessWidget {
                             : () => context
                                   .read<HandoverController>()
                                   .clearSelection(),
-                        child: const Text('Vider la sélection'),
+                        child: Text(l10n.clearSelection),
                       ),
                       const SizedBox(height: 10),
                       ElevatedButton(
@@ -255,7 +255,7 @@ class _PendingPaymentsSection extends StatelessWidget {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text('Déclarer le versement'),
+                            : Text(l10n.declareHandover),
                       ),
                     ],
                   );
@@ -270,7 +270,7 @@ class _PendingPaymentsSection extends StatelessWidget {
                             : () => context
                                   .read<HandoverController>()
                                   .clearSelection(),
-                        child: const Text('Vider la sélection'),
+                        child: Text(l10n.clearSelection),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -288,7 +288,7 @@ class _PendingPaymentsSection extends StatelessWidget {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text('Déclarer le versement'),
+                            : Text(l10n.declareHandover),
                       ),
                     ),
                   ],
@@ -326,14 +326,16 @@ class _HandoverHistorySection extends StatelessWidget {
     }
   }
 
-  String _statusLabel(String status) {
+  /// Les statuts sont des valeurs techniques stockées en base : seul leur
+  /// libellé est traduit.
+  String _statusLabel(AppLocalizations l10n, String status) {
     switch (status) {
       case 'pending':
-        return 'En attente';
+        return l10n.statusPending;
       case 'validated':
-        return 'Validé';
+        return l10n.statusValidated;
       case 'rejected':
-        return 'Rejeté';
+        return l10n.statusRejected;
       default:
         return status;
     }
@@ -341,6 +343,8 @@ class _HandoverHistorySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
@@ -349,7 +353,7 @@ class _HandoverHistorySection extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Historique des versements',
+                l10n.handoverHistory,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
@@ -366,15 +370,15 @@ class _HandoverHistorySection extends StatelessWidget {
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text('Erreur: ${snapshot.error}'));
+                    return Center(
+                      child: Text(l10n.errorPrefixed('${snapshot.error}')),
+                    );
                   }
 
                   final handovers = snapshot.data ?? [];
 
                   if (handovers.isEmpty) {
-                    return const Center(
-                      child: Text('Aucun versement enregistré.'),
-                    );
+                    return Center(child: Text(l10n.noHandoverRecorded));
                   }
 
                   return ListView.separated(
@@ -402,7 +406,9 @@ class _HandoverHistorySection extends StatelessWidget {
                             ),
                             const SizedBox(height: 6),
                             Text(
-                              'Paiements inclus : ${handover.paymentIds.length}',
+                              l10n.includedPayments(
+                                '${handover.paymentIds.length}',
+                              ),
                             ),
                             const SizedBox(height: 6),
                             Container(
@@ -417,7 +423,7 @@ class _HandoverHistorySection extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
-                                _statusLabel(handover.status),
+                                _statusLabel(l10n, handover.status),
                                 style: TextStyle(
                                   color: _statusColor(handover.status),
                                   fontWeight: FontWeight.w700,
@@ -453,7 +459,7 @@ class _HandoverHistorySection extends StatelessWidget {
                                   );
                                 },
                                 icon: const Icon(Icons.print_outlined),
-                                label: const Text('Imprimer'),
+                                label: Text(l10n.actionPrint),
                               ),
                             ),
                           ],

@@ -516,6 +516,183 @@
   "paymentMethodLabel": "Mode de paiement",
   "amountReceived": "Montant reçu",
 
+  "roomConsumptionInvoiceTitle": "Facture Consommation Chambre",
+  "noConsumptionForPeriod": "Aucune consommation trouvée pour cette période.",
+  "roomNumberLabel": "Numéro chambre",
+  "startDate": "Date début",
+  "endDate": "Date fin",
+  "actionShow": "Afficher",
+  "pickBothDates": "Veuillez choisir les dates de début et de fin.",
+  "startDateBeforeEndDate": "La date de début doit être antérieure ou égale à la date de fin.",
+
+  "handoverTitle": "Versement à la gérante",
+  "paymentsToHandOver": "Paiements à verser",
+  "selectionAmount": "Sélection : {amount} FCFA",
+  "@selectionAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "noPaymentAvailableForHandover": "Aucun paiement disponible pour versement.",
+  "handoverDeclared": "Versement déclaré avec succès.",
+  "clearSelection": "Vider la sélection",
+  "declareHandover": "Déclarer le versement",
+  "statusValidated": "Validé",
+  "statusRejected": "Rejeté",
+  "handoverHistory": "Historique des versements",
+  "noHandoverRecorded": "Aucun versement enregistré.",
+  "includedPayments": "Paiements inclus : {count}",
+  "@includedPayments": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "actionPrint": "Imprimer",
+
+  "attachClientOptional": "Rattacher un client (optionnel)",
+  "detachClient": "Détacher le client",
+  "orderSentSuccess": "Commande envoyée avec succès.",
+  "newOrderTitle": "Nouvelle commande",
+  "labelRestaurantClient": "Client Restaurant",
+  "labelHotelClient": "Client Hôtel",
+  "clientTypeLabel": "Type de client",
+  "tableNumberLabel": "Numéro de table",
+  "roomNumberFieldLabel": "Numéro de chambre",
+  "noItemAvailable": "Aucun article disponible.",
+  "actionAdd": "Ajouter",
+  "cartTitle": "Panier",
+  "noItemAdded": "Aucun article ajouté.",
+  "actionSendOrder": "Envoyer la commande",
+  "subtotalLine": "Sous-total : {amount} FCFA",
+  "@subtotalLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+
+  "serveurSpaceTitle": "Espace serveur - {establishment}",
+  "@serveurSpaceTitle": {
+    "placeholders": {
+      "establishment": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeName": "Bienvenue {name}",
+  "@welcomeName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "serveurSpaceSubtitle": "Espace de prise de commande et de suivi serveur",
+
+  "moduleOrdersRoomsTitle": "Commandes & Chambres",
+  "moduleOrdersRoomsSubtitle": "Prendre les commandes et gérer les consommations chambre",
+  "actionMenuOrderTitle": "Menu et Commande",
+  "actionMenuOrderSubtitle": "Prendre une commande restaurant, bar ou chambre",
+  "actionRoomConsumptionTitle": "Consommations Chambre",
+  "actionRoomConsumptionSubtitle": "Facturer les consommations liées à une chambre",
+
+  "modulePaymentsTitle": "Paiements & Versements",
+  "modulePaymentsSubtitle": "Encaisser les factures et remettre les fonds",
+  "actionCollectSubtitle": "Encaisser les factures non payées",
+  "actionMyInvoicesSubtitle": "Toutes mes factures : encaisser, fiscaliser, imprimer",
+  "actionHandoverSubtitle": "Remettre les encaissements à la gérante",
+
+  "moduleTrackingTitle": "Suivi Préparation",
+  "moduleTrackingSubtitle": "Suivre l’avancement des commandes bar et cuisine",
+  "actionSuiviBarSubtitle": "Voir l’état des commandes envoyées au bar",
+  "actionSuiviCuisineSubtitle": "Voir l’état des commandes envoyées en cuisine",
+
+  "categoryAll": "Toutes",
+  "menuTitle": "Notre menu",
+  "searchDishHint": "Rechercher un plat…",
+  "noAccompanimentAvailable": "Aucun accompagnement disponible. Plat ajouté sans accompagnement.",
+  "freeAccompaniment": "Accompagnement offert",
+  "chooseOneFreeAccompaniment": "Choisissez 1 accompagnement offert",
+  "labelFree": "Offert",
+  "paidExtraPortions": "Portions supplémentaires (payantes)",
+  "orderRecapTitle": "Récapitulatif de la commande",
+  "sendingInProgress": "Envoi en cours...",
+  "confirmAndSend": "Confirmer et envoyer",
+  "recapWithCount": "Récapitulatif ({count})",
+  "@recapWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "pricePerPortion": "{price} FCFA / portion",
+  "@pricePerPortion": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "accompanimentLine": "Accompagnement : {name} (offert)",
+  "@accompanimentLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "consumptionDetailsTitle": "Détails de la Consommation",
+  "certifiedInvoiceBadge": "FACTURE CERTIFIEE",
+  "generalInformation": "Informations générales",
+  "labelOrders": "Commandes",
+  "labelOrder": "Commande",
+  "labelDate": "Date",
+  "labelType": "Type",
+  "labelAmount": "Montant",
+  "clientInfoOptional": "Informations client (facultatives)",
+  "clientNameLabel": "Nom du client",
+  "clientAddressLabel": "Adresse du client",
+  "clientIfuLabel": "IFU du client",
+  "consumedItems": "Articles consommés",
+  "simpleInvoicePrinted": "Facture simple imprimée et encaissement enregistré.",
+  "normalizedInvoicePrinted": "Facture normalisée imprimée et encaissement enregistré.",
+  "invoiceAlreadyCertified": "Cette facture est déjà certifiée.",
+  "fiscalizeInvoiceFirst": "Fiscalisez d’abord la facture.",
+  "fillEstablishmentIfuFirst": "Renseignez d’abord l’IFU de l’établissement (console admin).",
+  "actionPrintNormalizedInvoice": "Imprimer facture normalisée",
+  "actionPrintSimpleInvoice": "Imprimer facture simple",
+  "quantityLine": "Qté : {quantity}",
+  "@quantityLine": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      }
+    }
+  },
+  "unitPriceLine": "P.U : {price} FCFA",
+  "@unitPriceLine": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceFiscalizedWithCode": "Facture fiscalisée avec certilink. Code MECeF : {code}",
+  "@invoiceFiscalizedWithCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+
   "clientDisabled": "Client désactivé.",
   "clientAdded": "Client ajouté.",
 

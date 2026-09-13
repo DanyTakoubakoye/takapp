@@ -671,6 +671,313 @@ class AppLocalizationsEn extends AppLocalizations {
   String get amountReceived => 'Amount received';
 
   @override
+  String get roomConsumptionInvoiceTitle => 'Room consumption invoice';
+
+  @override
+  String get noConsumptionForPeriod => 'No consumption found for this period.';
+
+  @override
+  String get roomNumberLabel => 'Room number';
+
+  @override
+  String get startDate => 'Start date';
+
+  @override
+  String get endDate => 'End date';
+
+  @override
+  String get actionShow => 'Show';
+
+  @override
+  String get pickBothDates => 'Please choose both the start and end dates.';
+
+  @override
+  String get startDateBeforeEndDate =>
+      'The start date must be on or before the end date.';
+
+  @override
+  String get handoverTitle => 'Handover to the manager';
+
+  @override
+  String get paymentsToHandOver => 'Payments to hand over';
+
+  @override
+  String selectionAmount(String amount) {
+    return 'Selection: $amount FCFA';
+  }
+
+  @override
+  String get noPaymentAvailableForHandover =>
+      'No payment available for handover.';
+
+  @override
+  String get handoverDeclared => 'Handover declared successfully.';
+
+  @override
+  String get clearSelection => 'Clear selection';
+
+  @override
+  String get declareHandover => 'Declare handover';
+
+  @override
+  String get statusValidated => 'Validated';
+
+  @override
+  String get statusRejected => 'Rejected';
+
+  @override
+  String get handoverHistory => 'Handover history';
+
+  @override
+  String get noHandoverRecorded => 'No handover recorded.';
+
+  @override
+  String includedPayments(String count) {
+    return 'Included payments: $count';
+  }
+
+  @override
+  String get actionPrint => 'Print';
+
+  @override
+  String get attachClientOptional => 'Attach a client (optional)';
+
+  @override
+  String get detachClient => 'Detach client';
+
+  @override
+  String get orderSentSuccess => 'Order sent successfully.';
+
+  @override
+  String get newOrderTitle => 'New order';
+
+  @override
+  String get labelRestaurantClient => 'Restaurant client';
+
+  @override
+  String get labelHotelClient => 'Hotel client';
+
+  @override
+  String get clientTypeLabel => 'Client type';
+
+  @override
+  String get tableNumberLabel => 'Table number';
+
+  @override
+  String get roomNumberFieldLabel => 'Room number';
+
+  @override
+  String get noItemAvailable => 'No item available.';
+
+  @override
+  String get actionAdd => 'Add';
+
+  @override
+  String get cartTitle => 'Cart';
+
+  @override
+  String get noItemAdded => 'No item added.';
+
+  @override
+  String get actionSendOrder => 'Send order';
+
+  @override
+  String subtotalLine(String amount) {
+    return 'Subtotal: $amount FCFA';
+  }
+
+  @override
+  String serveurSpaceTitle(String establishment) {
+    return 'Waiter area - $establishment';
+  }
+
+  @override
+  String welcomeName(String name) {
+    return 'Welcome $name';
+  }
+
+  @override
+  String get serveurSpaceSubtitle => 'Order taking and waiter tracking area';
+
+  @override
+  String get moduleOrdersRoomsTitle => 'Orders & Rooms';
+
+  @override
+  String get moduleOrdersRoomsSubtitle =>
+      'Take orders and manage room consumption';
+
+  @override
+  String get actionMenuOrderTitle => 'Menu and order';
+
+  @override
+  String get actionMenuOrderSubtitle => 'Take a restaurant, bar or room order';
+
+  @override
+  String get actionRoomConsumptionTitle => 'Room consumption';
+
+  @override
+  String get actionRoomConsumptionSubtitle =>
+      'Invoice consumption linked to a room';
+
+  @override
+  String get modulePaymentsTitle => 'Payments & Handovers';
+
+  @override
+  String get modulePaymentsSubtitle => 'Collect invoices and hand over funds';
+
+  @override
+  String get actionCollectSubtitle => 'Collect unpaid invoices';
+
+  @override
+  String get actionMyInvoicesSubtitle =>
+      'All my invoices: collect, fiscalize, print';
+
+  @override
+  String get actionHandoverSubtitle => 'Hand the collected cash to the manager';
+
+  @override
+  String get moduleTrackingTitle => 'Preparation tracking';
+
+  @override
+  String get moduleTrackingSubtitle =>
+      'Track the progress of bar and kitchen orders';
+
+  @override
+  String get actionSuiviBarSubtitle =>
+      'See the status of orders sent to the bar';
+
+  @override
+  String get actionSuiviCuisineSubtitle =>
+      'See the status of orders sent to the kitchen';
+
+  @override
+  String get categoryAll => 'All';
+
+  @override
+  String get menuTitle => 'Our menu';
+
+  @override
+  String get searchDishHint => 'Search for a dish…';
+
+  @override
+  String get noAccompanimentAvailable =>
+      'No side dish available. Dish added without a side.';
+
+  @override
+  String get freeAccompaniment => 'Free side dish';
+
+  @override
+  String get chooseOneFreeAccompaniment => 'Choose 1 free side dish';
+
+  @override
+  String get labelFree => 'Free';
+
+  @override
+  String get paidExtraPortions => 'Extra portions (paid)';
+
+  @override
+  String get orderRecapTitle => 'Order summary';
+
+  @override
+  String get sendingInProgress => 'Sending...';
+
+  @override
+  String get confirmAndSend => 'Confirm and send';
+
+  @override
+  String recapWithCount(String count) {
+    return 'Summary ($count)';
+  }
+
+  @override
+  String pricePerPortion(String price) {
+    return '$price FCFA / portion';
+  }
+
+  @override
+  String accompanimentLine(String name) {
+    return 'Side dish: $name (free)';
+  }
+
+  @override
+  String get consumptionDetailsTitle => 'Consumption details';
+
+  @override
+  String get certifiedInvoiceBadge => 'CERTIFIED INVOICE';
+
+  @override
+  String get generalInformation => 'General information';
+
+  @override
+  String get labelOrders => 'Orders';
+
+  @override
+  String get labelOrder => 'Order';
+
+  @override
+  String get labelDate => 'Date';
+
+  @override
+  String get labelType => 'Type';
+
+  @override
+  String get labelAmount => 'Amount';
+
+  @override
+  String get clientInfoOptional => 'Client information (optional)';
+
+  @override
+  String get clientNameLabel => 'Client name';
+
+  @override
+  String get clientAddressLabel => 'Client address';
+
+  @override
+  String get clientIfuLabel => 'Client IFU';
+
+  @override
+  String get consumedItems => 'Items consumed';
+
+  @override
+  String get simpleInvoicePrinted =>
+      'Simple invoice printed and payment recorded.';
+
+  @override
+  String get normalizedInvoicePrinted =>
+      'Normalized invoice printed and payment recorded.';
+
+  @override
+  String get invoiceAlreadyCertified => 'This invoice is already certified.';
+
+  @override
+  String get fiscalizeInvoiceFirst => 'Fiscalize the invoice first.';
+
+  @override
+  String get fillEstablishmentIfuFirst =>
+      'Enter the establishment\'s IFU first (admin console).';
+
+  @override
+  String get actionPrintNormalizedInvoice => 'Print normalized invoice';
+
+  @override
+  String get actionPrintSimpleInvoice => 'Print simple invoice';
+
+  @override
+  String quantityLine(String quantity) {
+    return 'Qty: $quantity';
+  }
+
+  @override
+  String unitPriceLine(String price) {
+    return 'Unit price: $price FCFA';
+  }
+
+  @override
+  String invoiceFiscalizedWithCode(String code) {
+    return 'Invoice fiscalized with certilink. MECeF code: $code';
+  }
+
+  @override
   String get clientDisabled => 'Client disabled.';
 
   @override

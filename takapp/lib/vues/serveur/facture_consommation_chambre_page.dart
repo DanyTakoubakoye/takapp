@@ -31,6 +31,8 @@ class _FactureConsommationChambrePageState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     final controller = context.watch<RoomConsumptionController>();
 
     final auth = context.watch<AuthController>();
@@ -38,23 +40,21 @@ class _FactureConsommationChambrePageState
     final user = auth.currentUser;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     final establishmentId = user.establishmentId.trim();
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     final isSmall = _isSmallScreen(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Facture Consommation Chambre")),
+      appBar: AppBar(title: Text(l10n.roomConsumptionInvoiceTitle)),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(isSmall ? 12 : 16),
@@ -74,9 +74,7 @@ class _FactureConsommationChambrePageState
                         child: Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: Text(
-                            controller.errorText(
-                              AppLocalizations.of(context),
-                            )!,
+                            controller.errorText(l10n)!,
                             style: const TextStyle(
                               color: Colors.red,
                               fontWeight: FontWeight.bold,
@@ -91,14 +89,12 @@ class _FactureConsommationChambrePageState
                     }
 
                     if (controller.invoice!.lines.isEmpty) {
-                      return const Center(
-                        child: Text(
-                          "Aucune consommation trouvée pour cette période.",
-                        ),
+                      return Center(
+                        child: Text(l10n.noConsumptionForPeriod),
                       );
                     }
 
-                    return _table(controller, isSmall);
+                    return _table(l10n, controller, isSmall);
                   },
                 ),
               ),
@@ -110,6 +106,7 @@ class _FactureConsommationChambrePageState
   }
 
   Widget _filters(BuildContext context, String establishmentId, bool isSmall) {
+    final l10n = AppLocalizations.of(context);
     final controller = context.read<RoomConsumptionController>();
 
     return Card(
@@ -120,7 +117,7 @@ class _FactureConsommationChambrePageState
           children: [
             TextField(
               controller: roomController,
-              decoration: const InputDecoration(labelText: "Numéro chambre"),
+              decoration: InputDecoration(labelText: l10n.roomNumberLabel),
             ),
             const SizedBox(height: 10),
             if (isSmall) ...[
@@ -129,7 +126,7 @@ class _FactureConsommationChambrePageState
                 child: ElevatedButton(
                   child: Text(
                     startDate == null
-                        ? "Date début"
+                        ? l10n.startDate
                         : "${startDate!.day.toString().padLeft(2, '0')}/${startDate!.month.toString().padLeft(2, '0')}/${startDate!.year}",
                   ),
                   onPressed: () async {
@@ -152,7 +149,7 @@ class _FactureConsommationChambrePageState
                 child: ElevatedButton(
                   child: Text(
                     endDate == null
-                        ? "Date fin"
+                        ? l10n.endDate
                         : "${endDate!.day.toString().padLeft(2, '0')}/${endDate!.month.toString().padLeft(2, '0')}/${endDate!.year}",
                   ),
                   onPressed: () async {
@@ -176,7 +173,7 @@ class _FactureConsommationChambrePageState
                     child: ElevatedButton(
                       child: Text(
                         startDate == null
-                            ? "Date début"
+                            ? l10n.startDate
                             : "${startDate!.day.toString().padLeft(2, '0')}/${startDate!.month.toString().padLeft(2, '0')}/${startDate!.year}",
                       ),
                       onPressed: () async {
@@ -198,7 +195,7 @@ class _FactureConsommationChambrePageState
                     child: ElevatedButton(
                       child: Text(
                         endDate == null
-                            ? "Date fin"
+                            ? l10n.endDate
                             : "${endDate!.day.toString().padLeft(2, '0')}/${endDate!.month.toString().padLeft(2, '0')}/${endDate!.year}",
                       ),
                       onPressed: () async {
@@ -221,13 +218,11 @@ class _FactureConsommationChambrePageState
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                child: const Text("Afficher"),
+                child: Text(l10n.actionShow),
                 onPressed: () {
                   if (roomController.text.trim().isEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Veuillez saisir le numéro de chambre."),
-                      ),
+                      SnackBar(content: Text(l10n.errRoomNumberRequired)),
                     );
 
                     return;
@@ -235,11 +230,7 @@ class _FactureConsommationChambrePageState
 
                   if (startDate == null || endDate == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          "Veuillez choisir les dates de début et de fin.",
-                        ),
-                      ),
+                      SnackBar(content: Text(l10n.pickBothDates)),
                     );
 
                     return;
@@ -247,11 +238,7 @@ class _FactureConsommationChambrePageState
 
                   if (startDate!.isAfter(endDate!)) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          "La date de début doit être antérieure ou égale à la date de fin.",
-                        ),
-                      ),
+                      SnackBar(content: Text(l10n.startDateBeforeEndDate)),
                     );
 
                     return;
@@ -272,14 +259,18 @@ class _FactureConsommationChambrePageState
     );
   }
 
-  Widget _table(RoomConsumptionController controller, bool isSmall) {
+  Widget _table(
+    AppLocalizations l10n,
+    RoomConsumptionController controller,
+    bool isSmall,
+  ) {
     final invoice = controller.invoice!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "Total : ${invoice.total.toStringAsFixed(0)} FCFA",
+          l10n.totalLine(invoice.total.toStringAsFixed(0)),
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 10),

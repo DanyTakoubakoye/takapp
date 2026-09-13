@@ -675,6 +675,318 @@ class AppLocalizationsFr extends AppLocalizations {
   String get amountReceived => 'Montant reçu';
 
   @override
+  String get roomConsumptionInvoiceTitle => 'Facture Consommation Chambre';
+
+  @override
+  String get noConsumptionForPeriod =>
+      'Aucune consommation trouvée pour cette période.';
+
+  @override
+  String get roomNumberLabel => 'Numéro chambre';
+
+  @override
+  String get startDate => 'Date début';
+
+  @override
+  String get endDate => 'Date fin';
+
+  @override
+  String get actionShow => 'Afficher';
+
+  @override
+  String get pickBothDates => 'Veuillez choisir les dates de début et de fin.';
+
+  @override
+  String get startDateBeforeEndDate =>
+      'La date de début doit être antérieure ou égale à la date de fin.';
+
+  @override
+  String get handoverTitle => 'Versement à la gérante';
+
+  @override
+  String get paymentsToHandOver => 'Paiements à verser';
+
+  @override
+  String selectionAmount(String amount) {
+    return 'Sélection : $amount FCFA';
+  }
+
+  @override
+  String get noPaymentAvailableForHandover =>
+      'Aucun paiement disponible pour versement.';
+
+  @override
+  String get handoverDeclared => 'Versement déclaré avec succès.';
+
+  @override
+  String get clearSelection => 'Vider la sélection';
+
+  @override
+  String get declareHandover => 'Déclarer le versement';
+
+  @override
+  String get statusValidated => 'Validé';
+
+  @override
+  String get statusRejected => 'Rejeté';
+
+  @override
+  String get handoverHistory => 'Historique des versements';
+
+  @override
+  String get noHandoverRecorded => 'Aucun versement enregistré.';
+
+  @override
+  String includedPayments(String count) {
+    return 'Paiements inclus : $count';
+  }
+
+  @override
+  String get actionPrint => 'Imprimer';
+
+  @override
+  String get attachClientOptional => 'Rattacher un client (optionnel)';
+
+  @override
+  String get detachClient => 'Détacher le client';
+
+  @override
+  String get orderSentSuccess => 'Commande envoyée avec succès.';
+
+  @override
+  String get newOrderTitle => 'Nouvelle commande';
+
+  @override
+  String get labelRestaurantClient => 'Client Restaurant';
+
+  @override
+  String get labelHotelClient => 'Client Hôtel';
+
+  @override
+  String get clientTypeLabel => 'Type de client';
+
+  @override
+  String get tableNumberLabel => 'Numéro de table';
+
+  @override
+  String get roomNumberFieldLabel => 'Numéro de chambre';
+
+  @override
+  String get noItemAvailable => 'Aucun article disponible.';
+
+  @override
+  String get actionAdd => 'Ajouter';
+
+  @override
+  String get cartTitle => 'Panier';
+
+  @override
+  String get noItemAdded => 'Aucun article ajouté.';
+
+  @override
+  String get actionSendOrder => 'Envoyer la commande';
+
+  @override
+  String subtotalLine(String amount) {
+    return 'Sous-total : $amount FCFA';
+  }
+
+  @override
+  String serveurSpaceTitle(String establishment) {
+    return 'Espace serveur - $establishment';
+  }
+
+  @override
+  String welcomeName(String name) {
+    return 'Bienvenue $name';
+  }
+
+  @override
+  String get serveurSpaceSubtitle =>
+      'Espace de prise de commande et de suivi serveur';
+
+  @override
+  String get moduleOrdersRoomsTitle => 'Commandes & Chambres';
+
+  @override
+  String get moduleOrdersRoomsSubtitle =>
+      'Prendre les commandes et gérer les consommations chambre';
+
+  @override
+  String get actionMenuOrderTitle => 'Menu et Commande';
+
+  @override
+  String get actionMenuOrderSubtitle =>
+      'Prendre une commande restaurant, bar ou chambre';
+
+  @override
+  String get actionRoomConsumptionTitle => 'Consommations Chambre';
+
+  @override
+  String get actionRoomConsumptionSubtitle =>
+      'Facturer les consommations liées à une chambre';
+
+  @override
+  String get modulePaymentsTitle => 'Paiements & Versements';
+
+  @override
+  String get modulePaymentsSubtitle =>
+      'Encaisser les factures et remettre les fonds';
+
+  @override
+  String get actionCollectSubtitle => 'Encaisser les factures non payées';
+
+  @override
+  String get actionMyInvoicesSubtitle =>
+      'Toutes mes factures : encaisser, fiscaliser, imprimer';
+
+  @override
+  String get actionHandoverSubtitle =>
+      'Remettre les encaissements à la gérante';
+
+  @override
+  String get moduleTrackingTitle => 'Suivi Préparation';
+
+  @override
+  String get moduleTrackingSubtitle =>
+      'Suivre l’avancement des commandes bar et cuisine';
+
+  @override
+  String get actionSuiviBarSubtitle =>
+      'Voir l’état des commandes envoyées au bar';
+
+  @override
+  String get actionSuiviCuisineSubtitle =>
+      'Voir l’état des commandes envoyées en cuisine';
+
+  @override
+  String get categoryAll => 'Toutes';
+
+  @override
+  String get menuTitle => 'Notre menu';
+
+  @override
+  String get searchDishHint => 'Rechercher un plat…';
+
+  @override
+  String get noAccompanimentAvailable =>
+      'Aucun accompagnement disponible. Plat ajouté sans accompagnement.';
+
+  @override
+  String get freeAccompaniment => 'Accompagnement offert';
+
+  @override
+  String get chooseOneFreeAccompaniment => 'Choisissez 1 accompagnement offert';
+
+  @override
+  String get labelFree => 'Offert';
+
+  @override
+  String get paidExtraPortions => 'Portions supplémentaires (payantes)';
+
+  @override
+  String get orderRecapTitle => 'Récapitulatif de la commande';
+
+  @override
+  String get sendingInProgress => 'Envoi en cours...';
+
+  @override
+  String get confirmAndSend => 'Confirmer et envoyer';
+
+  @override
+  String recapWithCount(String count) {
+    return 'Récapitulatif ($count)';
+  }
+
+  @override
+  String pricePerPortion(String price) {
+    return '$price FCFA / portion';
+  }
+
+  @override
+  String accompanimentLine(String name) {
+    return 'Accompagnement : $name (offert)';
+  }
+
+  @override
+  String get consumptionDetailsTitle => 'Détails de la Consommation';
+
+  @override
+  String get certifiedInvoiceBadge => 'FACTURE CERTIFIEE';
+
+  @override
+  String get generalInformation => 'Informations générales';
+
+  @override
+  String get labelOrders => 'Commandes';
+
+  @override
+  String get labelOrder => 'Commande';
+
+  @override
+  String get labelDate => 'Date';
+
+  @override
+  String get labelType => 'Type';
+
+  @override
+  String get labelAmount => 'Montant';
+
+  @override
+  String get clientInfoOptional => 'Informations client (facultatives)';
+
+  @override
+  String get clientNameLabel => 'Nom du client';
+
+  @override
+  String get clientAddressLabel => 'Adresse du client';
+
+  @override
+  String get clientIfuLabel => 'IFU du client';
+
+  @override
+  String get consumedItems => 'Articles consommés';
+
+  @override
+  String get simpleInvoicePrinted =>
+      'Facture simple imprimée et encaissement enregistré.';
+
+  @override
+  String get normalizedInvoicePrinted =>
+      'Facture normalisée imprimée et encaissement enregistré.';
+
+  @override
+  String get invoiceAlreadyCertified => 'Cette facture est déjà certifiée.';
+
+  @override
+  String get fiscalizeInvoiceFirst => 'Fiscalisez d’abord la facture.';
+
+  @override
+  String get fillEstablishmentIfuFirst =>
+      'Renseignez d’abord l’IFU de l’établissement (console admin).';
+
+  @override
+  String get actionPrintNormalizedInvoice => 'Imprimer facture normalisée';
+
+  @override
+  String get actionPrintSimpleInvoice => 'Imprimer facture simple';
+
+  @override
+  String quantityLine(String quantity) {
+    return 'Qté : $quantity';
+  }
+
+  @override
+  String unitPriceLine(String price) {
+    return 'P.U : $price FCFA';
+  }
+
+  @override
+  String invoiceFiscalizedWithCode(String code) {
+    return 'Facture fiscalisée avec certilink. Code MECeF : $code';
+  }
+
+  @override
   String get clientDisabled => 'Client désactivé.';
 
   @override

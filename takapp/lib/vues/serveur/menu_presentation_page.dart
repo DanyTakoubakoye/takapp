@@ -27,8 +27,17 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
 
   Stream<List<MenuItemModel>>? _menuItemsStream;
 
+  /// Sentinelle TECHNIQUE du filtre « toutes catégories ».
+  ///
+  /// Elle ne doit jamais être un libellé traduisible : cette valeur est
+  /// comparée (`selectedCategory == _allCategories`), triée et stockée dans
+  /// l'état. Auparavant la chaîne française « Toutes » jouait les deux rôles,
+  /// si bien que passer l'application en anglais aurait cassé le filtrage.
+  /// Le libellé affiché vit désormais dans `l10n.categoryAll`.
+  static const String _allCategories = '__all__';
+
   String searchText = '';
-  String selectedCategory = 'Toutes';
+  String selectedCategory = _allCategories;
   String? activeItemId;
 
   /// Articles SANS accompagnement : regroupés par quantité (comportement d'origine).
@@ -119,10 +128,8 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
         activeItemId = dish.id;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Aucun accompagnement disponible. Plat ajouté sans accompagnement.',
-          ),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).noAccompanimentAvailable),
         ),
       );
       return;
@@ -267,19 +274,18 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
     final user = auth.currentUser;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     final establishmentId = user.establishmentId.trim();
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -297,7 +303,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
       child: Scaffold(
         backgroundColor: _bg,
         appBar: AppBar(
-          title: const Text('Notre menu'),
+          title: Text(l10n.menuTitle),
           backgroundColor: _bg,
           foregroundColor: _navy,
           elevation: 0,
@@ -311,7 +317,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                 return Column(
                   children: [
                     _buildTopSearchZone(),
-                    _buildCategoryPills(const ['Toutes']),
+                    _buildCategoryPills(const [_allCategories]),
                     const Expanded(
                       child: Center(child: CircularProgressIndicator()),
                     ),
@@ -323,11 +329,11 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                 return Column(
                   children: [
                     _buildTopSearchZone(),
-                    _buildCategoryPills(const ['Toutes']),
+                    _buildCategoryPills(const [_allCategories]),
                     Expanded(
                       child: Center(
                         child: Text(
-                          'Erreur : ${snapshot.error}',
+                          l10n.errorPrefixed('${snapshot.error}'),
                           style: const TextStyle(color: _textSecondary),
                         ),
                       ),
@@ -353,20 +359,20 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
               // (« Cocktails »), qui regroupe alors les deux.
               final availableCategories =
                   <String>{
-                    'Toutes',
+                    _allCategories,
                     for (final item in rawItems) ...[
                       if (BarCategories.canonical(item.category).isNotEmpty)
                         BarCategories.canonical(item.category),
                       ?BarCategories.parentOf(item.category),
                     ],
                   }.toList()..sort((a, b) {
-                    if (a == 'Toutes') return -1;
-                    if (b == 'Toutes') return 1;
+                    if (a == _allCategories) return -1;
+                    if (b == _allCategories) return 1;
                     return _categorySortKey(a).compareTo(_categorySortKey(b));
                   });
 
               if (!availableCategories.contains(selectedCategory)) {
-                selectedCategory = 'Toutes';
+                selectedCategory = _allCategories;
               }
 
               if (rawItems.isEmpty) {
@@ -374,11 +380,11 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                   children: [
                     _buildTopSearchZone(),
                     _buildCategoryPills(availableCategories),
-                    const Expanded(
+                    Expanded(
                       child: Center(
                         child: Text(
-                          'Aucun article disponible.',
-                          style: TextStyle(color: _textSecondary),
+                          l10n.noItemAvailable,
+                          style: const TextStyle(color: _textSecondary),
                         ),
                       ),
                     ),
@@ -393,7 +399,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                         item.name.toLowerCase().contains(query) ||
                         item.category.toLowerCase().contains(query);
                     final matchesCategory =
-                        selectedCategory == 'Toutes' ||
+                        selectedCategory == _allCategories ||
                         BarCategories.belongsTo(
                           item.category,
                           selectedCategory,
@@ -453,6 +459,8 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
   }
 
   Widget _buildTopSearchZone() {
+    final l10n = AppLocalizations.of(context);
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
       color: _bg,
@@ -461,7 +469,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
         onChanged: (value) => setState(() => searchText = value),
         style: const TextStyle(color: _navy, fontSize: 14),
         decoration: InputDecoration(
-          hintText: 'Rechercher un plat…',
+          hintText: l10n.searchDishHint,
           hintStyle: const TextStyle(color: _textMuted, fontSize: 13),
           filled: true,
           fillColor: _cardBg,
@@ -489,6 +497,8 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
 
   /// Onglets de catégories en pills défilant horizontalement.
   Widget _buildCategoryPills(List<String> categories) {
+    final l10n = AppLocalizations.of(context);
+
     return Container(
       width: double.infinity,
       color: _bg,
@@ -515,7 +525,9 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                     border: Border.all(color: isActive ? _navy : _border),
                   ),
                   child: Text(
-                    category,
+                    // Seule la sentinelle est traduite : les autres valeurs
+                    // sont les catégories réelles saisies par l'établissement.
+                    category == _allCategories ? l10n.categoryAll : category,
                     style: TextStyle(
                       color: isActive ? _bg : _textSecondary,
                       fontSize: 13,
@@ -719,7 +731,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                           const SizedBox(width: 3),
                           Flexible(
                             child: Text(
-                              'Accompagnement offert',
+                              AppLocalizations.of(context).freeAccompaniment,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -894,7 +906,9 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                   const Icon(Icons.receipt_long_outlined, color: _bg, size: 20),
                   const SizedBox(width: 10),
                   Text(
-                    'Récapitulatif ($totalSelected)',
+                    AppLocalizations.of(
+                      context,
+                    ).recapWithCount('$totalSelected'),
                     style: const TextStyle(
                       color: _bg,
                       fontSize: 14,
@@ -952,6 +966,7 @@ class _AccompanimentSheetState extends State<_AccompanimentSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final media = MediaQuery.of(context);
     return Padding(
       padding: EdgeInsets.only(
@@ -983,7 +998,7 @@ class _AccompanimentSheetState extends State<_AccompanimentSheet> {
             ),
             const SizedBox(height: 2),
             Text(
-              'Choisissez 1 accompagnement offert',
+              l10n.chooseOneFreeAccompaniment,
               style: TextStyle(color: Colors.brown.shade400, fontSize: 13),
             ),
             const SizedBox(height: 14),
@@ -1023,9 +1038,9 @@ class _AccompanimentSheetState extends State<_AccompanimentSheet> {
                                 : Colors.grey,
                           ),
                           title: Text(acc.name),
-                          subtitle: const Text(
-                            'Offert',
-                            style: TextStyle(
+                          subtitle: Text(
+                            l10n.labelFree,
+                            style: const TextStyle(
                               color: Colors.green,
                               fontWeight: FontWeight.w600,
                               fontSize: 12.5,
@@ -1039,7 +1054,7 @@ class _AccompanimentSheetState extends State<_AccompanimentSheet> {
                     const Divider(),
                     const SizedBox(height: 8),
                     Text(
-                      'Portions supplémentaires (payantes)',
+                      l10n.paidExtraPortions,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.brown.shade700,
@@ -1060,7 +1075,9 @@ class _AccompanimentSheetState extends State<_AccompanimentSheet> {
                                 children: [
                                   Text(acc.name),
                                   Text(
-                                    '${acc.price.toStringAsFixed(0)} FCFA / portion',
+                                    l10n.pricePerPortion(
+                                      acc.price.toStringAsFixed(0),
+                                    ),
                                     style: TextStyle(
                                       color: Colors.grey.shade600,
                                       fontSize: 12,
@@ -1104,7 +1121,7 @@ class _AccompanimentSheetState extends State<_AccompanimentSheet> {
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () => Navigator.pop(context),
-                    child: const Text('Annuler'),
+                    child: Text(l10n.commonCancel),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -1133,7 +1150,7 @@ class _AccompanimentSheetState extends State<_AccompanimentSheet> {
                         ),
                       );
                     },
-                    child: const Text('Valider'),
+                    child: Text(l10n.commonValidate),
                   ),
                 ),
               ],
@@ -1199,13 +1216,15 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
   }
 
   Widget _buildClientSelector(bool isSubmitting) {
+    final l10n = AppLocalizations.of(context);
+
     if (_selectedClientId.isEmpty) {
       return Align(
         alignment: Alignment.centerLeft,
         child: TextButton.icon(
           onPressed: isSubmitting ? null : _pickClient,
           icon: const Icon(Icons.person_search, size: 18),
-          label: const Text('Rattacher un client (optionnel)'),
+          label: Text(l10n.attachClientOptional),
         ),
       );
     }
@@ -1221,12 +1240,12 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Client : $_selectedClientName',
+              l10n.clientLine(_selectedClientName),
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
           ),
           IconButton(
-            tooltip: 'Détacher le client',
+            tooltip: l10n.detachClient,
             icon: const Icon(Icons.close, size: 18),
             onPressed: isSubmitting ? null : _detachClient,
           ),
@@ -1240,6 +1259,7 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
   }
 
   Future<void> _confirmOrder() async {
+    final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthController>();
     final orderController = context.read<OrderController>();
     final user = auth.currentUser;
@@ -1247,32 +1267,28 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
     if (user == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errUserNotFound)));
       return;
     }
 
     if (establishmentId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Établissement introuvable.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errEstablishmentNotFound)));
       return;
     }
 
     if (clientType == 'restaurant' && tableController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez renseigner le numéro de table.'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errTableNumberRequired)));
       return;
     }
 
     if (clientType == 'hotel' && roomController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez renseigner le numéro de chambre.'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errRoomNumberRequired)));
       return;
     }
 
@@ -1304,13 +1320,11 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
 
     if (!mounted) return;
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Commande envoyée avec succès.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.orderSentSuccess)));
       Navigator.pop(context, true);
     } else if (orderController.hasError) {
-      final l10n = AppLocalizations.of(context);
-
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(orderController.errorText(l10n)!)));
@@ -1319,19 +1333,22 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final orderController = context.watch<OrderController>();
     final user = context.watch<AuthController>().currentUser;
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
+    // La CLÉ reste technique ('bar', 'restaurant', 'hotel') : c'est elle qui
+    // est stockée. Seul le libellé affiché est traduit.
     final clientTypeOptions = <MapEntry<String, String>>[
-      const MapEntry('bar', 'Client Bar'),
-      const MapEntry('restaurant', 'Client Restaurant'),
-      const MapEntry('hotel', 'Client Hôtel'),
+      MapEntry('bar', l10n.labelBarClient),
+      MapEntry('restaurant', l10n.labelRestaurantClient),
+      MapEntry('hotel', l10n.labelHotelClient),
     ].where((e) => user == null || user.canUseClientType(e.key)).toList();
 
     if (clientTypeOptions.isNotEmpty &&
@@ -1340,7 +1357,7 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Récapitulatif de la commande')),
+      appBar: AppBar(title: Text(l10n.orderRecapTitle)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Card(
@@ -1350,9 +1367,9 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
               children: [
                 DropdownButtonFormField<String>(
                   initialValue: clientType,
-                  decoration: const InputDecoration(
-                    labelText: 'Type de client',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.clientTypeLabel,
+                    border: const OutlineInputBorder(),
                   ),
                   items: clientTypeOptions
                       .map(
@@ -1374,18 +1391,18 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
                   TextField(
                     controller: tableController,
                     enabled: !orderController.isSubmitting,
-                    decoration: const InputDecoration(
-                      labelText: 'Numéro de table',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.tableNumberLabel,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                 if (clientType == 'hotel')
                   TextField(
                     controller: roomController,
                     enabled: !orderController.isSubmitting,
-                    decoration: const InputDecoration(
-                      labelText: 'Numéro de chambre',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: l10n.roomNumberFieldLabel,
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                 const SizedBox(height: 16),
@@ -1419,7 +1436,9 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      'Accompagnement : ${line.accompanimentName} (offert)',
+                                      l10n.accompanimentLine(
+                                        line.accompanimentName,
+                                      ),
                                       style: TextStyle(
                                         color: Colors.brown.shade400,
                                         fontSize: 12,
@@ -1443,7 +1462,7 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Total : ${totalAmount.toStringAsFixed(0)} FCFA',
+                    l10n.totalLine(totalAmount.toStringAsFixed(0)),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 17,
@@ -1471,8 +1490,8 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
                         : const Icon(Icons.send_outlined),
                     label: Text(
                       orderController.isSubmitting
-                          ? 'Envoi en cours...'
-                          : 'Confirmer et envoyer',
+                          ? l10n.sendingInProgress
+                          : l10n.confirmAndSend,
                     ),
                   ),
                 ),

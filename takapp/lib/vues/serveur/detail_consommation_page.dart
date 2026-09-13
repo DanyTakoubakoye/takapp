@@ -212,9 +212,11 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
     if (user == null) {
       if (!mounted) return false;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context).errUserNotFound),
+        ),
+      );
 
       return false;
     }
@@ -283,8 +285,8 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Facture simple imprimée et encaissement enregistré.'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).simpleInvoicePrinted),
         ),
       );
     } finally {
@@ -363,7 +365,9 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
 
     if (isFiscalized) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cette facture est déjà certifiée.')),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).invoiceAlreadyCertified),
+        ),
       );
 
       return;
@@ -384,21 +388,19 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
 
       final user = auth.currentUser;
 
+      final l10n = AppLocalizations.of(context);
+
       if (user == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Utilisateur introuvable.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.errUserNotFound)));
 
         return;
       }
 
       if (_sellerIfu.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              "Renseignez d'abord l'IFU de l'établissement (console admin).",
-            ),
-          ),
+          SnackBar(content: Text(l10n.fillEstablishmentIfuFirst)),
         );
         return;
       }
@@ -441,13 +443,13 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              'Facture fiscalisée avec certilink. Code MECeF : ${fiscalController.confirmResult!.codeMECeFDGI}',
+              l10n.invoiceFiscalizedWithCode(
+                fiscalController.confirmResult!.codeMECeFDGI,
+              ),
             ),
           ),
         );
       } else {
-        final l10n = AppLocalizations.of(context);
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -475,7 +477,9 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
 
     if (!isFiscalized) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Fiscalisez d’abord la facture.')),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).fiscalizeInvoiceFirst),
+        ),
       );
 
       return;
@@ -528,10 +532,8 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Facture normalisée imprimée et encaissement enregistré.',
-          ),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).normalizedInvoicePrinted),
         ),
       );
     } finally {
@@ -603,14 +605,16 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Détails de la Consommation')),
+      appBar: AppBar(title: Text(l10n.consumptionDetailsTitle)),
       body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
         stream: _orderStream,
         builder: (context, orderSnapshot) {
@@ -655,10 +659,10 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: Colors.green),
                           ),
-                          child: const Text(
-                            'FACTURE CERTIFIEE',
+                          child: Text(
+                            l10n.certifiedInvoiceBadge,
                             textAlign: TextAlign.center,
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Colors.green,
                               fontWeight: FontWeight.bold,
                               fontSize: 16,
@@ -672,19 +676,28 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _sectionTitle('Informations générales'),
-                              _infoRow('Client', _ticket.label, bold: true),
+                              _sectionTitle(l10n.generalInformation),
                               _infoRow(
-                                _ticket.isMultiOrder ? 'Commandes' : 'Commande',
+                                l10n.clientFallback,
+                                _ticket.labelFor(l10n),
+                                bold: true,
+                              ),
+                              _infoRow(
+                                _ticket.isMultiOrder
+                                    ? l10n.labelOrders
+                                    : l10n.labelOrder,
                                 _ticket.orderNumbers.join('\n'),
                               ),
-                              _infoRow('Date', _formatDate(_ticket.openedAt)),
                               _infoRow(
-                                'Type',
+                                l10n.labelDate,
+                                _formatDate(_ticket.openedAt),
+                              ),
+                              _infoRow(
+                                l10n.labelType,
                                 _ticket.primaryOrder.clientType.toUpperCase(),
                               ),
                               _infoRow(
-                                'Montant',
+                                l10n.labelAmount,
                                 '${_ticket.total.toStringAsFixed(0)} FCFA',
                                 bold: true,
                               ),
@@ -701,14 +714,12 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _sectionTitle(
-                                'Informations client (facultatives)',
-                              ),
+                              _sectionTitle(l10n.clientInfoOptional),
 
                               TextField(
                                 controller: clientNameController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Nom du client',
+                                decoration: InputDecoration(
+                                  labelText: l10n.clientNameLabel,
                                 ),
                               ),
 
@@ -716,8 +727,8 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
 
                               TextField(
                                 controller: clientAddressController,
-                                decoration: const InputDecoration(
-                                  labelText: 'Adresse du client',
+                                decoration: InputDecoration(
+                                  labelText: l10n.clientAddressLabel,
                                 ),
                               ),
 
@@ -725,8 +736,8 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
 
                               TextField(
                                 controller: clientIfuController,
-                                decoration: const InputDecoration(
-                                  labelText: 'IFU du client',
+                                decoration: InputDecoration(
+                                  labelText: l10n.clientIfuLabel,
                                 ),
                               ),
 
@@ -734,8 +745,8 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
 
                               DropdownButtonFormField<String>(
                                 initialValue: selectedPaymentMethod,
-                                decoration: const InputDecoration(
-                                  labelText: 'Mode de paiement',
+                                decoration: InputDecoration(
+                                  labelText: l10n.paymentMethodLabel,
                                 ),
                                 items: AppPaymentMethods.labels.entries
                                     .map(
@@ -768,7 +779,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _sectionTitle('Articles consommés'),
+                              _sectionTitle(l10n.consumedItems),
 
                               ...activeItems.map((item) {
                                 final quantity = (item['quantity'] ?? 0) as int;
@@ -795,14 +806,18 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
 
                                         const SizedBox(height: 6),
 
-                                        Text('Qté : $quantity'),
+                                        Text(l10n.quantityLine('$quantity')),
 
                                         Text(
-                                          'P.U : ${unitPrice.toStringAsFixed(0)} FCFA',
+                                          l10n.unitPriceLine(
+                                            unitPrice.toStringAsFixed(0),
+                                          ),
                                         ),
 
                                         Text(
-                                          'Total : ${total.toStringAsFixed(0)} FCFA',
+                                          l10n.totalLine(
+                                            total.toStringAsFixed(0),
+                                          ),
                                           style: const TextStyle(
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -852,8 +867,8 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                                       ),
                                 label: Text(
                                   isFiscalized
-                                      ? 'Imprimer facture normalisée'
-                                      : 'Fiscaliser',
+                                      ? l10n.actionPrintNormalizedInvoice
+                                      : l10n.actionFiscalize,
                                 ),
                               ),
                             ),
@@ -876,7 +891,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                                         ),
                                       )
                                     : const Icon(Icons.print_outlined),
-                                label: const Text('Imprimer facture simple'),
+                                label: Text(l10n.actionPrintSimpleInvoice),
                               ),
                             ),
                           ],
@@ -913,8 +928,8 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                                       ),
                                 label: Text(
                                   isFiscalized
-                                      ? 'Imprimer facture normalisée'
-                                      : 'Fiscaliser',
+                                      ? l10n.actionPrintNormalizedInvoice
+                                      : l10n.actionFiscalize,
                                 ),
                               ),
                             ),
@@ -938,7 +953,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                                         ),
                                       )
                                     : const Icon(Icons.print_outlined),
-                                label: const Text('Imprimer facture simple'),
+                                label: Text(l10n.actionPrintSimpleInvoice),
                               ),
                             ),
                           ],

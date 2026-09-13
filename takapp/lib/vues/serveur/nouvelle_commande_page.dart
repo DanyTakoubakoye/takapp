@@ -91,13 +91,15 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
 
   /// Sélecteur discret : jamais bloquant, jamais obligatoire.
   Widget _buildClientSelector(String establishmentId) {
+    final l10n = AppLocalizations.of(context);
+
     if (_selectedClientId.isEmpty) {
       return Align(
         alignment: Alignment.centerLeft,
         child: TextButton.icon(
           onPressed: () => _pickClient(establishmentId),
           icon: const Icon(Icons.person_search, size: 18),
-          label: const Text('Rattacher un client (optionnel)'),
+          label: Text(l10n.attachClientOptional),
         ),
       );
     }
@@ -114,12 +116,12 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Client : $_selectedClientName',
+              l10n.clientLine(_selectedClientName),
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
           ),
           IconButton(
-            tooltip: 'Détacher le client',
+            tooltip: l10n.detachClient,
             icon: const Icon(Icons.close, size: 18),
             onPressed: _detachClient,
           ),
@@ -129,6 +131,8 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
   }
 
   Future<void> _submitOrder(String establishmentId) async {
+    final l10n = AppLocalizations.of(context);
+
     final auth = context.read<AuthController>();
 
     final orderController = context.read<OrderController>();
@@ -138,14 +142,14 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
     if (user == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errUserNotFound)));
       return;
     }
 
     if (establishmentId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Établissement introuvable.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errEstablishmentNotFound)));
       return;
     }
 
@@ -162,9 +166,9 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
     if (!mounted) return;
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Commande envoyée avec succès.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.orderSentSuccess)));
 
       tableController.clear();
       roomController.clear();
@@ -175,8 +179,6 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
         _selectedClientName = '';
       });
     } else if (orderController.hasError) {
-      final l10n = AppLocalizations.of(context);
-
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(orderController.errorText(l10n)!)));
@@ -185,28 +187,28 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     final auth = context.watch<AuthController>();
 
     final user = auth.currentUser;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     final establishmentId = user.establishmentId.trim();
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     final orderController = context.watch<OrderController>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Nouvelle commande')),
+      appBar: AppBar(title: Text(l10n.newOrderTitle)),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final bool isMobile = constraints.maxWidth < 900;
@@ -273,12 +275,17 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
     required String establishmentId,
     required bool isMobile,
   }) {
+    final l10n = AppLocalizations.of(context);
+
     // Options du sélecteur "Type de client" limitées aux modules souscrits.
     // Un établissement abonné à tout conserve les trois options d'origine.
+    //
+    // La CLÉ reste technique ('bar', 'restaurant', 'hotel') : c'est elle qui
+    // est stockée. Seul le libellé affiché est traduit.
     final clientTypeOptions = <MapEntry<String, String>>[
-      const MapEntry('bar', 'Client Bar'),
-      const MapEntry('restaurant', 'Client Restaurant'),
-      const MapEntry('hotel', 'Client Hôtel'),
+      MapEntry('bar', l10n.labelBarClient),
+      MapEntry('restaurant', l10n.labelRestaurantClient),
+      MapEntry('hotel', l10n.labelHotelClient),
     ].where((e) => user.canUseClientType(e.key)).toList();
 
     // Si le type courant n'est plus proposable, on bascule sur le premier
@@ -295,9 +302,9 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
           children: [
             DropdownButtonFormField<String>(
               initialValue: clientType,
-              decoration: const InputDecoration(
-                labelText: 'Type de client',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.clientTypeLabel,
+                border: const OutlineInputBorder(),
               ),
               items: clientTypeOptions
                   .map(
@@ -317,17 +324,17 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
             if (clientType == 'restaurant')
               TextField(
                 controller: tableController,
-                decoration: const InputDecoration(
-                  labelText: 'Numéro de table',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.tableNumberLabel,
+                  border: const OutlineInputBorder(),
                 ),
               ),
             if (clientType == 'hotel')
               TextField(
                 controller: roomController,
-                decoration: const InputDecoration(
-                  labelText: 'Numéro de chambre',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.roomNumberFieldLabel,
+                  border: const OutlineInputBorder(),
                 ),
               ),
             const SizedBox(height: 16),
@@ -340,7 +347,9 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text('Erreur: ${snapshot.error}'));
+                    return Center(
+                      child: Text(l10n.errorPrefixed('${snapshot.error}')),
+                    );
                   }
 
                   final items =
@@ -352,9 +361,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
                         );
 
                   if (items.isEmpty) {
-                    return const Center(
-                      child: Text('Aucun article disponible.'),
-                    );
+                    return Center(child: Text(l10n.noItemAvailable));
                   }
 
                   return ListView.separated(
@@ -394,7 +401,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
                                             .read<OrderController>()
                                             .addMenuItem(item);
                                       },
-                                      child: const Text('Ajouter'),
+                                      child: Text(l10n.actionAdd),
                                     ),
                                   ),
                                 ],
@@ -427,7 +434,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
                                           .read<OrderController>()
                                           .addMenuItem(item);
                                     },
-                                    child: const Text('Ajouter'),
+                                    child: Text(l10n.actionAdd),
                                   ),
                                 ],
                               ),
@@ -448,16 +455,18 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
     OrderController orderController,
     String establishmentId,
   ) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Panier', style: Theme.of(context).textTheme.titleLarge),
+            Text(l10n.cartTitle, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 10),
             if (orderController.items.isEmpty)
-              const Text('Aucun article ajouté.')
+              Text(l10n.noItemAdded)
             else
               ConstrainedBox(
                 constraints: const BoxConstraints(maxHeight: 170),
@@ -509,11 +518,11 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
               ),
             const Divider(),
             Text(
-              'Sous-total : ${orderController.subtotal.toStringAsFixed(0)} FCFA',
+              l10n.subtotalLine(orderController.subtotal.toStringAsFixed(0)),
             ),
             const SizedBox(height: 6),
             Text(
-              'Total : ${orderController.total.toStringAsFixed(0)} FCFA',
+              l10n.totalLine(orderController.total.toStringAsFixed(0)),
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 6),
@@ -534,7 +543,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Envoyer la commande'),
+                    : Text(l10n.actionSendOrder),
               ),
             ),
           ],
@@ -548,16 +557,18 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
     OrderController orderController,
     String establishmentId,
   ) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Text('Panier', style: Theme.of(context).textTheme.titleLarge),
+            Text(l10n.cartTitle, style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 12),
             Expanded(
               child: orderController.items.isEmpty
-                  ? const Center(child: Text('Aucun article ajouté.'))
+                  ? Center(child: Text(l10n.noItemAdded))
                   : ListView.separated(
                       itemCount: orderController.items.length,
                       separatorBuilder: (_, _) => const Divider(height: 16),
@@ -608,14 +619,14 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Sous-total : ${orderController.subtotal.toStringAsFixed(0)} FCFA',
+                l10n.subtotalLine(orderController.subtotal.toStringAsFixed(0)),
               ),
             ),
             const SizedBox(height: 8),
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Total : ${orderController.total.toStringAsFixed(0)} FCFA',
+                l10n.totalLine(orderController.total.toStringAsFixed(0)),
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
@@ -640,7 +651,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Envoyer la commande'),
+                    : Text(l10n.actionSendOrder),
               ),
             ),
           ],

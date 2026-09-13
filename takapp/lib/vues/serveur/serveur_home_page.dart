@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/services/server_notification_service.dart';
 import 'package:takapp/services/notification_service.dart';
 import 'package:takapp/vues/serveur/encaissement_page.dart';
@@ -133,6 +134,7 @@ class _ServeurHomePageState extends State<ServeurHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
     final user = auth.currentUser;
 
@@ -141,16 +143,14 @@ class _ServeurHomePageState extends State<ServeurHomePage> {
     final isTablet = width >= 700 && width < 1100;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     final establishmentId = user.establishmentId.trim();
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -163,7 +163,7 @@ class _ServeurHomePageState extends State<ServeurHomePage> {
         return Scaffold(
           appBar: AppBar(
             title: Text(
-              'Espace serveur - $establishmentName',
+              l10n.serveurSpaceTitle(establishmentName),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: Colors.white,
                 fontSize: 20,
@@ -191,7 +191,7 @@ class _ServeurHomePageState extends State<ServeurHomePage> {
                           establishmentId: establishmentId,
                           serveurId: user.uid,
                         ),
-                        tooltip: 'Notifications',
+                        tooltip: l10n.navNotifications,
                         icon: const Icon(Icons.notifications),
                       ),
                       if (unreadCount > 0)
@@ -228,7 +228,7 @@ class _ServeurHomePageState extends State<ServeurHomePage> {
               ),
               IconButton(
                 onPressed: () => context.read<AuthController>().logout(),
-                tooltip: 'Déconnexion',
+                tooltip: l10n.commonLogout,
                 icon: const Icon(Icons.logout),
               ),
             ],
@@ -273,6 +273,8 @@ class _ServeurWelcomeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -287,14 +289,14 @@ class _ServeurWelcomeCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Bienvenue $name',
+                    l10n.welcomeName(name),
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Espace de prise de commande et de suivi serveur',
+                    l10n.serveurSpaceSubtitle,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ],
@@ -320,6 +322,7 @@ class _ServeurModulesGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
     final canRestaurant = auth.canAccessRestaurant;
     final canBar = auth.canAccessBar;
@@ -327,21 +330,21 @@ class _ServeurModulesGrid extends StatelessWidget {
 
     final modules = [
       _ServeurModule(
-        title: 'Commandes & Chambres',
-        subtitle: 'Prendre les commandes et gérer les consommations chambre',
+        title: l10n.moduleOrdersRoomsTitle,
+        subtitle: l10n.moduleOrdersRoomsSubtitle,
         icon: Icons.add_shopping_cart,
         color: Colors.deepOrange,
         actions: [
           _ServeurAction(
-            title: 'Menu et Commande',
-            subtitle: 'Prendre une commande restaurant, bar ou chambre',
+            title: l10n.actionMenuOrderTitle,
+            subtitle: l10n.actionMenuOrderSubtitle,
             icon: Icons.restaurant_menu,
             visible: canRestaurant || canBar,
             page: const MenuPresentationPage(),
           ),
           _ServeurAction(
-            title: 'Consommations Chambre',
-            subtitle: 'Facturer les consommations liées à une chambre',
+            title: l10n.actionRoomConsumptionTitle,
+            subtitle: l10n.actionRoomConsumptionSubtitle,
             icon: Icons.hotel,
             visible: canHotel,
             page: const FactureConsommationChambrePage(),
@@ -349,47 +352,47 @@ class _ServeurModulesGrid extends StatelessWidget {
         ],
       ),
       _ServeurModule(
-        title: 'Paiements & Versements',
-        subtitle: 'Encaisser les factures et remettre les fonds',
+        title: l10n.modulePaymentsTitle,
+        subtitle: l10n.modulePaymentsSubtitle,
         icon: Icons.payments_outlined,
         color: Colors.green,
         actions: [
           _ServeurAction(
-            title: 'Encaissement',
-            subtitle: 'Encaisser les factures non payées',
+            title: l10n.encaissementTitle,
+            subtitle: l10n.actionCollectSubtitle,
             icon: Icons.payments_outlined,
             page: const EncaissementPage(),
           ),
           _ServeurAction(
-            title: 'Mes factures',
-            subtitle: 'Toutes mes factures : encaisser, fiscaliser, imprimer',
+            title: l10n.myInvoicesTitle,
+            subtitle: l10n.actionMyInvoicesSubtitle,
             icon: Icons.receipt_long_outlined,
             page: MesFacturesServeurPage(establishmentId: establishmentId),
           ),
           _ServeurAction(
-            title: 'Versement à la gérante',
-            subtitle: 'Remettre les encaissements à la gérante',
+            title: l10n.handoverTitle,
+            subtitle: l10n.actionHandoverSubtitle,
             icon: Icons.account_balance_wallet_outlined,
             page: VersementGerantePage(establishmentId: establishmentId),
           ),
         ],
       ),
       _ServeurModule(
-        title: 'Suivi Préparation',
-        subtitle: 'Suivre l’avancement des commandes bar et cuisine',
+        title: l10n.moduleTrackingTitle,
+        subtitle: l10n.moduleTrackingSubtitle,
         icon: Icons.visibility_outlined,
         color: Colors.indigo,
         actions: [
           _ServeurAction(
-            title: 'Suivi bar',
-            subtitle: 'Voir l’état des commandes envoyées au bar',
+            title: l10n.suiviBarTitle,
+            subtitle: l10n.actionSuiviBarSubtitle,
             icon: Icons.local_bar,
             visible: canBar,
             page: SuiviBarPage(establishmentId: establishmentId),
           ),
           _ServeurAction(
-            title: 'Suivi cuisine',
-            subtitle: 'Voir l’état des commandes envoyées en cuisine',
+            title: l10n.suiviCuisineTitle,
+            subtitle: l10n.actionSuiviCuisineSubtitle,
             icon: Icons.restaurant,
             visible: canRestaurant,
             page: SuiviCuisinePage(establishmentId: establishmentId),

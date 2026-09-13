@@ -510,6 +510,183 @@
   "paymentMethodLabel": "Payment method",
   "amountReceived": "Amount received",
 
+  "roomConsumptionInvoiceTitle": "Room consumption invoice",
+  "noConsumptionForPeriod": "No consumption found for this period.",
+  "roomNumberLabel": "Room number",
+  "startDate": "Start date",
+  "endDate": "End date",
+  "actionShow": "Show",
+  "pickBothDates": "Please choose both the start and end dates.",
+  "startDateBeforeEndDate": "The start date must be on or before the end date.",
+
+  "handoverTitle": "Handover to the manager",
+  "paymentsToHandOver": "Payments to hand over",
+  "selectionAmount": "Selection: {amount} FCFA",
+  "@selectionAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "noPaymentAvailableForHandover": "No payment available for handover.",
+  "handoverDeclared": "Handover declared successfully.",
+  "clearSelection": "Clear selection",
+  "declareHandover": "Declare handover",
+  "statusValidated": "Validated",
+  "statusRejected": "Rejected",
+  "handoverHistory": "Handover history",
+  "noHandoverRecorded": "No handover recorded.",
+  "includedPayments": "Included payments: {count}",
+  "@includedPayments": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "actionPrint": "Print",
+
+  "attachClientOptional": "Attach a client (optional)",
+  "detachClient": "Detach client",
+  "orderSentSuccess": "Order sent successfully.",
+  "newOrderTitle": "New order",
+  "labelRestaurantClient": "Restaurant client",
+  "labelHotelClient": "Hotel client",
+  "clientTypeLabel": "Client type",
+  "tableNumberLabel": "Table number",
+  "roomNumberFieldLabel": "Room number",
+  "noItemAvailable": "No item available.",
+  "actionAdd": "Add",
+  "cartTitle": "Cart",
+  "noItemAdded": "No item added.",
+  "actionSendOrder": "Send order",
+  "subtotalLine": "Subtotal: {amount} FCFA",
+  "@subtotalLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+
+  "serveurSpaceTitle": "Waiter area - {establishment}",
+  "@serveurSpaceTitle": {
+    "placeholders": {
+      "establishment": {
+        "type": "String"
+      }
+    }
+  },
+  "welcomeName": "Welcome {name}",
+  "@welcomeName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "serveurSpaceSubtitle": "Order taking and waiter tracking area",
+
+  "moduleOrdersRoomsTitle": "Orders & Rooms",
+  "moduleOrdersRoomsSubtitle": "Take orders and manage room consumption",
+  "actionMenuOrderTitle": "Menu and order",
+  "actionMenuOrderSubtitle": "Take a restaurant, bar or room order",
+  "actionRoomConsumptionTitle": "Room consumption",
+  "actionRoomConsumptionSubtitle": "Invoice consumption linked to a room",
+
+  "modulePaymentsTitle": "Payments & Handovers",
+  "modulePaymentsSubtitle": "Collect invoices and hand over funds",
+  "actionCollectSubtitle": "Collect unpaid invoices",
+  "actionMyInvoicesSubtitle": "All my invoices: collect, fiscalize, print",
+  "actionHandoverSubtitle": "Hand the collected cash to the manager",
+
+  "moduleTrackingTitle": "Preparation tracking",
+  "moduleTrackingSubtitle": "Track the progress of bar and kitchen orders",
+  "actionSuiviBarSubtitle": "See the status of orders sent to the bar",
+  "actionSuiviCuisineSubtitle": "See the status of orders sent to the kitchen",
+
+  "categoryAll": "All",
+  "menuTitle": "Our menu",
+  "searchDishHint": "Search for a dish…",
+  "noAccompanimentAvailable": "No side dish available. Dish added without a side.",
+  "freeAccompaniment": "Free side dish",
+  "chooseOneFreeAccompaniment": "Choose 1 free side dish",
+  "labelFree": "Free",
+  "paidExtraPortions": "Extra portions (paid)",
+  "orderRecapTitle": "Order summary",
+  "sendingInProgress": "Sending...",
+  "confirmAndSend": "Confirm and send",
+  "recapWithCount": "Summary ({count})",
+  "@recapWithCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "pricePerPortion": "{price} FCFA / portion",
+  "@pricePerPortion": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "accompanimentLine": "Side dish: {name} (free)",
+  "@accompanimentLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "consumptionDetailsTitle": "Consumption details",
+  "certifiedInvoiceBadge": "CERTIFIED INVOICE",
+  "generalInformation": "General information",
+  "labelOrders": "Orders",
+  "labelOrder": "Order",
+  "labelDate": "Date",
+  "labelType": "Type",
+  "labelAmount": "Amount",
+  "clientInfoOptional": "Client information (optional)",
+  "clientNameLabel": "Client name",
+  "clientAddressLabel": "Client address",
+  "clientIfuLabel": "Client IFU",
+  "consumedItems": "Items consumed",
+  "simpleInvoicePrinted": "Simple invoice printed and payment recorded.",
+  "normalizedInvoicePrinted": "Normalized invoice printed and payment recorded.",
+  "invoiceAlreadyCertified": "This invoice is already certified.",
+  "fiscalizeInvoiceFirst": "Fiscalize the invoice first.",
+  "fillEstablishmentIfuFirst": "Enter the establishment's IFU first (admin console).",
+  "actionPrintNormalizedInvoice": "Print normalized invoice",
+  "actionPrintSimpleInvoice": "Print simple invoice",
+  "quantityLine": "Qty: {quantity}",
+  "@quantityLine": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      }
+    }
+  },
+  "unitPriceLine": "Unit price: {price} FCFA",
+  "@unitPriceLine": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "invoiceFiscalizedWithCode": "Invoice fiscalized with certilink. MECeF code: {code}",
+  "@invoiceFiscalizedWithCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+
   "clientDisabled": "Client disabled.",
   "clientAdded": "Client added.",
 
