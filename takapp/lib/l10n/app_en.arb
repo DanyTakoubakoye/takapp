@@ -1,0 +1,114 @@
+{
+  "@@locale": "en",
+
+  "languageLabel": "Language",
+  "languageFrench": "Français",
+  "languageEnglish": "English",
+
+  "commonDelete": "Delete",
+  "commonLogout": "Sign out",
+  "commonError": "Error: {error}",
+  "@commonError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errorPrefixed": "Error: {message}",
+  "@errorPrefixed": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errUnknown": "An unknown error occurred.",
+  "errEstablishmentNotFound": "Establishment not found.",
+  "errEstablishmentNotFoundReconnect": "Establishment not found. Please sign in again.",
+  "errAccountWithoutEstablishment": "Your account is not linked to any establishment.",
+
+  "errInvalidCredential": "Incorrect email or password.",
+  "errUserNotFound": "User not found.",
+  "errWrongPassword": "Incorrect password.",
+  "errNetworkRequestFailed": "Network problem. Please check your connection.",
+  "errPermissionDenied": "Access denied by Firestore rules.",
+  "errResetEmailFailed": "Could not send the reset email.",
+
+  "errOrderNotFound": "Order not found.",
+  "errInvoiceNotFound": "Invoice not found.",
+  "errReservationNotFound": "Reservation not found.",
+  "errRoomNotFound": "Room not found.",
+  "errClientNotFound": "Client not found.",
+  "errStockNotFound": "Stock not found.",
+  "errStockDocumentNotFound": "Stock document not found.",
+  "errHandoverNotFound": "Handover not found.",
+  "errRequestNotFound": "Request not found.",
+
+  "errClientNameRequired": "Client name is required.",
+  "errClientTypeInvalid": "Invalid client type.",
+  "errAmountMustBePositive": "The amount must be greater than 0.",
+  "errQuantityMustBePositive": "The quantity must be greater than 0.",
+  "errAddAtLeastOneItem": "Please add at least one item.",
+  "errSelectAtLeastOneItem": "Please select at least one item.",
+  "errSelectPaymentMethod": "Please choose a payment method.",
+  "errRoomNumberRequired": "Please specify the room number.",
+  "errTableNumberRequired": "Please specify the table number.",
+
+  "errStockInsufficient": "Insufficient stock for {name}.",
+  "@errStockInsufficient": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "clientDisabled": "Client disabled.",
+  "clientAdded": "Client added.",
+
+  "loginSubtitle": "Sign in to your workspace",
+  "loginEmailLabel": "Email",
+  "loginEmailHint": "example@domain.com",
+  "loginEmailRequired": "Please enter your email",
+  "loginEmailInvalid": "Invalid email",
+  "loginPasswordLabel": "Password",
+  "loginPasswordEmailFirst": "Please enter a complete email first",
+  "loginPasswordRequired": "Please enter your password",
+  "loginPasswordTooShort": "Minimum 6 characters",
+  "loginForgotPassword": "Forgot password?",
+  "loginSubmit": "Sign in",
+  "loginResetNeedsEmail": "Please enter your email address first to receive the reset link.",
+  "loginResetInvalidEmail": "Please enter a valid email address.",
+  "loginResetSent": "A reset link has been sent to {email}. Remember to check your spam folder.",
+  "@loginResetSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "loginResetFailed": "Could not send the reset email.",
+  "loginResetError": "Error while sending the email: {error}",
+  "@loginResetError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+
+  "roleGlobalAdmin": "Global Administrator",
+  "roleSuperAdmin": "Super Administrator",
+  "roleOwner": "Owner",
+  "roleManager": "Manager",
+  "roleAccountant": "Accountant",
+  "roleHeadChef": "Head Chef",
+  "roleWaiter": "Waiter",
+  "roleHousekeeping": "Housekeeping",
+  "roleBartender": "Bartender",
+  "roleButler": "Butler",
+  "roleReceptionist": "Receptionist"
+}

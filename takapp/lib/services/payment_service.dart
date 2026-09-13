@@ -63,6 +63,7 @@ class PaymentService {
           }).toList();
         });
   }
+
   /// =========================
   /// STREAM ALL ORDERS FOR SERVER (par jour)
   /// =========================
@@ -98,19 +99,28 @@ class PaymentService {
   /// REGISTER PAYMENT
   /// =========================
 
-  Future<void> registerPayment({
+  /// Encaisse une addition en un seul règlement.
+  ///
+  /// Toutes les commandes du ticket (table ou chambre) sont soldées ensemble et
+  /// donnent lieu à un unique document `payments` : le montant remis en caisse
+  /// correspond exactement à la facture présentée au client.
+  Future<void> registerTicketPayment({
     required String establishmentId,
-    required String orderId,
-    required String orderNumber,
+    required String ticketId,
+    required List<String> orderIds,
     required String receivedBy,
     required String receivedByName,
     required String method,
     required double amount,
-    double? roomNumber,
   }) async {
     _validateEstablishmentId(establishmentId);
 
-    if (orderId.trim().isEmpty) {
+    final ids = orderIds
+        .map((id) => id.trim())
+        .where((id) => id.isNotEmpty)
+        .toList();
+
+    if (ids.isEmpty) {
       throw Exception('Commande introuvable.');
     }
 
@@ -118,26 +128,45 @@ class PaymentService {
       throw Exception('Le montant doit être supérieur à 0.');
     }
 
-    final orderRef = _ordersRef(establishmentId: establishmentId).doc(orderId);
-    final orderDoc = await orderRef.get();
+    final orderRefs = ids
+        .map((id) => _ordersRef(establishmentId: establishmentId).doc(id))
+        .toList();
 
-    if (!orderDoc.exists || orderDoc.data() == null) {
-      throw Exception('Commande introuvable.');
+    final orderDocs = await Future.wait(orderRefs.map((ref) => ref.get()));
+
+    final List<Map<String, dynamic>> ordersData = [];
+
+    for (final orderDoc in orderDocs) {
+      if (!orderDoc.exists || orderDoc.data() == null) {
+        throw Exception('Commande introuvable.');
+      }
+
+      final orderData = orderDoc.data()!;
+
+      final orderNumber = (orderData['orderNumber'] ?? '').toString();
+
+      if (orderData['isForKitchen'] == true &&
+          orderData['kitchenStatus'] != 'ready' &&
+          orderData['kitchenStatus'] != 'served') {
+        throw Exception('Commande $orderNumber : cuisine non prête.');
+      }
+
+      if (orderData['isForBar'] == true &&
+          orderData['barStatus'] != 'ready' &&
+          orderData['barStatus'] != 'served') {
+        throw Exception('Commande $orderNumber : bar non prêt.');
+      }
+
+      ordersData.add(orderData);
     }
 
-    final orderData = orderDoc.data()!;
+    final primaryData = ordersData.first;
 
-    if (orderData['isForKitchen'] == true &&
-        orderData['kitchenStatus'] != 'ready' &&
-        orderData['kitchenStatus'] != 'served') {
-      throw Exception('Commande cuisine non prête.');
-    }
+    final orderNumbers = ordersData
+        .map((data) => (data['orderNumber'] ?? '').toString())
+        .toList();
 
-    if (orderData['isForBar'] == true &&
-        orderData['barStatus'] != 'ready' &&
-        orderData['barStatus'] != 'served') {
-      throw Exception('Commande bar non prête.');
-    }
+    final clientType = (primaryData['clientType'] ?? '').toString();
 
     final paymentRef = _paymentsRef(establishmentId: establishmentId).doc();
 
@@ -150,10 +179,13 @@ class PaymentService {
 
       batch.set(roomExtraRef, {
         'establishmentId': establishmentId,
-        'roomNumber': roomNumber,
+        'roomNumber': primaryData['roomNumber']?.toString() ?? '',
         'amount': amount,
-        'orderId': orderId,
-        'orderNumber': orderNumber,
+        'ticketId': ticketId,
+        'orderId': ids.first,
+        'orderNumber': orderNumbers.first,
+        'orderIds': ids,
+        'orderNumbers': orderNumbers,
         'createdBy': receivedBy,
         'createdByName': receivedByName,
         'createdAt': FieldValue.serverTimestamp(),
@@ -164,12 +196,19 @@ class PaymentService {
 
     batch.set(paymentRef, {
       'establishmentId': establishmentId,
-      'orderId': orderId,
-      'orderNumber': orderNumber,
-      'clientType': (orderData['clientType'] ?? '').toString(),
-      'type': method == 'room'
-          ? 'room'
-          : (orderData['clientType'] ?? '').toString(),
+      'ticketId': ticketId,
+
+      /// Commande principale de l'addition : conservée pour la compatibilité
+      /// des écrans qui rattachent un paiement à une commande unique.
+      'orderId': ids.first,
+      'orderNumber': orderNumbers.first,
+
+      'orderIds': ids,
+      'orderNumbers': orderNumbers,
+      'orderCount': ids.length,
+
+      'clientType': clientType,
+      'type': method == 'room' ? 'room' : clientType,
       'receivedBy': receivedBy,
       'receivedByName': receivedByName,
       'method': method,
@@ -185,14 +224,17 @@ class PaymentService {
       'updatedAt': FieldValue.serverTimestamp(),
     });
 
-    batch.update(orderRef, {
-      'paymentStatus': 'paid',
-      'status': 'paid',
-      'paidAt': FieldValue.serverTimestamp(),
-      'updatedAt': FieldValue.serverTimestamp(),
-      'pendingSync': false,
-      'syncError': false,
-    });
+    for (final orderRef in orderRefs) {
+      batch.update(orderRef, {
+        'paymentStatus': 'paid',
+        'status': 'paid',
+        'paymentId': paymentRef.id,
+        'paidAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+        'pendingSync': false,
+        'syncError': false,
+      });
+    }
 
     await batch.commit();
   }

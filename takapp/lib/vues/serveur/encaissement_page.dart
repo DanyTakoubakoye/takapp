@@ -1,27 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/payment_controller.dart';
 import 'package:takapp/core/constants/app_payment_methods.dart';
 import 'package:takapp/modeles/order_model.dart';
+import 'package:takapp/modeles/order_ticket_model.dart';
 import 'package:takapp/services/payment_service.dart';
 import 'package:takapp/vues/serveur/detail_consommation_page.dart';
 
 class EncaissementPage extends StatelessWidget {
   const EncaissementPage({super.key});
-
-  String _clientLabel(OrderModel order) {
-    switch (order.clientType) {
-      case 'restaurant':
-        return 'Table ${order.tableNumber ?? "-"}';
-      case 'hotel':
-        return 'Chambre ${order.roomNumber ?? "-"}';
-      case 'bar':
-        return 'Client Bar';
-      default:
-        return order.clientType;
-    }
-  }
 
   bool _isSmallScreen(BuildContext context) {
     return MediaQuery.of(context).size.width < 800;
@@ -77,8 +66,8 @@ class EncaissementPage extends StatelessWidget {
             }
 
             final rawOrders = snapshot.data ?? [];
-            final orders = rawOrders.where(_isVisibleForCashier).toList()
-              ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+            final orders = rawOrders.where(_isVisibleForCashier).toList();
 
             if (orders.isEmpty) {
               return const Center(
@@ -86,11 +75,15 @@ class EncaissementPage extends StatelessWidget {
               );
             }
 
+            // Toutes les commandes non encaissées d'une même table ou d'une
+            // même chambre forment une seule facture.
+            final tickets = OrderTicket.group(orders);
+
             return ListView.separated(
-              itemCount: orders.length,
+              itemCount: tickets.length,
               separatorBuilder: (_, _) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
-                final order = orders[index];
+                final ticket = tickets[index];
 
                 return Card(
                   child: Padding(
@@ -98,21 +91,67 @@ class EncaissementPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          order.orderNumber,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                ticket.label,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                            if (ticket.isMultiOrder)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Text(
+                                  '${ticket.orders.length} commandes',
+                                  style: const TextStyle(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
                         const SizedBox(height: 6),
-                        Text('Client : ${_clientLabel(order)}'),
-                        const SizedBox(height: 4),
-                        Text('Créée par : ${order.createdByName}'),
+                        Text(
+                          'Ouverte à ${DateFormat('HH:mm').format(ticket.openedAt)}',
+                        ),
                         const SizedBox(height: 4),
                         Text(
-                          'Montant : ${order.total.toStringAsFixed(0)} FCFA',
-                          style: const TextStyle(fontWeight: FontWeight.w700),
+                          'Créée par : ${ticket.primaryOrder.createdByName}',
+                        ),
+                        const SizedBox(height: 6),
+                        ...ticket.orders.map(
+                          (order) => Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(
+                              '${order.orderNumber}  •  ${order.total.toStringAsFixed(0)} FCFA',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Theme.of(
+                                  context,
+                                ).textTheme.bodySmall?.color,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Total à encaisser : ${ticket.total.toStringAsFixed(0)} FCFA',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                          ),
                         ),
                         const SizedBox(height: 12),
                         Align(
@@ -128,7 +167,7 @@ class EncaissementPage extends StatelessWidget {
                                     MaterialPageRoute(
                                       builder: (_) => DetailConsommationPage(
                                         establishmentId: establishmentId,
-                                        order: order,
+                                        ticket: ticket,
                                       ),
                                     ),
                                   );
@@ -142,7 +181,7 @@ class EncaissementPage extends StatelessWidget {
                                     context: context,
                                     builder: (_) => _PaymentDialog(
                                       establishmentId: establishmentId,
-                                      order: order,
+                                      ticket: ticket,
                                     ),
                                   );
                                 },
@@ -167,9 +206,9 @@ class EncaissementPage extends StatelessWidget {
 
 class _PaymentDialog extends StatefulWidget {
   final String establishmentId;
-  final OrderModel order;
+  final OrderTicket ticket;
 
-  const _PaymentDialog({required this.establishmentId, required this.order});
+  const _PaymentDialog({required this.establishmentId, required this.ticket});
 
   @override
   State<_PaymentDialog> createState() => _PaymentDialogState();
@@ -185,7 +224,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
   void initState() {
     super.initState();
     amountController = TextEditingController(
-      text: widget.order.total.toStringAsFixed(0),
+      text: widget.ticket.total.toStringAsFixed(0),
     );
   }
 
@@ -223,10 +262,10 @@ class _PaymentDialogState extends State<_PaymentDialog> {
       return;
     }
 
-    final success = await paymentController.registerPayment(
+    final success = await paymentController.registerTicketPayment(
       establishmentId: establishmentId,
-      orderId: widget.order.id,
-      orderNumber: widget.order.orderNumber,
+      ticketId: widget.ticket.ticketId,
+      orderIds: widget.ticket.orderIds,
       receivedBy: user.uid,
       receivedByName: user.name,
       method: selectedMethod,
@@ -253,11 +292,21 @@ class _PaymentDialogState extends State<_PaymentDialog> {
     final paymentController = context.watch<PaymentController>();
 
     return AlertDialog(
-      title: const Text('Encaisser la commande'),
+      title: Text('Encaisser — ${widget.ticket.label}'),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (widget.ticket.isMultiOrder)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(
+                  '${widget.ticket.orders.length} commandes regroupées : '
+                  '${widget.ticket.orderNumbers.join(", ")}',
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ),
             DropdownButtonFormField<String>(
               initialValue: selectedMethod,
               decoration: const InputDecoration(labelText: 'Mode de paiement'),

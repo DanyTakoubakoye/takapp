@@ -13,10 +13,12 @@ class PaymentController extends ChangeNotifier {
 
   String? get errorMessage => _errorMessage;
 
-  Future<bool> registerPayment({
+  /// Encaisse une addition complète (une ou plusieurs commandes d'une même
+  /// table ou chambre) en un seul règlement.
+  Future<bool> registerTicketPayment({
     required String establishmentId,
-    required String orderId,
-    required String orderNumber,
+    required String ticketId,
+    required List<String> orderIds,
     required String receivedBy,
     required String receivedByName,
     required String method,
@@ -28,7 +30,7 @@ class PaymentController extends ChangeNotifier {
       return false;
     }
 
-    if (orderId.trim().isEmpty) {
+    if (orderIds.where((id) => id.trim().isNotEmpty).isEmpty) {
       _errorMessage = 'Commande introuvable.';
       notifyListeners();
       return false;
@@ -52,10 +54,10 @@ class PaymentController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _paymentService.registerPayment(
+      await _paymentService.registerTicketPayment(
         establishmentId: establishmentId,
-        orderId: orderId,
-        orderNumber: orderNumber,
+        ticketId: ticketId,
+        orderIds: orderIds,
         receivedBy: receivedBy,
         receivedByName: receivedByName,
         method: method,

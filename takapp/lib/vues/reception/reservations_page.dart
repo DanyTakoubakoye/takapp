@@ -28,7 +28,23 @@ class _ReservationsPageState extends State<ReservationsPage> {
 
   final DateFormat _df = DateFormat('dd/MM/yyyy');
 
+  // Créés une seule fois : recréés dans build(), ils relanceraient
+  // l'abonnement à chaque rebuild et remettraient l'écran en chargement.
+  late final Stream<List<RoomTypeModel>> _roomTypesStream;
+  late final Stream<List<ReservationModel>> _reservationsStream;
+
   String get establishmentId => widget.establishmentId.trim();
+
+  @override
+  void initState() {
+    super.initState();
+    _roomTypesStream = _typeService.streamRoomTypes(
+      establishmentId: establishmentId,
+    );
+    _reservationsStream = _service.streamReservations(
+      establishmentId: establishmentId,
+    );
+  }
 
   void _showMessage(String message) {
     if (!mounted) return;
@@ -65,6 +81,18 @@ class _ReservationsPageState extends State<ReservationsPage> {
       default:
         return Colors.blueGrey;
     }
+  }
+
+  Future<void> _openEditForm(ReservationModel resa) async {
+    await showDialog<void>(
+      context: context,
+      builder: (_) => _EditReservationDialog(
+        establishmentId: establishmentId,
+        service: _service,
+        reservation: resa,
+        onDone: _showMessage,
+      ),
+    );
   }
 
   Future<void> _openForm(List<RoomTypeModel> types) async {
@@ -285,7 +313,7 @@ class _ReservationsPageState extends State<ReservationsPage> {
     }
 
     return StreamBuilder<List<RoomTypeModel>>(
-      stream: _typeService.streamRoomTypes(establishmentId: establishmentId),
+      stream: _roomTypesStream,
       builder: (context, typesSnapshot) {
         final types = typesSnapshot.data ?? [];
 
@@ -297,9 +325,7 @@ class _ReservationsPageState extends State<ReservationsPage> {
             label: const Text('Nouvelle réservation'),
           ),
           body: StreamBuilder<List<ReservationModel>>(
-            stream: _service.streamReservations(
-              establishmentId: establishmentId,
-            ),
+            stream: _reservationsStream,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -386,9 +412,11 @@ class _ReservationsPageState extends State<ReservationsPage> {
           ),
           PopupMenuButton<String>(
             onSelected: (value) {
+              if (value == 'edit') _openEditForm(resa);
               if (value == 'cancel') _confirmCancel(resa);
             },
             itemBuilder: (_) => const [
+              PopupMenuItem(value: 'edit', child: Text('Modifier')),
               PopupMenuItem(value: 'cancel', child: Text('Annuler')),
             ],
           ),
@@ -397,10 +425,25 @@ class _ReservationsPageState extends State<ReservationsPage> {
     }
 
     if (resa.status == 'checked_in') {
-      return TextButton.icon(
-        onPressed: () => _doCheckOut(resa),
-        icon: const Icon(Icons.logout, size: 18),
-        label: const Text('Check-out'),
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextButton.icon(
+            onPressed: () => _doCheckOut(resa),
+            icon: const Icon(Icons.logout, size: 18),
+            label: const Text('Check-out'),
+          ),
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'edit') _openEditForm(resa);
+              if (value == 'bill') _proposeFacturation(resa);
+            },
+            itemBuilder: (_) => const [
+              PopupMenuItem(value: 'edit', child: Text('Modifier')),
+              PopupMenuItem(value: 'bill', child: Text('Facturer')),
+            ],
+          ),
+        ],
       );
     }
 
@@ -427,6 +470,298 @@ class _ReservationFormDialog extends StatefulWidget {
 
   @override
   State<_ReservationFormDialog> createState() => _ReservationFormDialogState();
+}
+
+class _EditReservationDialog extends StatefulWidget {
+  final String establishmentId;
+  final ReservationService service;
+  final ReservationModel reservation;
+  final void Function(String message) onDone;
+
+  const _EditReservationDialog({
+    required this.establishmentId,
+    required this.service,
+    required this.reservation,
+    required this.onDone,
+  });
+
+  @override
+  State<_EditReservationDialog> createState() => _EditReservationDialogState();
+}
+
+class _EditReservationDialogState extends State<_EditReservationDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final DateFormat _df = DateFormat('dd/MM/yyyy');
+
+  late final TextEditingController _nameController;
+  late final TextEditingController _phoneController;
+  late final TextEditingController _ifuController;
+  late final TextEditingController _priceController;
+  late final TextEditingController _noteController;
+  late final TextEditingController _checkInController;
+  late final TextEditingController _checkOutController;
+
+  DateTime? _checkIn;
+  DateTime? _checkOut;
+  bool _isSaving = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final r = widget.reservation;
+    _nameController = TextEditingController(text: r.clientName);
+    _phoneController = TextEditingController(text: r.clientPhone);
+    _ifuController = TextEditingController(text: r.clientIfu);
+    _priceController = TextEditingController(
+      text: r.pricePerNight.toStringAsFixed(0),
+    );
+    _noteController = TextEditingController(text: r.note);
+    _checkIn = r.checkInDate;
+    _checkOut = r.checkOutDate;
+    _checkInController = TextEditingController(
+      text: r.checkInDate != null ? _df.format(r.checkInDate!) : '',
+    );
+    _checkOutController = TextEditingController(
+      text: r.checkOutDate != null ? _df.format(r.checkOutDate!) : '',
+    );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    _ifuController.dispose();
+    _priceController.dispose();
+    _noteController.dispose();
+    _checkInController.dispose();
+    _checkOutController.dispose();
+    super.dispose();
+  }
+
+  int get _nights {
+    if (_checkIn == null || _checkOut == null) return 0;
+    return _checkOut!.difference(_checkIn!).inDays;
+  }
+
+  DateTime? _parseDate(String text) {
+    if (text.length != 10) return null;
+    try {
+      final d = _df.parseStrict(text);
+      return DateTime(d.year, d.month, d.day);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Widget _buildDateField({
+    required TextEditingController controller,
+    required String label,
+    required ValueChanged<DateTime?> onParsed,
+  }) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: TextInputType.number,
+      inputFormatters: [_DateSlashFormatter()],
+      maxLength: 10,
+      decoration: InputDecoration(
+        labelText: label,
+        hintText: 'jj/mm/aaaa',
+        counterText: '',
+      ),
+      validator: (v) {
+        final text = (v ?? '').trim();
+        if (text.isEmpty) return 'Obligatoire';
+        return _parseDate(text) == null ? 'Date invalide' : null;
+      },
+      onChanged: (value) => onParsed(_parseDate(value.trim())),
+    );
+  }
+
+  Future<void> _pickDates() async {
+    final now = DateTime.now();
+    final picked = await showDateRangePicker(
+      context: context,
+      firstDate: DateTime(now.year - 1, now.month, now.day),
+      lastDate: DateTime(now.year + 2),
+      initialDateRange: (_checkIn != null && _checkOut != null)
+          ? DateTimeRange(start: _checkIn!, end: _checkOut!)
+          : null,
+      initialEntryMode: DatePickerEntryMode.calendarOnly,
+    );
+
+    if (picked != null) {
+      setState(() {
+        _checkIn = DateTime(
+          picked.start.year,
+          picked.start.month,
+          picked.start.day,
+        );
+        _checkOut = DateTime(picked.end.year, picked.end.month, picked.end.day);
+        _checkInController.text = _df.format(_checkIn!);
+        _checkOutController.text = _df.format(_checkOut!);
+      });
+    }
+  }
+
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
+    if (_checkIn == null || _checkOut == null) {
+      widget.onDone('Choisissez les dates du séjour.');
+      return;
+    }
+    if (!_checkOut!.isAfter(_checkIn!)) {
+      widget.onDone('La date de départ doit être après l\'arrivée.');
+      return;
+    }
+
+    setState(() => _isSaving = true);
+
+    final price =
+        double.tryParse(_priceController.text.trim()) ??
+        widget.reservation.pricePerNight;
+
+    try {
+      await widget.service.updateReservation(
+        establishmentId: widget.establishmentId,
+        reservationId: widget.reservation.id,
+        clientName: _nameController.text.trim(),
+        clientPhone: _phoneController.text.trim(),
+        clientIfu: _ifuController.text.trim(),
+        checkIn: _checkIn!,
+        checkOut: _checkOut!,
+        pricePerNight: price,
+        note: _noteController.text.trim(),
+      );
+      if (!mounted) return;
+      Navigator.of(context).pop();
+      widget.onDone('Réservation modifiée.');
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isSaving = false);
+      widget.onDone('Erreur : $e');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final price =
+        double.tryParse(_priceController.text.trim()) ??
+        widget.reservation.pricePerNight;
+    final total = _nights > 0 ? price * _nights : 0;
+
+    return AlertDialog(
+      title: const Text('Modifier la réservation'),
+      content: SizedBox(
+        width: 460,
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  '${widget.reservation.roomTypeName}'
+                  '${widget.reservation.assignedRoomNumber.isNotEmpty ? ' · Ch. ${widget.reservation.assignedRoomNumber}' : ''}',
+                  style: const TextStyle(color: Colors.black54),
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(labelText: 'Nom du client'),
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Obligatoire' : null,
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(
+                    labelText: 'Téléphone (optionnel)',
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _ifuController,
+                  decoration: const InputDecoration(
+                    labelText: 'IFU (optionnel, pour la facture)',
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _buildDateField(
+                        controller: _checkInController,
+                        label: 'Arrivée',
+                        onParsed: (d) => setState(() => _checkIn = d),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _buildDateField(
+                        controller: _checkOutController,
+                        label: 'Départ',
+                        onParsed: (d) => setState(() => _checkOut = d),
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Choisir au calendrier',
+                      onPressed: _pickDates,
+                      icon: const Icon(Icons.date_range),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                TextFormField(
+                  controller: _priceController,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(labelText: 'Prix / nuit'),
+                  onChanged: (_) => setState(() {}),
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _noteController,
+                  decoration: const InputDecoration(
+                    labelText: 'Note (optionnel)',
+                  ),
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 12),
+                if (_nights > 0)
+                  Text(
+                    'Total : ${total.toStringAsFixed(0)} FCFA '
+                    '($_nights nuit(s))',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
+          child: const Text('Annuler'),
+        ),
+        ElevatedButton.icon(
+          onPressed: _isSaving ? null : _save,
+          icon: _isSaving
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.save),
+          label: Text(_isSaving ? 'Enregistrement...' : 'Enregistrer'),
+        ),
+      ],
+    );
+  }
 }
 
 class _ReservationFormDialogState extends State<_ReservationFormDialog> {
@@ -1024,6 +1359,18 @@ class _ClientPickerSheetState extends State<_ClientPickerSheet> {
 
   String _query = '';
 
+  // Créé une seule fois : chaque frappe dans la recherche déclenche un
+  // setState, et un stream recréé remettrait la liste en chargement.
+  late final Stream<List<ClientModel>> _clientsStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _clientsStream = widget.service.streamClients(
+      establishmentId: widget.establishmentId,
+    );
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -1086,9 +1433,7 @@ class _ClientPickerSheetState extends State<_ClientPickerSheet> {
             ),
             Expanded(
               child: StreamBuilder<List<ClientModel>>(
-                stream: widget.service.streamClients(
-                  establishmentId: widget.establishmentId,
-                ),
+                stream: _clientsStream,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());

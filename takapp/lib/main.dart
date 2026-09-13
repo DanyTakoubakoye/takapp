@@ -37,6 +37,9 @@ import 'package:takapp/vues/commun/home_router.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'package:takapp/core/l10n/locale_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
+
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -56,10 +59,14 @@ Future<void> main() async {
   final authController = AuthController(authService);
   await authController.initialize();
 
+  final localeController = LocaleController();
+  await localeController.load();
+
   runApp(
     MyApp(
       authController: authController,
       notificationService: notificationService,
+      localeController: localeController,
     ),
   );
 }
@@ -67,11 +74,13 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   final AuthController authController;
   final NotificationService notificationService;
+  final LocaleController localeController;
 
   const MyApp({
     super.key,
     required this.authController,
     required this.notificationService,
+    required this.localeController,
   });
 
   @override
@@ -79,6 +88,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthController>.value(value: authController),
+        ChangeNotifierProvider<LocaleController>.value(value: localeController),
 
         Provider<NotificationService>.value(value: notificationService),
         Provider<OrderService>(create: (_) => OrderService()),
@@ -150,19 +160,24 @@ class MyApp extends StatelessWidget {
               previous ?? OwnerDashboardController(service),
         ),
       ],
-      child: MaterialApp(
-        navigatorKey: appNavigatorKey,
-        debugShowCheckedModeBanner: false,
-        title: 'TAKHOTEL',
-        theme: AppTheme.lightTheme,
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [Locale('fr', 'FR')],
-        locale: const Locale('fr', 'FR'),
-        home: const HomeRouter(),
+      child: Consumer<LocaleController>(
+        builder: (context, localeController, _) {
+          return MaterialApp(
+            navigatorKey: appNavigatorKey,
+            debugShowCheckedModeBanner: false,
+            title: 'TAKHOTEL',
+            theme: AppTheme.lightTheme,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: LocaleController.supportedLocales,
+            locale: localeController.locale,
+            home: const HomeRouter(),
+          );
+        },
       ),
     );
   }

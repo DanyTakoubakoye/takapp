@@ -10,18 +10,21 @@ import 'package:takapp/controllers/payment_controller.dart';
 import 'package:takapp/core/constants/app_payment_methods.dart';
 import 'package:takapp/modeles/emcf_invoice_item_model.dart';
 import 'package:takapp/modeles/emcf_invoice_request_model.dart';
-import 'package:takapp/modeles/order_model.dart';
+import 'package:takapp/modeles/order_ticket_model.dart';
 import 'package:takapp/services/pdf_service.dart';
 import 'package:takapp/services/printer_service.dart';
 
 class DetailConsommationPage extends StatefulWidget {
   final String establishmentId;
-  final OrderModel order;
+
+  /// Addition à facturer : une seule commande (facture historique) ou toutes
+  /// les commandes non encaissées d'une même table / chambre.
+  final OrderTicket ticket;
 
   const DetailConsommationPage({
     super.key,
     required this.establishmentId,
-    required this.order,
+    required this.ticket,
   });
 
   @override
@@ -47,14 +50,31 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
 
   bool get _isSmall => MediaQuery.of(context).size.width < 800;
 
+  // Stream et future créés une seule fois : build() dépend de MediaQuery et de
+  // plusieurs setState, les recréer remettrait Stream/FutureBuilder en attente
+  // et détruirait les champs client (le clavier se refermait aussitôt).
+  late final Stream<DocumentSnapshot<Map<String, dynamic>>> _orderStream;
+  late final Future<List<Map<String, dynamic>>> _itemsFuture;
+
   String get establishmentId => widget.establishmentId.trim();
 
-  DocumentReference<Map<String, dynamic>> get _orderRef {
+  OrderTicket get _ticket => widget.ticket;
+
+  CollectionReference<Map<String, dynamic>> get _ordersRef {
     return _firestore
         .collection('establishments')
         .doc(establishmentId)
-        .collection('orders')
-        .doc(widget.order.id);
+        .collection('orders');
+  }
+
+  /// Commande principale de l'addition : elle porte les informations client et
+  /// la certification de la facture.
+  DocumentReference<Map<String, dynamic>> get _primaryOrderRef {
+    return _ordersRef.doc(_ticket.primaryOrder.id);
+  }
+
+  List<DocumentReference<Map<String, dynamic>>> get _orderRefs {
+    return _ticket.orderIds.map(_ordersRef.doc).toList();
   }
 
   String _formatDate(DateTime? date) {
@@ -80,28 +100,18 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
     });
   }
 
-  String _clientLabel(OrderModel order) {
-    switch (order.clientType) {
-      case 'restaurant':
-        return 'Table ${order.tableNumber ?? "-"}';
-
-      case 'hotel':
-        return 'Chambre ${order.roomNumber ?? "-"}';
-
-      case 'bar':
-        return 'Client Bar';
-
-      default:
-        return order.clientType;
-    }
-  }
-
+  /// Articles de toutes les commandes de l'addition, dans l'ordre où elles ont
+  /// été lancées.
   Future<List<Map<String, dynamic>>> _loadItems({
     bool includeCancelled = true,
   }) async {
-    final snapshot = await _orderRef.collection('items').get();
+    final snapshots = await Future.wait(
+      _orderRefs.map((ref) => ref.collection('items').get()),
+    );
 
-    return snapshot.docs
+    final docs = snapshots.expand((snapshot) => snapshot.docs).toList();
+
+    return docs
         .map((doc) {
           final data = doc.data();
 
@@ -156,29 +166,39 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
         .toList();
   }
 
-  Future<Map<String, dynamic>?> _getOrderDoc() async {
-    final doc = await _orderRef.get();
-
-    return doc.data();
-  }
-
   Future<void> _saveClientInfo() async {
-    await _orderRef.update({
-      'invoiceClientName': clientNameController.text.trim(),
-      'invoiceClientAddress': clientAddressController.text.trim(),
-      'invoiceClientIfu': clientIfuController.text.trim(),
-      'establishmentId': establishmentId,
-    });
+    final batch = _firestore.batch();
+
+    for (final ref in _orderRefs) {
+      batch.update(ref, {
+        'invoiceClientName': clientNameController.text.trim(),
+        'invoiceClientAddress': clientAddressController.text.trim(),
+        'invoiceClientIfu': clientIfuController.text.trim(),
+        'establishmentId': establishmentId,
+      });
+    }
+
+    await batch.commit();
   }
 
   Future<bool> _ensurePaymentRegistered() async {
-    final orderDoc = await _getOrderDoc();
+    final orderDocs = await Future.wait(_orderRefs.map((ref) => ref.get()));
 
-    final paymentStatus = orderDoc?['paymentStatus']?.toString() ?? '';
+    // Encaissement de l'addition : on ne règle que les commandes qui ne le sont
+    // pas déjà, pour ne jamais compter un montant deux fois en caisse.
+    final unpaidDocs = orderDocs.where((doc) {
+      return (doc.data()?['paymentStatus']?.toString() ?? '') != 'paid';
+    }).toList();
 
-    if (paymentStatus == 'paid') {
+    if (unpaidDocs.isEmpty) {
       return true;
     }
+
+    final unpaidOrderIds = unpaidDocs.map((doc) => doc.id).toSet();
+
+    final unpaidTotal = _ticket.orders
+        .where((order) => unpaidOrderIds.contains(order.id))
+        .fold<double>(0, (running, order) => running + order.total);
 
     if (!mounted) return false;
 
@@ -198,14 +218,14 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
       return false;
     }
 
-    final success = await paymentController.registerPayment(
+    final success = await paymentController.registerTicketPayment(
       establishmentId: establishmentId,
-      orderId: widget.order.id,
-      orderNumber: widget.order.orderNumber,
+      ticketId: _ticket.ticketId,
+      orderIds: unpaidOrderIds.toList(),
       receivedBy: user.uid,
       receivedByName: user.name,
       method: selectedPaymentMethod,
-      amount: widget.order.total,
+      amount: unpaidTotal,
     );
 
     if (!mounted) return false;
@@ -247,11 +267,11 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
         sellerAddress: _sellerAddress,
         logo: _sellerLogo,
         clientName: clientNameController.text.trim().isEmpty
-            ? _clientLabel(widget.order)
+            ? _ticket.label
             : clientNameController.text.trim(),
-        reference: widget.order.roomNumber ?? widget.order.tableNumber ?? '-',
+        reference: _ticket.reference,
         lines: items,
-        total: widget.order.total,
+        total: _ticket.total,
       );
       await printer.printPdf(Uint8List.fromList(bytes));
 
@@ -322,7 +342,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
       payment: [
         {
           'name': mapPaymentMethod(selectedPaymentMethod),
-          'amount': widget.order.total.round(),
+          'amount': _ticket.total.round(),
         },
       ],
     );
@@ -382,7 +402,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
 
       await fiscalController.fiscalizeInvoice(
         establishmentId: establishmentId,
-        invoiceId: widget.order.id,
+        invoiceId: _ticket.primaryOrder.id,
         request: request,
         persistToInvoice: false,
       );
@@ -391,16 +411,25 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
 
       if (fiscalController.confirmResult != null &&
           !fiscalController.confirmResult!.hasError) {
-        await _orderRef.update({
-          'establishmentId': establishmentId,
-          'isFiscalized': true,
-          'fiscalStatus': 'success',
-          'fiscalMecefCode': fiscalController.confirmResult!.codeMECeFDGI,
-          'fiscalQrCode': fiscalController.confirmResult!.qrCode,
-          'fiscalNim': fiscalController.confirmResult!.nim,
-          'fiscalCounter': fiscalController.confirmResult!.counters,
-          'fiscalMachineDateTime': fiscalController.confirmResult!.dateTime,
-        });
+        // La certification porte sur l'addition entière : on l'inscrit sur
+        // chacune de ses commandes.
+        final batch = _firestore.batch();
+
+        for (final ref in _orderRefs) {
+          batch.update(ref, {
+            'establishmentId': establishmentId,
+            'isFiscalized': true,
+            'fiscalStatus': 'success',
+            'fiscalTicketId': _ticket.ticketId,
+            'fiscalMecefCode': fiscalController.confirmResult!.codeMECeFDGI,
+            'fiscalQrCode': fiscalController.confirmResult!.qrCode,
+            'fiscalNim': fiscalController.confirmResult!.nim,
+            'fiscalCounter': fiscalController.confirmResult!.counters,
+            'fiscalMachineDateTime': fiscalController.confirmResult!.dateTime,
+          });
+        }
+
+        await batch.commit();
 
         if (!mounted) return;
 
@@ -469,12 +498,12 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
         sellerAddress: _sellerAddress,
         logo: _sellerLogo,
         clientName: clientNameController.text.trim().isEmpty
-            ? _clientLabel(widget.order)
+            ? _ticket.label
             : clientNameController.text.trim(),
         clientIfu: clientIfuController.text.trim(),
-        reference: widget.order.roomNumber ?? widget.order.tableNumber ?? '-',
+        reference: _ticket.reference,
         lines: items,
-        total: widget.order.total,
+        total: _ticket.total,
         paymentMethodLabel:
             AppPaymentMethods.labels[selectedPaymentMethod] ??
             selectedPaymentMethod,
@@ -552,6 +581,8 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
   @override
   void initState() {
     super.initState();
+    _orderStream = _primaryOrderRef.snapshots();
+    _itemsFuture = _loadItems();
     _loadSellerInfo();
   }
 
@@ -574,7 +605,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Détails de la Consommation')),
       body: StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
-        stream: _orderRef.snapshots(),
+        stream: _orderStream,
         builder: (context, orderSnapshot) {
           final orderDoc = orderSnapshot.data?.data();
 
@@ -583,7 +614,7 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
               (orderDoc?['fiscalStatus']?.toString() == 'success');
 
           return FutureBuilder<List<Map<String, dynamic>>>(
-            future: _loadItems(),
+            future: _itemsFuture,
             builder: (context, itemSnapshot) {
               if (itemSnapshot.connectionState == ConnectionState.waiting ||
                   orderSnapshot.connectionState == ConnectionState.waiting) {
@@ -635,23 +666,19 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               _sectionTitle('Informations générales'),
+                              _infoRow('Client', _ticket.label, bold: true),
                               _infoRow(
-                                'Commande',
-                                widget.order.orderNumber,
-                                bold: true,
+                                _ticket.isMultiOrder ? 'Commandes' : 'Commande',
+                                _ticket.orderNumbers.join('\n'),
                               ),
-                              _infoRow(
-                                'Date',
-                                _formatDate(widget.order.createdAt),
-                              ),
-                              _infoRow('Client', _clientLabel(widget.order)),
+                              _infoRow('Date', _formatDate(_ticket.openedAt)),
                               _infoRow(
                                 'Type',
-                                widget.order.clientType.toUpperCase(),
+                                _ticket.primaryOrder.clientType.toUpperCase(),
                               ),
                               _infoRow(
                                 'Montant',
-                                '${widget.order.total.toStringAsFixed(0)} FCFA',
+                                '${_ticket.total.toStringAsFixed(0)} FCFA',
                                 bold: true,
                               ),
                             ],

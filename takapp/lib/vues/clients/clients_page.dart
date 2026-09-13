@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/core/errors/error_localizer.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/client_model.dart';
 import 'package:takapp/services/client_service.dart';
 import 'package:takapp/vues/clients/client_history_page.dart';
@@ -130,9 +132,12 @@ class _ClientsPageState extends State<ClientsPage> {
         establishmentId: establishmentId,
         clientId: client.id,
       );
-      _showMessage('Client désactivé.');
+      if (!mounted) return;
+      _showMessage(AppLocalizations.of(context).clientDisabled);
     } catch (e) {
-      _showMessage('Erreur : $e');
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context);
+      _showMessage(l10n.errorPrefixed(localizedError(l10n, e)));
     }
   }
 
@@ -425,11 +430,17 @@ class _ClientFormDialogState extends State<_ClientFormDialog> {
       );
 
       if (!mounted) return;
+
+      // l10n capturé AVANT le pop : après démontage, le context n'est
+      // plus exploitable pour lire les localisations.
+      final l10n = AppLocalizations.of(context);
+
       Navigator.of(context).pop();
-      widget.onDone('Client ajouté.');
+      widget.onDone(l10n.clientAdded);
     } catch (e) {
       if (!mounted) return;
-      widget.onDone('Erreur : $e');
+      final l10n = AppLocalizations.of(context);
+      widget.onDone(l10n.errorPrefixed(localizedError(l10n, e)));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }

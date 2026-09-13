@@ -195,7 +195,6 @@ class ReservationService {
 
     await batch.commit();
   }
-
   /// =========================
   /// CHECK-OUT
   /// =========================
@@ -310,6 +309,45 @@ class ReservationService {
 
     return list;
   }
+
+  Future<void> updateReservation({
+    String? establishmentId,
+    required String reservationId,
+    required String clientName,
+    required String clientPhone,
+    required String clientIfu,
+    required DateTime checkIn,
+    required DateTime checkOut,
+    required double pricePerNight,
+    required String note,
+  }) async {
+    final resolved = _resolveEstablishmentId(establishmentId);
+
+    final cleanName = clientName.trim();
+    if (cleanName.isEmpty) {
+      throw Exception('Nom du client obligatoire.');
+    }
+
+    final nights = checkOut.difference(checkIn).inDays;
+    if (nights <= 0) {
+      throw Exception('La date de départ doit être après l\'arrivée.');
+    }
+    final roomTotal = pricePerNight * nights;
+
+    await _col(establishmentId: resolved).doc(reservationId).update({
+      'clientName': cleanName,
+      'clientPhone': clientPhone.trim(),
+      'clientIfu': clientIfu.trim(),
+      'checkInDate': Timestamp.fromDate(checkIn),
+      'checkOutDate': Timestamp.fromDate(checkOut),
+      'pricePerNight': pricePerNight,
+      'numberOfNights': nights,
+      'roomTotal': roomTotal,
+      'note': note.trim(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
 
   /// =========================
   /// CREATE RESERVATION

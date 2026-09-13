@@ -4,6 +4,20 @@ import 'package:takapp/modeles/menu_item_model.dart';
 import 'package:takapp/modeles/order_model.dart';
 import 'package:takapp/services/store_stock_service.dart';
 
+/// Résultat du rattachement d'une commande à une addition.
+class _TicketResolution {
+  final String ticketId;
+
+  /// Commandes ouvertes de la même table / chambre créées avant l'introduction
+  /// des additions : elles doivent être rattachées au même ticket.
+  final List<String> orphanOrderIds;
+
+  const _TicketResolution({
+    required this.ticketId,
+    required this.orphanOrderIds,
+  });
+}
+
 class OrderService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final StoreStockService _storeStockService = StoreStockService();
@@ -22,6 +36,133 @@ class OrderService {
         .collection('establishments')
         .doc(establishmentId)
         .collection('menuItems');
+  }
+
+  /// =========================
+  /// ADDITIONS (TICKETS)
+  /// =========================
+
+  /// Référence de l'addition : la chambre pour l'hôtel, la table pour le
+  /// restaurant. Vide pour le bar : chaque commande y reste une facture à part.
+  String _ticketReference({
+    required String clientType,
+    String? tableNumber,
+    String? roomNumber,
+  }) {
+    final type = clientType.trim().toLowerCase();
+
+    if (type == 'hotel') return (roomNumber ?? '').trim();
+
+    if (type == 'restaurant') return (tableNumber ?? '').trim();
+
+    return '';
+  }
+
+  String _newTicketId({
+    required String clientType,
+    required String reference,
+    required String fallbackId,
+  }) {
+    final slug = reference.replaceAll(RegExp(r'[^A-Za-z0-9]'), '');
+
+    if (slug.isEmpty) return 'TCK-$fallbackId';
+
+    return 'TCK-${clientType.trim().toUpperCase()}-$slug-$fallbackId';
+  }
+
+  /// Détermine l'addition à laquelle rattacher une nouvelle commande.
+  ///
+  /// Si la table / la chambre a déjà une commande non encaissée, la nouvelle
+  /// commande rejoint la même addition. Sinon une nouvelle addition est ouverte.
+  ///
+  /// Requête sur un seul champ + filtrage côté client : aucun index composite
+  /// Firestore requis (convention du projet).
+  Future<_TicketResolution> _resolveTicket({
+    required String establishmentId,
+    required String clientType,
+    required String? tableNumber,
+    required String? roomNumber,
+    required String fallbackId,
+  }) async {
+    final type = clientType.trim().toLowerCase();
+
+    final reference = _ticketReference(
+      clientType: type,
+      tableNumber: tableNumber,
+      roomNumber: roomNumber,
+    );
+
+    if (reference.isEmpty) {
+      return _TicketResolution(
+        ticketId: _newTicketId(
+          clientType: type,
+          reference: reference,
+          fallbackId: fallbackId,
+        ),
+        orphanOrderIds: const [],
+      );
+    }
+
+    final snapshot = await _ordersRef(
+      establishmentId,
+    ).where('paymentStatus', isEqualTo: 'unpaid').get();
+
+    final openOrders =
+        snapshot.docs.where((doc) {
+          final data = doc.data();
+
+          if ((data['status'] ?? '').toString().toLowerCase() == 'cancelled') {
+            return false;
+          }
+
+          if ((data['clientType'] ?? '').toString().trim().toLowerCase() !=
+              type) {
+            return false;
+          }
+
+          return _ticketReference(
+                clientType: type,
+                tableNumber: data['tableNumber']?.toString(),
+                roomNumber: data['roomNumber']?.toString(),
+              ) ==
+              reference;
+        }).toList()..sort((a, b) {
+          final aDate = a.data()['createdAt'];
+          final bDate = b.data()['createdAt'];
+
+          final aMillis = aDate is Timestamp
+              ? aDate.millisecondsSinceEpoch
+              : 1 << 62;
+
+          final bMillis = bDate is Timestamp
+              ? bDate.millisecondsSinceEpoch
+              : 1 << 62;
+
+          return bMillis.compareTo(aMillis);
+        });
+
+    final existingTicketId = openOrders
+        .map((doc) => (doc.data()['ticketId'] ?? '').toString().trim())
+        .firstWhere((id) => id.isNotEmpty, orElse: () => '');
+
+    // Commandes ouvertes antérieures aux additions : on les rattache au ticket.
+    final orphanOrderIds = openOrders
+        .where(
+          (doc) => (doc.data()['ticketId'] ?? '').toString().trim().isEmpty,
+        )
+        .map((doc) => doc.id)
+        .toList();
+
+    return _TicketResolution(
+      ticketId: existingTicketId.isNotEmpty
+          ? existingTicketId
+          : _newTicketId(
+              clientType: type,
+              reference: reference,
+              fallbackId: fallbackId,
+            ),
+      orphanOrderIds: orphanOrderIds,
+    );
   }
 
   Future<void> createOrder({
@@ -45,6 +186,15 @@ class OrderService {
         'CMD-${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}-${now.millisecondsSinceEpoch}';
 
     final docRef = _ordersRef(establishmentId).doc();
+
+    final ticket = await _resolveTicket(
+      establishmentId: establishmentId,
+      clientType: clientType,
+      tableNumber: tableNumber,
+      roomNumber: roomNumber,
+      fallbackId: docRef.id,
+    );
+
     final batch = _firestore.batch();
 
     bool isForKitchen = false;
@@ -121,6 +271,7 @@ class OrderService {
     batch.set(docRef, {
       'establishmentId': establishmentId,
       'orderNumber': orderNumber,
+      'ticketId': ticket.ticketId,
       'clientType': clientType,
       'tableNumber': tableNumber,
       'roomNumber': roomNumber,
@@ -150,6 +301,12 @@ class OrderService {
         itemRef,
         item.copyWith(establishmentId: establishmentId).toMap(),
       );
+    }
+
+    for (final orphanOrderId in ticket.orphanOrderIds) {
+      batch.update(_ordersRef(establishmentId).doc(orphanOrderId), {
+        'ticketId': ticket.ticketId,
+      });
     }
 
     await batch.commit();

@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'package:takapp/core/errors/app_error.dart';
+
 import '../modeles/client_model.dart';
 
 class ClientService {
@@ -20,7 +22,7 @@ class ClientService {
     final resolved = (id ?? establishmentId ?? '').trim();
 
     if (resolved.isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
 
     return resolved;
@@ -165,13 +167,13 @@ class ClientService {
     final cleanName = name.trim();
 
     if (cleanName.isEmpty) {
-      throw Exception('Nom du client obligatoire.');
+      throw const AppError(AppErrorCode.clientNameRequired);
     }
 
     final cleanClientType = clientType.trim();
 
     if (!clientTypes.contains(cleanClientType)) {
-      throw Exception('Type de client invalide.');
+      throw const AppError(AppErrorCode.clientTypeInvalid);
     }
 
     /// =========================

@@ -1,0 +1,119 @@
+{
+  "@@locale": "fr",
+
+  "languageLabel": "Langue",
+  "@languageLabel": {
+    "description": "Libellé du sélecteur de langue"
+  },
+  "languageFrench": "Français",
+  "languageEnglish": "English",
+
+  "commonDelete": "Supprimer",
+  "commonLogout": "Déconnexion",
+  "commonError": "Erreur : {error}",
+  "@commonError": {
+    "description": "Message d'erreur générique",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errorPrefixed": "Erreur : {message}",
+  "@errorPrefixed": {
+    "description": "Encadre un message d'erreur déjà traduit",
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errUnknown": "Erreur inconnue.",
+  "errEstablishmentNotFound": "Établissement introuvable.",
+  "errEstablishmentNotFoundReconnect": "Établissement introuvable. Reconnectez-vous.",
+  "errAccountWithoutEstablishment": "Votre compte n’est rattaché à aucun établissement.",
+
+  "errInvalidCredential": "Email ou mot de passe incorrect.",
+  "errUserNotFound": "Utilisateur introuvable.",
+  "errWrongPassword": "Mot de passe incorrect.",
+  "errNetworkRequestFailed": "Problème réseau. Vérifiez votre connexion.",
+  "errPermissionDenied": "Accès refusé par les règles Firestore.",
+  "errResetEmailFailed": "Impossible d’envoyer le mail de réinitialisation.",
+
+  "errOrderNotFound": "Commande introuvable.",
+  "errInvoiceNotFound": "Facture introuvable.",
+  "errReservationNotFound": "Réservation introuvable.",
+  "errRoomNotFound": "Chambre introuvable.",
+  "errClientNotFound": "Client introuvable.",
+  "errStockNotFound": "Stock introuvable.",
+  "errStockDocumentNotFound": "Document de stock introuvable.",
+  "errHandoverNotFound": "Versement introuvable.",
+  "errRequestNotFound": "Demande introuvable.",
+
+  "errClientNameRequired": "Nom du client obligatoire.",
+  "errClientTypeInvalid": "Type de client invalide.",
+  "errAmountMustBePositive": "Le montant doit être supérieur à 0.",
+  "errQuantityMustBePositive": "La quantité doit être supérieure à 0.",
+  "errAddAtLeastOneItem": "Veuillez ajouter au moins un article.",
+  "errSelectAtLeastOneItem": "Veuillez sélectionner au moins un article.",
+  "errSelectPaymentMethod": "Veuillez choisir un mode de paiement.",
+  "errRoomNumberRequired": "Veuillez préciser le numéro de chambre.",
+  "errTableNumberRequired": "Veuillez préciser le numéro de table.",
+
+  "errStockInsufficient": "Stock insuffisant pour {name}.",
+  "@errStockInsufficient": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "clientDisabled": "Client désactivé.",
+  "clientAdded": "Client ajouté.",
+
+  "loginSubtitle": "Connectez-vous à votre espace de travail",
+  "loginEmailLabel": "Email",
+  "loginEmailHint": "exemple@domaine.com",
+  "loginEmailRequired": "Veuillez saisir votre email",
+  "loginEmailInvalid": "Email invalide",
+  "loginPasswordLabel": "Mot de passe",
+  "loginPasswordEmailFirst": "Veuillez saisir un email complet d’abord",
+  "loginPasswordRequired": "Veuillez saisir votre mot de passe",
+  "loginPasswordTooShort": "Minimum 6 caractères",
+  "loginForgotPassword": "Mot de passe oublié ?",
+  "loginSubmit": "Se connecter",
+  "loginResetNeedsEmail": "Veuillez d’abord saisir votre adresse email pour recevoir le lien de réinitialisation.",
+  "loginResetInvalidEmail": "Veuillez saisir un email valide.",
+  "loginResetSent": "Un lien de réinitialisation a été envoyé à {email}. Vérifiez aussi vos spams/indésirables.",
+  "@loginResetSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "loginResetFailed": "Impossible d’envoyer le mail de réinitialisation.",
+  "loginResetError": "Erreur lors de l’envoi du mail : {error}",
+  "@loginResetError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+
+  "roleGlobalAdmin": "Administrateur global",
+  "roleSuperAdmin": "Super Administrateur",
+  "roleOwner": "Propriétaire",
+  "roleManager": "Gérante",
+  "roleAccountant": "Comptable",
+  "roleHeadChef": "Chef Cuisine",
+  "roleWaiter": "Serveur",
+  "roleHousekeeping": "Service Hygiène",
+  "roleBartender": "Barman",
+  "roleButler": "Majordhomme",
+  "roleReceptionist": "Réceptionniste"
+}

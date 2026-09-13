@@ -83,6 +83,10 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # Génère AppLocalizations à partir des fichiers .arb de lib/l10n
+  generate: true
+
   assets:
     - assets/images/logo.png
     - web/sounds/

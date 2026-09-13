@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/core/l10n/language_selector.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -171,6 +173,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
     final email = _emailController.text.trim();
 
     // Sauvegarde dès que l'utilisateur soumet un email valide
@@ -194,11 +197,13 @@ class _LoginPageState extends State<LoginPage> {
     final messenger = ScaffoldMessenger.of(context);
     messenger.clearSnackBars();
 
-    if (!success && auth.errorMessage != null) {
+    final errorText = auth.errorText(l10n);
+
+    if (!success && errorText != null) {
       messenger.showSnackBar(
         SnackBar(
           behavior: SnackBarBehavior.floating,
-          content: Text(auth.errorMessage!),
+          content: Text(errorText),
         ),
       );
     }
@@ -207,6 +212,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _sendResetEmail() async {
     if (_isSendingReset) return;
 
+    final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthController>();
     final email = _emailController.text.trim();
 
@@ -218,8 +224,7 @@ class _LoginPageState extends State<LoginPage> {
     if (email.isEmpty) {
       setState(() {
         _resetSuccess = false;
-        _resetMessage =
-            'Veuillez d’abord saisir votre adresse email pour recevoir le lien de réinitialisation.';
+        _resetMessage = l10n.loginResetNeedsEmail;
       });
       return;
     }
@@ -227,7 +232,7 @@ class _LoginPageState extends State<LoginPage> {
     if (!_isValidEmail(email)) {
       setState(() {
         _resetSuccess = false;
-        _resetMessage = 'Veuillez saisir un email valide.';
+        _resetMessage = l10n.loginResetInvalidEmail;
       });
       return;
     }
@@ -245,16 +250,13 @@ class _LoginPageState extends State<LoginPage> {
       success = await auth.sendPasswordResetEmail(email);
 
       if (success) {
-        message =
-            'Un lien de réinitialisation a été envoyé à $email. Vérifiez aussi vos spams/indésirables.';
+        message = l10n.loginResetSent(email);
       } else {
-        message =
-            auth.errorMessage ??
-            'Impossible d’envoyer le mail de réinitialisation.';
+        message = auth.errorText(l10n) ?? l10n.loginResetFailed;
       }
     } catch (e) {
       success = false;
-      message = 'Erreur lors de l’envoi du mail : $e';
+      message = l10n.loginResetError('$e');
     }
 
     if (!mounted) return;
@@ -293,6 +295,8 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildEmailSuggestions() {
     if (_filteredEmails.isEmpty) return const SizedBox.shrink();
 
+    final l10n = AppLocalizations.of(context);
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(top: 6),
@@ -313,7 +317,7 @@ class _LoginPageState extends State<LoginPage> {
               leading: const Icon(Icons.history),
               title: Text(email),
               trailing: IconButton(
-                tooltip: 'Supprimer',
+                tooltip: l10n.commonDelete,
                 icon: const Icon(Icons.close, size: 18),
                 onPressed: () => _removeSavedEmail(email),
               ),
@@ -337,6 +341,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
     final size = MediaQuery.of(context).size;
 
@@ -353,6 +358,10 @@ class _LoginPageState extends State<LoginPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      const Align(
+                        alignment: Alignment.centerRight,
+                        child: LanguageSelector(),
+                      ),
                       Container(
                         height: size.width < 500 ? 72 : 84,
                         width: size.width < 500 ? 72 : 84,
@@ -373,7 +382,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Connectez-vous à votre espace de travail',
+                        l10n.loginSubtitle,
                         textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
@@ -387,17 +396,17 @@ class _LoginPageState extends State<LoginPage> {
                               focusNode: _emailFocusNode,
                               keyboardType: TextInputType.emailAddress,
                               textInputAction: TextInputAction.next,
-                              decoration: const InputDecoration(
-                                labelText: 'Email',
-                                hintText: 'exemple@domaine.com',
-                                prefixIcon: Icon(Icons.email_outlined),
+                              decoration: InputDecoration(
+                                labelText: l10n.loginEmailLabel,
+                                hintText: l10n.loginEmailHint,
+                                prefixIcon: const Icon(Icons.email_outlined),
                               ),
                               validator: (value) {
                                 if (value == null || value.trim().isEmpty) {
-                                  return 'Veuillez saisir votre email';
+                                  return l10n.loginEmailRequired;
                                 }
                                 if (!_isValidEmail(value)) {
-                                  return 'Email invalide';
+                                  return l10n.loginEmailInvalid;
                                 }
                                 return null;
                               },
@@ -417,7 +426,7 @@ class _LoginPageState extends State<LoginPage> {
                               obscureText: _obscurePassword,
                               textInputAction: TextInputAction.done,
                               decoration: InputDecoration(
-                                labelText: 'Mot de passe',
+                                labelText: l10n.loginPasswordLabel,
                                 prefixIcon: const Icon(Icons.lock_outline),
                                 suffixIcon: IconButton(
                                   onPressed: () {
@@ -434,13 +443,13 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               validator: (value) {
                                 if (!_passwordEnabled) {
-                                  return 'Veuillez saisir un email complet d’abord';
+                                  return l10n.loginPasswordEmailFirst;
                                 }
                                 if (value == null || value.trim().isEmpty) {
-                                  return 'Veuillez saisir votre mot de passe';
+                                  return l10n.loginPasswordRequired;
                                 }
                                 if (value.trim().length < 6) {
-                                  return 'Minimum 6 caractères';
+                                  return l10n.loginPasswordTooShort;
                                 }
                                 return null;
                               },
@@ -465,9 +474,9 @@ class _LoginPageState extends State<LoginPage> {
                                           strokeWidth: 2,
                                         ),
                                       )
-                                    : const Text(
-                                        'Mot de passe oublié ?',
-                                        style: TextStyle(
+                                    : Text(
+                                        l10n.loginForgotPassword,
+                                        style: const TextStyle(
                                           color: Colors.blue,
                                           fontWeight: FontWeight.w600,
                                         ),
@@ -489,7 +498,7 @@ class _LoginPageState extends State<LoginPage> {
                                           color: Colors.white,
                                         ),
                                       )
-                                    : const Text('Se connecter'),
+                                    : Text(l10n.loginSubmit),
                               ),
                             ),
                           ],

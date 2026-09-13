@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/modeles/order_model.dart';
+import 'package:takapp/modeles/order_ticket_model.dart';
 import 'package:takapp/services/payment_service.dart';
 import 'package:takapp/vues/serveur/detail_consommation_page.dart';
 
@@ -19,6 +20,32 @@ class MesFacturesServeurPage extends StatefulWidget {
 class _MesFacturesServeurPageState extends State<MesFacturesServeurPage> {
   final PaymentService _paymentService = PaymentService();
   DateTime _selectedDay = DateTime.now();
+
+  // Le stream dépend du jour sélectionné : on le mémorise et on ne le recrée
+  // que lorsque la clé change réellement. Sans ça, chaque rebuild relancerait
+  // l'abonnement et remettrait la liste en chargement.
+  String? _ordersStreamKey;
+  Stream<List<OrderModel>>? _ordersStream;
+
+  Stream<List<OrderModel>> _ordersStreamFor({
+    required String establishmentId,
+    required String serveurId,
+    required DateTime day,
+  }) {
+    final key =
+        '$establishmentId/$serveurId/${day.year}-${day.month}-${day.day}';
+
+    if (_ordersStreamKey != key || _ordersStream == null) {
+      _ordersStreamKey = key;
+      _ordersStream = _paymentService.streamOrdersForServerByDay(
+        establishmentId: establishmentId,
+        serveurId: serveurId,
+        day: day,
+      );
+    }
+
+    return _ordersStream!;
+  }
 
   String get establishmentId => widget.establishmentId.trim();
 
@@ -47,13 +74,14 @@ class _MesFacturesServeurPageState extends State<MesFacturesServeurPage> {
     }
   }
 
+  /// Historique : chaque commande de la journée est consultée individuellement.
   void _openDetail(OrderModel order) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => DetailConsommationPage(
           establishmentId: establishmentId,
-          order: order,
+          ticket: OrderTicket.single(order),
         ),
       ),
     );
@@ -136,7 +164,7 @@ class _MesFacturesServeurPageState extends State<MesFacturesServeurPage> {
           const Divider(height: 1),
           Expanded(
             child: StreamBuilder<List<OrderModel>>(
-              stream: _paymentService.streamOrdersForServerByDay(
+              stream: _ordersStreamFor(
                 establishmentId: establishmentId,
                 serveurId: user.uid,
                 day: _selectedDay,

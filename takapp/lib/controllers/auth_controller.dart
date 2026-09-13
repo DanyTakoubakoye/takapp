@@ -1,5 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:takapp/core/errors/app_error.dart';
+import 'package:takapp/core/errors/error_localizer.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/user_model.dart';
 import 'package:takapp/services/auth_service.dart';
 
@@ -11,15 +14,27 @@ class AuthController extends ChangeNotifier {
   UserModel? _currentUser;
   bool _isLoading = false;
   bool _isResetLoading = false;
-  String? _errorMessage;
   bool _isInitialized = false;
+
+  /// Erreur courante : un [AppError] traduisible, ou une exception brute
+  /// pas encore migrée. Jamais un texte destiné à l'affichage.
+  Object? _error;
 
   UserModel? get currentUser => _currentUser;
   bool get isLoading => _isLoading;
   bool get isResetLoading => _isResetLoading;
-  String? get errorMessage => _errorMessage;
   bool get isInitialized => _isInitialized;
   bool get isLoggedIn => _currentUser != null;
+
+  bool get hasError => _error != null;
+
+  /// Message d'erreur traduit dans la langue active, ou `null` s'il n'y a
+  /// pas d'erreur. C'est l'UI qui appelle cette méthode, car elle seule
+  /// dispose d'un `BuildContext`.
+  String? errorText(AppLocalizations l10n) {
+    if (_error == null) return null;
+    return localizedError(l10n, _error);
+  }
 
   String get establishmentId => _currentUser?.establishmentId ?? '';
   String get establishmentName => _currentUser?.establishmentName ?? '';
@@ -86,10 +101,10 @@ class AuthController extends ChangeNotifier {
       if (_currentUser != null && !isPlatformAdmin && !hasValidEstablishment) {
         await _authService.signOut();
         _currentUser = null;
-        _errorMessage = 'Votre compte n’est rattaché à aucun établissement.';
+        _error = const AppError(AppErrorCode.accountWithoutEstablishment);
       }
     } catch (e) {
-      _errorMessage = _cleanError(e);
+      _error = _mapError(e);
     } finally {
       _isInitialized = true;
       _setLoading(false);
@@ -109,7 +124,7 @@ class AuthController extends ChangeNotifier {
       if (_currentUser != null && !isPlatformAdmin && !hasValidEstablishment) {
         await _authService.signOut();
         _currentUser = null;
-        _errorMessage = 'Votre compte n’est rattaché à aucun établissement.';
+        _error = const AppError(AppErrorCode.accountWithoutEstablishment);
         notifyListeners();
         return false;
       }
@@ -117,7 +132,7 @@ class AuthController extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = _cleanError(e);
+      _error = _mapError(e);
       notifyListeners();
       return false;
     } finally {
@@ -127,18 +142,19 @@ class AuthController extends ChangeNotifier {
 
   Future<bool> sendPasswordResetEmail(String email) async {
     _isResetLoading = true;
-    _errorMessage = null;
+    _error = null;
     notifyListeners();
 
     try {
       await _authService.sendPasswordReset(email: email);
       return true;
     } on FirebaseAuthException catch (e) {
-      _errorMessage = e.message ?? 'Erreur lors de l’envoi du mail';
+      _error = _mapFirebaseAuthCode(e.code) ??
+          const AppError(AppErrorCode.resetEmailFailed);
       return false;
     } catch (e) {
       debugPrint('Erreur générale reset password: $e');
-      _errorMessage = 'Une erreur est survenue';
+      _error = const AppError(AppErrorCode.unknown);
       return false;
     } finally {
       _isResetLoading = false;
@@ -154,7 +170,7 @@ class AuthController extends ChangeNotifier {
       await _authService.signOut();
       _currentUser = null;
     } catch (e) {
-      _errorMessage = _cleanError(e);
+      _error = _mapError(e);
     } finally {
       _setLoading(false);
     }
@@ -166,28 +182,61 @@ class AuthController extends ChangeNotifier {
   }
 
   void _clearError() {
-    _errorMessage = null;
+    _error = null;
   }
 
-  String _cleanError(Object error) {
+  /// =========================
+  /// MAPPING DES ERREURS
+  /// =========================
+  ///
+  /// Traduit les codes Firebase en [AppError]. Une erreur non reconnue est
+  /// renvoyée telle quelle : `localizedError()` affichera son texte brut
+  /// plutôt que de masquer l'information.
+  static AppError? _mapFirebaseAuthCode(String code) {
+    switch (code) {
+      case 'invalid-credential':
+        return const AppError(AppErrorCode.invalidCredential);
+      case 'user-not-found':
+        return const AppError(AppErrorCode.userNotFound);
+      case 'wrong-password':
+        return const AppError(AppErrorCode.wrongPassword);
+      case 'network-request-failed':
+        return const AppError(AppErrorCode.networkRequestFailed);
+      case 'permission-denied':
+        return const AppError(AppErrorCode.permissionDenied);
+      default:
+        return null;
+    }
+  }
+
+  static Object _mapError(Object error) {
+    if (error is AppError) return error;
+
+    if (error is FirebaseAuthException) {
+      final mapped = _mapFirebaseAuthCode(error.code);
+      if (mapped != null) return mapped;
+    }
+
+    /// Repli : certaines erreurs n'exposent pas de code exploitable et
+    /// n'arrivent ici que sous forme de texte.
     final text = error.toString();
 
     if (text.contains('invalid-credential')) {
-      return 'Email ou mot de passe incorrect.';
+      return const AppError(AppErrorCode.invalidCredential);
     }
     if (text.contains('user-not-found')) {
-      return 'Utilisateur introuvable.';
+      return const AppError(AppErrorCode.userNotFound);
     }
     if (text.contains('wrong-password')) {
-      return 'Mot de passe incorrect.';
+      return const AppError(AppErrorCode.wrongPassword);
     }
     if (text.contains('network-request-failed')) {
-      return 'Problème réseau. Vérifiez votre connexion.';
+      return const AppError(AppErrorCode.networkRequestFailed);
     }
     if (text.contains('permission-denied')) {
-      return 'Accès refusé par les règles Firestore.';
+      return const AppError(AppErrorCode.permissionDenied);
     }
 
-    return text.replaceFirst('Exception: ', '');
+    return error;
   }
 }

@@ -8,6 +8,10 @@ class OrderModel {
 
   final String orderNumber;
 
+  /// Addition (ticket) regroupant toutes les commandes successives d'une même
+  /// table ou d'une même chambre tant qu'elles ne sont pas encaissées.
+  final String ticketId;
+
   /// restaurant | hotel | bar
   final String clientType;
 
@@ -52,6 +56,7 @@ class OrderModel {
 
   /// Annulations
   final bool hasCancelledItems;
+
   /// Fiscalisation (écrits sur la commande lors de la certification)
   final bool isFiscalized;
   final String fiscalStatus;
@@ -60,6 +65,7 @@ class OrderModel {
     required this.id,
     required this.establishmentId,
     required this.orderNumber,
+    this.ticketId = '',
     required this.clientType,
     required this.tableNumber,
     required this.roomNumber,
@@ -110,6 +116,8 @@ class OrderModel {
       establishmentId: (map['establishmentId'] ?? '').toString(),
 
       orderNumber: (map['orderNumber'] ?? '').toString(),
+
+      ticketId: (map['ticketId'] ?? '').toString(),
 
       clientType: (map['clientType'] ?? '').toString(),
 
@@ -164,6 +172,8 @@ class OrderModel {
 
       'orderNumber': orderNumber,
 
+      'ticketId': ticketId,
+
       'clientType': clientType,
 
       'tableNumber': tableNumber,
@@ -208,6 +218,7 @@ class OrderModel {
     String? id,
     String? establishmentId,
     String? orderNumber,
+    String? ticketId,
     String? clientType,
     String? tableNumber,
     String? roomNumber,
@@ -238,6 +249,8 @@ class OrderModel {
       establishmentId: establishmentId ?? this.establishmentId,
 
       orderNumber: orderNumber ?? this.orderNumber,
+
+      ticketId: ticketId ?? this.ticketId,
 
       clientType: clientType ?? this.clientType,
 
