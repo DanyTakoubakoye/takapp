@@ -308,11 +308,89 @@ abstract class AppLocalizations {
   /// **'Veuillez préciser le numéro de table.'**
   String get errTableNumberRequired;
 
+  /// No description provided for @errAddAtLeastOneUsedItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez ajouter au moins un article utilisé.'**
+  String get errAddAtLeastOneUsedItem;
+
+  /// No description provided for @errSelectAtLeastOnePayment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez sélectionner au moins un paiement.'**
+  String get errSelectAtLeastOnePayment;
+
+  /// No description provided for @errSelectAtLeastOneOrderOrPayment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez sélectionner au moins une commande/paiement.'**
+  String get errSelectAtLeastOneOrderOrPayment;
+
+  /// No description provided for @errLabelRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez saisir un libellé.'**
+  String get errLabelRequired;
+
+  /// No description provided for @errStoreRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez préciser le magasin.'**
+  String get errStoreRequired;
+
+  /// No description provided for @errServerNameRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez saisir le nom du serveur.'**
+  String get errServerNameRequired;
+
+  /// No description provided for @errPhoneRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez saisir le numéro de téléphone.'**
+  String get errPhoneRequired;
+
+  /// No description provided for @errEmailRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez saisir une adresse email.'**
+  String get errEmailRequired;
+
+  /// No description provided for @errMinThresholdNegative.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le seuil minimum ne peut pas être négatif.'**
+  String get errMinThresholdNegative;
+
+  /// No description provided for @errCertilinkError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur CertiLink'**
+  String get errCertilinkError;
+
+  /// No description provided for @errFiscalizationFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Échec de fiscalisation'**
+  String get errFiscalizationFailed;
+
+  /// No description provided for @errCertificationFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Échec de certification'**
+  String get errCertificationFailed;
+
   /// No description provided for @errStockInsufficient.
   ///
   /// In fr, this message translates to:
   /// **'Stock insuffisant pour {name}.'**
   String errStockInsufficient(String name);
+
+  /// {name} porte le detail technique de l'echec
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors de l’enregistrement du serveur : {name}'**
+  String errServerRegistrationFailed(String name);
 
   /// No description provided for @clientDisabled.
   ///

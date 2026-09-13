@@ -5,6 +5,9 @@ import 'package:intl/intl.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/core/errors/app_error.dart';
+import 'package:takapp/core/errors/error_localizer.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/services/owner_dashboard_service.dart';
 import 'package:takapp/services/pdf_service.dart';
 import 'package:takapp/services/printer_service.dart';
@@ -30,7 +33,10 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
 
   bool isLoading = true;
 
-  String? errorMessage;
+  /// Erreur courante : un [AppError] traduisible, ou une exception brute.
+  /// Jamais un texte destiné à l'affichage — la traduction a lieu au
+  /// moment du rendu, dans la langue active.
+  Object? _error;
 
   Map<String, double> balancesByType = {};
 
@@ -61,7 +67,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
       if (user == null || user.establishmentId.trim().isEmpty) {
         setState(() {
           isLoading = false;
-          errorMessage = 'Établissement introuvable.';
+          _error = const AppError(AppErrorCode.establishmentNotFound);
         });
         return;
       }
@@ -194,14 +200,14 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     if (establishmentId.trim().isEmpty) {
       setState(() {
         isLoading = false;
-        errorMessage = 'Établissement introuvable.';
+        _error = const AppError(AppErrorCode.establishmentNotFound);
       });
       return;
     }
 
     setState(() {
       isLoading = true;
-      errorMessage = null;
+      _error = null;
     });
 
     try {
@@ -225,7 +231,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
       });
     } catch (e) {
       setState(() {
-        errorMessage = e.toString();
+        _error = e;
       });
     } finally {
       if (mounted) {
@@ -380,8 +386,14 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                   const Expanded(
                     child: Center(child: CircularProgressIndicator()),
                   )
-                else if (errorMessage != null)
-                  Expanded(child: Center(child: Text(errorMessage!)))
+                else if (_error != null)
+                  Expanded(
+                    child: Center(
+                      child: Text(
+                        localizedError(AppLocalizations.of(context), _error),
+                      ),
+                    ),
+                  )
                 else
                   Expanded(
                     child: Card(

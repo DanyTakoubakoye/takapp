@@ -62,8 +62,32 @@
   "errRoomNumberRequired": "Veuillez préciser le numéro de chambre.",
   "errTableNumberRequired": "Veuillez préciser le numéro de table.",
 
+  "errAddAtLeastOneUsedItem": "Veuillez ajouter au moins un article utilisé.",
+  "errSelectAtLeastOnePayment": "Veuillez sélectionner au moins un paiement.",
+  "errSelectAtLeastOneOrderOrPayment": "Veuillez sélectionner au moins une commande/paiement.",
+  "errLabelRequired": "Veuillez saisir un libellé.",
+  "errStoreRequired": "Veuillez préciser le magasin.",
+  "errServerNameRequired": "Veuillez saisir le nom du serveur.",
+  "errPhoneRequired": "Veuillez saisir le numéro de téléphone.",
+  "errEmailRequired": "Veuillez saisir une adresse email.",
+  "errMinThresholdNegative": "Le seuil minimum ne peut pas être négatif.",
+
+  "errCertilinkError": "Erreur CertiLink",
+  "errFiscalizationFailed": "Échec de fiscalisation",
+  "errCertificationFailed": "Échec de certification",
+
   "errStockInsufficient": "Stock insuffisant pour {name}.",
   "@errStockInsufficient": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errServerRegistrationFailed": "Erreur lors de l’enregistrement du serveur : {name}",
+  "@errServerRegistrationFailed": {
+    "description": "{name} porte le detail technique de l'echec",
     "placeholders": {
       "name": {
         "type": "String"

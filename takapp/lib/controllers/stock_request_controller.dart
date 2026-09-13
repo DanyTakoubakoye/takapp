@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:takapp/core/errors/app_error.dart';
+import 'package:takapp/core/errors/error_localizer.dart';
+import 'package:takapp/l10n/app_localizations.dart';
+
 import '../modeles/stock_request_item_model.dart';
 import '../services/stock_request_service.dart';
 
@@ -8,7 +12,18 @@ class StockRequestController extends ChangeNotifier {
 
   bool isSubmitting = false;
 
-  String? errorMessage;
+  /// Erreur courante : un [AppError] traduisible, ou une exception brute
+  /// pas encore migrée. Jamais un texte destiné à l'affichage.
+  Object? _error;
+
+  bool get hasError => _error != null;
+
+  /// Message traduit dans la langue active, ou `null` s'il n'y a pas
+  /// d'erreur. Appelé par l'UI, seule à disposer d'un `BuildContext`.
+  String? errorText(AppLocalizations l10n) {
+    if (_error == null) return null;
+    return localizedError(l10n, _error);
+  }
 
   Future<bool> createRequest({
     required String establishmentId,
@@ -24,26 +39,26 @@ class StockRequestController extends ChangeNotifier {
     required List<StockRequestItemModel> items,
   }) async {
     if (establishmentId.trim().isEmpty) {
-      errorMessage = 'Établissement introuvable.';
+      _error = const AppError(AppErrorCode.establishmentNotFound);
       notifyListeners();
       return false;
     }
 
     if (store.trim().isEmpty) {
-      errorMessage = 'Veuillez préciser le magasin.';
+      _error = const AppError(AppErrorCode.storeRequired);
       notifyListeners();
       return false;
     }
 
     if (items.isEmpty) {
-      errorMessage = 'Veuillez ajouter au moins un article.';
+      _error = const AppError(AppErrorCode.addAtLeastOneItem);
       notifyListeners();
       return false;
     }
 
     try {
       isSubmitting = true;
-      errorMessage = null;
+      _error = null;
 
       notifyListeners();
 
@@ -63,7 +78,7 @@ class StockRequestController extends ChangeNotifier {
 
       return true;
     } catch (e) {
-      errorMessage = e.toString().replaceFirst('Exception: ', '');
+      _error = e;
 
       return false;
     } finally {
@@ -85,26 +100,26 @@ class StockRequestController extends ChangeNotifier {
     required String store,
   }) async {
     if (establishmentId.trim().isEmpty) {
-      errorMessage = 'Établissement introuvable.';
+      _error = const AppError(AppErrorCode.establishmentNotFound);
       notifyListeners();
       return false;
     }
 
     if (requestId.trim().isEmpty) {
-      errorMessage = 'Demande introuvable.';
+      _error = const AppError(AppErrorCode.requestNotFound);
       notifyListeners();
       return false;
     }
 
     if (deliveredItems.isEmpty) {
-      errorMessage = 'Veuillez sélectionner au moins un article.';
+      _error = const AppError(AppErrorCode.selectAtLeastOneItem);
       notifyListeners();
       return false;
     }
 
     try {
       isSubmitting = true;
-      errorMessage = null;
+      _error = null;
 
       notifyListeners();
 
@@ -123,7 +138,7 @@ class StockRequestController extends ChangeNotifier {
 
       return true;
     } catch (e) {
-      errorMessage = e.toString().replaceFirst('Exception: ', '');
+      _error = e;
 
       return false;
     } finally {
@@ -141,20 +156,20 @@ class StockRequestController extends ChangeNotifier {
     required String receivedByName,
   }) async {
     if (establishmentId.trim().isEmpty) {
-      errorMessage = 'Établissement introuvable.';
+      _error = const AppError(AppErrorCode.establishmentNotFound);
       notifyListeners();
       return false;
     }
 
     if (requestId.trim().isEmpty) {
-      errorMessage = 'Demande introuvable.';
+      _error = const AppError(AppErrorCode.requestNotFound);
       notifyListeners();
       return false;
     }
 
     try {
       isSubmitting = true;
-      errorMessage = null;
+      _error = null;
 
       notifyListeners();
 
@@ -169,7 +184,7 @@ class StockRequestController extends ChangeNotifier {
 
       return true;
     } catch (e) {
-      errorMessage = e.toString().replaceFirst('Exception: ', '');
+      _error = e;
 
       return false;
     } finally {
@@ -179,7 +194,7 @@ class StockRequestController extends ChangeNotifier {
   }
 
   void clearError() {
-    errorMessage = null;
+    _error = null;
     notifyListeners();
   }
 }

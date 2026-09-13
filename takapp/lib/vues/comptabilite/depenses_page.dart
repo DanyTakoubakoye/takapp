@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/comptabilite_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 
 import 'package:takapp/core/constants/account_types.dart';
 
@@ -127,10 +128,12 @@ class _DepensesPageState extends State<DepensesPage> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Dépense enregistrée.')));
-    } else if (controller.errorMessage != null) {
+    } else if (controller.hasError) {
+      final l10n = AppLocalizations.of(context);
+
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(controller.errorMessage!)));
+      ).showSnackBar(SnackBar(content: Text(controller.errorText(l10n)!)));
     }
   }
 

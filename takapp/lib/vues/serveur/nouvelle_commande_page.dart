@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/order_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/client_model.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
 import 'package:takapp/modeles/user_model.dart';
@@ -173,10 +174,12 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
         _selectedClientId = '';
         _selectedClientName = '';
       });
-    } else if (orderController.errorMessage != null) {
+    } else if (orderController.hasError) {
+      final l10n = AppLocalizations.of(context);
+
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(orderController.errorMessage!)));
+      ).showSnackBar(SnackBar(content: Text(orderController.errorText(l10n)!)));
     }
   }
 

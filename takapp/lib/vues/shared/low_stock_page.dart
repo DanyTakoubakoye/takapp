@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/store_stock_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/store_stock_model.dart';
 import 'package:takapp/services/store_stock_service.dart';
 import 'package:takapp/vues/gerante/direct_stock_supply_page.dart';
@@ -182,8 +183,14 @@ class LowStockPage extends StatelessWidget {
                                         ).showSnackBar(
                                           SnackBar(
                                             content: Text(
-                                              controller.errorMessage ??
-                                                  'Erreur inconnue.',
+                                              controller.errorText(
+                                                    AppLocalizations.of(
+                                                      context,
+                                                    ),
+                                                  ) ??
+                                                  AppLocalizations.of(
+                                                    context,
+                                                  ).errUnknown,
                                             ),
                                           ),
                                         );

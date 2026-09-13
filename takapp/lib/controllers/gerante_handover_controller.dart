@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:takapp/core/errors/app_error.dart';
+import 'package:takapp/core/errors/error_localizer.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/payment_model.dart';
 import 'package:takapp/modeles/server_handover_model.dart';
 import 'package:takapp/services/gerante_handover_service.dart';
@@ -9,11 +12,23 @@ class GeranteHandoverController extends ChangeNotifier {
   GeranteHandoverController(this._service);
 
   bool _isSubmitting = false;
-  String? _errorMessage;
+
+  /// Erreur courante : un [AppError] traduisible, ou une exception brute
+  /// pas encore migrée. Jamais un texte destiné à l'affichage.
+  Object? _error;
+
   final List<PaymentModel> _selectedPayments = [];
 
   bool get isSubmitting => _isSubmitting;
-  String? get errorMessage => _errorMessage;
+
+  bool get hasError => _error != null;
+
+  /// Message traduit dans la langue active, ou `null` s'il n'y a pas
+  /// d'erreur. Appelé par l'UI, seule à disposer d'un `BuildContext`.
+  String? errorText(AppLocalizations l10n) {
+    if (_error == null) return null;
+    return localizedError(l10n, _error);
+  }
 
   List<PaymentModel> get selectedPayments {
     return List.unmodifiable(_selectedPayments);
@@ -41,7 +56,7 @@ class GeranteHandoverController extends ChangeNotifier {
 
   void clearSelection() {
     _selectedPayments.clear();
-    _errorMessage = null;
+    _error = null;
     notifyListeners();
   }
 
@@ -53,19 +68,19 @@ class GeranteHandoverController extends ChangeNotifier {
     required String managerName,
   }) async {
     if (establishmentId.trim().isEmpty) {
-      _errorMessage = 'Établissement introuvable.';
+      _error = const AppError(AppErrorCode.establishmentNotFound);
       notifyListeners();
       return false;
     }
 
     if (_selectedPayments.isEmpty) {
-      _errorMessage = 'Veuillez sélectionner au moins une commande/paiement.';
+      _error = const AppError(AppErrorCode.selectAtLeastOneOrderOrPayment);
       notifyListeners();
       return false;
     }
 
     _isSubmitting = true;
-    _errorMessage = null;
+    _error = null;
     notifyListeners();
 
     try {
@@ -82,7 +97,7 @@ class GeranteHandoverController extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      _error = e;
       notifyListeners();
       return false;
     } finally {
@@ -99,19 +114,19 @@ class GeranteHandoverController extends ChangeNotifier {
     required String managerName,
   }) async {
     if (establishmentId.trim().isEmpty) {
-      _errorMessage = 'Établissement introuvable.';
+      _error = const AppError(AppErrorCode.establishmentNotFound);
       notifyListeners();
       return false;
     }
 
     if (_selectedPayments.isEmpty) {
-      _errorMessage = 'Veuillez sélectionner au moins une commande/paiement.';
+      _error = const AppError(AppErrorCode.selectAtLeastOneOrderOrPayment);
       notifyListeners();
       return false;
     }
 
     _isSubmitting = true;
-    _errorMessage = null;
+    _error = null;
     notifyListeners();
 
     try {
@@ -128,7 +143,7 @@ class GeranteHandoverController extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      _error = e;
       notifyListeners();
       return false;
     } finally {

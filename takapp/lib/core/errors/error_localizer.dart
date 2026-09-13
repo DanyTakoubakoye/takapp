@@ -80,16 +80,43 @@ String _messageFor(AppLocalizations l10n, AppError error) {
       return l10n.errQuantityMustBePositive;
     case AppErrorCode.addAtLeastOneItem:
       return l10n.errAddAtLeastOneItem;
+    case AppErrorCode.addAtLeastOneUsedItem:
+      return l10n.errAddAtLeastOneUsedItem;
     case AppErrorCode.selectAtLeastOneItem:
       return l10n.errSelectAtLeastOneItem;
+    case AppErrorCode.selectAtLeastOnePayment:
+      return l10n.errSelectAtLeastOnePayment;
+    case AppErrorCode.selectAtLeastOneOrderOrPayment:
+      return l10n.errSelectAtLeastOneOrderOrPayment;
     case AppErrorCode.selectPaymentMethod:
       return l10n.errSelectPaymentMethod;
     case AppErrorCode.roomNumberRequired:
       return l10n.errRoomNumberRequired;
     case AppErrorCode.tableNumberRequired:
       return l10n.errTableNumberRequired;
+    case AppErrorCode.labelRequired:
+      return l10n.errLabelRequired;
+    case AppErrorCode.storeRequired:
+      return l10n.errStoreRequired;
+    case AppErrorCode.serverNameRequired:
+      return l10n.errServerNameRequired;
+    case AppErrorCode.phoneRequired:
+      return l10n.errPhoneRequired;
+    case AppErrorCode.emailRequired:
+      return l10n.errEmailRequired;
+    case AppErrorCode.minThresholdNegative:
+      return l10n.errMinThresholdNegative;
+
+    case AppErrorCode.certilinkError:
+      return l10n.errCertilinkError;
+    case AppErrorCode.fiscalizationFailed:
+      return l10n.errFiscalizationFailed;
+    case AppErrorCode.certificationFailed:
+      return l10n.errCertificationFailed;
 
     case AppErrorCode.stockInsufficient:
       return l10n.errStockInsufficient(error.name ?? '');
+    case AppErrorCode.serverRegistrationFailed:
+      return l10n.errServerRegistrationFailed(error.name ?? '');
   }
 }

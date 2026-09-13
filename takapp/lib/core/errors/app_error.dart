@@ -56,22 +56,42 @@ enum AppErrorCode {
   amountMustBePositive,
   quantityMustBePositive,
   addAtLeastOneItem,
+  addAtLeastOneUsedItem,
   selectAtLeastOneItem,
+  selectAtLeastOnePayment,
+  selectAtLeastOneOrderOrPayment,
   selectPaymentMethod,
   roomNumberRequired,
   tableNumberRequired,
+  labelRequired,
+  storeRequired,
+  serverNameRequired,
+  phoneRequired,
+  emailRequired,
+  minThresholdNegative,
+
+  /// =========================
+  /// FISCALISATION
+  /// =========================
+  certilinkError,
+  fiscalizationFailed,
+  certificationFailed,
 
   /// =========================
   /// STOCK
   /// =========================
   /// Utilise le paramètre [AppError.name].
   stockInsufficient,
+
+  /// Utilise [AppError.name] pour transporter le détail de l'échec.
+  serverRegistrationFailed,
 }
 
 /// Exception traduisible à l'affichage.
 ///
-/// [name] porte le seul paramètre variable observé dans l'application
-/// (un nom d'article), interpolé par certains messages.
+/// [name] porte le seul paramètre variable de l'application (un nom
+/// d'article, ou le détail technique d'un échec), interpolé par les
+/// quelques messages qui en ont besoin.
 class AppError implements Exception {
   final AppErrorCode code;
   final String? name;

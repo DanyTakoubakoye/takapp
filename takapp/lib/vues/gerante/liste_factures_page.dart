@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/fiscalization_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/emcf_invoice_item_model.dart';
 import 'package:takapp/modeles/emcf_invoice_request_model.dart';
 import 'package:takapp/modeles/room_invoice_model.dart';
@@ -286,7 +287,11 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
         'Facture fiscalisée. Code MECeF : ${fiscalController.confirmResult!.codeMECeFDGI}',
       );
     } else {
-      _showSnack(fiscalController.errorMessage ?? 'Échec de fiscalisation');
+      final l10n = AppLocalizations.of(context);
+
+      _showSnack(
+        fiscalController.errorText(l10n) ?? l10n.errFiscalizationFailed,
+      );
     }
   }
 

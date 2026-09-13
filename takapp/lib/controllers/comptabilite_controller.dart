@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:takapp/core/errors/app_error.dart';
+import 'package:takapp/core/errors/error_localizer.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/services/comptabilite_service.dart';
 
 class ComptabiliteController extends ChangeNotifier {
@@ -7,10 +10,21 @@ class ComptabiliteController extends ChangeNotifier {
   ComptabiliteController(this._service);
 
   bool _isSubmitting = false;
-  String? _errorMessage;
+
+  /// Erreur courante : un [AppError] traduisible, ou une exception brute
+  /// pas encore migrée. Jamais un texte destiné à l'affichage.
+  Object? _error;
 
   bool get isSubmitting => _isSubmitting;
-  String? get errorMessage => _errorMessage;
+
+  bool get hasError => _error != null;
+
+  /// Message traduit dans la langue active, ou `null` s'il n'y a pas
+  /// d'erreur. Appelé par l'UI, seule à disposer d'un `BuildContext`.
+  String? errorText(AppLocalizations l10n) {
+    if (_error == null) return null;
+    return localizedError(l10n, _error);
+  }
 
   Future<bool> confirmTransferReception({
     required String establishmentId,
@@ -19,13 +33,13 @@ class ComptabiliteController extends ChangeNotifier {
     required String accountingName,
   }) async {
     if (establishmentId.trim().isEmpty) {
-      _errorMessage = 'Établissement introuvable.';
+      _error = const AppError(AppErrorCode.establishmentNotFound);
       notifyListeners();
       return false;
     }
 
     _isSubmitting = true;
-    _errorMessage = null;
+    _error = null;
     notifyListeners();
 
     try {
@@ -38,7 +52,7 @@ class ComptabiliteController extends ChangeNotifier {
 
       return true;
     } catch (e) {
-      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      _error = e;
       return false;
     } finally {
       _isSubmitting = false;
@@ -56,25 +70,25 @@ class ComptabiliteController extends ChangeNotifier {
     required String createdByName,
   }) async {
     if (establishmentId.trim().isEmpty) {
-      _errorMessage = 'Établissement introuvable.';
+      _error = const AppError(AppErrorCode.establishmentNotFound);
       notifyListeners();
       return false;
     }
 
     if (label.trim().isEmpty) {
-      _errorMessage = 'Veuillez saisir un libellé.';
+      _error = const AppError(AppErrorCode.labelRequired);
       notifyListeners();
       return false;
     }
 
     if (amount <= 0) {
-      _errorMessage = 'Le montant doit être supérieur à 0.';
+      _error = const AppError(AppErrorCode.amountMustBePositive);
       notifyListeners();
       return false;
     }
 
     _isSubmitting = true;
-    _errorMessage = null;
+    _error = null;
     notifyListeners();
 
     try {
@@ -90,7 +104,7 @@ class ComptabiliteController extends ChangeNotifier {
 
       return true;
     } catch (e) {
-      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      _error = e;
       return false;
     } finally {
       _isSubmitting = false;

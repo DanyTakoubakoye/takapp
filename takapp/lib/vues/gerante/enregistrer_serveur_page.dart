@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../controllers/auth_controller.dart';
 import '../../controllers/serveur_controller.dart';
+import '../../core/errors/error_localizer.dart';
+import '../../l10n/app_localizations.dart';
 
 class EnregistrerServeurPage extends StatefulWidget {
   const EnregistrerServeurPage({super.key});
@@ -64,9 +66,11 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
     if (!mounted) return;
 
     if (error != null) {
+      final l10n = AppLocalizations.of(context);
+
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(error)));
+      ).showSnackBar(SnackBar(content: Text(localizedError(l10n, error))));
       return;
     }
 

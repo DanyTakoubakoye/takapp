@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/comptabilite_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/manager_transfer_model.dart';
 import 'package:takapp/services/comptabilite_service.dart';
 
@@ -113,10 +114,14 @@ class ReceptionVersementsPage extends StatelessWidget {
                                     content: Text('Réception confirmée.'),
                                   ),
                                 );
-                              } else if (controller.errorMessage != null) {
+                              } else if (controller.hasError) {
+                                final l10n = AppLocalizations.of(context);
+
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text(controller.errorMessage!),
+                                    content: Text(
+                                      controller.errorText(l10n)!,
+                                    ),
                                   ),
                                 );
                               }

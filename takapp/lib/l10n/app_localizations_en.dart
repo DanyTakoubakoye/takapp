@@ -122,8 +122,52 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errTableNumberRequired => 'Please specify the table number.';
 
   @override
+  String get errAddAtLeastOneUsedItem => 'Please add at least one item used.';
+
+  @override
+  String get errSelectAtLeastOnePayment =>
+      'Please select at least one payment.';
+
+  @override
+  String get errSelectAtLeastOneOrderOrPayment =>
+      'Please select at least one order or payment.';
+
+  @override
+  String get errLabelRequired => 'Please enter a label.';
+
+  @override
+  String get errStoreRequired => 'Please specify the store.';
+
+  @override
+  String get errServerNameRequired => 'Please enter the waiter\'s name.';
+
+  @override
+  String get errPhoneRequired => 'Please enter the phone number.';
+
+  @override
+  String get errEmailRequired => 'Please enter an email address.';
+
+  @override
+  String get errMinThresholdNegative =>
+      'The minimum threshold cannot be negative.';
+
+  @override
+  String get errCertilinkError => 'CertiLink error';
+
+  @override
+  String get errFiscalizationFailed => 'Fiscalization failed';
+
+  @override
+  String get errCertificationFailed => 'Certification failed';
+
+  @override
   String errStockInsufficient(String name) {
     return 'Insufficient stock for $name.';
+  }
+
+  @override
+  String errServerRegistrationFailed(String name) {
+    return 'Error while registering the waiter: $name';
   }
 
   @override

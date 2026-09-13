@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/stock_request_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/stock_request_item_model.dart';
 import 'package:takapp/modeles/stock_request_model.dart';
 import 'package:takapp/services/stock_request_service.dart';
@@ -174,8 +175,12 @@ class _StockDeliveryPageState extends State<StockDeliveryPage> {
       );
       Navigator.pop(context);
     } else {
+      final l10n = AppLocalizations.of(context);
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(controller.errorMessage ?? 'Erreur inconnue.')),
+        SnackBar(
+          content: Text(controller.errorText(l10n) ?? l10n.errUnknown),
+        ),
       );
     }
   }

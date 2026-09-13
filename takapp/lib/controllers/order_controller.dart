@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:takapp/core/errors/app_error.dart';
+import 'package:takapp/core/errors/error_localizer.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
 import 'package:takapp/modeles/order_item_model.dart';
 import 'package:takapp/services/order_service.dart';
@@ -12,11 +15,22 @@ class OrderController extends ChangeNotifier {
   final List<OrderItemModel> _items = [];
 
   bool _isSubmitting = false;
-  String? _errorMessage;
+
+  /// Erreur courante : un [AppError] traduisible, ou une exception brute
+  /// pas encore migrée. Jamais un texte destiné à l'affichage.
+  Object? _error;
 
   List<OrderItemModel> get items => List.unmodifiable(_items);
   bool get isSubmitting => _isSubmitting;
-  String? get errorMessage => _errorMessage;
+
+  bool get hasError => _error != null;
+
+  /// Message traduit dans la langue active, ou `null` s'il n'y a pas
+  /// d'erreur. Appelé par l'UI, seule à disposer d'un `BuildContext`.
+  String? errorText(AppLocalizations l10n) {
+    if (_error == null) return null;
+    return localizedError(l10n, _error);
+  }
 
   // =========================
   // CALCULS
@@ -146,7 +160,7 @@ class OrderController extends ChangeNotifier {
 
   void clearOrder() {
     _items.clear();
-    _errorMessage = null;
+    _error = null;
     notifyListeners();
   }
 
@@ -192,34 +206,34 @@ class OrderController extends ChangeNotifier {
     String clientId = '',
   }) async {
     if (_items.isEmpty) {
-      _errorMessage = 'Ajoutez au moins un article.';
+      _error = const AppError(AppErrorCode.addAtLeastOneItem);
       notifyListeners();
       return false;
     }
 
     if (clientType == 'restaurant' &&
         (tableNumber == null || tableNumber.trim().isEmpty)) {
-      _errorMessage = 'Veuillez préciser le numéro de table.';
+      _error = const AppError(AppErrorCode.tableNumberRequired);
       notifyListeners();
       return false;
     }
 
     if (clientType == 'hotel' &&
         (roomNumber == null || roomNumber.trim().isEmpty)) {
-      _errorMessage = 'Veuillez préciser le numéro de chambre.';
+      _error = const AppError(AppErrorCode.roomNumberRequired);
       notifyListeners();
       return false;
     }
 
     // Garde-fou : refuser si l'établissement n'est pas résolu
     if (establishmentId.trim().isEmpty) {
-      _errorMessage = 'Établissement introuvable. Reconnectez-vous.';
+      _error = const AppError(AppErrorCode.establishmentNotFoundReconnect);
       notifyListeners();
       return false;
     }
 
     _isSubmitting = true;
-    _errorMessage = null;
+    _error = null;
     notifyListeners();
 
     try {
@@ -247,7 +261,7 @@ class OrderController extends ChangeNotifier {
 
       return true;
     } catch (e) {
-      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      _error = e;
       return false;
     } finally {
       _isSubmitting = false;

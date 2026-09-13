@@ -8,6 +8,7 @@ import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/fiscalization_controller.dart';
 import 'package:takapp/controllers/payment_controller.dart';
 import 'package:takapp/core/constants/app_payment_methods.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/emcf_invoice_item_model.dart';
 import 'package:takapp/modeles/emcf_invoice_request_model.dart';
 import 'package:takapp/modeles/order_ticket_model.dart';
@@ -230,10 +231,14 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
 
     if (!mounted) return false;
 
-    if (!success && paymentController.errorMessage != null) {
+    if (!success && paymentController.hasError) {
+      final l10n = AppLocalizations.of(context);
+
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(paymentController.errorMessage!)));
+      ).showSnackBar(
+        SnackBar(content: Text(paymentController.errorText(l10n)!)),
+      );
     }
 
     return success;
@@ -441,10 +446,12 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
           ),
         );
       } else {
+        final l10n = AppLocalizations.of(context);
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              fiscalController.errorMessage ?? 'Échec de certification',
+              fiscalController.errorText(l10n) ?? l10n.errCertificationFailed,
             ),
           ),
         );

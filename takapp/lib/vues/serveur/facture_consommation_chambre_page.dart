@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/room_consumption_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 
 class FactureConsommationChambrePage extends StatefulWidget {
   const FactureConsommationChambrePage({super.key});
@@ -68,12 +69,14 @@ class _FactureConsommationChambrePageState
                       return const Center(child: CircularProgressIndicator());
                     }
 
-                    if (controller.errorMessage != null) {
+                    if (controller.hasError) {
                       return SingleChildScrollView(
                         child: Padding(
                           padding: const EdgeInsets.only(top: 8),
                           child: Text(
-                            controller.errorMessage!,
+                            controller.errorText(
+                              AppLocalizations.of(context),
+                            )!,
                             style: const TextStyle(
                               color: Colors.red,
                               fontWeight: FontWeight.bold,

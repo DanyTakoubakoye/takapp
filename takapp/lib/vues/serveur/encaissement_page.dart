@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/payment_controller.dart';
 import 'package:takapp/core/constants/app_payment_methods.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/order_model.dart';
 import 'package:takapp/modeles/order_ticket_model.dart';
 import 'package:takapp/services/payment_service.dart';
@@ -280,10 +281,14 @@ class _PaymentDialogState extends State<_PaymentDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Paiement enregistré avec succès.')),
       );
-    } else if (paymentController.errorMessage != null) {
+    } else if (paymentController.hasError) {
+      final l10n = AppLocalizations.of(context);
+
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(paymentController.errorMessage!)));
+      ).showSnackBar(
+        SnackBar(content: Text(paymentController.errorText(l10n)!)),
+      );
     }
   }
 

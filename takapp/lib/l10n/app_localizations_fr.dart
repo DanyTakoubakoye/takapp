@@ -124,8 +124,53 @@ class AppLocalizationsFr extends AppLocalizations {
   String get errTableNumberRequired => 'Veuillez préciser le numéro de table.';
 
   @override
+  String get errAddAtLeastOneUsedItem =>
+      'Veuillez ajouter au moins un article utilisé.';
+
+  @override
+  String get errSelectAtLeastOnePayment =>
+      'Veuillez sélectionner au moins un paiement.';
+
+  @override
+  String get errSelectAtLeastOneOrderOrPayment =>
+      'Veuillez sélectionner au moins une commande/paiement.';
+
+  @override
+  String get errLabelRequired => 'Veuillez saisir un libellé.';
+
+  @override
+  String get errStoreRequired => 'Veuillez préciser le magasin.';
+
+  @override
+  String get errServerNameRequired => 'Veuillez saisir le nom du serveur.';
+
+  @override
+  String get errPhoneRequired => 'Veuillez saisir le numéro de téléphone.';
+
+  @override
+  String get errEmailRequired => 'Veuillez saisir une adresse email.';
+
+  @override
+  String get errMinThresholdNegative =>
+      'Le seuil minimum ne peut pas être négatif.';
+
+  @override
+  String get errCertilinkError => 'Erreur CertiLink';
+
+  @override
+  String get errFiscalizationFailed => 'Échec de fiscalisation';
+
+  @override
+  String get errCertificationFailed => 'Échec de certification';
+
+  @override
   String errStockInsufficient(String name) {
     return 'Stock insuffisant pour $name.';
+  }
+
+  @override
+  String errServerRegistrationFailed(String name) {
+    return 'Erreur lors de l’enregistrement du serveur : $name';
   }
 
   @override

@@ -57,8 +57,31 @@
   "errRoomNumberRequired": "Please specify the room number.",
   "errTableNumberRequired": "Please specify the table number.",
 
+  "errAddAtLeastOneUsedItem": "Please add at least one item used.",
+  "errSelectAtLeastOnePayment": "Please select at least one payment.",
+  "errSelectAtLeastOneOrderOrPayment": "Please select at least one order or payment.",
+  "errLabelRequired": "Please enter a label.",
+  "errStoreRequired": "Please specify the store.",
+  "errServerNameRequired": "Please enter the waiter's name.",
+  "errPhoneRequired": "Please enter the phone number.",
+  "errEmailRequired": "Please enter an email address.",
+  "errMinThresholdNegative": "The minimum threshold cannot be negative.",
+
+  "errCertilinkError": "CertiLink error",
+  "errFiscalizationFailed": "Fiscalization failed",
+  "errCertificationFailed": "Certification failed",
+
   "errStockInsufficient": "Insufficient stock for {name}.",
   "@errStockInsufficient": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errServerRegistrationFailed": "Error while registering the waiter: {name}",
+  "@errServerRegistrationFailed": {
     "placeholders": {
       "name": {
         "type": "String"

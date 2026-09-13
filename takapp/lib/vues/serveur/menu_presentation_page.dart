@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/order_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/client_model.dart';
 import 'package:takapp/core/constants/bar_categories.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
@@ -1307,10 +1308,12 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
         const SnackBar(content: Text('Commande envoyée avec succès.')),
       );
       Navigator.pop(context, true);
-    } else if (orderController.errorMessage != null) {
+    } else if (orderController.hasError) {
+      final l10n = AppLocalizations.of(context);
+
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text(orderController.errorMessage!)));
+      ).showSnackBar(SnackBar(content: Text(orderController.errorText(l10n)!)));
     }
   }
 

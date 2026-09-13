@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/handover_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/payment_model.dart';
 import 'package:takapp/modeles/server_handover_model.dart';
 import 'package:takapp/services/handover_service.dart';
@@ -217,9 +218,13 @@ class _PendingPaymentsSection extends StatelessWidget {
                         content: Text('Versement déclaré avec succès.'),
                       ),
                     );
-                  } else if (handoverController.errorMessage != null) {
+                  } else if (handoverController.hasError) {
+                    final l10n = AppLocalizations.of(context);
+
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(handoverController.errorMessage!)),
+                      SnackBar(
+                        content: Text(handoverController.errorText(l10n)!),
+                      ),
                     );
                   }
                 }

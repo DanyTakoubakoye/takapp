@@ -1,6 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:takapp/core/errors/app_error.dart';
+import 'package:takapp/core/errors/error_localizer.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/certilink/services/certilink_certification_service.dart';
 import 'package:takapp/certilink/services/certilink_config_service.dart';
 
@@ -26,7 +29,19 @@ class FiscalizationController extends ChangeNotifier {
        _roomInvoiceService = roomInvoiceService ?? RoomInvoiceService();
 
   bool isLoading = false;
-  String? errorMessage;
+
+  /// Erreur courante : un [AppError] traduisible, ou une exception brute
+  /// pas encore migrée. Jamais un texte destiné à l'affichage.
+  Object? _error;
+
+  bool get hasError => _error != null;
+
+  /// Message traduit dans la langue active, ou `null` s'il n'y a pas
+  /// d'erreur. Appelé par l'UI, seule à disposer d'un `BuildContext`.
+  String? errorText(AppLocalizations l10n) {
+    if (_error == null) return null;
+    return localizedError(l10n, _error);
+  }
 
   /// Conservé pour compatibilité avec les anciennes vues.
   EmcfInvoiceCreateResponseModel? createResult;
@@ -54,19 +69,19 @@ class FiscalizationController extends ChangeNotifier {
     bool persistToInvoice = true,
   }) async {
     if (establishmentId.trim().isEmpty) {
-      errorMessage = 'Établissement introuvable.';
+      _error = const AppError(AppErrorCode.establishmentNotFound);
       notifyListeners();
       return false;
     }
 
     if (invoiceId.trim().isEmpty) {
-      errorMessage = 'Facture introuvable.';
+      _error = const AppError(AppErrorCode.invoiceNotFound);
       notifyListeners();
       return false;
     }
 
     isLoading = true;
-    errorMessage = null;
+    _error = null;
     createResult = null;
     confirmResult = null;
     notifyListeners();
@@ -138,7 +153,14 @@ class FiscalizationController extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
-      errorMessage = e.toString().replaceFirst('Exception: ', '');
+      _error = e;
+
+      /// Texte TECHNIQUE, destiné à Firestore et non à l'écran : il est
+      /// persisté tel quel dans la facture, donc il ne doit pas dépendre
+      /// de la langue active de l'utilisateur.
+      final rawError = e.toString().replaceFirst('Exception: ', '').trim();
+
+      final persistedError = rawError.isEmpty ? 'CertiLink error' : rawError;
 
       confirmResult = EmcfSecurityElementModel(
         dateTime: DateTime.now().toIso8601String(),
@@ -147,11 +169,8 @@ class FiscalizationController extends ChangeNotifier {
         counters: '',
         nim: '',
         errorCode: 'certilink_error',
-        errorDesc: errorMessage ?? 'Erreur CertiLink',
-        raw: {
-          'error': errorMessage ?? 'Erreur CertiLink',
-          'provider': 'certilink',
-        },
+        errorDesc: persistedError,
+        raw: {'error': persistedError, 'provider': 'certilink'},
       );
 
       if (persistToInvoice) {
@@ -159,7 +178,7 @@ class FiscalizationController extends ChangeNotifier {
           await _roomInvoiceService.markFiscalizationFailed(
             establishmentId: establishmentId,
             invoiceId: invoiceId,
-            error: errorMessage ?? 'Erreur CertiLink',
+            error: persistedError,
             rawResponse: jsonEncode(confirmResult?.raw ?? {}),
           );
         } catch (_) {
@@ -214,7 +233,7 @@ class FiscalizationController extends ChangeNotifier {
 
   void clearState() {
     isLoading = false;
-    errorMessage = null;
+    _error = null;
     createResult = null;
     confirmResult = null;
     notifyListeners();
