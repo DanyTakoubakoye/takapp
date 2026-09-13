@@ -722,6 +722,490 @@ abstract class AppLocalizations {
   /// **'Erreur lors du chargement des consommations : {name}'**
   String errConsumptionLoadFailed(String name);
 
+  /// No description provided for @errStockNotFoundFor.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stock introuvable pour « {name} ».'**
+  String errStockNotFoundFor(String name);
+
+  /// No description provided for @errInconsistentUnit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Unité incohérente pour « {name} » : stock en « {stockUnit} » mais recette en « {recipeUnit} ».'**
+  String errInconsistentUnit(String name, String stockUnit, String recipeUnit);
+
+  /// No description provided for @errInsufficientStockDetailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stock insuffisant pour « {name} » : disponible {available}, requis {required}.'**
+  String errInsufficientStockDetailed(
+    String name,
+    String available,
+    String required,
+  );
+
+  /// No description provided for @navNotifications.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notifications'**
+  String get navNotifications;
+
+  /// No description provided for @serverNotFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Serveur introuvable.'**
+  String get serverNotFound;
+
+  /// No description provided for @noNotifications.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune notification.'**
+  String get noNotifications;
+
+  /// No description provided for @notificationFallbackTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notification'**
+  String get notificationFallbackTitle;
+
+  /// No description provided for @departmentKitchen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cuisine'**
+  String get departmentKitchen;
+
+  /// No description provided for @departmentBar.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bar'**
+  String get departmentBar;
+
+  /// No description provided for @labelTable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Table {number}'**
+  String labelTable(String number);
+
+  /// No description provided for @labelRoom.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chambre {number}'**
+  String labelRoom(String number);
+
+  /// No description provided for @labelBarClient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Client Bar'**
+  String get labelBarClient;
+
+  /// No description provided for @clientLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Client : {client}'**
+  String clientLine(String client);
+
+  /// No description provided for @cancelPartialTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annulation partielle {orderNumber}'**
+  String cancelPartialTitle(String orderNumber);
+
+  /// No description provided for @cancelItemAlreadyCancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déjà annulé'**
+  String get cancelItemAlreadyCancelled;
+
+  /// No description provided for @cancelItemKitchenDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cuisine déjà prête/servie'**
+  String get cancelItemKitchenDone;
+
+  /// No description provided for @cancelItemBarDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bar déjà prêt/servi'**
+  String get cancelItemBarDone;
+
+  /// No description provided for @cancelItemCancelable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annulable'**
+  String get cancelItemCancelable;
+
+  /// No description provided for @cancelItemsDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Articles annulés et stock restitué.'**
+  String get cancelItemsDone;
+
+  /// No description provided for @cancelLoadOrderError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur chargement commande : {error}'**
+  String cancelLoadOrderError(String error);
+
+  /// No description provided for @cancelLoadItemsError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur chargement articles : {error}'**
+  String cancelLoadItemsError(String error);
+
+  /// No description provided for @cancelDepartmentLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Département : {department}'**
+  String cancelDepartmentLine(String department);
+
+  /// No description provided for @cancelReasonLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Motif d’annulation'**
+  String get cancelReasonLabel;
+
+  /// No description provided for @cancelAmountToDeduct.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant à retrancher : {amount} FCFA'**
+  String cancelAmountToDeduct(String amount);
+
+  /// No description provided for @cancelInProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annulation en cours...'**
+  String get cancelInProgress;
+
+  /// No description provided for @cancelValidate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valider l’annulation'**
+  String get cancelValidate;
+
+  /// No description provided for @myInvoicesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mes factures'**
+  String get myInvoicesTitle;
+
+  /// No description provided for @today.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aujourd’hui'**
+  String get today;
+
+  /// No description provided for @todayWithDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aujourd’hui ({date})'**
+  String todayWithDate(String date);
+
+  /// No description provided for @pickDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir une date'**
+  String get pickDate;
+
+  /// No description provided for @noInvoiceForDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune facture pour cette date.'**
+  String get noInvoiceForDate;
+
+  /// No description provided for @statusPaid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaissée'**
+  String get statusPaid;
+
+  /// No description provided for @statusUnpaid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non encaissée'**
+  String get statusUnpaid;
+
+  /// No description provided for @statusFiscalized.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fiscalisée'**
+  String get statusFiscalized;
+
+  /// No description provided for @statusNotFiscalized.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non fiscalisée'**
+  String get statusNotFiscalized;
+
+  /// No description provided for @actionCollectInvoice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaisser la facture'**
+  String get actionCollectInvoice;
+
+  /// No description provided for @actionPrintInvoice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Imprimer facture'**
+  String get actionPrintInvoice;
+
+  /// No description provided for @actionFiscalize.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fiscaliser'**
+  String get actionFiscalize;
+
+  /// No description provided for @actionPrintFiscalizedInvoice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Imprimer facture fiscalisée'**
+  String get actionPrintFiscalizedInvoice;
+
+  /// No description provided for @commonCancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler'**
+  String get commonCancel;
+
+  /// No description provided for @commonValidate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valider'**
+  String get commonValidate;
+
+  /// No description provided for @clientFallback.
+  ///
+  /// In fr, this message translates to:
+  /// **'Client'**
+  String get clientFallback;
+
+  /// No description provided for @noOrders.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune commande'**
+  String get noOrders;
+
+  /// No description provided for @statusPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'En attente'**
+  String get statusPending;
+
+  /// No description provided for @statusPreparing.
+  ///
+  /// In fr, this message translates to:
+  /// **'En préparation'**
+  String get statusPreparing;
+
+  /// No description provided for @statusReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prête'**
+  String get statusReady;
+
+  /// No description provided for @statusServed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Servie'**
+  String get statusServed;
+
+  /// No description provided for @statusPickedUp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Récupérée'**
+  String get statusPickedUp;
+
+  /// No description provided for @columnPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'En attente'**
+  String get columnPending;
+
+  /// No description provided for @columnPreparing.
+  ///
+  /// In fr, this message translates to:
+  /// **'En préparation'**
+  String get columnPreparing;
+
+  /// No description provided for @columnReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prêtes'**
+  String get columnReady;
+
+  /// No description provided for @suiviBarTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suivi Bar'**
+  String get suiviBarTitle;
+
+  /// No description provided for @suiviCuisineTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suivi Cuisine'**
+  String get suiviCuisineTitle;
+
+  /// No description provided for @barItems.
+  ///
+  /// In fr, this message translates to:
+  /// **'Articles bar'**
+  String get barItems;
+
+  /// No description provided for @kitchenItems.
+  ///
+  /// In fr, this message translates to:
+  /// **'Articles cuisine'**
+  String get kitchenItems;
+
+  /// No description provided for @waiterLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Serveur : {name}'**
+  String waiterLine(String name);
+
+  /// No description provided for @orderTotalLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total commande : {amount} FCFA'**
+  String orderTotalLine(String amount);
+
+  /// No description provided for @totalLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total : {amount} FCFA'**
+  String totalLine(String amount);
+
+  /// No description provided for @noteLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Note : {note}'**
+  String noteLine(String note);
+
+  /// No description provided for @barItemsError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur articles bar : {error}'**
+  String barItemsError(String error);
+
+  /// No description provided for @kitchenItemsError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur articles cuisine : {error}'**
+  String kitchenItemsError(String error);
+
+  /// No description provided for @actionSetPreparing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Passer en préparation'**
+  String get actionSetPreparing;
+
+  /// No description provided for @actionMarkReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Marquer prête'**
+  String get actionMarkReady;
+
+  /// No description provided for @actionBackToPreparing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenir en préparation'**
+  String get actionBackToPreparing;
+
+  /// No description provided for @actionBack.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revenir'**
+  String get actionBack;
+
+  /// No description provided for @actionPickedUp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Récupéré'**
+  String get actionPickedUp;
+
+  /// No description provided for @encaissementTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaissement'**
+  String get encaissementTitle;
+
+  /// No description provided for @noUnpaidOrder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune commande non encaissée.'**
+  String get noUnpaidOrder;
+
+  /// No description provided for @ordersCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} commandes'**
+  String ordersCount(String count);
+
+  /// No description provided for @openedAt.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouverte à {time}'**
+  String openedAt(String time);
+
+  /// No description provided for @createdByLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créée par : {name}'**
+  String createdByLine(String name);
+
+  /// No description provided for @totalToCollect.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total à encaisser : {amount} FCFA'**
+  String totalToCollect(String amount);
+
+  /// No description provided for @actionShowAndPrint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Afficher et Imprimer'**
+  String get actionShowAndPrint;
+
+  /// No description provided for @actionCollect.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaisser'**
+  String get actionCollect;
+
+  /// No description provided for @invalidAmount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant invalide.'**
+  String get invalidAmount;
+
+  /// No description provided for @paymentRecorded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement enregistré avec succès.'**
+  String get paymentRecorded;
+
+  /// No description provided for @collectForTicket.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaisser — {label}'**
+  String collectForTicket(String label);
+
+  /// No description provided for @groupedOrders.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} commandes regroupées : {numbers}'**
+  String groupedOrders(String count, String numbers);
+
+  /// No description provided for @paymentMethodLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode de paiement'**
+  String get paymentMethodLabel;
+
+  /// No description provided for @amountReceived.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant reçu'**
+  String get amountReceived;
+
   /// No description provided for @clientDisabled.
   ///
   /// In fr, this message translates to:

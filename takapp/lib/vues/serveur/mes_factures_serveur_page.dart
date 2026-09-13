@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/order_model.dart';
 import 'package:takapp/modeles/order_ticket_model.dart';
 import 'package:takapp/services/payment_service.dart';
@@ -49,14 +50,16 @@ class _MesFacturesServeurPageState extends State<MesFacturesServeurPage> {
 
   String get establishmentId => widget.establishmentId.trim();
 
-  String _clientLabel(OrderModel order) {
+  /// `clientType` est une valeur technique ('restaurant' / 'hotel' / 'bar')
+  /// stockée en base : elle n'est jamais traduite, seul son libellé l'est.
+  String _clientLabel(AppLocalizations l10n, OrderModel order) {
     switch (order.clientType) {
       case 'restaurant':
-        return 'Table ${order.tableNumber ?? "-"}';
+        return l10n.labelTable(order.tableNumber ?? '-');
       case 'hotel':
-        return 'Chambre ${order.roomNumber ?? "-"}';
+        return l10n.labelRoom(order.roomNumber ?? '-');
       case 'bar':
-        return 'Client Bar';
+        return l10n.labelBarClient;
       default:
         return order.clientType;
     }
@@ -116,19 +119,20 @@ class _MesFacturesServeurPageState extends State<MesFacturesServeurPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthController>();
     final user = auth.currentUser;
 
     if (establishmentId.isEmpty || user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     final isToday = DateUtils.isSameDay(_selectedDay, DateTime.now());
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mes factures')),
+      appBar: AppBar(title: Text(l10n.myInvoicesTitle)),
       body: Column(
         children: [
           // Sélecteur de date
@@ -139,7 +143,9 @@ class _MesFacturesServeurPageState extends State<MesFacturesServeurPage> {
                 Expanded(
                   child: Text(
                     isToday
-                        ? "Aujourd'hui (${DateFormat('dd/MM/yyyy').format(_selectedDay)})"
+                        ? l10n.todayWithDate(
+                            DateFormat('dd/MM/yyyy').format(_selectedDay),
+                          )
                         : DateFormat('dd/MM/yyyy').format(_selectedDay),
                     style: const TextStyle(
                       fontSize: 16,
@@ -151,12 +157,12 @@ class _MesFacturesServeurPageState extends State<MesFacturesServeurPage> {
                   TextButton(
                     onPressed: () =>
                         setState(() => _selectedDay = DateTime.now()),
-                    child: const Text("Aujourd'hui"),
+                    child: Text(l10n.today),
                   ),
                 IconButton(
                   onPressed: _pickDate,
                   icon: const Icon(Icons.calendar_today),
-                  tooltip: 'Choisir une date',
+                  tooltip: l10n.pickDate,
                 ),
               ],
             ),
@@ -177,18 +183,20 @@ class _MesFacturesServeurPageState extends State<MesFacturesServeurPage> {
                   return Center(
                     child: Padding(
                       padding: const EdgeInsets.all(16),
-                      child: SelectableText('Erreur : ${snapshot.error}'),
+                      child: SelectableText(
+                        l10n.errorPrefixed('${snapshot.error}'),
+                      ),
                     ),
                   );
                 }
 
                 final orders = snapshot.data ?? [];
                 if (orders.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Padding(
-                      padding: EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(24),
                       child: Text(
-                        'Aucune facture pour cette date.',
+                        l10n.noInvoiceForDate,
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -235,7 +243,7 @@ class _MesFacturesServeurPageState extends State<MesFacturesServeurPage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Client : ${_clientLabel(order)}',
+                              l10n.clientLine(_clientLabel(l10n, order)),
                               style: const TextStyle(fontSize: 13),
                             ),
                             const SizedBox(height: 10),
@@ -245,13 +253,13 @@ class _MesFacturesServeurPageState extends State<MesFacturesServeurPage> {
                               runSpacing: 8,
                               children: [
                                 _statusChip(
-                                  isPaid ? 'Encaissée' : 'Non encaissée',
+                                  isPaid ? l10n.statusPaid : l10n.statusUnpaid,
                                   isPaid,
                                 ),
                                 _statusChip(
                                   isFiscalized
-                                      ? 'Fiscalisée'
-                                      : 'Non fiscalisée',
+                                      ? l10n.statusFiscalized
+                                      : l10n.statusNotFiscalized,
                                   isFiscalized,
                                 ),
                               ],
@@ -269,13 +277,13 @@ class _MesFacturesServeurPageState extends State<MesFacturesServeurPage> {
                                       Icons.payments_outlined,
                                       size: 18,
                                     ),
-                                    label: const Text('Encaisser la facture'),
+                                    label: Text(l10n.actionCollectInvoice),
                                   )
                                 else
                                   OutlinedButton.icon(
                                     onPressed: () => _openDetail(order),
                                     icon: const Icon(Icons.print, size: 18),
-                                    label: const Text('Imprimer facture'),
+                                    label: Text(l10n.actionPrintInvoice),
                                   ),
                                 if (!isFiscalized)
                                   ElevatedButton.icon(
@@ -288,7 +296,7 @@ class _MesFacturesServeurPageState extends State<MesFacturesServeurPage> {
                                       Icons.verified_outlined,
                                       size: 18,
                                     ),
-                                    label: const Text('Fiscaliser'),
+                                    label: Text(l10n.actionFiscalize),
                                   )
                                 else
                                   OutlinedButton.icon(
@@ -297,8 +305,8 @@ class _MesFacturesServeurPageState extends State<MesFacturesServeurPage> {
                                       Icons.receipt_long,
                                       size: 18,
                                     ),
-                                    label: const Text(
-                                      'Imprimer facture fiscalisée',
+                                    label: Text(
+                                      l10n.actionPrintFiscalizedInvoice,
                                     ),
                                   ),
                               ],

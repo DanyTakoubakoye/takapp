@@ -189,9 +189,9 @@ class StoreStockService {
     // On capture la raison d'échec dans une variable au lieu de la lancer
     // depuis l'intérieur de la transaction : sur Flutter web, un `throw` dans
     // runTransaction est "boxé" (message perdu -> "Dart exception thrown from
-    // converted Future"). On relance l'exception APRÈS la transaction, avec un
-    // message explicite nommant l'ingrédient concerné.
-    String? stockError;
+    // converted Future"). On relance l'erreur APRÈS la transaction, en
+    // nommant l'ingrédient concerné.
+    AppError? stockError;
 
     await _firestore.runTransaction((transaction) async {
       stockError = null; // reset : la transaction peut être rejouée
@@ -209,7 +209,10 @@ class StoreStockService {
         final docSnap = await transaction.get(entry.ref);
 
         if (!docSnap.exists || docSnap.data() == null) {
-          stockError = 'Stock introuvable pour « $itemName ».';
+          stockError = AppError(
+            AppErrorCode.stockNotFoundFor,
+            name: itemName,
+          );
           return;
         }
 
@@ -222,17 +225,23 @@ class StoreStockService {
         final stockUnit = data['unit']?.toString() ?? '';
 
         if (stockUnit != unit) {
-          stockError =
-              'Unité incohérente pour « $itemName » : '
-              'stock en "$stockUnit" mais recette en "$unit".';
+          stockError = AppError(
+            AppErrorCode.inconsistentUnit,
+            name: itemName,
+            params: {'stockUnit': stockUnit, 'recipeUnit': unit},
+          );
           return;
         }
 
         if (current < quantity) {
-          stockError =
-              'Stock insuffisant pour « $itemName » : '
-              'disponible ${fmt(current)} $stockUnit, '
-              'requis ${fmt(quantity)} $unit.';
+          stockError = AppError(
+            AppErrorCode.insufficientStockDetailed,
+            name: itemName,
+            params: {
+              'available': '${fmt(current)} $stockUnit',
+              'required': '${fmt(quantity)} $unit',
+            },
+          );
           return;
         }
 
@@ -323,7 +332,10 @@ class StoreStockService {
     // La transaction a été volontairement abandonnée (aucune déduction faite).
     // On relance ici, hors transaction, pour que le message survive au web.
     if (stockError != null) {
-      throw Exception(stockError);
+      // `stockError!` est nécessaire : la variable est capturée et modifiée
+      // dans la closure de la transaction, ce qui empêche Dart de promouvoir
+      // son type malgré le test de nullité juste au-dessus.
+      throw stockError!;
     }
   }
 

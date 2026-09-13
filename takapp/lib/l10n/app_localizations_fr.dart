@@ -383,6 +383,298 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String errStockNotFoundFor(String name) {
+    return 'Stock introuvable pour « $name ».';
+  }
+
+  @override
+  String errInconsistentUnit(String name, String stockUnit, String recipeUnit) {
+    return 'Unité incohérente pour « $name » : stock en « $stockUnit » mais recette en « $recipeUnit ».';
+  }
+
+  @override
+  String errInsufficientStockDetailed(
+    String name,
+    String available,
+    String required,
+  ) {
+    return 'Stock insuffisant pour « $name » : disponible $available, requis $required.';
+  }
+
+  @override
+  String get navNotifications => 'Notifications';
+
+  @override
+  String get serverNotFound => 'Serveur introuvable.';
+
+  @override
+  String get noNotifications => 'Aucune notification.';
+
+  @override
+  String get notificationFallbackTitle => 'Notification';
+
+  @override
+  String get departmentKitchen => 'Cuisine';
+
+  @override
+  String get departmentBar => 'Bar';
+
+  @override
+  String labelTable(String number) {
+    return 'Table $number';
+  }
+
+  @override
+  String labelRoom(String number) {
+    return 'Chambre $number';
+  }
+
+  @override
+  String get labelBarClient => 'Client Bar';
+
+  @override
+  String clientLine(String client) {
+    return 'Client : $client';
+  }
+
+  @override
+  String cancelPartialTitle(String orderNumber) {
+    return 'Annulation partielle $orderNumber';
+  }
+
+  @override
+  String get cancelItemAlreadyCancelled => 'Déjà annulé';
+
+  @override
+  String get cancelItemKitchenDone => 'Cuisine déjà prête/servie';
+
+  @override
+  String get cancelItemBarDone => 'Bar déjà prêt/servi';
+
+  @override
+  String get cancelItemCancelable => 'Annulable';
+
+  @override
+  String get cancelItemsDone => 'Articles annulés et stock restitué.';
+
+  @override
+  String cancelLoadOrderError(String error) {
+    return 'Erreur chargement commande : $error';
+  }
+
+  @override
+  String cancelLoadItemsError(String error) {
+    return 'Erreur chargement articles : $error';
+  }
+
+  @override
+  String cancelDepartmentLine(String department) {
+    return 'Département : $department';
+  }
+
+  @override
+  String get cancelReasonLabel => 'Motif d’annulation';
+
+  @override
+  String cancelAmountToDeduct(String amount) {
+    return 'Montant à retrancher : $amount FCFA';
+  }
+
+  @override
+  String get cancelInProgress => 'Annulation en cours...';
+
+  @override
+  String get cancelValidate => 'Valider l’annulation';
+
+  @override
+  String get myInvoicesTitle => 'Mes factures';
+
+  @override
+  String get today => 'Aujourd’hui';
+
+  @override
+  String todayWithDate(String date) {
+    return 'Aujourd’hui ($date)';
+  }
+
+  @override
+  String get pickDate => 'Choisir une date';
+
+  @override
+  String get noInvoiceForDate => 'Aucune facture pour cette date.';
+
+  @override
+  String get statusPaid => 'Encaissée';
+
+  @override
+  String get statusUnpaid => 'Non encaissée';
+
+  @override
+  String get statusFiscalized => 'Fiscalisée';
+
+  @override
+  String get statusNotFiscalized => 'Non fiscalisée';
+
+  @override
+  String get actionCollectInvoice => 'Encaisser la facture';
+
+  @override
+  String get actionPrintInvoice => 'Imprimer facture';
+
+  @override
+  String get actionFiscalize => 'Fiscaliser';
+
+  @override
+  String get actionPrintFiscalizedInvoice => 'Imprimer facture fiscalisée';
+
+  @override
+  String get commonCancel => 'Annuler';
+
+  @override
+  String get commonValidate => 'Valider';
+
+  @override
+  String get clientFallback => 'Client';
+
+  @override
+  String get noOrders => 'Aucune commande';
+
+  @override
+  String get statusPending => 'En attente';
+
+  @override
+  String get statusPreparing => 'En préparation';
+
+  @override
+  String get statusReady => 'Prête';
+
+  @override
+  String get statusServed => 'Servie';
+
+  @override
+  String get statusPickedUp => 'Récupérée';
+
+  @override
+  String get columnPending => 'En attente';
+
+  @override
+  String get columnPreparing => 'En préparation';
+
+  @override
+  String get columnReady => 'Prêtes';
+
+  @override
+  String get suiviBarTitle => 'Suivi Bar';
+
+  @override
+  String get suiviCuisineTitle => 'Suivi Cuisine';
+
+  @override
+  String get barItems => 'Articles bar';
+
+  @override
+  String get kitchenItems => 'Articles cuisine';
+
+  @override
+  String waiterLine(String name) {
+    return 'Serveur : $name';
+  }
+
+  @override
+  String orderTotalLine(String amount) {
+    return 'Total commande : $amount FCFA';
+  }
+
+  @override
+  String totalLine(String amount) {
+    return 'Total : $amount FCFA';
+  }
+
+  @override
+  String noteLine(String note) {
+    return 'Note : $note';
+  }
+
+  @override
+  String barItemsError(String error) {
+    return 'Erreur articles bar : $error';
+  }
+
+  @override
+  String kitchenItemsError(String error) {
+    return 'Erreur articles cuisine : $error';
+  }
+
+  @override
+  String get actionSetPreparing => 'Passer en préparation';
+
+  @override
+  String get actionMarkReady => 'Marquer prête';
+
+  @override
+  String get actionBackToPreparing => 'Revenir en préparation';
+
+  @override
+  String get actionBack => 'Revenir';
+
+  @override
+  String get actionPickedUp => 'Récupéré';
+
+  @override
+  String get encaissementTitle => 'Encaissement';
+
+  @override
+  String get noUnpaidOrder => 'Aucune commande non encaissée.';
+
+  @override
+  String ordersCount(String count) {
+    return '$count commandes';
+  }
+
+  @override
+  String openedAt(String time) {
+    return 'Ouverte à $time';
+  }
+
+  @override
+  String createdByLine(String name) {
+    return 'Créée par : $name';
+  }
+
+  @override
+  String totalToCollect(String amount) {
+    return 'Total à encaisser : $amount FCFA';
+  }
+
+  @override
+  String get actionShowAndPrint => 'Afficher et Imprimer';
+
+  @override
+  String get actionCollect => 'Encaisser';
+
+  @override
+  String get invalidAmount => 'Montant invalide.';
+
+  @override
+  String get paymentRecorded => 'Paiement enregistré avec succès.';
+
+  @override
+  String collectForTicket(String label) {
+    return 'Encaisser — $label';
+  }
+
+  @override
+  String groupedOrders(String count, String numbers) {
+    return '$count commandes regroupées : $numbers';
+  }
+
+  @override
+  String get paymentMethodLabel => 'Mode de paiement';
+
+  @override
+  String get amountReceived => 'Montant reçu';
+
+  @override
   String get clientDisabled => 'Client désactivé.';
 
   @override

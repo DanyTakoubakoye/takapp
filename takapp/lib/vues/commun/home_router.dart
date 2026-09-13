@@ -25,7 +25,14 @@ class HomeRouter extends StatelessWidget {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthController>();
 
-    if (!auth.isInitialized || auth.isLoading) {
+    // Le spinner global est réservé au DÉMARRAGE de l'application.
+    //
+    // Il incluait auparavant `auth.isLoading`, ce qui démontait l'écran
+    // courant pendant une connexion : au retour de `login()`, le `State`
+    // de LoginPage était détruit, son garde `mounted` coupait la suite, et
+    // le message d'erreur n'était jamais affiché. Chaque écran gère son
+    // propre indicateur de chargement (LoginPage a le sien sur le bouton).
+    if (!auth.isInitialized) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/order_item_model.dart';
 import 'package:takapp/services/cuisine_service.dart';
 import 'package:takapp/vues/serveur/cancel_order_items_page.dart';
@@ -26,39 +27,41 @@ class SuiviCuisinePage extends StatelessWidget {
     }
   }
 
-  String _statusLabel(String status) {
+  /// Les statuts ('pending', 'preparing'…) sont des valeurs techniques
+  /// stockées en base : seul leur libellé est traduit.
+  String _statusLabel(AppLocalizations l10n, String status) {
     switch (status) {
       case 'pending':
-        return 'En attente';
+        return l10n.statusPending;
       case 'preparing':
-        return 'En préparation';
+        return l10n.statusPreparing;
       case 'ready':
-        return 'Prête';
+        return l10n.statusReady;
       case 'served':
-        return 'Servie';
+        return l10n.statusServed;
       default:
         return status;
     }
   }
 
-  String _clientLabel(Map<String, dynamic> data) {
+  String _clientLabel(AppLocalizations l10n, Map<String, dynamic> data) {
     final clientType = (data['clientType'] ?? '').toString().trim();
     final tableNumber = (data['tableNumber'] ?? '').toString().trim();
     final roomNumber = (data['roomNumber'] ?? '').toString().trim();
 
     if (clientType == 'hotel' && roomNumber.isNotEmpty) {
-      return 'Chambre $roomNumber';
+      return l10n.labelRoom(roomNumber);
     }
 
     if (tableNumber.isNotEmpty) {
-      return 'Table $tableNumber';
+      return l10n.labelTable(tableNumber);
     }
 
     if (clientType == 'bar') {
-      return 'Client Bar';
+      return l10n.labelBarClient;
     }
 
-    return clientType.isNotEmpty ? clientType : 'Client';
+    return clientType.isNotEmpty ? clientType : l10n.clientFallback;
   }
 
   bool _canCancelOrder(Map<String, dynamic> data) {
@@ -91,14 +94,15 @@ class SuiviCuisinePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final user = context.watch<AuthController>().currentUser;
     final cuisineService = CuisineService();
     final isMobile = MediaQuery.of(context).size.width < 900;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Suivi Cuisine')),
+      appBar: AppBar(title: Text(l10n.suiviCuisineTitle)),
       body: user == null
-          ? const Center(child: Text('Utilisateur introuvable'))
+          ? Center(child: Text(l10n.errUserNotFound))
           : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: FirebaseFirestore.instance
                   .collection('establishments')
@@ -113,7 +117,9 @@ class SuiviCuisinePage extends StatelessWidget {
                 }
 
                 if (snapshot.hasError) {
-                  return Center(child: Text('Erreur : ${snapshot.error}'));
+                  return Center(
+                    child: Text(l10n.errorPrefixed('${snapshot.error}')),
+                  );
                 }
 
                 final docs = (snapshot.data?.docs ?? []).where((doc) {
@@ -166,12 +172,14 @@ class SuiviCuisinePage extends StatelessWidget {
                         SizedBox(
                           height: 500,
                           child: _CuisineColumn(
-                            title: 'En attente',
+                            title: l10n.columnPending,
                             orders: pending,
                             establishmentId: establishmentId,
                             colorBuilder: _color,
-                            statusLabelBuilder: _statusLabel,
-                            clientLabelBuilder: _clientLabel,
+                            statusLabelBuilder: (status) =>
+                                _statusLabel(l10n, status),
+                            clientLabelBuilder: (data) =>
+                                _clientLabel(l10n, data),
                             canCancelOrder: _canCancelOrder,
                             onCancel: openCancelPage,
                             cuisineService: cuisineService,
@@ -181,12 +189,14 @@ class SuiviCuisinePage extends StatelessWidget {
                         SizedBox(
                           height: 500,
                           child: _CuisineColumn(
-                            title: 'En préparation',
+                            title: l10n.columnPreparing,
                             orders: preparing,
                             establishmentId: establishmentId,
                             colorBuilder: _color,
-                            statusLabelBuilder: _statusLabel,
-                            clientLabelBuilder: _clientLabel,
+                            statusLabelBuilder: (status) =>
+                                _statusLabel(l10n, status),
+                            clientLabelBuilder: (data) =>
+                                _clientLabel(l10n, data),
                             canCancelOrder: _canCancelOrder,
                             onCancel: openCancelPage,
                             cuisineService: cuisineService,
@@ -196,12 +206,14 @@ class SuiviCuisinePage extends StatelessWidget {
                         SizedBox(
                           height: 500,
                           child: _CuisineColumn(
-                            title: 'Prêtes',
+                            title: l10n.columnReady,
                             orders: ready,
                             establishmentId: establishmentId,
                             colorBuilder: _color,
-                            statusLabelBuilder: _statusLabel,
-                            clientLabelBuilder: _clientLabel,
+                            statusLabelBuilder: (status) =>
+                                _statusLabel(l10n, status),
+                            clientLabelBuilder: (data) =>
+                                _clientLabel(l10n, data),
                             canCancelOrder: _canCancelOrder,
                             onCancel: openCancelPage,
                             cuisineService: cuisineService,
@@ -217,12 +229,13 @@ class SuiviCuisinePage extends StatelessWidget {
                   children: [
                     Expanded(
                       child: _CuisineColumn(
-                        title: 'En attente',
+                        title: l10n.columnPending,
                         orders: pending,
                         establishmentId: establishmentId,
                         colorBuilder: _color,
-                        statusLabelBuilder: _statusLabel,
-                        clientLabelBuilder: _clientLabel,
+                        statusLabelBuilder: (status) =>
+                            _statusLabel(l10n, status),
+                        clientLabelBuilder: (data) => _clientLabel(l10n, data),
                         canCancelOrder: _canCancelOrder,
                         onCancel: openCancelPage,
                         cuisineService: cuisineService,
@@ -231,12 +244,13 @@ class SuiviCuisinePage extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _CuisineColumn(
-                        title: 'En préparation',
+                        title: l10n.columnPreparing,
                         orders: preparing,
                         establishmentId: establishmentId,
                         colorBuilder: _color,
-                        statusLabelBuilder: _statusLabel,
-                        clientLabelBuilder: _clientLabel,
+                        statusLabelBuilder: (status) =>
+                            _statusLabel(l10n, status),
+                        clientLabelBuilder: (data) => _clientLabel(l10n, data),
                         canCancelOrder: _canCancelOrder,
                         onCancel: openCancelPage,
                         cuisineService: cuisineService,
@@ -245,12 +259,13 @@ class SuiviCuisinePage extends StatelessWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: _CuisineColumn(
-                        title: 'Prêtes',
+                        title: l10n.columnReady,
                         orders: ready,
                         establishmentId: establishmentId,
                         colorBuilder: _color,
-                        statusLabelBuilder: _statusLabel,
-                        clientLabelBuilder: _clientLabel,
+                        statusLabelBuilder: (status) =>
+                            _statusLabel(l10n, status),
+                        clientLabelBuilder: (data) => _clientLabel(l10n, data),
                         canCancelOrder: _canCancelOrder,
                         onCancel: openCancelPage,
                         cuisineService: cuisineService,
@@ -289,6 +304,8 @@ class _CuisineColumn extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -314,7 +331,7 @@ class _CuisineColumn extends StatelessWidget {
             const SizedBox(height: 10),
             Expanded(
               child: orders.isEmpty
-                  ? const Center(child: Text('Aucune commande'))
+                  ? Center(child: Text(l10n.noOrders))
                   : ListView.separated(
                       itemCount: orders.length,
                       separatorBuilder: (_, _) => const SizedBox(height: 10),
@@ -356,7 +373,9 @@ class _CuisineColumn extends StatelessWidget {
                                 child: Padding(
                                   padding: const EdgeInsets.all(16),
                                   child: Text(
-                                    'Erreur articles cuisine : ${itemSnapshot.error}',
+                                    l10n.kitchenItemsError(
+                                      '${itemSnapshot.error}',
+                                    ),
                                   ),
                                 ),
                               );
@@ -384,11 +403,13 @@ class _CuisineColumn extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      'Client : ${clientLabelBuilder(data)}',
+                                      l10n.clientLine(clientLabelBuilder(data)),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      'Total : ${total.toStringAsFixed(0)} FCFA',
+                                      l10n.totalLine(
+                                        total.toStringAsFixed(0),
+                                      ),
                                       style: const TextStyle(
                                         fontWeight: FontWeight.w600,
                                       ),
@@ -415,9 +436,9 @@ class _CuisineColumn extends StatelessWidget {
                                     const SizedBox(height: 10),
                                     const Divider(height: 1),
                                     const SizedBox(height: 8),
-                                    const Text(
-                                      'Articles cuisine',
-                                      style: TextStyle(
+                                    Text(
+                                      l10n.kitchenItems,
+                                      style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -442,7 +463,7 @@ class _CuisineColumn extends StatelessWidget {
                                                       .trim()
                                                       .isNotEmpty)
                                                     Text(
-                                                      'Note : ${item.note}',
+                                                      l10n.noteLine(item.note),
                                                       style: const TextStyle(
                                                         fontSize: 12,
                                                         color: Colors.black54,
@@ -472,8 +493,8 @@ class _CuisineColumn extends StatelessWidget {
                                                         'preparing',
                                                   );
                                             },
-                                            child: const Text(
-                                              'Passer en préparation',
+                                            child: Text(
+                                              l10n.actionSetPreparing,
                                             ),
                                           ),
                                         if (kitchenStatus == 'preparing')
@@ -487,7 +508,7 @@ class _CuisineColumn extends StatelessWidget {
                                                     newKitchenStatus: 'ready',
                                                   );
                                             },
-                                            child: const Text('Marquer prête'),
+                                            child: Text(l10n.actionMarkReady),
                                           ),
                                         if (kitchenStatus == 'ready')
                                           OutlinedButton(
@@ -501,7 +522,7 @@ class _CuisineColumn extends StatelessWidget {
                                                         'preparing',
                                                   );
                                             },
-                                            child: const Text('Revenir'),
+                                            child: Text(l10n.actionBack),
                                           ),
                                         if (kitchenStatus == 'ready')
                                           ElevatedButton(
@@ -514,7 +535,7 @@ class _CuisineColumn extends StatelessWidget {
                                                     newKitchenStatus: 'served',
                                                   );
                                             },
-                                            child: const Text('Récupéré'),
+                                            child: Text(l10n.actionPickedUp),
                                           ),
                                         if (canCancel)
                                           OutlinedButton.icon(
@@ -523,7 +544,7 @@ class _CuisineColumn extends StatelessWidget {
                                             icon: const Icon(
                                               Icons.cancel_outlined,
                                             ),
-                                            label: const Text('Annuler'),
+                                            label: Text(l10n.commonCancel),
                                           ),
                                       ],
                                     ),

@@ -236,5 +236,20 @@ String _messageFor(AppLocalizations l10n, AppError error) {
       return l10n.errFirestoreError(error.name ?? '');
     case AppErrorCode.consumptionLoadFailed:
       return l10n.errConsumptionLoadFailed(error.name ?? '');
+
+    case AppErrorCode.stockNotFoundFor:
+      return l10n.errStockNotFoundFor(error.name ?? '');
+    case AppErrorCode.inconsistentUnit:
+      return l10n.errInconsistentUnit(
+        error.name ?? '',
+        error.param('stockUnit'),
+        error.param('recipeUnit'),
+      );
+    case AppErrorCode.insufficientStockDetailed:
+      return l10n.errInsufficientStockDetailed(
+        error.name ?? '',
+        error.param('available'),
+        error.param('required'),
+      );
   }
 }

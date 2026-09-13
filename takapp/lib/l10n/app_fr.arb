@@ -243,6 +243,279 @@
     }
   },
 
+  "errStockNotFoundFor": "Stock introuvable pour « {name} ».",
+  "@errStockNotFoundFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errInconsistentUnit": "Unité incohérente pour « {name} » : stock en « {stockUnit} » mais recette en « {recipeUnit} ».",
+  "@errInconsistentUnit": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "stockUnit": {
+        "type": "String"
+      },
+      "recipeUnit": {
+        "type": "String"
+      }
+    }
+  },
+  "errInsufficientStockDetailed": "Stock insuffisant pour « {name} » : disponible {available}, requis {required}.",
+  "@errInsufficientStockDetailed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "available": {
+        "type": "String"
+      },
+      "required": {
+        "type": "String"
+      }
+    }
+  },
+
+  "navNotifications": "Notifications",
+  "serverNotFound": "Serveur introuvable.",
+  "noNotifications": "Aucune notification.",
+  "notificationFallbackTitle": "Notification",
+
+  "departmentKitchen": "Cuisine",
+  "departmentBar": "Bar",
+
+  "labelTable": "Table {number}",
+  "@labelTable": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "labelRoom": "Chambre {number}",
+  "@labelRoom": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "labelBarClient": "Client Bar",
+  "clientLine": "Client : {client}",
+  "@clientLine": {
+    "placeholders": {
+      "client": {
+        "type": "String"
+      }
+    }
+  },
+
+  "cancelPartialTitle": "Annulation partielle {orderNumber}",
+  "@cancelPartialTitle": {
+    "placeholders": {
+      "orderNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelItemAlreadyCancelled": "Déjà annulé",
+  "cancelItemKitchenDone": "Cuisine déjà prête/servie",
+  "cancelItemBarDone": "Bar déjà prêt/servi",
+  "cancelItemCancelable": "Annulable",
+  "cancelItemsDone": "Articles annulés et stock restitué.",
+  "cancelLoadOrderError": "Erreur chargement commande : {error}",
+  "@cancelLoadOrderError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelLoadItemsError": "Erreur chargement articles : {error}",
+  "@cancelLoadItemsError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelDepartmentLine": "Département : {department}",
+  "@cancelDepartmentLine": {
+    "placeholders": {
+      "department": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelReasonLabel": "Motif d’annulation",
+  "cancelAmountToDeduct": "Montant à retrancher : {amount} FCFA",
+  "@cancelAmountToDeduct": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelInProgress": "Annulation en cours...",
+  "cancelValidate": "Valider l’annulation",
+
+  "myInvoicesTitle": "Mes factures",
+  "today": "Aujourd’hui",
+  "todayWithDate": "Aujourd’hui ({date})",
+  "@todayWithDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pickDate": "Choisir une date",
+  "noInvoiceForDate": "Aucune facture pour cette date.",
+  "statusPaid": "Encaissée",
+  "statusUnpaid": "Non encaissée",
+  "statusFiscalized": "Fiscalisée",
+  "statusNotFiscalized": "Non fiscalisée",
+  "actionCollectInvoice": "Encaisser la facture",
+  "actionPrintInvoice": "Imprimer facture",
+  "actionFiscalize": "Fiscaliser",
+  "actionPrintFiscalizedInvoice": "Imprimer facture fiscalisée",
+
+  "commonCancel": "Annuler",
+  "commonValidate": "Valider",
+  "clientFallback": "Client",
+  "noOrders": "Aucune commande",
+
+  "statusPending": "En attente",
+  "statusPreparing": "En préparation",
+  "statusReady": "Prête",
+  "statusServed": "Servie",
+  "statusPickedUp": "Récupérée",
+  "columnPending": "En attente",
+  "columnPreparing": "En préparation",
+  "columnReady": "Prêtes",
+
+  "suiviBarTitle": "Suivi Bar",
+  "suiviCuisineTitle": "Suivi Cuisine",
+  "barItems": "Articles bar",
+  "kitchenItems": "Articles cuisine",
+  "waiterLine": "Serveur : {name}",
+  "@waiterLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "orderTotalLine": "Total commande : {amount} FCFA",
+  "@orderTotalLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "totalLine": "Total : {amount} FCFA",
+  "@totalLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "noteLine": "Note : {note}",
+  "@noteLine": {
+    "placeholders": {
+      "note": {
+        "type": "String"
+      }
+    }
+  },
+  "barItemsError": "Erreur articles bar : {error}",
+  "@barItemsError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "kitchenItemsError": "Erreur articles cuisine : {error}",
+  "@kitchenItemsError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "actionSetPreparing": "Passer en préparation",
+  "actionMarkReady": "Marquer prête",
+  "actionBackToPreparing": "Revenir en préparation",
+  "actionBack": "Revenir",
+  "actionPickedUp": "Récupéré",
+
+  "encaissementTitle": "Encaissement",
+  "noUnpaidOrder": "Aucune commande non encaissée.",
+  "ordersCount": "{count} commandes",
+  "@ordersCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "openedAt": "Ouverte à {time}",
+  "@openedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "createdByLine": "Créée par : {name}",
+  "@createdByLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "totalToCollect": "Total à encaisser : {amount} FCFA",
+  "@totalToCollect": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "actionShowAndPrint": "Afficher et Imprimer",
+  "actionCollect": "Encaisser",
+  "invalidAmount": "Montant invalide.",
+  "paymentRecorded": "Paiement enregistré avec succès.",
+  "collectForTicket": "Encaisser — {label}",
+  "@collectForTicket": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "groupedOrders": "{count} commandes regroupées : {numbers}",
+  "@groupedOrders": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "numbers": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentMethodLabel": "Mode de paiement",
+  "amountReceived": "Montant reçu",
+
   "clientDisabled": "Client désactivé.",
   "clientAdded": "Client ajouté.",
 

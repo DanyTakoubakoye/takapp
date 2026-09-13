@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/services/server_notification_service.dart';
 
 class ServeurNotificationsPage extends StatelessWidget {
@@ -23,24 +24,25 @@ class ServeurNotificationsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final safeEstablishmentId = establishmentId.trim();
     final safeServerId = serveurId.trim();
 
     if (safeEstablishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     if (safeServerId.isEmpty) {
-      return const Scaffold(body: Center(child: Text('Serveur introuvable.')));
+      return Scaffold(body: Center(child: Text(l10n.serverNotFound)));
     }
 
     final service = ServerNotificationService();
     final isSmallScreen = MediaQuery.of(context).size.width < 700;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Notifications')),
+      appBar: AppBar(title: Text(l10n.navNotifications)),
       body: Padding(
         padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
         child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -55,13 +57,15 @@ class ServeurNotificationsPage extends StatelessWidget {
             }
 
             if (snapshot.hasError) {
-              return Center(child: Text('Erreur : ${snapshot.error}'));
+              return Center(
+                child: Text(l10n.errorPrefixed('${snapshot.error}')),
+              );
             }
 
             final docs = snapshot.data?.docs ?? [];
 
             if (docs.isEmpty) {
-              return const Center(child: Text('Aucune notification.'));
+              return Center(child: Text(l10n.noNotifications));
             }
 
             final notifications = [...docs];
@@ -87,10 +91,13 @@ class ServeurNotificationsPage extends StatelessWidget {
                 final doc = notifications[index];
                 final data = doc.data();
 
+                // Le titre vient de la notification elle-même (rédigée par
+                // l'émetteur) : il n'est pas traduisible ici. Seul le repli
+                // l'est.
                 final title =
                     data['title']?.toString() ??
                     data['type']?.toString() ??
-                    'Notification';
+                    l10n.notificationFallbackTitle;
 
                 final message =
                     data['message']?.toString() ??

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/services/bar_service.dart';
 import 'package:takapp/vues/serveur/cancel_order_items_page.dart';
 
@@ -25,39 +26,41 @@ class SuiviBarPage extends StatelessWidget {
     }
   }
 
-  String _statusLabel(String status) {
+  /// Les statuts ('pending', 'preparing'…) sont des valeurs techniques
+  /// stockées en base : seul leur libellé est traduit.
+  String _statusLabel(AppLocalizations l10n, String status) {
     switch (status) {
       case 'pending':
-        return 'En attente';
+        return l10n.statusPending;
       case 'preparing':
-        return 'En préparation';
+        return l10n.statusPreparing;
       case 'ready':
-        return 'Prête';
+        return l10n.statusReady;
       case 'served':
-        return 'Récupérée';
+        return l10n.statusPickedUp;
       default:
         return status;
     }
   }
 
-  String _clientLabel(Map<String, dynamic> data) {
+  String _clientLabel(AppLocalizations l10n, Map<String, dynamic> data) {
     final clientType = (data['clientType'] ?? '').toString().trim();
     final tableNumber = (data['tableNumber'] ?? '').toString().trim();
     final roomNumber = (data['roomNumber'] ?? '').toString().trim();
 
     if (clientType == 'hotel' && roomNumber.isNotEmpty) {
-      return 'Chambre $roomNumber';
+      return l10n.labelRoom(roomNumber);
     }
 
     if (tableNumber.isNotEmpty) {
-      return 'Table $tableNumber';
+      return l10n.labelTable(tableNumber);
     }
 
     if (clientType == 'bar') {
-      return 'Client Bar';
+      return l10n.labelBarClient;
     }
 
-    return clientType.isNotEmpty ? clientType : 'Client';
+    return clientType.isNotEmpty ? clientType : l10n.clientFallback;
   }
 
   bool _canCancelOrder(Map<String, dynamic> data) {
@@ -83,6 +86,7 @@ class SuiviBarPage extends StatelessWidget {
     List<Map<String, dynamic>> barItems,
     String safeEstablishmentId,
   ) {
+    final l10n = AppLocalizations.of(context);
     final barService = BarService();
     final data = doc.data() as Map<String, dynamic>;
 
@@ -108,12 +112,12 @@ class SuiviBarPage extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 6),
-            Text('Serveur : $createdByName'),
+            Text(l10n.waiterLine(createdByName)),
             const SizedBox(height: 4),
-            Text('Client : ${_clientLabel(data)}'),
+            Text(l10n.clientLine(_clientLabel(l10n, data))),
             const SizedBox(height: 4),
             Text(
-              'Total commande : ${total.toStringAsFixed(0)} FCFA',
+              l10n.orderTotalLine(total.toStringAsFixed(0)),
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 6),
@@ -124,15 +128,15 @@ class SuiviBarPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                _statusLabel(barStatus),
+                _statusLabel(l10n, barStatus),
                 style: const TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
             const SizedBox(height: 12),
             const Divider(),
-            const Text(
-              'Articles bar',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Text(
+              l10n.barItems,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             ...barItems.map(
@@ -162,7 +166,7 @@ class SuiviBarPage extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.local_bar),
-                    label: const Text('Passer en préparation'),
+                    label: Text(l10n.actionSetPreparing),
                   ),
                 if (barStatus == 'preparing')
                   ElevatedButton.icon(
@@ -174,7 +178,7 @@ class SuiviBarPage extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.check_circle_outline),
-                    label: const Text('Marquer prête'),
+                    label: Text(l10n.actionMarkReady),
                   ),
                 if (barStatus == 'ready')
                   OutlinedButton.icon(
@@ -186,7 +190,7 @@ class SuiviBarPage extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.undo),
-                    label: const Text('Revenir en préparation'),
+                    label: Text(l10n.actionBackToPreparing),
                   ),
                 if (barStatus == 'ready')
                   ElevatedButton.icon(
@@ -198,7 +202,7 @@ class SuiviBarPage extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.done_all),
-                    label: const Text('Récupéré'),
+                    label: Text(l10n.actionPickedUp),
                   ),
                 if (canCancel)
                   OutlinedButton.icon(
@@ -215,7 +219,7 @@ class SuiviBarPage extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.cancel_outlined),
-                    label: const Text('Annuler'),
+                    label: Text(l10n.commonCancel),
                   ),
               ],
             ),
@@ -231,6 +235,7 @@ class SuiviBarPage extends StatelessWidget {
     List<QueryDocumentSnapshot> orders,
     String safeEstablishmentId,
   ) {
+    final l10n = AppLocalizations.of(context);
     final barService = BarService();
 
     return Card(
@@ -246,7 +251,7 @@ class SuiviBarPage extends StatelessWidget {
             const SizedBox(height: 10),
             Expanded(
               child: orders.isEmpty
-                  ? const Center(child: Text('Aucune commande'))
+                  ? Center(child: Text(l10n.noOrders))
                   : ListView.separated(
                       itemCount: orders.length,
                       separatorBuilder: (_, _) => const SizedBox(height: 10),
@@ -276,7 +281,7 @@ class SuiviBarPage extends StatelessWidget {
                                 child: Padding(
                                   padding: const EdgeInsets.all(16),
                                   child: Text(
-                                    'Erreur articles bar : ${snapshot.error}',
+                                    l10n.barItemsError('${snapshot.error}'),
                                   ),
                                 ),
                               );
@@ -307,26 +312,25 @@ class SuiviBarPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final safeEstablishmentId = establishmentId.trim();
     final user = context.watch<AuthController>().currentUser;
     final isSmallScreen = MediaQuery.of(context).size.width < 900;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     final serveurId = user.uid;
 
     if (safeEstablishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Suivi Bar')),
+      appBar: AppBar(title: Text(l10n.suiviBarTitle)),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('establishments')
@@ -342,7 +346,9 @@ class SuiviBarPage extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Erreur : ${snapshot.error}'));
+            return Center(
+              child: Text(l10n.errorPrefixed('${snapshot.error}')),
+            );
           }
 
           final docs = (snapshot.data?.docs ?? []).where((doc) {
@@ -374,7 +380,7 @@ class SuiviBarPage extends StatelessWidget {
                     height: 500,
                     child: _buildColumnCard(
                       context,
-                      'En attente',
+                      l10n.columnPending,
                       pending,
                       safeEstablishmentId,
                     ),
@@ -384,7 +390,7 @@ class SuiviBarPage extends StatelessWidget {
                     height: 500,
                     child: _buildColumnCard(
                       context,
-                      'En préparation',
+                      l10n.columnPreparing,
                       preparing,
                       safeEstablishmentId,
                     ),
@@ -394,7 +400,7 @@ class SuiviBarPage extends StatelessWidget {
                     height: 500,
                     child: _buildColumnCard(
                       context,
-                      'Prêtes',
+                      l10n.columnReady,
                       ready,
                       safeEstablishmentId,
                     ),
@@ -410,7 +416,7 @@ class SuiviBarPage extends StatelessWidget {
               Expanded(
                 child: _buildColumnCard(
                   context,
-                  'En attente',
+                  l10n.columnPending,
                   pending,
                   safeEstablishmentId,
                 ),
@@ -418,7 +424,7 @@ class SuiviBarPage extends StatelessWidget {
               Expanded(
                 child: _buildColumnCard(
                   context,
-                  'En préparation',
+                  l10n.columnPreparing,
                   preparing,
                   safeEstablishmentId,
                 ),
@@ -426,7 +432,7 @@ class SuiviBarPage extends StatelessWidget {
               Expanded(
                 child: _buildColumnCard(
                   context,
-                  'Prêtes',
+                  l10n.columnReady,
                   ready,
                   safeEstablishmentId,
                 ),

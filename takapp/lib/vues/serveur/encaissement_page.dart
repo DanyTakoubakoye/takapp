@@ -29,27 +29,26 @@ class EncaissementPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
     final paymentService = context.read<PaymentService>();
     final user = auth.currentUser;
     final isSmall = _isSmallScreen(context);
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     final establishmentId = user.establishmentId.trim();
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Encaissement')),
+      appBar: AppBar(title: Text(l10n.encaissementTitle)),
       body: Padding(
         padding: EdgeInsets.all(isSmall ? 12 : 16),
         child: StreamBuilder<List<OrderModel>>(
@@ -63,7 +62,9 @@ class EncaissementPage extends StatelessWidget {
             }
 
             if (snapshot.hasError) {
-              return Center(child: Text('Erreur: ${snapshot.error}'));
+              return Center(
+                child: Text(l10n.errorPrefixed('${snapshot.error}')),
+              );
             }
 
             final rawOrders = snapshot.data ?? [];
@@ -71,9 +72,7 @@ class EncaissementPage extends StatelessWidget {
             final orders = rawOrders.where(_isVisibleForCashier).toList();
 
             if (orders.isEmpty) {
-              return const Center(
-                child: Text('Aucune commande non encaissée.'),
-              );
+              return Center(child: Text(l10n.noUnpaidOrder));
             }
 
             // Toutes les commandes non encaissées d'une même table ou d'une
@@ -96,7 +95,7 @@ class EncaissementPage extends StatelessWidget {
                           children: [
                             Expanded(
                               child: Text(
-                                ticket.label,
+                                ticket.labelFor(l10n),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
@@ -114,7 +113,7 @@ class EncaissementPage extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
-                                  '${ticket.orders.length} commandes',
+                                  l10n.ordersCount('${ticket.orders.length}'),
                                   style: const TextStyle(
                                     color: Colors.blue,
                                     fontWeight: FontWeight.w600,
@@ -125,11 +124,15 @@ class EncaissementPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Ouverte à ${DateFormat('HH:mm').format(ticket.openedAt)}',
+                          l10n.openedAt(
+                            DateFormat('HH:mm').format(ticket.openedAt),
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Créée par : ${ticket.primaryOrder.createdByName}',
+                          l10n.createdByLine(
+                            ticket.primaryOrder.createdByName,
+                          ),
                         ),
                         const SizedBox(height: 6),
                         ...ticket.orders.map(
@@ -148,7 +151,9 @@ class EncaissementPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Total à encaisser : ${ticket.total.toStringAsFixed(0)} FCFA',
+                          l10n.totalToCollect(
+                            ticket.total.toStringAsFixed(0),
+                          ),
                           style: const TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 15,
@@ -174,7 +179,7 @@ class EncaissementPage extends StatelessWidget {
                                   );
                                 },
                                 icon: const Icon(Icons.receipt_long),
-                                label: const Text('Afficher et Imprimer'),
+                                label: Text(l10n.actionShowAndPrint),
                               ),
                               ElevatedButton.icon(
                                 onPressed: () {
@@ -187,7 +192,7 @@ class EncaissementPage extends StatelessWidget {
                                   );
                                 },
                                 icon: const Icon(Icons.payments_outlined),
-                                label: const Text('Encaisser'),
+                                label: Text(l10n.actionCollect),
                               ),
                             ],
                           ),
@@ -236,6 +241,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthController>();
     final paymentController = context.read<PaymentController>();
     final user = auth.currentUser;
@@ -243,14 +249,14 @@ class _PaymentDialogState extends State<_PaymentDialog> {
     if (user == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errUserNotFound)));
       return;
     }
 
     if (establishmentId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Établissement introuvable.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errEstablishmentNotFound)));
       return;
     }
 
@@ -259,7 +265,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
     if (amount == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Montant invalide.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.invalidAmount)));
       return;
     }
 
@@ -278,12 +284,10 @@ class _PaymentDialogState extends State<_PaymentDialog> {
     if (success) {
       Navigator.pop(context);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Paiement enregistré avec succès.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.paymentRecorded)));
     } else if (paymentController.hasError) {
-      final l10n = AppLocalizations.of(context);
-
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(
@@ -294,10 +298,11 @@ class _PaymentDialogState extends State<_PaymentDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final paymentController = context.watch<PaymentController>();
 
     return AlertDialog(
-      title: Text('Encaisser — ${widget.ticket.label}'),
+      title: Text(l10n.collectForTicket(widget.ticket.labelFor(l10n))),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -307,14 +312,18 @@ class _PaymentDialogState extends State<_PaymentDialog> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Text(
-                  '${widget.ticket.orders.length} commandes regroupées : '
-                  '${widget.ticket.orderNumbers.join(", ")}',
+                  l10n.groupedOrders(
+                    '${widget.ticket.orders.length}',
+                    widget.ticket.orderNumbers.join(', '),
+                  ),
                   style: const TextStyle(fontSize: 12),
                 ),
               ),
             DropdownButtonFormField<String>(
               initialValue: selectedMethod,
-              decoration: const InputDecoration(labelText: 'Mode de paiement'),
+              decoration: InputDecoration(
+                labelText: l10n.paymentMethodLabel,
+              ),
               items: AppPaymentMethods.labels.entries
                   .map(
                     (entry) => DropdownMenuItem<String>(
@@ -338,7 +347,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
               controller: amountController,
               enabled: !paymentController.isSubmitting,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Montant reçu'),
+              decoration: InputDecoration(labelText: l10n.amountReceived),
             ),
           ],
         ),
@@ -348,7 +357,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
           onPressed: paymentController.isSubmitting
               ? null
               : () => Navigator.pop(context),
-          child: const Text('Annuler'),
+          child: Text(l10n.commonCancel),
         ),
         ElevatedButton(
           onPressed: paymentController.isSubmitting ? null : _submit,
@@ -361,7 +370,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                     color: Colors.white,
                   ),
                 )
-              : const Text('Valider'),
+              : Text(l10n.commonValidate),
         ),
       ],
     );

@@ -1,3 +1,4 @@
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/order_model.dart';
 
 /// Addition d'une table ou d'une chambre.
@@ -45,6 +46,12 @@ class OrderTicket {
     return orders.map((order) => order.orderNumber).toList();
   }
 
+  /// Libellé destiné aux DOCUMENTS IMPRIMÉS (factures, tickets).
+  ///
+  /// Volontairement en français et indépendant de la langue de
+  /// l'utilisateur : une facture ne doit pas changer de contenu selon qui
+  /// clique sur « imprimer ». Pour l'affichage à l'écran, utiliser
+  /// [labelFor].
   String get label {
     switch (primaryOrder.clientType) {
       case 'restaurant':
@@ -55,6 +62,26 @@ class OrderTicket {
 
       case 'bar':
         return 'Client Bar';
+
+      default:
+        return primaryOrder.clientType;
+    }
+  }
+
+  /// Libellé traduit, destiné à l'AFFICHAGE.
+  ///
+  /// `clientType` reste une valeur technique ('restaurant', 'hotel',
+  /// 'bar') : seul son rendu est localisé.
+  String labelFor(AppLocalizations l10n) {
+    switch (primaryOrder.clientType) {
+      case 'restaurant':
+        return l10n.labelTable(primaryOrder.tableNumber ?? '-');
+
+      case 'hotel':
+        return l10n.labelRoom(primaryOrder.roomNumber ?? '-');
+
+      case 'bar':
+        return l10n.labelBarClient;
 
       default:
         return primaryOrder.clientType;

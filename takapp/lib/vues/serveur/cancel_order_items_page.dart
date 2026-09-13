@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/core/errors/app_error.dart';
+import 'package:takapp/core/errors/error_localizer.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/order_item_model.dart';
 import 'package:takapp/services/order_service.dart';
 
@@ -75,8 +78,12 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
     return true;
   }
 
-  String _itemStatusLabel(OrderItemModel item, Map<String, dynamic> orderData) {
-    if (item.isCancelled) return 'Déjà annulé';
+  String _itemStatusLabel(
+    AppLocalizations l10n,
+    OrderItemModel item,
+    Map<String, dynamic> orderData,
+  ) {
+    if (item.isCancelled) return l10n.cancelItemAlreadyCancelled;
 
     final kitchenStatus = (orderData['kitchenStatus'] ?? '').toString();
     final barStatus = (orderData['barStatus'] ?? '').toString();
@@ -84,30 +91,44 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
 
     if ((target == 'kitchen' || target == 'cuisine') &&
         (kitchenStatus == 'ready' || kitchenStatus == 'served')) {
-      return 'Cuisine déjà prête/servie';
+      return l10n.cancelItemKitchenDone;
     }
 
     if (target == 'bar' && (barStatus == 'ready' || barStatus == 'served')) {
-      return 'Bar déjà prêt/servi';
+      return l10n.cancelItemBarDone;
     }
 
-    return 'Annulable';
+    return l10n.cancelItemCancelable;
+  }
+
+  /// `targetDepartment` est une valeur technique ('kitchen' / 'bar') stockée
+  /// en base : on la traduit à l'affichage sans jamais la remplacer.
+  String _departmentLabel(AppLocalizations l10n, String department) {
+    switch (department.toLowerCase()) {
+      case 'kitchen':
+      case 'cuisine':
+        return l10n.departmentKitchen;
+      case 'bar':
+        return l10n.departmentBar;
+      default:
+        return department;
+    }
   }
 
   Future<void> _submit(List<OrderItemModel> items) async {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Établissement introuvable.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errEstablishmentNotFound)));
       return;
     }
 
     if (_selectedItemIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez sélectionner au moins un article.'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errSelectAtLeastOneItem)));
       return;
     }
 
@@ -121,7 +142,7 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
       final orderService = OrderService();
 
       if (user == null) {
-        throw Exception('Utilisateur introuvable.');
+        throw const AppError(AppErrorCode.userNotFound);
       }
 
       await orderService.cancelOrderItems(
@@ -135,17 +156,17 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Articles annulés et stock restitué.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.cancelItemsDone)));
 
       Navigator.pop(context, true);
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erreur : $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.errorPrefixed(localizedError(l10n, e)))),
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -169,14 +190,18 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('Annulation partielle ${widget.orderNumber}')),
+      appBar: AppBar(
+        title: Text(l10n.cancelPartialTitle(widget.orderNumber)),
+      ),
       body: FutureBuilder<Map<String, dynamic>?>(
         future: _loadOrder(),
         builder: (context, orderSnapshot) {
@@ -187,7 +212,7 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
           if (orderSnapshot.hasError || orderSnapshot.data == null) {
             return Center(
               child: Text(
-                'Erreur chargement commande : ${orderSnapshot.error}',
+                l10n.cancelLoadOrderError('${orderSnapshot.error}'),
               ),
             );
           }
@@ -204,7 +229,7 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
               if (itemsSnapshot.hasError) {
                 return Center(
                   child: Text(
-                    'Erreur chargement articles : ${itemsSnapshot.error}',
+                    l10n.cancelLoadItemsError('${itemsSnapshot.error}'),
                   ),
                 );
               }
@@ -212,9 +237,7 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
               final items = itemsSnapshot.data ?? [];
 
               if (items.isEmpty) {
-                return const Center(
-                  child: Text('Aucun article trouvé dans cette commande.'),
-                );
+                return Center(child: Text(l10n.errNoItemsFoundInOrder));
               }
 
               final selectedAmount = _selectedAmount(items);
@@ -253,10 +276,17 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
                                   '${item.quantity} x ${item.unitPrice.toStringAsFixed(0)} FCFA = ${item.totalPrice.toStringAsFixed(0)} FCFA',
                                 ),
                                 const SizedBox(height: 4),
-                                Text('Département : ${item.targetDepartment}'),
+                                Text(
+                                  l10n.cancelDepartmentLine(
+                                    _departmentLabel(
+                                      l10n,
+                                      item.targetDepartment,
+                                    ),
+                                  ),
+                                ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  _itemStatusLabel(item, orderData),
+                                  _itemStatusLabel(l10n, item, orderData),
                                   style: TextStyle(
                                     color: item.isCancelled
                                         ? Colors.red
@@ -297,16 +327,18 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
                         TextField(
                           controller: _reasonController,
                           maxLines: 3,
-                          decoration: const InputDecoration(
-                            labelText: 'Motif d’annulation',
-                            border: OutlineInputBorder(),
+                          decoration: InputDecoration(
+                            labelText: l10n.cancelReasonLabel,
+                            border: const OutlineInputBorder(),
                           ),
                         ),
                         const SizedBox(height: 12),
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            'Montant à retrancher : ${selectedAmount.toStringAsFixed(0)} FCFA',
+                            l10n.cancelAmountToDeduct(
+                              selectedAmount.toStringAsFixed(0),
+                            ),
                             style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ),
@@ -329,8 +361,8 @@ class _CancelOrderItemsPageState extends State<CancelOrderItemsPage> {
                                 : const Icon(Icons.cancel_schedule_send),
                             label: Text(
                               _isSubmitting
-                                  ? 'Annulation en cours...'
-                                  : 'Valider l’annulation',
+                                  ? l10n.cancelInProgress
+                                  : l10n.cancelValidate,
                             ),
                           ),
                         ),

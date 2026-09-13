@@ -237,6 +237,279 @@
     }
   },
 
+  "errStockNotFoundFor": "Stock not found for \"{name}\".",
+  "@errStockNotFoundFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errInconsistentUnit": "Inconsistent unit for \"{name}\": stock in \"{stockUnit}\" but recipe in \"{recipeUnit}\".",
+  "@errInconsistentUnit": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "stockUnit": {
+        "type": "String"
+      },
+      "recipeUnit": {
+        "type": "String"
+      }
+    }
+  },
+  "errInsufficientStockDetailed": "Insufficient stock for \"{name}\": {available} available, {required} required.",
+  "@errInsufficientStockDetailed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "available": {
+        "type": "String"
+      },
+      "required": {
+        "type": "String"
+      }
+    }
+  },
+
+  "navNotifications": "Notifications",
+  "serverNotFound": "Waiter not found.",
+  "noNotifications": "No notifications.",
+  "notificationFallbackTitle": "Notification",
+
+  "departmentKitchen": "Kitchen",
+  "departmentBar": "Bar",
+
+  "labelTable": "Table {number}",
+  "@labelTable": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "labelRoom": "Room {number}",
+  "@labelRoom": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "labelBarClient": "Bar client",
+  "clientLine": "Client: {client}",
+  "@clientLine": {
+    "placeholders": {
+      "client": {
+        "type": "String"
+      }
+    }
+  },
+
+  "cancelPartialTitle": "Partial cancellation {orderNumber}",
+  "@cancelPartialTitle": {
+    "placeholders": {
+      "orderNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelItemAlreadyCancelled": "Already cancelled",
+  "cancelItemKitchenDone": "Kitchen already ready/served",
+  "cancelItemBarDone": "Bar already ready/served",
+  "cancelItemCancelable": "Can be cancelled",
+  "cancelItemsDone": "Items cancelled and stock restored.",
+  "cancelLoadOrderError": "Error loading the order: {error}",
+  "@cancelLoadOrderError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelLoadItemsError": "Error loading the items: {error}",
+  "@cancelLoadItemsError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelDepartmentLine": "Department: {department}",
+  "@cancelDepartmentLine": {
+    "placeholders": {
+      "department": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelReasonLabel": "Cancellation reason",
+  "cancelAmountToDeduct": "Amount to deduct: {amount} FCFA",
+  "@cancelAmountToDeduct": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelInProgress": "Cancelling...",
+  "cancelValidate": "Confirm cancellation",
+
+  "myInvoicesTitle": "My invoices",
+  "today": "Today",
+  "todayWithDate": "Today ({date})",
+  "@todayWithDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pickDate": "Pick a date",
+  "noInvoiceForDate": "No invoice for this date.",
+  "statusPaid": "Paid",
+  "statusUnpaid": "Unpaid",
+  "statusFiscalized": "Fiscalized",
+  "statusNotFiscalized": "Not fiscalized",
+  "actionCollectInvoice": "Collect payment",
+  "actionPrintInvoice": "Print invoice",
+  "actionFiscalize": "Fiscalize",
+  "actionPrintFiscalizedInvoice": "Print fiscalized invoice",
+
+  "commonCancel": "Cancel",
+  "commonValidate": "Confirm",
+  "clientFallback": "Client",
+  "noOrders": "No orders",
+
+  "statusPending": "Pending",
+  "statusPreparing": "Preparing",
+  "statusReady": "Ready",
+  "statusServed": "Served",
+  "statusPickedUp": "Picked up",
+  "columnPending": "Pending",
+  "columnPreparing": "Preparing",
+  "columnReady": "Ready",
+
+  "suiviBarTitle": "Bar tracking",
+  "suiviCuisineTitle": "Kitchen tracking",
+  "barItems": "Bar items",
+  "kitchenItems": "Kitchen items",
+  "waiterLine": "Waiter: {name}",
+  "@waiterLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "orderTotalLine": "Order total: {amount} FCFA",
+  "@orderTotalLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "totalLine": "Total: {amount} FCFA",
+  "@totalLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "noteLine": "Note: {note}",
+  "@noteLine": {
+    "placeholders": {
+      "note": {
+        "type": "String"
+      }
+    }
+  },
+  "barItemsError": "Error loading bar items: {error}",
+  "@barItemsError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "kitchenItemsError": "Error loading kitchen items: {error}",
+  "@kitchenItemsError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "actionSetPreparing": "Start preparing",
+  "actionMarkReady": "Mark as ready",
+  "actionBackToPreparing": "Back to preparing",
+  "actionBack": "Back",
+  "actionPickedUp": "Picked up",
+
+  "encaissementTitle": "Payment collection",
+  "noUnpaidOrder": "No unpaid order.",
+  "ordersCount": "{count} orders",
+  "@ordersCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "openedAt": "Opened at {time}",
+  "@openedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "createdByLine": "Created by: {name}",
+  "@createdByLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "totalToCollect": "Total to collect: {amount} FCFA",
+  "@totalToCollect": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "actionShowAndPrint": "View and print",
+  "actionCollect": "Collect",
+  "invalidAmount": "Invalid amount.",
+  "paymentRecorded": "Payment recorded successfully.",
+  "collectForTicket": "Collect — {label}",
+  "@collectForTicket": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "groupedOrders": "{count} grouped orders: {numbers}",
+  "@groupedOrders": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "numbers": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentMethodLabel": "Payment method",
+  "amountReceived": "Amount received",
+
   "clientDisabled": "Client disabled.",
   "clientAdded": "Client added.",
 

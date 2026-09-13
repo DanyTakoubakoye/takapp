@@ -183,6 +183,16 @@ enum AppErrorCode {
   /// Utilisent [AppError.name] (détail technique de l'échec).
   firestoreError,
   consumptionLoadFailed,
+
+  /// =========================
+  /// STOCK DETAILLE
+  /// =========================
+  ///
+  /// Ces trois messages portent plusieurs variables : ils utilisent
+  /// [AppError.params] en plus de [AppError.name].
+  stockNotFoundFor,
+  inconsistentUnit,
+  insufficientStockDetailed,
 }
 
 /// Exception traduisible à l'affichage.
@@ -194,7 +204,18 @@ class AppError implements Exception {
   final AppErrorCode code;
   final String? name;
 
-  const AppError(this.code, {this.name});
+  /// Variables supplémentaires, pour les rares messages qui en portent
+  /// plus d'une (unités, quantités disponibles et requises…).
+  ///
+  /// [name] reste le paramètre principal et couvre la grande majorité des
+  /// cas ; `params` ne sert qu'aux messages composés.
+  final Map<String, String> params;
+
+  const AppError(this.code, {this.name, this.params = const {}});
+
+  /// Valeur d'un paramètre supplémentaire, ou chaîne vide s'il est absent :
+  /// un message incomplet vaut mieux qu'un plantage à l'affichage.
+  String param(String key) => params[key] ?? '';
 
   /// Volontairement technique : ce texte ne doit jamais être montré à
   /// l'utilisateur. Il n'apparaît que dans les logs.
