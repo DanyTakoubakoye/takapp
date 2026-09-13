@@ -1029,6 +1029,295 @@ class AppLocalizationsFr extends AppLocalizations {
   String get accountMixed => 'Paiement Mixte';
 
   @override
+  String get actionEdit => 'Modifier';
+
+  @override
+  String get actionDelete => 'Supprimer';
+
+  @override
+  String get actionDisable => 'Désactiver';
+
+  @override
+  String get actionSave => 'Enregistrer';
+
+  @override
+  String get savingInProgress => 'Enregistrement...';
+
+  @override
+  String get fieldRequired => 'Obligatoire';
+
+  @override
+  String get receptionTitle => 'Réception';
+
+  @override
+  String get receptionSubtitle =>
+      'Espace réception : chambres, séjours et factures';
+
+  @override
+  String get tileRoomsBoardTitle => 'Plan des chambres';
+
+  @override
+  String get tileRoomsBoardSubtitle => 'Voir l’état des chambres en temps réel';
+
+  @override
+  String get tileReservationsTitle => 'Réservations';
+
+  @override
+  String get tileReservationsSubtitle => 'Créer et gérer les réservations';
+
+  @override
+  String get tileRoomInvoicingTitle => 'Facturation chambre';
+
+  @override
+  String get tileRoomInvoicingSubtitle => 'Facturer et certifier un séjour';
+
+  @override
+  String get tileInvoicesListTitle => 'Liste des factures';
+
+  @override
+  String get tileInvoicesListSubtitle => 'Consulter les factures chambres';
+
+  @override
+  String get tileClientsTitle => 'Clients';
+
+  @override
+  String get tileClientsSubtitle => 'Fiches clients et historique';
+
+  @override
+  String get roomsTitle => 'Chambres';
+
+  @override
+  String get tileRoomsSubtitle => 'Gérer les chambres';
+
+  @override
+  String get roomTypesTitle => 'Types de chambres';
+
+  @override
+  String get tileRoomTypesSubtitle => 'Configurer les catégories';
+
+  @override
+  String get disableTypeConfirmTitle => 'Désactiver ce type ?';
+
+  @override
+  String disableTypeConfirmBody(String name) {
+    return 'Le type « $name » ne sera plus proposé, mais les chambres existantes ne sont pas supprimées.';
+  }
+
+  @override
+  String get typeDisabled => 'Type désactivé.';
+
+  @override
+  String get typeUpdated => 'Type modifié.';
+
+  @override
+  String get typeAdded => 'Type ajouté.';
+
+  @override
+  String get addRoomType => 'Ajouter un type';
+
+  @override
+  String get noRoomType =>
+      'Aucun type de chambre.\nAjoutez vos catégories (Simple, Suite, Bungalow...).';
+
+  @override
+  String roomTypeSubtitle(String price, String capacity) {
+    return '$price FCFA / nuit · $capacity pers.';
+  }
+
+  @override
+  String get editTypeTitle => 'Modifier le type';
+
+  @override
+  String get newTypeTitle => 'Nouveau type de chambre';
+
+  @override
+  String get typeNameLabel => 'Nom du type';
+
+  @override
+  String get typeNameHint => 'Ex. Suite Présidentielle, Bungalow...';
+
+  @override
+  String get pricePerNightLabel => 'Prix par nuit (FCFA)';
+
+  @override
+  String get pricePerNightHint => 'Ex. 25000';
+
+  @override
+  String get invalidPrice => 'Prix invalide';
+
+  @override
+  String get capacityLabel => 'Capacité (personnes)';
+
+  @override
+  String get capacityHint => 'Ex. 2';
+
+  @override
+  String get invalidCapacity => 'Capacité invalide';
+
+  @override
+  String get descriptionOptionalLabel => 'Description (optionnel)';
+
+  @override
+  String get amenitiesLabel => 'Équipements (séparés par des virgules)';
+
+  @override
+  String get amenitiesHint => 'Ex. Clim, Wifi, TV, Minibar';
+
+  @override
+  String get roomStatusAvailable => 'Libre';
+
+  @override
+  String get roomStatusOccupied => 'Occupée';
+
+  @override
+  String get roomStatusCleaning => 'À nettoyer';
+
+  @override
+  String get roomStatusMaintenance => 'Maintenance';
+
+  @override
+  String changeRoomStateTitle(String number) {
+    return 'Chambre $number — changer l’état';
+  }
+
+  @override
+  String roomOccupiedTitle(String number) {
+    return 'Chambre $number (occupée)';
+  }
+
+  @override
+  String get actionCheckOut => 'Check-out (départ du client)';
+
+  @override
+  String get actionChangeStateManually => 'Changer l’état manuellement';
+
+  @override
+  String roomStatusChanged(String number, String status) {
+    return 'Chambre $number : $status';
+  }
+
+  @override
+  String get noActiveReservationForRoom =>
+      'Aucune réservation active trouvée pour cette chambre. Vous pouvez changer son état manuellement.';
+
+  @override
+  String get checkOutTitle => 'Check-out';
+
+  @override
+  String checkOutConfirmBody(String client, String number) {
+    return 'Confirmer le départ de $client (chambre $number) ?\n\nLa chambre passera « à nettoyer ».';
+  }
+
+  @override
+  String get actionConfirmDeparture => 'Confirmer le départ';
+
+  @override
+  String get checkOutDone => 'Check-out effectué.';
+
+  @override
+  String get billStayTitle => 'Facturer le séjour ?';
+
+  @override
+  String billStayBody(String client) {
+    return 'Voulez-vous établir la facture de $client maintenant ?';
+  }
+
+  @override
+  String get actionLater => 'Plus tard';
+
+  @override
+  String get actionBill => 'Facturer';
+
+  @override
+  String get noRoomBoard =>
+      'Aucune chambre.\nAjoutez vos chambres pour voir le plan.';
+
+  @override
+  String roomsCountSummary(
+    String total,
+    String free,
+    String occupied,
+    String toClean,
+  ) {
+    return '$total chambres · $free libres · $occupied occupées · $toClean à nettoyer';
+  }
+
+  @override
+  String get createRoomTypeFirst =>
+      'Créez d’abord au moins un type de chambre.';
+
+  @override
+  String get deleteRoomConfirmTitle => 'Supprimer cette chambre ?';
+
+  @override
+  String deleteRoomConfirmBody(String number) {
+    return 'La chambre « $number » sera retirée de la liste.';
+  }
+
+  @override
+  String get roomDeleted => 'Chambre supprimée.';
+
+  @override
+  String get addRoom => 'Ajouter une chambre';
+
+  @override
+  String get noRoomTypeThenRooms =>
+      'Créez d’abord un type de chambre,\npuis ajoutez vos chambres.';
+
+  @override
+  String get noRoomYet =>
+      'Aucune chambre.\nAjoutez vos chambres avec le bouton +.';
+
+  @override
+  String floorSuffix(String floor) {
+    return ' · Étage $floor';
+  }
+
+  @override
+  String get pickRoomType => 'Veuillez choisir un type de chambre.';
+
+  @override
+  String get chooseRoomType => 'Choisissez un type';
+
+  @override
+  String get roomUpdated => 'Chambre modifiée.';
+
+  @override
+  String get roomAdded => 'Chambre ajoutée.';
+
+  @override
+  String get editRoomTitle => 'Modifier la chambre';
+
+  @override
+  String get newRoomTitle => 'Nouvelle chambre';
+
+  @override
+  String get roomNumberOrNameLabel => 'Numéro / nom de la chambre';
+
+  @override
+  String get roomNumberOrNameHint => 'Ex. 101, Jasmin, A2';
+
+  @override
+  String get roomTypeLabel => 'Type de chambre';
+
+  @override
+  String roomTypeOption(String name, String price) {
+    return '$name ($price FCFA)';
+  }
+
+  @override
+  String get floorOptionalLabel => 'Étage (optionnel)';
+
+  @override
+  String get floorHint => 'Ex. 1, RDC';
+
+  @override
+  String get specificPriceLabel => 'Prix spécifique (optionnel)';
+
+  @override
+  String get specificPriceHint => 'Laisser vide = prix du type';
+
+  @override
   String get clientDisabled => 'Client désactivé.';
 
   @override

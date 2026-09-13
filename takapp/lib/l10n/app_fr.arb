@@ -709,6 +709,195 @@
   "accountBeninResto": "Bénin Resto",
   "accountMixed": "Paiement Mixte",
 
+  "actionEdit": "Modifier",
+  "actionDelete": "Supprimer",
+  "actionDisable": "Désactiver",
+  "actionSave": "Enregistrer",
+  "savingInProgress": "Enregistrement...",
+  "fieldRequired": "Obligatoire",
+
+  "receptionTitle": "Réception",
+  "receptionSubtitle": "Espace réception : chambres, séjours et factures",
+  "tileRoomsBoardTitle": "Plan des chambres",
+  "tileRoomsBoardSubtitle": "Voir l’état des chambres en temps réel",
+  "tileReservationsTitle": "Réservations",
+  "tileReservationsSubtitle": "Créer et gérer les réservations",
+  "tileRoomInvoicingTitle": "Facturation chambre",
+  "tileRoomInvoicingSubtitle": "Facturer et certifier un séjour",
+  "tileInvoicesListTitle": "Liste des factures",
+  "tileInvoicesListSubtitle": "Consulter les factures chambres",
+  "tileClientsTitle": "Clients",
+  "tileClientsSubtitle": "Fiches clients et historique",
+  "roomsTitle": "Chambres",
+  "tileRoomsSubtitle": "Gérer les chambres",
+  "roomTypesTitle": "Types de chambres",
+  "tileRoomTypesSubtitle": "Configurer les catégories",
+
+  "disableTypeConfirmTitle": "Désactiver ce type ?",
+  "disableTypeConfirmBody": "Le type « {name} » ne sera plus proposé, mais les chambres existantes ne sont pas supprimées.",
+  "@disableTypeConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "typeDisabled": "Type désactivé.",
+  "typeUpdated": "Type modifié.",
+  "typeAdded": "Type ajouté.",
+  "addRoomType": "Ajouter un type",
+  "noRoomType": "Aucun type de chambre.\nAjoutez vos catégories (Simple, Suite, Bungalow...).",
+  "roomTypeSubtitle": "{price} FCFA / nuit · {capacity} pers.",
+  "@roomTypeSubtitle": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "capacity": {
+        "type": "String"
+      }
+    }
+  },
+  "editTypeTitle": "Modifier le type",
+  "newTypeTitle": "Nouveau type de chambre",
+  "typeNameLabel": "Nom du type",
+  "typeNameHint": "Ex. Suite Présidentielle, Bungalow...",
+  "pricePerNightLabel": "Prix par nuit (FCFA)",
+  "pricePerNightHint": "Ex. 25000",
+  "invalidPrice": "Prix invalide",
+  "capacityLabel": "Capacité (personnes)",
+  "capacityHint": "Ex. 2",
+  "invalidCapacity": "Capacité invalide",
+  "descriptionOptionalLabel": "Description (optionnel)",
+  "amenitiesLabel": "Équipements (séparés par des virgules)",
+  "amenitiesHint": "Ex. Clim, Wifi, TV, Minibar",
+
+  "roomStatusAvailable": "Libre",
+  "roomStatusOccupied": "Occupée",
+  "roomStatusCleaning": "À nettoyer",
+  "roomStatusMaintenance": "Maintenance",
+
+  "changeRoomStateTitle": "Chambre {number} — changer l’état",
+  "@changeRoomStateTitle": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "roomOccupiedTitle": "Chambre {number} (occupée)",
+  "@roomOccupiedTitle": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCheckOut": "Check-out (départ du client)",
+  "actionChangeStateManually": "Changer l’état manuellement",
+  "roomStatusChanged": "Chambre {number} : {status}",
+  "@roomStatusChanged": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "noActiveReservationForRoom": "Aucune réservation active trouvée pour cette chambre. Vous pouvez changer son état manuellement.",
+  "checkOutTitle": "Check-out",
+  "checkOutConfirmBody": "Confirmer le départ de {client} (chambre {number}) ?\n\nLa chambre passera « à nettoyer ».",
+  "@checkOutConfirmBody": {
+    "placeholders": {
+      "client": {
+        "type": "String"
+      },
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "actionConfirmDeparture": "Confirmer le départ",
+  "checkOutDone": "Check-out effectué.",
+  "billStayTitle": "Facturer le séjour ?",
+  "billStayBody": "Voulez-vous établir la facture de {client} maintenant ?",
+  "@billStayBody": {
+    "placeholders": {
+      "client": {
+        "type": "String"
+      }
+    }
+  },
+  "actionLater": "Plus tard",
+  "actionBill": "Facturer",
+  "noRoomBoard": "Aucune chambre.\nAjoutez vos chambres pour voir le plan.",
+  "roomsCountSummary": "{total} chambres · {free} libres · {occupied} occupées · {toClean} à nettoyer",
+  "@roomsCountSummary": {
+    "placeholders": {
+      "total": {
+        "type": "String"
+      },
+      "free": {
+        "type": "String"
+      },
+      "occupied": {
+        "type": "String"
+      },
+      "toClean": {
+        "type": "String"
+      }
+    }
+  },
+
+  "createRoomTypeFirst": "Créez d’abord au moins un type de chambre.",
+  "deleteRoomConfirmTitle": "Supprimer cette chambre ?",
+  "deleteRoomConfirmBody": "La chambre « {number} » sera retirée de la liste.",
+  "@deleteRoomConfirmBody": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "roomDeleted": "Chambre supprimée.",
+  "addRoom": "Ajouter une chambre",
+  "noRoomTypeThenRooms": "Créez d’abord un type de chambre,\npuis ajoutez vos chambres.",
+  "noRoomYet": "Aucune chambre.\nAjoutez vos chambres avec le bouton +.",
+  "floorSuffix": " · Étage {floor}",
+  "@floorSuffix": {
+    "placeholders": {
+      "floor": {
+        "type": "String"
+      }
+    }
+  },
+  "pickRoomType": "Veuillez choisir un type de chambre.",
+  "chooseRoomType": "Choisissez un type",
+  "roomUpdated": "Chambre modifiée.",
+  "roomAdded": "Chambre ajoutée.",
+  "editRoomTitle": "Modifier la chambre",
+  "newRoomTitle": "Nouvelle chambre",
+  "roomNumberOrNameLabel": "Numéro / nom de la chambre",
+  "roomNumberOrNameHint": "Ex. 101, Jasmin, A2",
+  "roomTypeLabel": "Type de chambre",
+  "roomTypeOption": "{name} ({price} FCFA)",
+  "@roomTypeOption": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "floorOptionalLabel": "Étage (optionnel)",
+  "floorHint": "Ex. 1, RDC",
+  "specificPriceLabel": "Prix spécifique (optionnel)",
+  "specificPriceHint": "Laisser vide = prix du type",
+
   "clientDisabled": "Client désactivé.",
   "clientAdded": "Client ajouté.",
 

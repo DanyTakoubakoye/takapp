@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/vues/clients/clients_page.dart';
 import 'package:takapp/vues/reception/reservations_page.dart';
 import 'package:takapp/vues/reception/room_types_page.dart';
@@ -17,19 +18,18 @@ class ReceptionDashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
     final user = auth.currentUser;
     final isSmall = MediaQuery.of(context).size.width < 700;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     if (establishmentId.trim().isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -39,51 +39,51 @@ class ReceptionDashboardPage extends StatelessWidget {
         ? <_ReceptionTile>[]
         : <_ReceptionTile>[
       _ReceptionTile(
-        title: 'Plan des chambres',
-        subtitle: 'Voir l\'état des chambres en temps réel',
+        title: l10n.tileRoomsBoardTitle,
+        subtitle: l10n.tileRoomsBoardSubtitle,
         icon: Icons.grid_view_outlined,
         color: Colors.teal,
         pageBuilder: (_) => RoomsBoardPage(establishmentId: establishmentId),
       ),
       _ReceptionTile(
-        title: 'Réservations',
-        subtitle: 'Créer et gérer les réservations',
+        title: l10n.tileReservationsTitle,
+        subtitle: l10n.tileReservationsSubtitle,
         icon: Icons.event_available_outlined,
         color: Colors.green,
         pageBuilder: (_) => ReservationsPage(establishmentId: establishmentId),
       ),
       _ReceptionTile(
-        title: 'Facturation chambre',
-        subtitle: 'Facturer et certifier un séjour',
+        title: l10n.tileRoomInvoicingTitle,
+        subtitle: l10n.tileRoomInvoicingSubtitle,
         icon: Icons.receipt_long_outlined,
         color: Colors.indigo,
         pageBuilder: (_) =>
             FacturationChambrePage(establishmentId: establishmentId),
       ),
       _ReceptionTile(
-        title: 'Liste des factures',
-        subtitle: 'Consulter les factures chambres',
+        title: l10n.tileInvoicesListTitle,
+        subtitle: l10n.tileInvoicesListSubtitle,
         icon: Icons.description_outlined,
         color: Colors.blueGrey,
         pageBuilder: (_) => ListeFacturesPage(establishmentId: establishmentId),
       ),
       _ReceptionTile(
-        title: 'Clients',
-        subtitle: 'Fiches clients et historique',
+        title: l10n.tileClientsTitle,
+        subtitle: l10n.tileClientsSubtitle,
         icon: Icons.people_outline,
         color: Colors.orange,
         pageBuilder: (_) => ClientsPage(establishmentId: establishmentId),
       ),
       _ReceptionTile(
-        title: 'Chambres',
-        subtitle: 'Gérer les chambres',
+        title: l10n.roomsTitle,
+        subtitle: l10n.tileRoomsSubtitle,
         icon: Icons.meeting_room_outlined,
         color: Colors.brown,
         pageBuilder: (_) => RoomsPage(establishmentId: establishmentId),
       ),
       _ReceptionTile(
-        title: 'Types de chambres',
-        subtitle: 'Configurer les catégories',
+        title: l10n.roomTypesTitle,
+        subtitle: l10n.tileRoomTypesSubtitle,
         icon: Icons.category_outlined,
         color: Colors.deepPurple,
         pageBuilder: (_) => RoomTypesPage(establishmentId: establishmentId),
@@ -92,11 +92,11 @@ class ReceptionDashboardPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Réception'),
+        title: Text(l10n.receptionTitle),
         actions: [
           IconButton(
             onPressed: () => context.read<AuthController>().logout(),
-            tooltip: 'Déconnexion',
+            tooltip: l10n.commonLogout,
             icon: const Icon(Icons.logout),
           ),
         ],
@@ -123,13 +123,13 @@ class ReceptionDashboardPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Bienvenue ${user.name}',
+                              l10n.welcomeName(user.name),
                               style: Theme.of(context).textTheme.titleLarge
                                   ?.copyWith(fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Espace réception : chambres, séjours et factures',
+                              l10n.receptionSubtitle,
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
                           ],

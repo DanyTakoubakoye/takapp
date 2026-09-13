@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/core/errors/error_localizer.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/room_model.dart';
 import 'package:takapp/modeles/room_type_model.dart';
 import 'package:takapp/services/room_service.dart';
@@ -43,16 +45,18 @@ class _RoomsPageState extends State<RoomsPage> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  String _statusLabel(String status) {
+  /// Les états sont des valeurs techniques stockées en base : seul leur
+  /// libellé est traduit.
+  String _statusLabel(AppLocalizations l10n, String status) {
     switch (status) {
       case 'available':
-        return 'Libre';
+        return l10n.roomStatusAvailable;
       case 'occupied':
-        return 'Occupée';
+        return l10n.roomStatusOccupied;
       case 'cleaning':
-        return 'À nettoyer';
+        return l10n.roomStatusCleaning;
       case 'maintenance':
-        return 'Maintenance';
+        return l10n.roomStatusMaintenance;
       default:
         return status;
     }
@@ -78,7 +82,7 @@ class _RoomsPageState extends State<RoomsPage> {
     RoomModel? existing,
   }) async {
     if (types.isEmpty) {
-      _showMessage('Créez d\'abord au moins un type de chambre.');
+      _showMessage(AppLocalizations.of(context).createRoomTypeFirst);
       return;
     }
 
@@ -100,19 +104,21 @@ class _RoomsPageState extends State<RoomsPage> {
   }
 
   Future<void> _confirmDisable(RoomModel room) async {
+    final l10n = AppLocalizations.of(context);
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Supprimer cette chambre ?'),
-        content: Text('La chambre "${room.number}" sera retirée de la liste.'),
+        title: Text(l10n.deleteRoomConfirmTitle),
+        content: Text(l10n.deleteRoomConfirmBody(room.number)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Annuler'),
+            child: Text(l10n.commonCancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Supprimer'),
+            child: Text(l10n.actionDelete),
           ),
         ],
       ),
@@ -125,17 +131,19 @@ class _RoomsPageState extends State<RoomsPage> {
         establishmentId: establishmentId,
         roomId: room.id,
       );
-      _showMessage('Chambre supprimée.');
+      _showMessage(l10n.roomDeleted);
     } catch (e) {
-      _showMessage('Erreur : $e');
+      _showMessage(l10n.errorPrefixed(localizedError(l10n, e)));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -146,11 +154,11 @@ class _RoomsPageState extends State<RoomsPage> {
         final types = typesSnapshot.data ?? [];
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Chambres')),
+          appBar: AppBar(title: Text(l10n.roomsTitle)),
           floatingActionButton: FloatingActionButton.extended(
             onPressed: () => _openForm(types: types),
             icon: const Icon(Icons.add),
-            label: const Text('Ajouter une chambre'),
+            label: Text(l10n.addRoom),
           ),
           body: StreamBuilder<List<RoomModel>>(
             stream: _roomsStream,
@@ -161,7 +169,9 @@ class _RoomsPageState extends State<RoomsPage> {
 
               if (snapshot.hasError) {
                 return Center(
-                  child: SelectableText('Erreur : ${snapshot.error}'),
+                  child: SelectableText(
+                    l10n.errorPrefixed('${snapshot.error}'),
+                  ),
                 );
               }
 
@@ -173,8 +183,8 @@ class _RoomsPageState extends State<RoomsPage> {
                     padding: const EdgeInsets.all(24),
                     child: Text(
                       types.isEmpty
-                          ? 'Créez d\'abord un type de chambre,\npuis ajoutez vos chambres.'
-                          : 'Aucune chambre.\nAjoutez vos chambres avec le bouton +.',
+                          ? l10n.noRoomTypeThenRooms
+                          : l10n.noRoomYet,
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -203,13 +213,13 @@ class _RoomsPageState extends State<RoomsPage> {
                         child: Icon(Icons.meeting_room, color: color),
                       ),
                       title: Text(
-                        'Chambre ${room.number}',
+                        l10n.labelRoom(room.number),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: Text(
                         '${room.roomTypeName}'
-                        '${room.floor.isNotEmpty ? ' · Étage ${room.floor}' : ''}'
-                        '\n${_statusLabel(room.status)}',
+                        '${room.floor.isNotEmpty ? l10n.floorSuffix(room.floor) : ''}'
+                        '\n${_statusLabel(l10n, room.status)}',
                       ),
                       isThreeLine: true,
                       trailing: PopupMenuButton<String>(
@@ -220,11 +230,14 @@ class _RoomsPageState extends State<RoomsPage> {
                             _confirmDisable(room);
                           }
                         },
-                        itemBuilder: (_) => const [
-                          PopupMenuItem(value: 'edit', child: Text('Modifier')),
+                        itemBuilder: (_) => [
+                          PopupMenuItem(
+                            value: 'edit',
+                            child: Text(l10n.actionEdit),
+                          ),
                           PopupMenuItem(
                             value: 'disable',
-                            child: Text('Supprimer'),
+                            child: Text(l10n.actionDelete),
                           ),
                         ],
                       ),
@@ -305,8 +318,11 @@ class _RoomFormDialogState extends State<_RoomFormDialog> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+
+    final l10n = AppLocalizations.of(context);
+
     if (_selectedTypeId == null) {
-      widget.onDone('Veuillez choisir un type de chambre.');
+      widget.onDone(l10n.pickRoomType);
       return;
     }
 
@@ -348,10 +364,10 @@ class _RoomFormDialogState extends State<_RoomFormDialog> {
 
       if (!mounted) return;
       Navigator.of(context).pop();
-      widget.onDone(_isEdit ? 'Chambre modifiée.' : 'Chambre ajoutée.');
+      widget.onDone(_isEdit ? l10n.roomUpdated : l10n.roomAdded);
     } catch (e) {
       if (!mounted) return;
-      widget.onDone('Erreur : $e');
+      widget.onDone(l10n.errorPrefixed(localizedError(l10n, e)));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -359,8 +375,10 @@ class _RoomFormDialogState extends State<_RoomFormDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return AlertDialog(
-      title: Text(_isEdit ? 'Modifier la chambre' : 'Nouvelle chambre'),
+      title: Text(_isEdit ? l10n.editRoomTitle : l10n.newRoomTitle),
       content: SizedBox(
         width: 420,
         child: Form(
@@ -371,25 +389,27 @@ class _RoomFormDialogState extends State<_RoomFormDialog> {
               children: [
                 TextFormField(
                   controller: _numberController,
-                  decoration: const InputDecoration(
-                    labelText: 'Numéro / nom de la chambre',
-                    hintText: 'Ex. 101, Jasmin, A2',
+                  decoration: InputDecoration(
+                    labelText: l10n.roomNumberOrNameLabel,
+                    hintText: l10n.roomNumberOrNameHint,
                   ),
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Obligatoire' : null,
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? l10n.fieldRequired
+                      : null,
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   initialValue: _selectedTypeId,
-                  decoration: const InputDecoration(
-                    labelText: 'Type de chambre',
-                  ),
+                  decoration: InputDecoration(labelText: l10n.roomTypeLabel),
                   items: widget.types
                       .map(
                         (t) => DropdownMenuItem<String>(
                           value: t.id,
                           child: Text(
-                            '${t.name} (${t.basePrice.toStringAsFixed(0)} FCFA)',
+                            l10n.roomTypeOption(
+                              t.name,
+                              t.basePrice.toStringAsFixed(0),
+                            ),
                           ),
                         ),
                       )
@@ -398,23 +418,23 @@ class _RoomFormDialogState extends State<_RoomFormDialog> {
                     setState(() => _selectedTypeId = value);
                   },
                   validator: (v) =>
-                      (v == null || v.isEmpty) ? 'Choisissez un type' : null,
+                      (v == null || v.isEmpty) ? l10n.chooseRoomType : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _floorController,
-                  decoration: const InputDecoration(
-                    labelText: 'Étage (optionnel)',
-                    hintText: 'Ex. 1, RDC',
+                  decoration: InputDecoration(
+                    labelText: l10n.floorOptionalLabel,
+                    hintText: l10n.floorHint,
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _priceOverrideController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Prix spécifique (optionnel)',
-                    hintText: 'Laisser vide = prix du type',
+                  decoration: InputDecoration(
+                    labelText: l10n.specificPriceLabel,
+                    hintText: l10n.specificPriceHint,
                   ),
                 ),
               ],
@@ -425,7 +445,7 @@ class _RoomFormDialogState extends State<_RoomFormDialog> {
       actions: [
         TextButton(
           onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
-          child: const Text('Annuler'),
+          child: Text(l10n.commonCancel),
         ),
         ElevatedButton.icon(
           onPressed: _isSaving ? null : _save,
@@ -436,7 +456,7 @@ class _RoomFormDialogState extends State<_RoomFormDialog> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.save),
-          label: Text(_isSaving ? 'Enregistrement...' : 'Enregistrer'),
+          label: Text(_isSaving ? l10n.savingInProgress : l10n.actionSave),
         ),
       ],
     );

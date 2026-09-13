@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:takapp/core/errors/error_localizer.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/room_model.dart';
 import 'package:takapp/services/room_service.dart';
 
@@ -41,16 +43,18 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
     ).showSnackBar(SnackBar(content: Text(message)));
   }
 
-  String _statusLabel(String status) {
+  /// Les états sont des valeurs techniques stockées en base : seul leur
+  /// libellé est traduit.
+  String _statusLabel(AppLocalizations l10n, String status) {
     switch (status) {
       case 'available':
-        return 'Libre';
+        return l10n.roomStatusAvailable;
       case 'occupied':
-        return 'Occupée';
+        return l10n.roomStatusOccupied;
       case 'cleaning':
-        return 'À nettoyer';
+        return l10n.roomStatusCleaning;
       case 'maintenance':
-        return 'Maintenance';
+        return l10n.roomStatusMaintenance;
       default:
         return status;
     }
@@ -87,6 +91,8 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
   }
 
   Future<void> _changeStatus(RoomModel room) async {
+    final l10n = AppLocalizations.of(context);
+
     final selected = await showModalBottomSheet<String>(
       context: context,
       builder: (sheetContext) {
@@ -97,13 +103,14 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Text(
-                  'Chambre ${room.number} — changer l\'état',
+                  l10n.changeRoomStateTitle(room.number),
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
                 ),
               ),
+              // Valeurs TECHNIQUES : ce sont elles qui sont écrites en base.
               for (final s in const [
                 'available',
                 'occupied',
@@ -112,7 +119,7 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
               ])
                 ListTile(
                   leading: Icon(_statusIcon(s), color: _statusColor(s)),
-                  title: Text(_statusLabel(s)),
+                  title: Text(_statusLabel(l10n, s)),
                   trailing: room.status == s
                       ? const Icon(Icons.check, color: Colors.blue)
                       : null,
@@ -133,13 +140,17 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
         roomId: room.id,
         status: selected,
       );
-      _showMessage('Chambre ${room.number} : ${_statusLabel(selected)}');
+      _showMessage(
+        l10n.roomStatusChanged(room.number, _statusLabel(l10n, selected)),
+      );
     } catch (e) {
-      _showMessage('Erreur : $e');
+      _showMessage(l10n.errorPrefixed(localizedError(l10n, e)));
     }
   }
 
   Future<void> _onRoomTap(RoomModel room) async {
+    final l10n = AppLocalizations.of(context);
+
     // Chambre occupée → proposer le check-out en priorité
     if (room.status == 'occupied') {
       final action = await showModalBottomSheet<String>(
@@ -152,7 +163,7 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
                 Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text(
-                    'Chambre ${room.number} (occupée)',
+                    l10n.roomOccupiedTitle(room.number),
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -161,12 +172,12 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.logout, color: Colors.red),
-                  title: const Text('Check-out (départ du client)'),
+                  title: Text(l10n.actionCheckOut),
                   onTap: () => Navigator.pop(sheetContext, 'checkout'),
                 ),
                 ListTile(
                   leading: const Icon(Icons.tune, color: Colors.blueGrey),
-                  title: const Text('Changer l\'état manuellement'),
+                  title: Text(l10n.actionChangeStateManually),
                   onTap: () => Navigator.pop(sheetContext, 'status'),
                 ),
                 const SizedBox(height: 8),
@@ -189,6 +200,8 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
   }
 
   Future<void> _doCheckOutFromBoard(RoomModel room) async {
+    final l10n = AppLocalizations.of(context);
+
     // Retrouver la réservation active de cette chambre
     ReservationModel? resa;
     try {
@@ -197,16 +210,13 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
         roomId: room.id,
       );
     } catch (e) {
-      _showMessage('Erreur : $e');
+      _showMessage(l10n.errorPrefixed(localizedError(l10n, e)));
       return;
     }
 
     if (resa == null) {
       // Pas de réservation liée : proposer juste de libérer la chambre
-      _showMessage(
-        'Aucune réservation active trouvée pour cette chambre. '
-        'Vous pouvez changer son état manuellement.',
-      );
+      _showMessage(l10n.noActiveReservationForRoom);
       return;
     }
 
@@ -215,20 +225,18 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Check-out'),
+        title: Text(l10n.checkOutTitle),
         content: Text(
-          'Confirmer le départ de ${resa!.clientName} '
-          '(chambre ${room.number}) ?\n\n'
-          'La chambre passera "à nettoyer".',
+          l10n.checkOutConfirmBody(resa!.clientName, room.number),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Annuler'),
+            child: Text(l10n.commonCancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Confirmer le départ'),
+            child: Text(l10n.actionConfirmDeparture),
           ),
         ],
       ),
@@ -242,29 +250,29 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
         reservationId: resa.id,
       );
       if (!mounted) return;
-      _showMessage('Check-out effectué.');
+      _showMessage(l10n.checkOutDone);
       _proposeFacturation(resa);
     } catch (e) {
-      _showMessage('Erreur : $e');
+      _showMessage(l10n.errorPrefixed(localizedError(l10n, e)));
     }
   }
 
   Future<void> _proposeFacturation(ReservationModel resa) async {
+    final l10n = AppLocalizations.of(context);
+
     final goToBilling = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Facturer le séjour ?'),
-        content: Text(
-          'Voulez-vous établir la facture de ${resa.clientName} maintenant ?',
-        ),
+        title: Text(l10n.billStayTitle),
+        content: Text(l10n.billStayBody(resa.clientName)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Plus tard'),
+            child: Text(l10n.actionLater),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Facturer'),
+            child: Text(l10n.actionBill),
           ),
         ],
       ),
@@ -284,6 +292,8 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
   }
 
   Widget _buildLegend() {
+    final l10n = AppLocalizations.of(context);
+
     Widget dot(String status) {
       return Row(
         mainAxisSize: MainAxisSize.min,
@@ -297,7 +307,10 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
             ),
           ),
           const SizedBox(width: 4),
-          Text(_statusLabel(status), style: const TextStyle(fontSize: 12)),
+          Text(
+            _statusLabel(l10n, status),
+            style: const TextStyle(fontSize: 12),
+          ),
         ],
       );
     }
@@ -316,9 +329,11 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -332,7 +347,7 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
         : 6;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Plan des chambres')),
+      appBar: AppBar(title: Text(l10n.tileRoomsBoardTitle)),
       body: StreamBuilder<List<RoomModel>>(
         stream: _roomsStream,
         builder: (context, snapshot) {
@@ -341,19 +356,20 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: SelectableText('Erreur : ${snapshot.error}'));
+            return Center(
+              child: SelectableText(
+                l10n.errorPrefixed('${snapshot.error}'),
+              ),
+            );
           }
 
           final rooms = snapshot.data ?? [];
 
           if (rooms.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Text(
-                  'Aucune chambre.\nAjoutez vos chambres pour voir le plan.',
-                  textAlign: TextAlign.center,
-                ),
+                padding: const EdgeInsets.all(24),
+                child: Text(l10n.noRoomBoard, textAlign: TextAlign.center),
               ),
             );
           }
@@ -372,10 +388,12 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '${rooms.length} chambres · '
-                      '${counts['available'] ?? 0} libres · '
-                      '${counts['occupied'] ?? 0} occupées · '
-                      '${counts['cleaning'] ?? 0} à nettoyer',
+                      l10n.roomsCountSummary(
+                        '${rooms.length}',
+                        '${counts['available'] ?? 0}',
+                        '${counts['occupied'] ?? 0}',
+                        '${counts['cleaning'] ?? 0}',
+                      ),
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 8),
@@ -434,7 +452,7 @@ class _RoomsBoardPageState extends State<RoomsBoardPage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              _statusLabel(room.status),
+                              _statusLabel(l10n, room.status),
                               style: TextStyle(
                                 fontSize: 11,
                                 color: color,

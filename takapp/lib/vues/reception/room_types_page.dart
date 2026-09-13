@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/core/errors/error_localizer.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/room_type_model.dart';
 import 'package:takapp/services/room_type_service.dart';
 
@@ -56,22 +58,21 @@ class _RoomTypesPageState extends State<RoomTypesPage> {
   }
 
   Future<void> _confirmDisable(RoomTypeModel type) async {
+    final l10n = AppLocalizations.of(context);
+
     final confirm = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Désactiver ce type ?'),
-        content: Text(
-          'Le type "${type.name}" ne sera plus proposé, '
-          'mais les chambres existantes ne sont pas supprimées.',
-        ),
+        title: Text(l10n.disableTypeConfirmTitle),
+        content: Text(l10n.disableTypeConfirmBody(type.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Annuler'),
+            child: Text(l10n.commonCancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Désactiver'),
+            child: Text(l10n.actionDisable),
           ),
         ],
       ),
@@ -84,26 +85,28 @@ class _RoomTypesPageState extends State<RoomTypesPage> {
         establishmentId: establishmentId,
         typeId: type.id,
       );
-      _showMessage('Type désactivé.');
+      _showMessage(l10n.typeDisabled);
     } catch (e) {
-      _showMessage('Erreur : $e');
+      _showMessage(l10n.errorPrefixed(localizedError(l10n, e)));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Types de chambres')),
+      appBar: AppBar(title: Text(l10n.roomTypesTitle)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openForm(),
         icon: const Icon(Icons.add),
-        label: const Text('Ajouter un type'),
+        label: Text(l10n.addRoomType),
       ),
       body: StreamBuilder<List<RoomTypeModel>>(
         stream: _roomTypesStream,
@@ -113,20 +116,20 @@ class _RoomTypesPageState extends State<RoomTypesPage> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: SelectableText('Erreur : ${snapshot.error}'));
+            return Center(
+              child: SelectableText(
+                l10n.errorPrefixed('${snapshot.error}'),
+              ),
+            );
           }
 
           final types = snapshot.data ?? [];
 
           if (types.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Text(
-                  'Aucun type de chambre.\n'
-                  'Ajoutez vos catégories (Simple, Suite, Bungalow...).',
-                  textAlign: TextAlign.center,
-                ),
+                padding: const EdgeInsets.all(24),
+                child: Text(l10n.noRoomType, textAlign: TextAlign.center),
               ),
             );
           }
@@ -152,8 +155,7 @@ class _RoomTypesPageState extends State<RoomTypesPage> {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(
-                    '${type.basePrice.toStringAsFixed(0)} FCFA / nuit'
-                    ' · ${type.capacity} pers.'
+                    '${l10n.roomTypeSubtitle(type.basePrice.toStringAsFixed(0), '${type.capacity}')}'
                     '${type.description.isNotEmpty ? '\n${type.description}' : ''}',
                   ),
                   isThreeLine: type.description.isNotEmpty,
@@ -165,11 +167,14 @@ class _RoomTypesPageState extends State<RoomTypesPage> {
                         _confirmDisable(type);
                       }
                     },
-                    itemBuilder: (_) => const [
-                      PopupMenuItem(value: 'edit', child: Text('Modifier')),
+                    itemBuilder: (_) => [
+                      PopupMenuItem(
+                        value: 'edit',
+                        child: Text(l10n.actionEdit),
+                      ),
                       PopupMenuItem(
                         value: 'disable',
-                        child: Text('Désactiver'),
+                        child: Text(l10n.actionDisable),
                       ),
                     ],
                   ),
@@ -248,6 +253,8 @@ class _RoomTypeFormDialogState extends State<_RoomTypeFormDialog> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final l10n = AppLocalizations.of(context);
+
     setState(() => _isSaving = true);
 
     final name = _nameController.text.trim();
@@ -286,10 +293,10 @@ class _RoomTypeFormDialogState extends State<_RoomTypeFormDialog> {
 
       if (!mounted) return;
       Navigator.of(context).pop();
-      widget.onDone(_isEdit ? 'Type modifié.' : 'Type ajouté.');
+      widget.onDone(_isEdit ? l10n.typeUpdated : l10n.typeAdded);
     } catch (e) {
       if (!mounted) return;
-      widget.onDone('Erreur : $e');
+      widget.onDone(l10n.errorPrefixed(localizedError(l10n, e)));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -297,8 +304,10 @@ class _RoomTypeFormDialogState extends State<_RoomTypeFormDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return AlertDialog(
-      title: Text(_isEdit ? 'Modifier le type' : 'Nouveau type de chambre'),
+      title: Text(_isEdit ? l10n.editTypeTitle : l10n.newTypeTitle),
       content: SizedBox(
         width: 420,
         child: Form(
@@ -309,24 +318,25 @@ class _RoomTypeFormDialogState extends State<_RoomTypeFormDialog> {
               children: [
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Nom du type',
-                    hintText: 'Ex. Suite Présidentielle, Bungalow...',
+                  decoration: InputDecoration(
+                    labelText: l10n.typeNameLabel,
+                    hintText: l10n.typeNameHint,
                   ),
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Obligatoire' : null,
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? l10n.fieldRequired
+                      : null,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _priceController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Prix par nuit (FCFA)',
-                    hintText: 'Ex. 25000',
+                  decoration: InputDecoration(
+                    labelText: l10n.pricePerNightLabel,
+                    hintText: l10n.pricePerNightHint,
                   ),
                   validator: (v) {
                     final n = double.tryParse((v ?? '').trim());
-                    if (n == null || n <= 0) return 'Prix invalide';
+                    if (n == null || n <= 0) return l10n.invalidPrice;
                     return null;
                   },
                 ),
@@ -334,30 +344,30 @@ class _RoomTypeFormDialogState extends State<_RoomTypeFormDialog> {
                 TextFormField(
                   controller: _capacityController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Capacité (personnes)',
-                    hintText: 'Ex. 2',
+                  decoration: InputDecoration(
+                    labelText: l10n.capacityLabel,
+                    hintText: l10n.capacityHint,
                   ),
                   validator: (v) {
                     final n = int.tryParse((v ?? '').trim());
-                    if (n == null || n <= 0) return 'Capacité invalide';
+                    if (n == null || n <= 0) return l10n.invalidCapacity;
                     return null;
                   },
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _descriptionController,
-                  decoration: const InputDecoration(
-                    labelText: 'Description (optionnel)',
+                  decoration: InputDecoration(
+                    labelText: l10n.descriptionOptionalLabel,
                   ),
                   maxLines: 2,
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _amenitiesController,
-                  decoration: const InputDecoration(
-                    labelText: 'Équipements (séparés par des virgules)',
-                    hintText: 'Ex. Clim, Wifi, TV, Minibar',
+                  decoration: InputDecoration(
+                    labelText: l10n.amenitiesLabel,
+                    hintText: l10n.amenitiesHint,
                   ),
                 ),
               ],
@@ -368,7 +378,7 @@ class _RoomTypeFormDialogState extends State<_RoomTypeFormDialog> {
       actions: [
         TextButton(
           onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
-          child: const Text('Annuler'),
+          child: Text(l10n.commonCancel),
         ),
         ElevatedButton.icon(
           onPressed: _isSaving ? null : _save,
@@ -379,7 +389,7 @@ class _RoomTypeFormDialogState extends State<_RoomTypeFormDialog> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.save),
-          label: Text(_isSaving ? 'Enregistrement...' : 'Enregistrer'),
+          label: Text(_isSaving ? l10n.savingInProgress : l10n.actionSave),
         ),
       ],
     );

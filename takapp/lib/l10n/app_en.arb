@@ -703,6 +703,195 @@
   "accountBeninResto": "Bénin Resto",
   "accountMixed": "Mixed payment",
 
+  "actionEdit": "Edit",
+  "actionDelete": "Delete",
+  "actionDisable": "Disable",
+  "actionSave": "Save",
+  "savingInProgress": "Saving...",
+  "fieldRequired": "Required",
+
+  "receptionTitle": "Reception",
+  "receptionSubtitle": "Reception area: rooms, stays and invoices",
+  "tileRoomsBoardTitle": "Rooms board",
+  "tileRoomsBoardSubtitle": "See room status in real time",
+  "tileReservationsTitle": "Reservations",
+  "tileReservationsSubtitle": "Create and manage reservations",
+  "tileRoomInvoicingTitle": "Room invoicing",
+  "tileRoomInvoicingSubtitle": "Invoice and certify a stay",
+  "tileInvoicesListTitle": "Invoice list",
+  "tileInvoicesListSubtitle": "Browse room invoices",
+  "tileClientsTitle": "Clients",
+  "tileClientsSubtitle": "Client records and history",
+  "roomsTitle": "Rooms",
+  "tileRoomsSubtitle": "Manage rooms",
+  "roomTypesTitle": "Room types",
+  "tileRoomTypesSubtitle": "Configure categories",
+
+  "disableTypeConfirmTitle": "Disable this type?",
+  "disableTypeConfirmBody": "The type \"{name}\" will no longer be offered, but existing rooms are not deleted.",
+  "@disableTypeConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "typeDisabled": "Type disabled.",
+  "typeUpdated": "Type updated.",
+  "typeAdded": "Type added.",
+  "addRoomType": "Add a type",
+  "noRoomType": "No room type yet.\nAdd your categories (Single, Suite, Bungalow...).",
+  "roomTypeSubtitle": "{price} FCFA / night · {capacity} people",
+  "@roomTypeSubtitle": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      },
+      "capacity": {
+        "type": "String"
+      }
+    }
+  },
+  "editTypeTitle": "Edit type",
+  "newTypeTitle": "New room type",
+  "typeNameLabel": "Type name",
+  "typeNameHint": "E.g. Presidential Suite, Bungalow...",
+  "pricePerNightLabel": "Price per night (FCFA)",
+  "pricePerNightHint": "E.g. 25000",
+  "invalidPrice": "Invalid price",
+  "capacityLabel": "Capacity (people)",
+  "capacityHint": "E.g. 2",
+  "invalidCapacity": "Invalid capacity",
+  "descriptionOptionalLabel": "Description (optional)",
+  "amenitiesLabel": "Amenities (comma separated)",
+  "amenitiesHint": "E.g. AC, Wifi, TV, Minibar",
+
+  "roomStatusAvailable": "Free",
+  "roomStatusOccupied": "Occupied",
+  "roomStatusCleaning": "To clean",
+  "roomStatusMaintenance": "Maintenance",
+
+  "changeRoomStateTitle": "Room {number} — change status",
+  "@changeRoomStateTitle": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "roomOccupiedTitle": "Room {number} (occupied)",
+  "@roomOccupiedTitle": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCheckOut": "Check-out (client departure)",
+  "actionChangeStateManually": "Change status manually",
+  "roomStatusChanged": "Room {number}: {status}",
+  "@roomStatusChanged": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "noActiveReservationForRoom": "No active reservation found for this room. You can change its status manually.",
+  "checkOutTitle": "Check-out",
+  "checkOutConfirmBody": "Confirm the departure of {client} (room {number})?\n\nThe room will be set to \"to clean\".",
+  "@checkOutConfirmBody": {
+    "placeholders": {
+      "client": {
+        "type": "String"
+      },
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "actionConfirmDeparture": "Confirm departure",
+  "checkOutDone": "Check-out completed.",
+  "billStayTitle": "Invoice the stay?",
+  "billStayBody": "Do you want to issue {client}'s invoice now?",
+  "@billStayBody": {
+    "placeholders": {
+      "client": {
+        "type": "String"
+      }
+    }
+  },
+  "actionLater": "Later",
+  "actionBill": "Invoice",
+  "noRoomBoard": "No room yet.\nAdd your rooms to see the board.",
+  "roomsCountSummary": "{total} rooms · {free} free · {occupied} occupied · {toClean} to clean",
+  "@roomsCountSummary": {
+    "placeholders": {
+      "total": {
+        "type": "String"
+      },
+      "free": {
+        "type": "String"
+      },
+      "occupied": {
+        "type": "String"
+      },
+      "toClean": {
+        "type": "String"
+      }
+    }
+  },
+
+  "createRoomTypeFirst": "Create at least one room type first.",
+  "deleteRoomConfirmTitle": "Delete this room?",
+  "deleteRoomConfirmBody": "The room \"{number}\" will be removed from the list.",
+  "@deleteRoomConfirmBody": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "roomDeleted": "Room deleted.",
+  "addRoom": "Add a room",
+  "noRoomTypeThenRooms": "Create a room type first,\nthen add your rooms.",
+  "noRoomYet": "No room yet.\nAdd your rooms with the + button.",
+  "floorSuffix": " · Floor {floor}",
+  "@floorSuffix": {
+    "placeholders": {
+      "floor": {
+        "type": "String"
+      }
+    }
+  },
+  "pickRoomType": "Please choose a room type.",
+  "chooseRoomType": "Choose a type",
+  "roomUpdated": "Room updated.",
+  "roomAdded": "Room added.",
+  "editRoomTitle": "Edit room",
+  "newRoomTitle": "New room",
+  "roomNumberOrNameLabel": "Room number / name",
+  "roomNumberOrNameHint": "E.g. 101, Jasmine, A2",
+  "roomTypeLabel": "Room type",
+  "roomTypeOption": "{name} ({price} FCFA)",
+  "@roomTypeOption": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "floorOptionalLabel": "Floor (optional)",
+  "floorHint": "E.g. 1, Ground",
+  "specificPriceLabel": "Specific price (optional)",
+  "specificPriceHint": "Leave empty = type price",
+
   "clientDisabled": "Client disabled.",
   "clientAdded": "Client added.",
 

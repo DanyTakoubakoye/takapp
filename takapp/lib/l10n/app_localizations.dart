@@ -1836,6 +1836,521 @@ abstract class AppLocalizations {
   /// **'Paiement Mixte'**
   String get accountMixed;
 
+  /// No description provided for @actionEdit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier'**
+  String get actionEdit;
+
+  /// No description provided for @actionDelete.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer'**
+  String get actionDelete;
+
+  /// No description provided for @actionDisable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Désactiver'**
+  String get actionDisable;
+
+  /// No description provided for @actionSave.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer'**
+  String get actionSave;
+
+  /// No description provided for @savingInProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrement...'**
+  String get savingInProgress;
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Obligatoire'**
+  String get fieldRequired;
+
+  /// No description provided for @receptionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réception'**
+  String get receptionTitle;
+
+  /// No description provided for @receptionSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Espace réception : chambres, séjours et factures'**
+  String get receptionSubtitle;
+
+  /// No description provided for @tileRoomsBoardTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plan des chambres'**
+  String get tileRoomsBoardTitle;
+
+  /// No description provided for @tileRoomsBoardSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir l’état des chambres en temps réel'**
+  String get tileRoomsBoardSubtitle;
+
+  /// No description provided for @tileReservationsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réservations'**
+  String get tileReservationsTitle;
+
+  /// No description provided for @tileReservationsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer et gérer les réservations'**
+  String get tileReservationsSubtitle;
+
+  /// No description provided for @tileRoomInvoicingTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facturation chambre'**
+  String get tileRoomInvoicingTitle;
+
+  /// No description provided for @tileRoomInvoicingSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facturer et certifier un séjour'**
+  String get tileRoomInvoicingSubtitle;
+
+  /// No description provided for @tileInvoicesListTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Liste des factures'**
+  String get tileInvoicesListTitle;
+
+  /// No description provided for @tileInvoicesListSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Consulter les factures chambres'**
+  String get tileInvoicesListSubtitle;
+
+  /// No description provided for @tileClientsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clients'**
+  String get tileClientsTitle;
+
+  /// No description provided for @tileClientsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fiches clients et historique'**
+  String get tileClientsSubtitle;
+
+  /// No description provided for @roomsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chambres'**
+  String get roomsTitle;
+
+  /// No description provided for @tileRoomsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gérer les chambres'**
+  String get tileRoomsSubtitle;
+
+  /// No description provided for @roomTypesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Types de chambres'**
+  String get roomTypesTitle;
+
+  /// No description provided for @tileRoomTypesSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Configurer les catégories'**
+  String get tileRoomTypesSubtitle;
+
+  /// No description provided for @disableTypeConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Désactiver ce type ?'**
+  String get disableTypeConfirmTitle;
+
+  /// No description provided for @disableTypeConfirmBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le type « {name} » ne sera plus proposé, mais les chambres existantes ne sont pas supprimées.'**
+  String disableTypeConfirmBody(String name);
+
+  /// No description provided for @typeDisabled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type désactivé.'**
+  String get typeDisabled;
+
+  /// No description provided for @typeUpdated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type modifié.'**
+  String get typeUpdated;
+
+  /// No description provided for @typeAdded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type ajouté.'**
+  String get typeAdded;
+
+  /// No description provided for @addRoomType.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un type'**
+  String get addRoomType;
+
+  /// No description provided for @noRoomType.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun type de chambre.\nAjoutez vos catégories (Simple, Suite, Bungalow...).'**
+  String get noRoomType;
+
+  /// No description provided for @roomTypeSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'{price} FCFA / nuit · {capacity} pers.'**
+  String roomTypeSubtitle(String price, String capacity);
+
+  /// No description provided for @editTypeTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier le type'**
+  String get editTypeTitle;
+
+  /// No description provided for @newTypeTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveau type de chambre'**
+  String get newTypeTitle;
+
+  /// No description provided for @typeNameLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom du type'**
+  String get typeNameLabel;
+
+  /// No description provided for @typeNameHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. Suite Présidentielle, Bungalow...'**
+  String get typeNameHint;
+
+  /// No description provided for @pricePerNightLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prix par nuit (FCFA)'**
+  String get pricePerNightLabel;
+
+  /// No description provided for @pricePerNightHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. 25000'**
+  String get pricePerNightHint;
+
+  /// No description provided for @invalidPrice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prix invalide'**
+  String get invalidPrice;
+
+  /// No description provided for @capacityLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Capacité (personnes)'**
+  String get capacityLabel;
+
+  /// No description provided for @capacityHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. 2'**
+  String get capacityHint;
+
+  /// No description provided for @invalidCapacity.
+  ///
+  /// In fr, this message translates to:
+  /// **'Capacité invalide'**
+  String get invalidCapacity;
+
+  /// No description provided for @descriptionOptionalLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Description (optionnel)'**
+  String get descriptionOptionalLabel;
+
+  /// No description provided for @amenitiesLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Équipements (séparés par des virgules)'**
+  String get amenitiesLabel;
+
+  /// No description provided for @amenitiesHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. Clim, Wifi, TV, Minibar'**
+  String get amenitiesHint;
+
+  /// No description provided for @roomStatusAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Libre'**
+  String get roomStatusAvailable;
+
+  /// No description provided for @roomStatusOccupied.
+  ///
+  /// In fr, this message translates to:
+  /// **'Occupée'**
+  String get roomStatusOccupied;
+
+  /// No description provided for @roomStatusCleaning.
+  ///
+  /// In fr, this message translates to:
+  /// **'À nettoyer'**
+  String get roomStatusCleaning;
+
+  /// No description provided for @roomStatusMaintenance.
+  ///
+  /// In fr, this message translates to:
+  /// **'Maintenance'**
+  String get roomStatusMaintenance;
+
+  /// No description provided for @changeRoomStateTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chambre {number} — changer l’état'**
+  String changeRoomStateTitle(String number);
+
+  /// No description provided for @roomOccupiedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chambre {number} (occupée)'**
+  String roomOccupiedTitle(String number);
+
+  /// No description provided for @actionCheckOut.
+  ///
+  /// In fr, this message translates to:
+  /// **'Check-out (départ du client)'**
+  String get actionCheckOut;
+
+  /// No description provided for @actionChangeStateManually.
+  ///
+  /// In fr, this message translates to:
+  /// **'Changer l’état manuellement'**
+  String get actionChangeStateManually;
+
+  /// No description provided for @roomStatusChanged.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chambre {number} : {status}'**
+  String roomStatusChanged(String number, String status);
+
+  /// No description provided for @noActiveReservationForRoom.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune réservation active trouvée pour cette chambre. Vous pouvez changer son état manuellement.'**
+  String get noActiveReservationForRoom;
+
+  /// No description provided for @checkOutTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Check-out'**
+  String get checkOutTitle;
+
+  /// No description provided for @checkOutConfirmBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer le départ de {client} (chambre {number}) ?\n\nLa chambre passera « à nettoyer ».'**
+  String checkOutConfirmBody(String client, String number);
+
+  /// No description provided for @actionConfirmDeparture.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer le départ'**
+  String get actionConfirmDeparture;
+
+  /// No description provided for @checkOutDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Check-out effectué.'**
+  String get checkOutDone;
+
+  /// No description provided for @billStayTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facturer le séjour ?'**
+  String get billStayTitle;
+
+  /// No description provided for @billStayBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voulez-vous établir la facture de {client} maintenant ?'**
+  String billStayBody(String client);
+
+  /// No description provided for @actionLater.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plus tard'**
+  String get actionLater;
+
+  /// No description provided for @actionBill.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facturer'**
+  String get actionBill;
+
+  /// No description provided for @noRoomBoard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune chambre.\nAjoutez vos chambres pour voir le plan.'**
+  String get noRoomBoard;
+
+  /// No description provided for @roomsCountSummary.
+  ///
+  /// In fr, this message translates to:
+  /// **'{total} chambres · {free} libres · {occupied} occupées · {toClean} à nettoyer'**
+  String roomsCountSummary(
+    String total,
+    String free,
+    String occupied,
+    String toClean,
+  );
+
+  /// No description provided for @createRoomTypeFirst.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créez d’abord au moins un type de chambre.'**
+  String get createRoomTypeFirst;
+
+  /// No description provided for @deleteRoomConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer cette chambre ?'**
+  String get deleteRoomConfirmTitle;
+
+  /// No description provided for @deleteRoomConfirmBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'La chambre « {number} » sera retirée de la liste.'**
+  String deleteRoomConfirmBody(String number);
+
+  /// No description provided for @roomDeleted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chambre supprimée.'**
+  String get roomDeleted;
+
+  /// No description provided for @addRoom.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une chambre'**
+  String get addRoom;
+
+  /// No description provided for @noRoomTypeThenRooms.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créez d’abord un type de chambre,\npuis ajoutez vos chambres.'**
+  String get noRoomTypeThenRooms;
+
+  /// No description provided for @noRoomYet.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune chambre.\nAjoutez vos chambres avec le bouton +.'**
+  String get noRoomYet;
+
+  /// No description provided for @floorSuffix.
+  ///
+  /// In fr, this message translates to:
+  /// **' · Étage {floor}'**
+  String floorSuffix(String floor);
+
+  /// No description provided for @pickRoomType.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez choisir un type de chambre.'**
+  String get pickRoomType;
+
+  /// No description provided for @chooseRoomType.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez un type'**
+  String get chooseRoomType;
+
+  /// No description provided for @roomUpdated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chambre modifiée.'**
+  String get roomUpdated;
+
+  /// No description provided for @roomAdded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chambre ajoutée.'**
+  String get roomAdded;
+
+  /// No description provided for @editRoomTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier la chambre'**
+  String get editRoomTitle;
+
+  /// No description provided for @newRoomTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle chambre'**
+  String get newRoomTitle;
+
+  /// No description provided for @roomNumberOrNameLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro / nom de la chambre'**
+  String get roomNumberOrNameLabel;
+
+  /// No description provided for @roomNumberOrNameHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. 101, Jasmin, A2'**
+  String get roomNumberOrNameHint;
+
+  /// No description provided for @roomTypeLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type de chambre'**
+  String get roomTypeLabel;
+
+  /// No description provided for @roomTypeOption.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} ({price} FCFA)'**
+  String roomTypeOption(String name, String price);
+
+  /// No description provided for @floorOptionalLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Étage (optionnel)'**
+  String get floorOptionalLabel;
+
+  /// No description provided for @floorHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. 1, RDC'**
+  String get floorHint;
+
+  /// No description provided for @specificPriceLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prix spécifique (optionnel)'**
+  String get specificPriceLabel;
+
+  /// No description provided for @specificPriceHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Laisser vide = prix du type'**
+  String get specificPriceHint;
+
   /// No description provided for @clientDisabled.
   ///
   /// In fr, this message translates to:
