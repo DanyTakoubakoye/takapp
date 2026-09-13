@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:printing/printing.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 class PrinterService {
   /// =========================
@@ -9,7 +10,7 @@ class PrinterService {
 
   Future<void> printPdf(Uint8List bytes) async {
     if (bytes.isEmpty) {
-      throw Exception('Document PDF vide.');
+      throw const AppError(AppErrorCode.emptyPdfDocument);
     }
 
     await Printing.layoutPdf(
@@ -24,7 +25,7 @@ class PrinterService {
 
   Future<void> sharePdf(Uint8List bytes, String filename) async {
     if (bytes.isEmpty) {
-      throw Exception('Document PDF vide.');
+      throw const AppError(AppErrorCode.emptyPdfDocument);
     }
 
     final safeFilename = filename.trim().isEmpty
@@ -40,7 +41,7 @@ class PrinterService {
 
   Future<void> previewPdf(Uint8List bytes) async {
     if (bytes.isEmpty) {
-      throw Exception('Document PDF vide.');
+      throw const AppError(AppErrorCode.emptyPdfDocument);
     }
 
     await Printing.layoutPdf(
@@ -71,7 +72,7 @@ class PrinterService {
     String documentName = 'takapp_document',
   }) async {
     if (bytes.isEmpty) {
-      throw Exception('Document PDF vide.');
+      throw const AppError(AppErrorCode.emptyPdfDocument);
     }
 
     await Printing.directPrintPdf(

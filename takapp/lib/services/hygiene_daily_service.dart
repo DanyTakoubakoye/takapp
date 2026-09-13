@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 import '../services/store_stock_service.dart';
 
@@ -35,15 +36,15 @@ class HygieneDailyService {
     required List<Map<String, dynamic>> usedItems,
   }) async {
     if (establishmentId.trim().isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
 
     if (roomNumber.trim().isEmpty) {
-      throw Exception('Veuillez préciser le numéro de chambre.');
+      throw const AppError(AppErrorCode.roomNumberRequired);
     }
 
     if (usedItems.isEmpty) {
-      throw Exception('Veuillez ajouter au moins un article utilisé.');
+      throw const AppError(AppErrorCode.addAtLeastOneUsedItem);
     }
 
     final docRef = await _col(establishmentId: establishmentId).add({
@@ -66,11 +67,11 @@ class HygieneDailyService {
       final quantityUsed = _toDouble(item['quantityUsed']);
 
       if (itemId.isEmpty) {
-        throw Exception('Article de stock invalide : itemId manquant.');
+        throw const AppError(AppErrorCode.invalidStockItemMissingId);
       }
 
       if (quantityUsed <= 0) {
-        throw Exception('Quantité invalide pour l’article "$itemName".');
+        throw AppError(AppErrorCode.invalidQuantityForItem, name: itemName);
       }
 
       await docRef.collection('items').add({
@@ -127,7 +128,7 @@ class HygieneDailyService {
     required String establishmentId,
   }) {
     if (establishmentId.trim().isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
 
     return _col(

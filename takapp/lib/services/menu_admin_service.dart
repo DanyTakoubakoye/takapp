@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
 
 class MenuAdminService {
@@ -27,7 +28,7 @@ class MenuAdminService {
     final resolvedEstablishmentId = _resolveEstablishmentId(establishmentId);
 
     if (resolvedEstablishmentId.isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
 
     final docRef = _menuCol(establishmentId: resolvedEstablishmentId).doc();
@@ -97,11 +98,11 @@ class MenuAdminService {
     final menuItemId = id.trim();
 
     if (resolvedEstablishmentId.isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
 
     if (menuItemId.isEmpty) {
-      throw Exception('Identifiant menu invalide.');
+      throw const AppError(AppErrorCode.invalidMenuId);
     }
 
     await _menuCol(
@@ -117,11 +118,11 @@ class MenuAdminService {
     final resolvedEstablishmentId = _resolveEstablishmentId(establishmentId);
 
     if (resolvedEstablishmentId.isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
 
     if (id.trim().isEmpty) {
-      throw Exception('Identifiant menu invalide.');
+      throw const AppError(AppErrorCode.invalidMenuId);
     }
 
     await _menuCol(establishmentId: resolvedEstablishmentId).doc(id).update({
@@ -139,11 +140,11 @@ class MenuAdminService {
     final resolvedEstablishmentId = _resolveEstablishmentId(establishmentId);
 
     if (resolvedEstablishmentId.isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
 
     if (item.id.trim().isEmpty) {
-      throw Exception('Identifiant menu invalide.');
+      throw const AppError(AppErrorCode.invalidMenuId);
     }
 
     await _menuCol(

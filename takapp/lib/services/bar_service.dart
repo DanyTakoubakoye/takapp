@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class BarService {
@@ -10,7 +11,7 @@ class BarService {
   /// Helper : référence vers la sous-collection orders du tenant
   CollectionReference<Map<String, dynamic>> _ordersRef(String establishmentId) {
     if (establishmentId.isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
     return _firestore
         .collection('establishments')
@@ -59,7 +60,7 @@ class BarService {
     final orderDoc = await orderRef.get();
 
     if (!orderDoc.exists) {
-      throw Exception('Commande introuvable.');
+      throw const AppError(AppErrorCode.orderNotFound);
     }
 
     final updates = <String, dynamic>{

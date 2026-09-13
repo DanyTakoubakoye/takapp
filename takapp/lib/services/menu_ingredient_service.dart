@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 class MenuIngredientService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -96,10 +97,10 @@ class MenuIngredientService {
     required String adresse,
   }) async {
     if (establishmentId.trim().isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
     if (menuItemId.trim().isEmpty) {
-      throw Exception('Identifiant menu invalide.');
+      throw const AppError(AppErrorCode.invalidMenuId);
     }
     await _menuItemsCol(
       establishmentId: establishmentId,
@@ -120,10 +121,10 @@ class MenuIngredientService {
     String? adresse,
   }) async {
     if (establishmentId.trim().isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
     if (menuItemId.trim().isEmpty) {
-      throw Exception('Identifiant menu invalide.');
+      throw const AppError(AppErrorCode.invalidMenuId);
     }
     final normalizedIngredients = ingredients.map((ingredient) {
       return {...ingredient, 'establishmentId': establishmentId};
@@ -157,10 +158,10 @@ class MenuIngredientService {
     String category = 'boisson',
   }) async {
     if (establishmentId.trim().isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
     if (name.trim().isEmpty) {
-      throw Exception('Nom du cocktail obligatoire.');
+      throw const AppError(AppErrorCode.cocktailNameRequired);
     }
     final docRef = _menuItemsCol(establishmentId: establishmentId).doc();
     await docRef.set({
@@ -189,10 +190,10 @@ class MenuIngredientService {
     String category = 'plat',
   }) async {
     if (establishmentId.trim().isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
     if (name.trim().isEmpty) {
-      throw Exception('Nom du plat obligatoire.');
+      throw const AppError(AppErrorCode.dishNameRequired);
     }
     final docRef = _menuItemsCol(establishmentId: establishmentId).doc();
     await docRef.set({

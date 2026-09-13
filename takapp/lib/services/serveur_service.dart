@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 class ServeurService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -18,7 +19,7 @@ class ServeurService {
 
   void _validateEstablishmentId(String establishmentId) {
     if (establishmentId.trim().isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
   }
 
@@ -41,11 +42,11 @@ class ServeurService {
     final cleanEmail = email.trim().toLowerCase();
 
     if (cleanName.isEmpty) {
-      throw Exception('Nom du serveur invalide.');
+      throw const AppError(AppErrorCode.invalidServerName);
     }
 
     if (cleanEmail.isEmpty) {
-      throw Exception('Email invalide.');
+      throw const AppError(AppErrorCode.invalidEmail);
     }
 
     /// =========================
@@ -57,7 +58,7 @@ class ServeurService {
     ).where('email', isEqualTo: cleanEmail).limit(1).get();
 
     if (existing.docs.isNotEmpty) {
-      throw Exception('Un utilisateur avec cet email existe déjà.');
+      throw const AppError(AppErrorCode.userEmailAlreadyExists);
     }
 
     /// =========================

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 class MenuImageService {
   final FirebaseStorage _storage = FirebaseStorage.instance;
@@ -29,10 +30,10 @@ class MenuImageService {
     required Uint8List imageBytes,
   }) async {
     if (establishmentId.trim().isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
     if (menuItemId.trim().isEmpty) {
-      throw Exception('Identifiant du plat invalide.');
+      throw const AppError(AppErrorCode.invalidDishId);
     }
 
     final path = 'establishments/$establishmentId/menuItems/$menuItemId.jpg';

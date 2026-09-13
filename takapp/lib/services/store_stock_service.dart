@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 import '../modeles/store_stock_model.dart';
 import '../modeles/stock_movement_model.dart';
@@ -179,11 +180,7 @@ class StoreStockService {
           .get();
 
       if (query.docs.isEmpty) {
-        throw Exception(
-          'Article introuvable '
-          'dans le stock : '
-          '$itemName',
-        );
+        throw AppError(AppErrorCode.itemNotFoundInStockFor, name: itemName);
       }
 
       stockRefs.add((ref: query.docs.first.reference, deduction: deduction));
@@ -408,7 +405,7 @@ class StoreStockService {
     ).doc(stockDocId).get();
 
     if (!doc.exists || doc.data() == null) {
-      throw Exception('Stock introuvable.');
+      throw const AppError(AppErrorCode.stockNotFound);
     }
 
     final data = doc.data()!;
@@ -599,7 +596,7 @@ class StoreStockService {
         .get();
 
     if (query.docs.isEmpty) {
-      throw Exception('Article introuvable dans le stock.');
+      throw const AppError(AppErrorCode.itemNotFoundInStock);
     }
 
     final doc = query.docs.first;
@@ -610,7 +607,7 @@ class StoreStockService {
     double newQuantity;
     if (current < quantity) {
       if (!allowNegative) {
-        throw Exception('Stock insuffisant pour $itemName.');
+        throw AppError(AppErrorCode.stockInsufficient, name: itemName);
       }
       // Stock insuffisant mais on laisse passer : on planche à 0.
       newQuantity = 0;

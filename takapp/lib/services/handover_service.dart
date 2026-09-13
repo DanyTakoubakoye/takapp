@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'package:takapp/core/errors/app_error.dart';
 import 'package:takapp/modeles/payment_model.dart';
 import 'package:takapp/modeles/server_handover_model.dart';
 
@@ -80,11 +81,11 @@ class HandoverService {
     required List<String> paymentIds,
   }) async {
     if (establishmentId.trim().isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
 
     if (paymentIds.isEmpty) {
-      throw Exception('Aucun paiement sélectionné pour le versement.');
+      throw const AppError(AppErrorCode.noPaymentSelectedForHandover);
     }
 
     final handoverRef = _handoversRef(establishmentId: establishmentId).doc();
@@ -136,7 +137,7 @@ class HandoverService {
     required List<String> paymentIds,
   }) async {
     if (establishmentId.trim().isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
 
     if (paymentIds.isEmpty) {

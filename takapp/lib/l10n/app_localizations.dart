@@ -392,6 +392,336 @@ abstract class AppLocalizations {
   /// **'Erreur lors de l’enregistrement du serveur : {name}'**
   String errServerRegistrationFailed(String name);
 
+  /// No description provided for @errFirebaseUserNotFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Utilisateur Firebase introuvable après connexion.'**
+  String get errFirebaseUserNotFound;
+
+  /// No description provided for @errAccountDisabled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce compte est désactivé.'**
+  String get errAccountDisabled;
+
+  /// No description provided for @errUserProfileNotFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le profil utilisateur est introuvable dans Firestore.'**
+  String get errUserProfileNotFound;
+
+  /// No description provided for @errInvalidMenuId.
+  ///
+  /// In fr, this message translates to:
+  /// **'Identifiant menu invalide.'**
+  String get errInvalidMenuId;
+
+  /// No description provided for @errInvalidDishId.
+  ///
+  /// In fr, this message translates to:
+  /// **'Identifiant du plat invalide.'**
+  String get errInvalidDishId;
+
+  /// No description provided for @errDishNameRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom du plat obligatoire.'**
+  String get errDishNameRequired;
+
+  /// No description provided for @errCocktailNameRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom du cocktail obligatoire.'**
+  String get errCocktailNameRequired;
+
+  /// No description provided for @errMenuItemNotFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Article menu introuvable : {name}'**
+  String errMenuItemNotFound(String name);
+
+  /// No description provided for @errNoRecipeDefined.
+  ///
+  /// In fr, this message translates to:
+  /// **'L’article « {name} » n’a pas de recette définie.'**
+  String errNoRecipeDefined(String name);
+
+  /// No description provided for @errNoOrderSelected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune commande sélectionnée.'**
+  String get errNoOrderSelected;
+
+  /// No description provided for @errNoPaymentSelectedForHandover.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun paiement sélectionné pour le versement.'**
+  String get errNoPaymentSelectedForHandover;
+
+  /// No description provided for @errOrderAlreadyCancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette commande est déjà annulée.'**
+  String get errOrderAlreadyCancelled;
+
+  /// No description provided for @errStockAlreadyRestored.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le stock de cette commande a déjà été restitué.'**
+  String get errStockAlreadyRestored;
+
+  /// No description provided for @errCannotCancelPaidOrder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d’annuler une commande déjà encaissée.'**
+  String get errCannotCancelPaidOrder;
+
+  /// No description provided for @errCannotCancelPaidOrderItems.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d’annuler des articles d’une commande déjà encaissée.'**
+  String get errCannotCancelPaidOrderItems;
+
+  /// No description provided for @errCannotCancelKitchenReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d’annuler : la partie cuisine est déjà prête ou servie.'**
+  String get errCannotCancelKitchenReady;
+
+  /// No description provided for @errCannotCancelBarReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d’annuler : la partie bar est déjà prête ou servie.'**
+  String get errCannotCancelBarReady;
+
+  /// No description provided for @errOrderHasNoItems.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette commande ne contient aucun article.'**
+  String get errOrderHasNoItems;
+
+  /// No description provided for @errNoItemsFoundInOrder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun article trouvé dans cette commande.'**
+  String get errNoItemsFoundInOrder;
+
+  /// No description provided for @errNoItemSelectedForCancellation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun article sélectionné pour annulation.'**
+  String get errNoItemSelectedForCancellation;
+
+  /// No description provided for @errKitchenNotReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande {name} : cuisine non prête.'**
+  String errKitchenNotReady(String name);
+
+  /// No description provided for @errBarNotReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande {name} : bar non prêt.'**
+  String errBarNotReady(String name);
+
+  /// No description provided for @errItemAlreadyCancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'L’article « {name} » est déjà annulé.'**
+  String errItemAlreadyCancelled(String name);
+
+  /// No description provided for @errCannotCancelItemKitchenReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d’annuler « {name} » : la cuisine est déjà prête ou servie.'**
+  String errCannotCancelItemKitchenReady(String name);
+
+  /// No description provided for @errCannotCancelItemBarReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d’annuler « {name} » : le bar est déjà prêt ou servi.'**
+  String errCannotCancelItemBarReady(String name);
+
+  /// No description provided for @errInvalidQuantityForItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quantité invalide pour l’article « {name} ».'**
+  String errInvalidQuantityForItem(String name);
+
+  /// No description provided for @errInvalidQuantityInOrder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quantité invalide dans la commande pour « {name} ».'**
+  String errInvalidQuantityInOrder(String name);
+
+  /// No description provided for @errInvalidRoomNumber.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro de chambre invalide.'**
+  String get errInvalidRoomNumber;
+
+  /// No description provided for @errRoomTypeRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type de chambre requis.'**
+  String get errRoomTypeRequired;
+
+  /// No description provided for @errRoomNumberAlreadyExists.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une chambre avec ce numéro existe déjà.'**
+  String get errRoomNumberAlreadyExists;
+
+  /// No description provided for @errInvalidRoomStatus.
+  ///
+  /// In fr, this message translates to:
+  /// **'Statut de chambre invalide.'**
+  String get errInvalidRoomStatus;
+
+  /// No description provided for @errInvalidRoomTypeName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom du type invalide.'**
+  String get errInvalidRoomTypeName;
+
+  /// No description provided for @errPricePerNightMustBePositive.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le prix par nuit doit être supérieur à 0.'**
+  String get errPricePerNightMustBePositive;
+
+  /// No description provided for @errRoomTypeAlreadyExists.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce type de chambre existe déjà.'**
+  String get errRoomTypeAlreadyExists;
+
+  /// No description provided for @errReservationNotAwaitingArrival.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette réservation n’est pas en attente d’arrivée.'**
+  String get errReservationNotAwaitingArrival;
+
+  /// No description provided for @errReservationNotInStay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette réservation n’est pas en cours de séjour.'**
+  String get errReservationNotInStay;
+
+  /// No description provided for @errRoomNoLongerAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette chambre n’est plus disponible.'**
+  String get errRoomNoLongerAvailable;
+
+  /// No description provided for @errRoomNotOfReservedType.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette chambre n’est pas du type réservé.'**
+  String get errRoomNotOfReservedType;
+
+  /// No description provided for @errCheckOutAfterCheckIn.
+  ///
+  /// In fr, this message translates to:
+  /// **'La date de départ doit être après la date d’arrivée.'**
+  String get errCheckOutAfterCheckIn;
+
+  /// No description provided for @errNoRoomOfTypeAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune chambre de ce type disponible sur cette période. Vous pouvez forcer la réservation si nécessaire.'**
+  String get errNoRoomOfTypeAvailable;
+
+  /// No description provided for @errInvalidStockItemMissingId.
+  ///
+  /// In fr, this message translates to:
+  /// **'Article de stock invalide : itemId manquant.'**
+  String get errInvalidStockItemMissingId;
+
+  /// No description provided for @errItemNotFoundInStock.
+  ///
+  /// In fr, this message translates to:
+  /// **'Article introuvable dans le stock.'**
+  String get errItemNotFoundInStock;
+
+  /// No description provided for @errNoItemDelivered.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun article livré.'**
+  String get errNoItemDelivered;
+
+  /// No description provided for @errInvalidItemName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom article invalide.'**
+  String get errInvalidItemName;
+
+  /// No description provided for @errInvalidStore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Magasin invalide.'**
+  String get errInvalidStore;
+
+  /// No description provided for @errItemAlreadyExistsInStore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cet article existe déjà dans ce magasin.'**
+  String get errItemAlreadyExistsInStore;
+
+  /// No description provided for @errItemNotFoundInStockFor.
+  ///
+  /// In fr, this message translates to:
+  /// **'Article introuvable dans le stock : {name}'**
+  String errItemNotFoundInStockFor(String name);
+
+  /// No description provided for @errInvalidServerName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom du serveur invalide.'**
+  String get errInvalidServerName;
+
+  /// No description provided for @errInvalidEmail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Email invalide.'**
+  String get errInvalidEmail;
+
+  /// No description provided for @errUserEmailAlreadyExists.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un utilisateur avec cet email existe déjà.'**
+  String get errUserEmailAlreadyExists;
+
+  /// No description provided for @errTotalAmountInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant total invalide.'**
+  String get errTotalAmountInvalid;
+
+  /// No description provided for @errPaymentAmountInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant de paiement invalide.'**
+  String get errPaymentAmountInvalid;
+
+  /// No description provided for @errEmptyPdfDocument.
+  ///
+  /// In fr, this message translates to:
+  /// **'Document PDF vide.'**
+  String get errEmptyPdfDocument;
+
+  /// No description provided for @errFirestoreError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur Firestore : {name}'**
+  String errFirestoreError(String name);
+
+  /// No description provided for @errConsumptionLoadFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors du chargement des consommations : {name}'**
+  String errConsumptionLoadFailed(String name);
+
   /// No description provided for @clientDisabled.
   ///
   /// In fr, this message translates to:

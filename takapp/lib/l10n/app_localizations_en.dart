@@ -171,6 +171,214 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get errFirebaseUserNotFound =>
+      'Firebase user not found after sign-in.';
+
+  @override
+  String get errAccountDisabled => 'This account is disabled.';
+
+  @override
+  String get errUserProfileNotFound =>
+      'The user profile could not be found in Firestore.';
+
+  @override
+  String get errInvalidMenuId => 'Invalid menu identifier.';
+
+  @override
+  String get errInvalidDishId => 'Invalid dish identifier.';
+
+  @override
+  String get errDishNameRequired => 'Dish name is required.';
+
+  @override
+  String get errCocktailNameRequired => 'Cocktail name is required.';
+
+  @override
+  String errMenuItemNotFound(String name) {
+    return 'Menu item not found: $name';
+  }
+
+  @override
+  String errNoRecipeDefined(String name) {
+    return 'The item \"$name\" has no recipe defined.';
+  }
+
+  @override
+  String get errNoOrderSelected => 'No order selected.';
+
+  @override
+  String get errNoPaymentSelectedForHandover =>
+      'No payment selected for the handover.';
+
+  @override
+  String get errOrderAlreadyCancelled => 'This order is already cancelled.';
+
+  @override
+  String get errStockAlreadyRestored =>
+      'The stock for this order has already been restored.';
+
+  @override
+  String get errCannotCancelPaidOrder =>
+      'Cannot cancel an order that has already been paid.';
+
+  @override
+  String get errCannotCancelPaidOrderItems =>
+      'Cannot cancel items from an order that has already been paid.';
+
+  @override
+  String get errCannotCancelKitchenReady =>
+      'Cannot cancel: the kitchen part is already ready or served.';
+
+  @override
+  String get errCannotCancelBarReady =>
+      'Cannot cancel: the bar part is already ready or served.';
+
+  @override
+  String get errOrderHasNoItems => 'This order contains no items.';
+
+  @override
+  String get errNoItemsFoundInOrder => 'No item found in this order.';
+
+  @override
+  String get errNoItemSelectedForCancellation =>
+      'No item selected for cancellation.';
+
+  @override
+  String errKitchenNotReady(String name) {
+    return 'Order $name: kitchen not ready.';
+  }
+
+  @override
+  String errBarNotReady(String name) {
+    return 'Order $name: bar not ready.';
+  }
+
+  @override
+  String errItemAlreadyCancelled(String name) {
+    return 'The item \"$name\" is already cancelled.';
+  }
+
+  @override
+  String errCannotCancelItemKitchenReady(String name) {
+    return 'Cannot cancel \"$name\": the kitchen is already ready or served.';
+  }
+
+  @override
+  String errCannotCancelItemBarReady(String name) {
+    return 'Cannot cancel \"$name\": the bar is already ready or served.';
+  }
+
+  @override
+  String errInvalidQuantityForItem(String name) {
+    return 'Invalid quantity for the item \"$name\".';
+  }
+
+  @override
+  String errInvalidQuantityInOrder(String name) {
+    return 'Invalid quantity in the order for \"$name\".';
+  }
+
+  @override
+  String get errInvalidRoomNumber => 'Invalid room number.';
+
+  @override
+  String get errRoomTypeRequired => 'Room type is required.';
+
+  @override
+  String get errRoomNumberAlreadyExists =>
+      'A room with this number already exists.';
+
+  @override
+  String get errInvalidRoomStatus => 'Invalid room status.';
+
+  @override
+  String get errInvalidRoomTypeName => 'Invalid type name.';
+
+  @override
+  String get errPricePerNightMustBePositive =>
+      'The price per night must be greater than 0.';
+
+  @override
+  String get errRoomTypeAlreadyExists => 'This room type already exists.';
+
+  @override
+  String get errReservationNotAwaitingArrival =>
+      'This reservation is not awaiting arrival.';
+
+  @override
+  String get errReservationNotInStay =>
+      'This reservation is not currently in stay.';
+
+  @override
+  String get errRoomNoLongerAvailable => 'This room is no longer available.';
+
+  @override
+  String get errRoomNotOfReservedType =>
+      'This room is not of the reserved type.';
+
+  @override
+  String get errCheckOutAfterCheckIn =>
+      'The departure date must be after the arrival date.';
+
+  @override
+  String get errNoRoomOfTypeAvailable =>
+      'No room of this type is available for this period. You can force the reservation if necessary.';
+
+  @override
+  String get errInvalidStockItemMissingId =>
+      'Invalid stock item: missing itemId.';
+
+  @override
+  String get errItemNotFoundInStock => 'Item not found in stock.';
+
+  @override
+  String get errNoItemDelivered => 'No item delivered.';
+
+  @override
+  String get errInvalidItemName => 'Invalid item name.';
+
+  @override
+  String get errInvalidStore => 'Invalid store.';
+
+  @override
+  String get errItemAlreadyExistsInStore =>
+      'This item already exists in this store.';
+
+  @override
+  String errItemNotFoundInStockFor(String name) {
+    return 'Item not found in stock: $name';
+  }
+
+  @override
+  String get errInvalidServerName => 'Invalid waiter name.';
+
+  @override
+  String get errInvalidEmail => 'Invalid email.';
+
+  @override
+  String get errUserEmailAlreadyExists =>
+      'A user with this email already exists.';
+
+  @override
+  String get errTotalAmountInvalid => 'Invalid total amount.';
+
+  @override
+  String get errPaymentAmountInvalid => 'Invalid payment amount.';
+
+  @override
+  String get errEmptyPdfDocument => 'Empty PDF document.';
+
+  @override
+  String errFirestoreError(String name) {
+    return 'Firestore error: $name';
+  }
+
+  @override
+  String errConsumptionLoadFailed(String name) {
+    return 'Error while loading consumption: $name';
+  }
+
+  @override
   String get clientDisabled => 'Client disabled.';
 
   @override

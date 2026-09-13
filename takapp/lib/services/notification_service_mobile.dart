@@ -5,6 +5,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:takapp/core/app_navigator.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 class NotificationService {
   NotificationService._internal();
@@ -37,7 +38,7 @@ class NotificationService {
     String establishmentId,
   ) {
     if (establishmentId.isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
     return _firestore
         .collection('establishments')

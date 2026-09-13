@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 import '../modeles/room_model.dart';
 
@@ -17,7 +18,7 @@ class RoomService {
     final resolved = (id ?? establishmentId ?? '').trim();
 
     if (resolved.isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
 
     return resolved;
@@ -82,11 +83,11 @@ class RoomService {
     final cleanNumber = number.trim();
 
     if (cleanNumber.isEmpty) {
-      throw Exception('Numéro de chambre invalide.');
+      throw const AppError(AppErrorCode.invalidRoomNumber);
     }
 
     if (roomTypeId.trim().isEmpty) {
-      throw Exception('Type de chambre requis.');
+      throw const AppError(AppErrorCode.roomTypeRequired);
     }
 
     /// =========================
@@ -98,7 +99,7 @@ class RoomService {
     ).where('number', isEqualTo: cleanNumber).limit(1).get();
 
     if (existing.docs.isNotEmpty) {
-      throw Exception('Une chambre avec ce numéro existe déjà.');
+      throw const AppError(AppErrorCode.roomNumberAlreadyExists);
     }
 
     /// =========================
@@ -161,7 +162,7 @@ class RoomService {
 
     const allowed = ['available', 'occupied', 'cleaning', 'maintenance'];
     if (!allowed.contains(status)) {
-      throw Exception('Statut de chambre invalide.');
+      throw const AppError(AppErrorCode.invalidRoomStatus);
     }
 
     await _col(establishmentId: resolvedEstablishmentId).doc(roomId).update({

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 import 'package:takapp/modeles/order_item_model.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
 import 'package:takapp/modeles/order_model.dart';
@@ -230,21 +231,22 @@ class OrderService {
       ).doc(menuItemId).get();
 
       if (!menuSnap.exists || menuSnap.data() == null) {
-        throw Exception('Article menu introuvable : $menuItemId');
+        throw AppError(AppErrorCode.menuItemNotFound, name: menuItemId);
       }
 
       final menuItem = MenuItemModel.fromMap(menuSnap.data()!, menuSnap.id);
 
       if (menuItem.ingredients.isEmpty) {
-        throw Exception(
-          'L’article "${menuItem.name}" n’a pas de recette définie.',
-        );
+        throw AppError(AppErrorCode.noRecipeDefined, name: menuItem.name);
       }
 
       final orderedQuantity = (itemMap['quantity'] as num?)?.toDouble() ?? 0;
 
       if (orderedQuantity <= 0) {
-        throw Exception('Quantité invalide pour l’article "${menuItem.name}".');
+        throw AppError(
+          AppErrorCode.invalidQuantityForItem,
+          name: menuItem.name,
+        );
       }
 
       for (final ingredient in menuItem.ingredients) {
@@ -356,7 +358,7 @@ class OrderService {
     final orderSnap = await orderRef.get();
 
     if (!orderSnap.exists || orderSnap.data() == null) {
-      throw Exception('Commande introuvable.');
+      throw const AppError(AppErrorCode.orderNotFound);
     }
 
     final orderData = Map<String, dynamic>.from(orderSnap.data()!);
@@ -366,15 +368,13 @@ class OrderService {
         .toLowerCase();
 
     if (paymentStatus == 'paid') {
-      throw Exception(
-        'Impossible d’annuler des articles d’une commande déjà encaissée.',
-      );
+      throw const AppError(AppErrorCode.cannotCancelPaidOrderItems);
     }
 
     final itemsSnap = await orderRef.collection('items').get();
 
     if (itemsSnap.docs.isEmpty) {
-      throw Exception('Aucun article trouvé dans cette commande.');
+      throw const AppError(AppErrorCode.noItemsFoundInOrder);
     }
 
     final orderItems = itemsSnap.docs.map((doc) {
@@ -386,7 +386,7 @@ class OrderService {
         .toList();
 
     if (selectedItems.isEmpty) {
-      throw Exception('Aucun article sélectionné pour annulation.');
+      throw const AppError(AppErrorCode.noItemSelectedForCancellation);
     }
 
     final kitchenStatus = (orderData['kitchenStatus'] ?? '').toString();
@@ -396,7 +396,7 @@ class OrderService {
 
     for (final item in selectedItems) {
       if (item.isCancelled) {
-        throw Exception('L’article "${item.name}" est déjà annulé.');
+        throw AppError(AppErrorCode.itemAlreadyCancelled, name: item.name);
       }
 
       final target = item.targetDepartment.toLowerCase();
@@ -406,14 +406,16 @@ class OrderService {
 
       if (isKitchenItem &&
           (kitchenStatus == 'ready' || kitchenStatus == 'served')) {
-        throw Exception(
-          'Impossible d’annuler "${item.name}" : la cuisine est déjà prête ou servie.',
+        throw AppError(
+          AppErrorCode.cannotCancelItemKitchenReady,
+          name: item.name,
         );
       }
 
       if (isBarItem && (barStatus == 'ready' || barStatus == 'served')) {
-        throw Exception(
-          'Impossible d’annuler "${item.name}" : le bar est déjà prêt ou servi.',
+        throw AppError(
+          AppErrorCode.cannotCancelItemBarReady,
+          name: item.name,
         );
       }
 
@@ -422,17 +424,16 @@ class OrderService {
       ).doc(item.menuItemId).get();
 
       if (!menuSnap.exists || menuSnap.data() == null) {
-        throw Exception(
-          'Article menu introuvable pour annulation : ${item.menuItemId}',
+        throw AppError(
+          AppErrorCode.menuItemNotFound,
+          name: item.menuItemId,
         );
       }
 
       final menuItem = MenuItemModel.fromMap(menuSnap.data()!, menuSnap.id);
 
       if (menuItem.ingredients.isEmpty) {
-        throw Exception(
-          'Impossible d’annuler : l’article "${menuItem.name}" n’a pas de recette définie.',
-        );
+        throw AppError(AppErrorCode.noRecipeDefined, name: menuItem.name);
       }
 
       final orderedQuantity = item.quantity.toDouble();
@@ -565,7 +566,7 @@ class OrderService {
     final orderSnap = await orderRef.get();
 
     if (!orderSnap.exists || orderSnap.data() == null) {
-      throw Exception('Commande introuvable.');
+      throw const AppError(AppErrorCode.orderNotFound);
     }
 
     final orderData = Map<String, dynamic>.from(orderSnap.data()!);
@@ -584,34 +585,30 @@ class OrderService {
     final barStatus = (orderData['barStatus'] ?? '').toString();
 
     if (status == 'cancelled') {
-      throw Exception('Cette commande est déjà annulée.');
+      throw const AppError(AppErrorCode.orderAlreadyCancelled);
     }
 
     if (stockRestored) {
-      throw Exception('Le stock de cette commande a déjà été restitué.');
+      throw const AppError(AppErrorCode.stockAlreadyRestored);
     }
 
     if (paymentStatus.toLowerCase() == 'paid') {
-      throw Exception('Impossible d’annuler une commande déjà encaissée.');
+      throw const AppError(AppErrorCode.cannotCancelPaidOrder);
     }
 
     if (isForKitchen &&
         (kitchenStatus == 'ready' || kitchenStatus == 'served')) {
-      throw Exception(
-        'Impossible d’annuler : la partie cuisine est déjà prête ou servie.',
-      );
+      throw const AppError(AppErrorCode.cannotCancelKitchenReady);
     }
 
     if (isForBar && (barStatus == 'ready' || barStatus == 'served')) {
-      throw Exception(
-        'Impossible d’annuler : la partie bar est déjà prête ou servie.',
-      );
+      throw const AppError(AppErrorCode.cannotCancelBarReady);
     }
 
     final itemsSnap = await orderRef.collection('items').get();
 
     if (itemsSnap.docs.isEmpty) {
-      throw Exception('Cette commande ne contient aucun article.');
+      throw const AppError(AppErrorCode.orderHasNoItems);
     }
 
     final items = itemsSnap.docs
@@ -634,24 +631,21 @@ class OrderService {
       ).doc(menuItemId).get();
 
       if (!menuSnap.exists || menuSnap.data() == null) {
-        throw Exception(
-          'Article menu introuvable pour annulation : $menuItemId',
-        );
+        throw AppError(AppErrorCode.menuItemNotFound, name: menuItemId);
       }
 
       final menuItem = MenuItemModel.fromMap(menuSnap.data()!, menuSnap.id);
 
       if (menuItem.ingredients.isEmpty) {
-        throw Exception(
-          'Impossible d’annuler : l’article "${menuItem.name}" n’a pas de recette définie.',
-        );
+        throw AppError(AppErrorCode.noRecipeDefined, name: menuItem.name);
       }
 
       final orderedQuantity = toDouble(item.quantity);
 
       if (orderedQuantity <= 0) {
-        throw Exception(
-          'Quantité invalide dans la commande pour "${menuItem.name}".',
+        throw AppError(
+          AppErrorCode.invalidQuantityInOrder,
+          name: menuItem.name,
         );
       }
 
@@ -716,7 +710,7 @@ class OrderService {
     final resolvedEstablishmentId = (establishmentId ?? '').trim();
 
     if (resolvedEstablishmentId.isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
 
     final cleanClientId = clientId.trim();

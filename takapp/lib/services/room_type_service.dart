@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 import '../modeles/room_type_model.dart';
 
@@ -17,7 +18,7 @@ class RoomTypeService {
     final resolved = (id ?? establishmentId ?? '').trim();
 
     if (resolved.isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
 
     return resolved;
@@ -78,11 +79,11 @@ class RoomTypeService {
     final cleanName = name.trim();
 
     if (cleanName.isEmpty) {
-      throw Exception('Nom du type invalide.');
+      throw const AppError(AppErrorCode.invalidRoomTypeName);
     }
 
     if (basePrice <= 0) {
-      throw Exception('Le prix par nuit doit être supérieur à 0.');
+      throw const AppError(AppErrorCode.pricePerNightMustBePositive);
     }
 
     /// =========================
@@ -94,7 +95,7 @@ class RoomTypeService {
     ).where('name', isEqualTo: cleanName).limit(1).get();
 
     if (existing.docs.isNotEmpty) {
-      throw Exception('Ce type de chambre existe déjà.');
+      throw const AppError(AppErrorCode.roomTypeAlreadyExists);
     }
 
     /// =========================

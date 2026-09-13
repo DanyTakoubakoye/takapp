@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:takapp/core/errors/app_error.dart';
 import 'package:takapp/modeles/user_model.dart';
 import 'package:takapp/services/notification_service.dart';
 
@@ -29,19 +30,19 @@ class AuthService {
     final firebaseUser = credential.user;
 
     if (firebaseUser == null) {
-      throw Exception("Utilisateur Firebase introuvable après connexion.");
+      throw const AppError(AppErrorCode.firebaseUserNotFound);
     }
 
     final user = await _loadUserProfile(firebaseUser.uid);
 
     if (!user.isActive) {
       await _auth.signOut();
-      throw Exception("Ce compte est désactivé.");
+      throw const AppError(AppErrorCode.accountDisabled);
     }
 
     if (!_hasValidSaasAccess(user)) {
       await _auth.signOut();
-      throw Exception("Ce compte n’est rattaché à aucun établissement.");
+      throw const AppError(AppErrorCode.accountWithoutEstablishment);
     }
 
     if (!_isGlobalAdmin(user)) {
@@ -100,7 +101,7 @@ class AuthService {
     final doc = await _firestore.collection('users').doc(uid).get();
 
     if (!doc.exists || doc.data() == null) {
-      throw Exception("Le profil utilisateur est introuvable dans Firestore.");
+      throw const AppError(AppErrorCode.userProfileNotFound);
     }
 
     final data = doc.data()!;

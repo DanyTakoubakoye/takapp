@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 import '../modeles/room_consumption_line_model.dart';
 import '../modeles/room_consumption_invoice_model.dart';
@@ -66,11 +67,11 @@ class RoomConsumptionService {
     required DateTime endDate,
   }) async {
     if (establishmentId.trim().isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
 
     if (roomNumber.trim().isEmpty) {
-      throw Exception('Veuillez préciser le numéro de chambre.');
+      throw const AppError(AppErrorCode.roomNumberRequired);
     }
 
     try {
@@ -170,9 +171,12 @@ class RoomConsumptionService {
         syncError: false,
       );
     } on FirebaseException catch (e) {
-      throw Exception('Erreur Firestore: ${e.message ?? e.code}');
+      throw AppError(
+        AppErrorCode.firestoreError,
+        name: e.message ?? e.code,
+      );
     } catch (e) {
-      throw Exception('Erreur lors du chargement des consommations: $e');
+      throw AppError(AppErrorCode.consumptionLoadFailed, name: '$e');
     }
   }
 }

@@ -85,6 +85,104 @@ enum AppErrorCode {
 
   /// Utilise [AppError.name] pour transporter le détail de l'échec.
   serverRegistrationFailed,
+
+  /// =========================
+  /// COMPTE / PROFIL
+  /// =========================
+  firebaseUserNotFound,
+  accountDisabled,
+  userProfileNotFound,
+
+  /// =========================
+  /// MENU
+  /// =========================
+  invalidMenuId,
+  invalidDishId,
+  dishNameRequired,
+  cocktailNameRequired,
+
+  /// Utilisent [AppError.name] (nom ou identifiant de l'article).
+  menuItemNotFound,
+  noRecipeDefined,
+
+  /// =========================
+  /// COMMANDE / ANNULATION
+  /// =========================
+  noOrderSelected,
+  noPaymentSelectedForHandover,
+  orderAlreadyCancelled,
+  stockAlreadyRestored,
+  cannotCancelPaidOrder,
+  cannotCancelPaidOrderItems,
+  cannotCancelKitchenReady,
+  cannotCancelBarReady,
+  orderHasNoItems,
+  noItemsFoundInOrder,
+  noItemSelectedForCancellation,
+
+  /// Utilisent [AppError.name].
+  kitchenNotReady,
+  barNotReady,
+  itemAlreadyCancelled,
+  cannotCancelItemKitchenReady,
+  cannotCancelItemBarReady,
+  invalidQuantityForItem,
+  invalidQuantityInOrder,
+
+  /// =========================
+  /// CHAMBRES ET TYPES
+  /// =========================
+  invalidRoomNumber,
+  roomTypeRequired,
+  roomNumberAlreadyExists,
+  invalidRoomStatus,
+  invalidRoomTypeName,
+  pricePerNightMustBePositive,
+  roomTypeAlreadyExists,
+
+  /// =========================
+  /// RESERVATION
+  /// =========================
+  reservationNotAwaitingArrival,
+  reservationNotInStay,
+  roomNoLongerAvailable,
+  roomNotOfReservedType,
+  checkOutAfterCheckIn,
+
+  /// Type complet sur la période : l'UI propose de forcer la réservation.
+  /// Ce code remplace la détection par texte qui existait auparavant.
+  noRoomOfTypeAvailable,
+
+  /// =========================
+  /// STOCK ET ARTICLES
+  /// =========================
+  invalidStockItemMissingId,
+  itemNotFoundInStock,
+  noItemDelivered,
+  invalidItemName,
+  invalidStore,
+  itemAlreadyExistsInStore,
+
+  /// Utilise [AppError.name].
+  itemNotFoundInStockFor,
+
+  /// =========================
+  /// SERVEUR
+  /// =========================
+  invalidServerName,
+  invalidEmail,
+  userEmailAlreadyExists,
+
+  /// =========================
+  /// MONTANTS ET DOCUMENTS
+  /// =========================
+  totalAmountInvalid,
+  paymentAmountInvalid,
+  emptyPdfDocument,
+
+  /// Utilisent [AppError.name] (détail technique de l'échec).
+  firestoreError,
+  consumptionLoadFailed,
 }
 
 /// Exception traduisible à l'affichage.

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 import 'package:takapp/modeles/order_model.dart';
 
@@ -38,7 +39,7 @@ class PaymentService {
 
   void _validateEstablishmentId(String establishmentId) {
     if (establishmentId.trim().isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
   }
 
@@ -121,11 +122,11 @@ class PaymentService {
         .toList();
 
     if (ids.isEmpty) {
-      throw Exception('Commande introuvable.');
+      throw const AppError(AppErrorCode.orderNotFound);
     }
 
     if (amount <= 0) {
-      throw Exception('Le montant doit être supérieur à 0.');
+      throw const AppError(AppErrorCode.amountMustBePositive);
     }
 
     final orderRefs = ids
@@ -138,7 +139,7 @@ class PaymentService {
 
     for (final orderDoc in orderDocs) {
       if (!orderDoc.exists || orderDoc.data() == null) {
-        throw Exception('Commande introuvable.');
+        throw const AppError(AppErrorCode.orderNotFound);
       }
 
       final orderData = orderDoc.data()!;
@@ -148,13 +149,13 @@ class PaymentService {
       if (orderData['isForKitchen'] == true &&
           orderData['kitchenStatus'] != 'ready' &&
           orderData['kitchenStatus'] != 'served') {
-        throw Exception('Commande $orderNumber : cuisine non prête.');
+        throw AppError(AppErrorCode.kitchenNotReady, name: orderNumber);
       }
 
       if (orderData['isForBar'] == true &&
           orderData['barStatus'] != 'ready' &&
           orderData['barStatus'] != 'served') {
-        throw Exception('Commande $orderNumber : bar non prêt.');
+        throw AppError(AppErrorCode.barNotReady, name: orderNumber);
       }
 
       ordersData.add(orderData);

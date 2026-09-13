@@ -4,6 +4,9 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/core/errors/app_error.dart';
+import 'package:takapp/core/errors/error_localizer.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/client_model.dart';
 import 'package:takapp/modeles/reservation_model.dart';
 import 'package:takapp/modeles/room_type_model.dart';
@@ -1060,12 +1063,18 @@ class _ReservationFormDialogState extends State<_ReservationFormDialog> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _isSaving = false);
-      // Si complet, proposer de forcer
-      final msg = e.toString();
-      if (!force && msg.contains('disponible')) {
+
+      // Si le type est complet, proposer de forcer. On teste le CODE de
+      // l'erreur et non son texte : la détection se faisait auparavant sur
+      // la chaîne française, ce qui cessait de fonctionner en anglais.
+      final isTypeFull =
+          e is AppError && e.code == AppErrorCode.noRoomOfTypeAvailable;
+
+      if (!force && isTypeFull) {
         _proposeForce();
       } else {
-        widget.onDone('Erreur : $e');
+        final l10n = AppLocalizations.of(context);
+        widget.onDone(l10n.errorPrefixed(localizedError(l10n, e)));
       }
     }
   }

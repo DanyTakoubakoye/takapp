@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 class ServerNotificationService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -18,7 +19,7 @@ class ServerNotificationService {
 
   void _validateEstablishmentId(String establishmentId) {
     if (establishmentId.trim().isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
   }
 

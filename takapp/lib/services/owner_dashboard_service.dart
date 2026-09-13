@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 class OwnerDashboardService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -27,7 +28,7 @@ class OwnerDashboardService {
 
   void _validateEstablishmentId(String establishmentId) {
     if (establishmentId.trim().isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
   }
 

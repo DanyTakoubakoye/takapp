@@ -95,6 +95,154 @@
     }
   },
 
+  "errFirebaseUserNotFound": "Utilisateur Firebase introuvable après connexion.",
+  "errAccountDisabled": "Ce compte est désactivé.",
+  "errUserProfileNotFound": "Le profil utilisateur est introuvable dans Firestore.",
+
+  "errInvalidMenuId": "Identifiant menu invalide.",
+  "errInvalidDishId": "Identifiant du plat invalide.",
+  "errDishNameRequired": "Nom du plat obligatoire.",
+  "errCocktailNameRequired": "Nom du cocktail obligatoire.",
+  "errMenuItemNotFound": "Article menu introuvable : {name}",
+  "@errMenuItemNotFound": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errNoRecipeDefined": "L’article « {name} » n’a pas de recette définie.",
+  "@errNoRecipeDefined": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errNoOrderSelected": "Aucune commande sélectionnée.",
+  "errNoPaymentSelectedForHandover": "Aucun paiement sélectionné pour le versement.",
+  "errOrderAlreadyCancelled": "Cette commande est déjà annulée.",
+  "errStockAlreadyRestored": "Le stock de cette commande a déjà été restitué.",
+  "errCannotCancelPaidOrder": "Impossible d’annuler une commande déjà encaissée.",
+  "errCannotCancelPaidOrderItems": "Impossible d’annuler des articles d’une commande déjà encaissée.",
+  "errCannotCancelKitchenReady": "Impossible d’annuler : la partie cuisine est déjà prête ou servie.",
+  "errCannotCancelBarReady": "Impossible d’annuler : la partie bar est déjà prête ou servie.",
+  "errOrderHasNoItems": "Cette commande ne contient aucun article.",
+  "errNoItemsFoundInOrder": "Aucun article trouvé dans cette commande.",
+  "errNoItemSelectedForCancellation": "Aucun article sélectionné pour annulation.",
+
+  "errKitchenNotReady": "Commande {name} : cuisine non prête.",
+  "@errKitchenNotReady": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errBarNotReady": "Commande {name} : bar non prêt.",
+  "@errBarNotReady": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errItemAlreadyCancelled": "L’article « {name} » est déjà annulé.",
+  "@errItemAlreadyCancelled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errCannotCancelItemKitchenReady": "Impossible d’annuler « {name} » : la cuisine est déjà prête ou servie.",
+  "@errCannotCancelItemKitchenReady": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errCannotCancelItemBarReady": "Impossible d’annuler « {name} » : le bar est déjà prêt ou servi.",
+  "@errCannotCancelItemBarReady": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errInvalidQuantityForItem": "Quantité invalide pour l’article « {name} ».",
+  "@errInvalidQuantityForItem": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errInvalidQuantityInOrder": "Quantité invalide dans la commande pour « {name} ».",
+  "@errInvalidQuantityInOrder": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errInvalidRoomNumber": "Numéro de chambre invalide.",
+  "errRoomTypeRequired": "Type de chambre requis.",
+  "errRoomNumberAlreadyExists": "Une chambre avec ce numéro existe déjà.",
+  "errInvalidRoomStatus": "Statut de chambre invalide.",
+  "errInvalidRoomTypeName": "Nom du type invalide.",
+  "errPricePerNightMustBePositive": "Le prix par nuit doit être supérieur à 0.",
+  "errRoomTypeAlreadyExists": "Ce type de chambre existe déjà.",
+
+  "errReservationNotAwaitingArrival": "Cette réservation n’est pas en attente d’arrivée.",
+  "errReservationNotInStay": "Cette réservation n’est pas en cours de séjour.",
+  "errRoomNoLongerAvailable": "Cette chambre n’est plus disponible.",
+  "errRoomNotOfReservedType": "Cette chambre n’est pas du type réservé.",
+  "errCheckOutAfterCheckIn": "La date de départ doit être après la date d’arrivée.",
+  "errNoRoomOfTypeAvailable": "Aucune chambre de ce type disponible sur cette période. Vous pouvez forcer la réservation si nécessaire.",
+
+  "errInvalidStockItemMissingId": "Article de stock invalide : itemId manquant.",
+  "errItemNotFoundInStock": "Article introuvable dans le stock.",
+  "errNoItemDelivered": "Aucun article livré.",
+  "errInvalidItemName": "Nom article invalide.",
+  "errInvalidStore": "Magasin invalide.",
+  "errItemAlreadyExistsInStore": "Cet article existe déjà dans ce magasin.",
+  "errItemNotFoundInStockFor": "Article introuvable dans le stock : {name}",
+  "@errItemNotFoundInStockFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errInvalidServerName": "Nom du serveur invalide.",
+  "errInvalidEmail": "Email invalide.",
+  "errUserEmailAlreadyExists": "Un utilisateur avec cet email existe déjà.",
+
+  "errTotalAmountInvalid": "Montant total invalide.",
+  "errPaymentAmountInvalid": "Montant de paiement invalide.",
+  "errEmptyPdfDocument": "Document PDF vide.",
+  "errFirestoreError": "Erreur Firestore : {name}",
+  "@errFirestoreError": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errConsumptionLoadFailed": "Erreur lors du chargement des consommations : {name}",
+  "@errConsumptionLoadFailed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
   "clientDisabled": "Client désactivé.",
   "clientAdded": "Client ajouté.",
 

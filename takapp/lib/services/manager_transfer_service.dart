@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 class ManagerTransferService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -27,11 +28,11 @@ class ManagerTransferService {
     required String managerName,
   }) async {
     if (establishmentId.trim().isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
 
     if (amount <= 0) {
-      throw Exception('Le montant doit être supérieur à zéro.');
+      throw const AppError(AppErrorCode.amountMustBePositive);
     }
 
     await _col(establishmentId: establishmentId).add({

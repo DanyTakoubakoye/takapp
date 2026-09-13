@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 import '../modeles/stock_request_item_model.dart';
 import '../modeles/stock_request_model.dart';
@@ -142,11 +143,11 @@ class StockRequestService {
     required List<StockRequestItemModel> items,
   }) async {
     if (establishmentId.trim().isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
 
     if (items.isEmpty) {
-      throw Exception('Veuillez ajouter au moins un article.');
+      throw const AppError(AppErrorCode.addAtLeastOneItem);
     }
 
     final docRef = await _col(establishmentId: establishmentId).add({
@@ -224,7 +225,7 @@ class StockRequestService {
     required String store,
   }) async {
     if (deliveredItems.isEmpty) {
-      throw Exception('Aucun article livré.');
+      throw const AppError(AppErrorCode.noItemDelivered);
     }
 
     for (final item in deliveredItems) {

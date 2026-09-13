@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'package:takapp/core/errors/app_error.dart';
 import 'package:takapp/modeles/payment_model.dart';
 import 'package:takapp/modeles/server_handover_model.dart';
 
@@ -113,7 +114,7 @@ class GeranteHandoverService {
     required String managerName,
   }) async {
     if (selectedPaymentIds.isEmpty) {
-      throw Exception('Aucune commande sélectionnée.');
+      throw const AppError(AppErrorCode.noOrderSelected);
     }
 
     final handoverRef = _handoversRef(
@@ -123,7 +124,7 @@ class GeranteHandoverService {
     final handoverSnap = await handoverRef.get();
 
     if (!handoverSnap.exists || handoverSnap.data() == null) {
-      throw Exception('Versement introuvable.');
+      throw const AppError(AppErrorCode.handoverNotFound);
     }
 
     final data = handoverSnap.data()!;
@@ -196,7 +197,7 @@ class GeranteHandoverService {
     required String managerName,
   }) async {
     if (selectedPaymentIds.isEmpty) {
-      throw Exception('Aucune commande sélectionnée.');
+      throw const AppError(AppErrorCode.noOrderSelected);
     }
 
     final handoverRef = _handoversRef(
@@ -206,7 +207,7 @@ class GeranteHandoverService {
     final handoverSnap = await handoverRef.get();
 
     if (!handoverSnap.exists || handoverSnap.data() == null) {
-      throw Exception('Versement introuvable.');
+      throw const AppError(AppErrorCode.handoverNotFound);
     }
 
     final data = handoverSnap.data()!;

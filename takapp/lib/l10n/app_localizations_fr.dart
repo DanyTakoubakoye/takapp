@@ -174,6 +174,215 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get errFirebaseUserNotFound =>
+      'Utilisateur Firebase introuvable après connexion.';
+
+  @override
+  String get errAccountDisabled => 'Ce compte est désactivé.';
+
+  @override
+  String get errUserProfileNotFound =>
+      'Le profil utilisateur est introuvable dans Firestore.';
+
+  @override
+  String get errInvalidMenuId => 'Identifiant menu invalide.';
+
+  @override
+  String get errInvalidDishId => 'Identifiant du plat invalide.';
+
+  @override
+  String get errDishNameRequired => 'Nom du plat obligatoire.';
+
+  @override
+  String get errCocktailNameRequired => 'Nom du cocktail obligatoire.';
+
+  @override
+  String errMenuItemNotFound(String name) {
+    return 'Article menu introuvable : $name';
+  }
+
+  @override
+  String errNoRecipeDefined(String name) {
+    return 'L’article « $name » n’a pas de recette définie.';
+  }
+
+  @override
+  String get errNoOrderSelected => 'Aucune commande sélectionnée.';
+
+  @override
+  String get errNoPaymentSelectedForHandover =>
+      'Aucun paiement sélectionné pour le versement.';
+
+  @override
+  String get errOrderAlreadyCancelled => 'Cette commande est déjà annulée.';
+
+  @override
+  String get errStockAlreadyRestored =>
+      'Le stock de cette commande a déjà été restitué.';
+
+  @override
+  String get errCannotCancelPaidOrder =>
+      'Impossible d’annuler une commande déjà encaissée.';
+
+  @override
+  String get errCannotCancelPaidOrderItems =>
+      'Impossible d’annuler des articles d’une commande déjà encaissée.';
+
+  @override
+  String get errCannotCancelKitchenReady =>
+      'Impossible d’annuler : la partie cuisine est déjà prête ou servie.';
+
+  @override
+  String get errCannotCancelBarReady =>
+      'Impossible d’annuler : la partie bar est déjà prête ou servie.';
+
+  @override
+  String get errOrderHasNoItems => 'Cette commande ne contient aucun article.';
+
+  @override
+  String get errNoItemsFoundInOrder =>
+      'Aucun article trouvé dans cette commande.';
+
+  @override
+  String get errNoItemSelectedForCancellation =>
+      'Aucun article sélectionné pour annulation.';
+
+  @override
+  String errKitchenNotReady(String name) {
+    return 'Commande $name : cuisine non prête.';
+  }
+
+  @override
+  String errBarNotReady(String name) {
+    return 'Commande $name : bar non prêt.';
+  }
+
+  @override
+  String errItemAlreadyCancelled(String name) {
+    return 'L’article « $name » est déjà annulé.';
+  }
+
+  @override
+  String errCannotCancelItemKitchenReady(String name) {
+    return 'Impossible d’annuler « $name » : la cuisine est déjà prête ou servie.';
+  }
+
+  @override
+  String errCannotCancelItemBarReady(String name) {
+    return 'Impossible d’annuler « $name » : le bar est déjà prêt ou servi.';
+  }
+
+  @override
+  String errInvalidQuantityForItem(String name) {
+    return 'Quantité invalide pour l’article « $name ».';
+  }
+
+  @override
+  String errInvalidQuantityInOrder(String name) {
+    return 'Quantité invalide dans la commande pour « $name ».';
+  }
+
+  @override
+  String get errInvalidRoomNumber => 'Numéro de chambre invalide.';
+
+  @override
+  String get errRoomTypeRequired => 'Type de chambre requis.';
+
+  @override
+  String get errRoomNumberAlreadyExists =>
+      'Une chambre avec ce numéro existe déjà.';
+
+  @override
+  String get errInvalidRoomStatus => 'Statut de chambre invalide.';
+
+  @override
+  String get errInvalidRoomTypeName => 'Nom du type invalide.';
+
+  @override
+  String get errPricePerNightMustBePositive =>
+      'Le prix par nuit doit être supérieur à 0.';
+
+  @override
+  String get errRoomTypeAlreadyExists => 'Ce type de chambre existe déjà.';
+
+  @override
+  String get errReservationNotAwaitingArrival =>
+      'Cette réservation n’est pas en attente d’arrivée.';
+
+  @override
+  String get errReservationNotInStay =>
+      'Cette réservation n’est pas en cours de séjour.';
+
+  @override
+  String get errRoomNoLongerAvailable => 'Cette chambre n’est plus disponible.';
+
+  @override
+  String get errRoomNotOfReservedType =>
+      'Cette chambre n’est pas du type réservé.';
+
+  @override
+  String get errCheckOutAfterCheckIn =>
+      'La date de départ doit être après la date d’arrivée.';
+
+  @override
+  String get errNoRoomOfTypeAvailable =>
+      'Aucune chambre de ce type disponible sur cette période. Vous pouvez forcer la réservation si nécessaire.';
+
+  @override
+  String get errInvalidStockItemMissingId =>
+      'Article de stock invalide : itemId manquant.';
+
+  @override
+  String get errItemNotFoundInStock => 'Article introuvable dans le stock.';
+
+  @override
+  String get errNoItemDelivered => 'Aucun article livré.';
+
+  @override
+  String get errInvalidItemName => 'Nom article invalide.';
+
+  @override
+  String get errInvalidStore => 'Magasin invalide.';
+
+  @override
+  String get errItemAlreadyExistsInStore =>
+      'Cet article existe déjà dans ce magasin.';
+
+  @override
+  String errItemNotFoundInStockFor(String name) {
+    return 'Article introuvable dans le stock : $name';
+  }
+
+  @override
+  String get errInvalidServerName => 'Nom du serveur invalide.';
+
+  @override
+  String get errInvalidEmail => 'Email invalide.';
+
+  @override
+  String get errUserEmailAlreadyExists =>
+      'Un utilisateur avec cet email existe déjà.';
+
+  @override
+  String get errTotalAmountInvalid => 'Montant total invalide.';
+
+  @override
+  String get errPaymentAmountInvalid => 'Montant de paiement invalide.';
+
+  @override
+  String get errEmptyPdfDocument => 'Document PDF vide.';
+
+  @override
+  String errFirestoreError(String name) {
+    return 'Erreur Firestore : $name';
+  }
+
+  @override
+  String errConsumptionLoadFailed(String name) {
+    return 'Erreur lors du chargement des consommations : $name';
+  }
+
+  @override
   String get clientDisabled => 'Client désactivé.';
 
   @override

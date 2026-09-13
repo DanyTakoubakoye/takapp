@@ -118,5 +118,123 @@ String _messageFor(AppLocalizations l10n, AppError error) {
       return l10n.errStockInsufficient(error.name ?? '');
     case AppErrorCode.serverRegistrationFailed:
       return l10n.errServerRegistrationFailed(error.name ?? '');
+
+    case AppErrorCode.firebaseUserNotFound:
+      return l10n.errFirebaseUserNotFound;
+    case AppErrorCode.accountDisabled:
+      return l10n.errAccountDisabled;
+    case AppErrorCode.userProfileNotFound:
+      return l10n.errUserProfileNotFound;
+
+    case AppErrorCode.invalidMenuId:
+      return l10n.errInvalidMenuId;
+    case AppErrorCode.invalidDishId:
+      return l10n.errInvalidDishId;
+    case AppErrorCode.dishNameRequired:
+      return l10n.errDishNameRequired;
+    case AppErrorCode.cocktailNameRequired:
+      return l10n.errCocktailNameRequired;
+    case AppErrorCode.menuItemNotFound:
+      return l10n.errMenuItemNotFound(error.name ?? '');
+    case AppErrorCode.noRecipeDefined:
+      return l10n.errNoRecipeDefined(error.name ?? '');
+
+    case AppErrorCode.noOrderSelected:
+      return l10n.errNoOrderSelected;
+    case AppErrorCode.noPaymentSelectedForHandover:
+      return l10n.errNoPaymentSelectedForHandover;
+    case AppErrorCode.orderAlreadyCancelled:
+      return l10n.errOrderAlreadyCancelled;
+    case AppErrorCode.stockAlreadyRestored:
+      return l10n.errStockAlreadyRestored;
+    case AppErrorCode.cannotCancelPaidOrder:
+      return l10n.errCannotCancelPaidOrder;
+    case AppErrorCode.cannotCancelPaidOrderItems:
+      return l10n.errCannotCancelPaidOrderItems;
+    case AppErrorCode.cannotCancelKitchenReady:
+      return l10n.errCannotCancelKitchenReady;
+    case AppErrorCode.cannotCancelBarReady:
+      return l10n.errCannotCancelBarReady;
+    case AppErrorCode.orderHasNoItems:
+      return l10n.errOrderHasNoItems;
+    case AppErrorCode.noItemsFoundInOrder:
+      return l10n.errNoItemsFoundInOrder;
+    case AppErrorCode.noItemSelectedForCancellation:
+      return l10n.errNoItemSelectedForCancellation;
+    case AppErrorCode.kitchenNotReady:
+      return l10n.errKitchenNotReady(error.name ?? '');
+    case AppErrorCode.barNotReady:
+      return l10n.errBarNotReady(error.name ?? '');
+    case AppErrorCode.itemAlreadyCancelled:
+      return l10n.errItemAlreadyCancelled(error.name ?? '');
+    case AppErrorCode.cannotCancelItemKitchenReady:
+      return l10n.errCannotCancelItemKitchenReady(error.name ?? '');
+    case AppErrorCode.cannotCancelItemBarReady:
+      return l10n.errCannotCancelItemBarReady(error.name ?? '');
+    case AppErrorCode.invalidQuantityForItem:
+      return l10n.errInvalidQuantityForItem(error.name ?? '');
+    case AppErrorCode.invalidQuantityInOrder:
+      return l10n.errInvalidQuantityInOrder(error.name ?? '');
+
+    case AppErrorCode.invalidRoomNumber:
+      return l10n.errInvalidRoomNumber;
+    case AppErrorCode.roomTypeRequired:
+      return l10n.errRoomTypeRequired;
+    case AppErrorCode.roomNumberAlreadyExists:
+      return l10n.errRoomNumberAlreadyExists;
+    case AppErrorCode.invalidRoomStatus:
+      return l10n.errInvalidRoomStatus;
+    case AppErrorCode.invalidRoomTypeName:
+      return l10n.errInvalidRoomTypeName;
+    case AppErrorCode.pricePerNightMustBePositive:
+      return l10n.errPricePerNightMustBePositive;
+    case AppErrorCode.roomTypeAlreadyExists:
+      return l10n.errRoomTypeAlreadyExists;
+
+    case AppErrorCode.reservationNotAwaitingArrival:
+      return l10n.errReservationNotAwaitingArrival;
+    case AppErrorCode.reservationNotInStay:
+      return l10n.errReservationNotInStay;
+    case AppErrorCode.roomNoLongerAvailable:
+      return l10n.errRoomNoLongerAvailable;
+    case AppErrorCode.roomNotOfReservedType:
+      return l10n.errRoomNotOfReservedType;
+    case AppErrorCode.checkOutAfterCheckIn:
+      return l10n.errCheckOutAfterCheckIn;
+    case AppErrorCode.noRoomOfTypeAvailable:
+      return l10n.errNoRoomOfTypeAvailable;
+
+    case AppErrorCode.invalidStockItemMissingId:
+      return l10n.errInvalidStockItemMissingId;
+    case AppErrorCode.itemNotFoundInStock:
+      return l10n.errItemNotFoundInStock;
+    case AppErrorCode.noItemDelivered:
+      return l10n.errNoItemDelivered;
+    case AppErrorCode.invalidItemName:
+      return l10n.errInvalidItemName;
+    case AppErrorCode.invalidStore:
+      return l10n.errInvalidStore;
+    case AppErrorCode.itemAlreadyExistsInStore:
+      return l10n.errItemAlreadyExistsInStore;
+    case AppErrorCode.itemNotFoundInStockFor:
+      return l10n.errItemNotFoundInStockFor(error.name ?? '');
+
+    case AppErrorCode.invalidServerName:
+      return l10n.errInvalidServerName;
+    case AppErrorCode.invalidEmail:
+      return l10n.errInvalidEmail;
+    case AppErrorCode.userEmailAlreadyExists:
+      return l10n.errUserEmailAlreadyExists;
+
+    case AppErrorCode.totalAmountInvalid:
+      return l10n.errTotalAmountInvalid;
+    case AppErrorCode.paymentAmountInvalid:
+      return l10n.errPaymentAmountInvalid;
+    case AppErrorCode.emptyPdfDocument:
+      return l10n.errEmptyPdfDocument;
+    case AppErrorCode.firestoreError:
+      return l10n.errFirestoreError(error.name ?? '');
+    case AppErrorCode.consumptionLoadFailed:
+      return l10n.errConsumptionLoadFailed(error.name ?? '');
   }
 }

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 import '../modeles/reservation_model.dart';
 import '../modeles/room_model.dart';
@@ -18,7 +19,7 @@ class ReservationService {
     final resolved = (id ?? establishmentId ?? '').trim();
 
     if (resolved.isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
 
     return resolved;
@@ -160,23 +161,23 @@ class ReservationService {
     // Vérifications de cohérence
     final resaSnap = await resaRef.get();
     if (!resaSnap.exists) {
-      throw Exception('Réservation introuvable.');
+      throw const AppError(AppErrorCode.reservationNotFound);
     }
     final resa = ReservationModel.fromMap(resaSnap.id, resaSnap.data()!);
     if (resa.status != 'confirmed') {
-      throw Exception('Cette réservation n\'est pas en attente d\'arrivée.');
+      throw const AppError(AppErrorCode.reservationNotAwaitingArrival);
     }
 
     final roomSnap = await roomRef.get();
     if (!roomSnap.exists) {
-      throw Exception('Chambre introuvable.');
+      throw const AppError(AppErrorCode.roomNotFound);
     }
     final room = RoomModel.fromMap(roomSnap.id, roomSnap.data()!);
     if (room.status != 'available') {
-      throw Exception('Cette chambre n\'est plus disponible.');
+      throw const AppError(AppErrorCode.roomNoLongerAvailable);
     }
     if (room.roomTypeId != resa.roomTypeId) {
-      throw Exception('Cette chambre n\'est pas du type réservé.');
+      throw const AppError(AppErrorCode.roomNotOfReservedType);
     }
 
     final batch = _firestore.batch();
@@ -211,11 +212,11 @@ class ReservationService {
 
     final resaSnap = await resaRef.get();
     if (!resaSnap.exists) {
-      throw Exception('Réservation introuvable.');
+      throw const AppError(AppErrorCode.reservationNotFound);
     }
     final resa = ReservationModel.fromMap(resaSnap.id, resaSnap.data()!);
     if (resa.status != 'checked_in') {
-      throw Exception('Cette réservation n\'est pas en cours de séjour.');
+      throw const AppError(AppErrorCode.reservationNotInStay);
     }
 
     final batch = _firestore.batch();
@@ -325,12 +326,12 @@ class ReservationService {
 
     final cleanName = clientName.trim();
     if (cleanName.isEmpty) {
-      throw Exception('Nom du client obligatoire.');
+      throw const AppError(AppErrorCode.clientNameRequired);
     }
 
     final nights = checkOut.difference(checkIn).inDays;
     if (nights <= 0) {
-      throw Exception('La date de départ doit être après l\'arrivée.');
+      throw const AppError(AppErrorCode.checkOutAfterCheckIn);
     }
     final roomTotal = pricePerNight * nights;
 
@@ -378,13 +379,13 @@ class ReservationService {
 
     final cleanName = clientName.trim();
     if (cleanName.isEmpty) {
-      throw Exception('Nom du client obligatoire.');
+      throw const AppError(AppErrorCode.clientNameRequired);
     }
     if (roomTypeId.trim().isEmpty) {
-      throw Exception('Type de chambre obligatoire.');
+      throw const AppError(AppErrorCode.roomTypeRequired);
     }
     if (!checkOut.isAfter(checkIn)) {
-      throw Exception('La date de départ doit être après la date d\'arrivée.');
+      throw const AppError(AppErrorCode.checkOutAfterCheckIn);
     }
 
     // Vérification de disponibilité (sauf si on force)
@@ -397,10 +398,11 @@ class ReservationService {
       );
 
       if (available <= 0) {
-        throw Exception(
-          'Aucune chambre de ce type disponible sur cette période. '
-          'Vous pouvez forcer la réservation si nécessaire.',
-        );
+        /// L'UI reconnaît ce code pour proposer de forcer la réservation.
+        /// Ne pas remplacer par un texte : la détection se faisait
+        /// auparavant sur la chaîne française, ce qui cassait dès qu'on
+        /// changeait de langue.
+        throw const AppError(AppErrorCode.noRoomOfTypeAvailable);
       }
     }
 

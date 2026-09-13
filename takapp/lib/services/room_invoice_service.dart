@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 import '../modeles/room_invoice_model.dart';
 
@@ -20,7 +21,7 @@ class RoomInvoiceService {
 
   void _validateEstablishmentId(String establishmentId) {
     if (establishmentId.trim().isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
   }
 
@@ -270,7 +271,7 @@ class RoomInvoiceService {
     final snapshot = await docRef.get();
 
     if (!snapshot.exists || snapshot.data() == null) {
-      throw Exception('Facture introuvable.');
+      throw const AppError(AppErrorCode.invoiceNotFound);
     }
 
     final data = snapshot.data()!;
@@ -278,11 +279,11 @@ class RoomInvoiceService {
     final invoiceTotal = _toDouble(data['total']);
 
     if (invoiceTotal <= 0) {
-      throw Exception('Montant total invalide.');
+      throw const AppError(AppErrorCode.totalAmountInvalid);
     }
 
     if (amount <= 0) {
-      throw Exception('Montant de paiement invalide.');
+      throw const AppError(AppErrorCode.paymentAmountInvalid);
     }
 
     await docRef.update({
@@ -321,7 +322,7 @@ class RoomInvoiceService {
     final snapshot = await docRef.get();
 
     if (!snapshot.exists || snapshot.data() == null) {
-      throw Exception('Facture introuvable.');
+      throw const AppError(AppErrorCode.invoiceNotFound);
     }
 
     final data = snapshot.data()!;

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 import '../modeles/stock_item_model.dart';
 
@@ -17,7 +18,7 @@ class StockItemService {
     final resolved = (id ?? establishmentId ?? '').trim();
 
     if (resolved.isEmpty) {
-      throw Exception('Établissement introuvable.');
+      throw const AppError(AppErrorCode.establishmentNotFound);
     }
 
     return resolved;
@@ -113,11 +114,11 @@ class StockItemService {
     final cleanStore = store.trim();
 
     if (cleanName.isEmpty) {
-      throw Exception('Nom article invalide.');
+      throw const AppError(AppErrorCode.invalidItemName);
     }
 
     if (cleanStore.isEmpty) {
-      throw Exception('Magasin invalide.');
+      throw const AppError(AppErrorCode.invalidStore);
     }
 
     /// =========================
@@ -131,7 +132,7 @@ class StockItemService {
         .get();
 
     if (existing.docs.isNotEmpty) {
-      throw Exception('Cet article existe déjà dans ce magasin.');
+      throw const AppError(AppErrorCode.itemAlreadyExistsInStore);
     }
 
     /// =========================

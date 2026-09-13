@@ -89,6 +89,154 @@
     }
   },
 
+  "errFirebaseUserNotFound": "Firebase user not found after sign-in.",
+  "errAccountDisabled": "This account is disabled.",
+  "errUserProfileNotFound": "The user profile could not be found in Firestore.",
+
+  "errInvalidMenuId": "Invalid menu identifier.",
+  "errInvalidDishId": "Invalid dish identifier.",
+  "errDishNameRequired": "Dish name is required.",
+  "errCocktailNameRequired": "Cocktail name is required.",
+  "errMenuItemNotFound": "Menu item not found: {name}",
+  "@errMenuItemNotFound": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errNoRecipeDefined": "The item \"{name}\" has no recipe defined.",
+  "@errNoRecipeDefined": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errNoOrderSelected": "No order selected.",
+  "errNoPaymentSelectedForHandover": "No payment selected for the handover.",
+  "errOrderAlreadyCancelled": "This order is already cancelled.",
+  "errStockAlreadyRestored": "The stock for this order has already been restored.",
+  "errCannotCancelPaidOrder": "Cannot cancel an order that has already been paid.",
+  "errCannotCancelPaidOrderItems": "Cannot cancel items from an order that has already been paid.",
+  "errCannotCancelKitchenReady": "Cannot cancel: the kitchen part is already ready or served.",
+  "errCannotCancelBarReady": "Cannot cancel: the bar part is already ready or served.",
+  "errOrderHasNoItems": "This order contains no items.",
+  "errNoItemsFoundInOrder": "No item found in this order.",
+  "errNoItemSelectedForCancellation": "No item selected for cancellation.",
+
+  "errKitchenNotReady": "Order {name}: kitchen not ready.",
+  "@errKitchenNotReady": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errBarNotReady": "Order {name}: bar not ready.",
+  "@errBarNotReady": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errItemAlreadyCancelled": "The item \"{name}\" is already cancelled.",
+  "@errItemAlreadyCancelled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errCannotCancelItemKitchenReady": "Cannot cancel \"{name}\": the kitchen is already ready or served.",
+  "@errCannotCancelItemKitchenReady": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errCannotCancelItemBarReady": "Cannot cancel \"{name}\": the bar is already ready or served.",
+  "@errCannotCancelItemBarReady": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errInvalidQuantityForItem": "Invalid quantity for the item \"{name}\".",
+  "@errInvalidQuantityForItem": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errInvalidQuantityInOrder": "Invalid quantity in the order for \"{name}\".",
+  "@errInvalidQuantityInOrder": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errInvalidRoomNumber": "Invalid room number.",
+  "errRoomTypeRequired": "Room type is required.",
+  "errRoomNumberAlreadyExists": "A room with this number already exists.",
+  "errInvalidRoomStatus": "Invalid room status.",
+  "errInvalidRoomTypeName": "Invalid type name.",
+  "errPricePerNightMustBePositive": "The price per night must be greater than 0.",
+  "errRoomTypeAlreadyExists": "This room type already exists.",
+
+  "errReservationNotAwaitingArrival": "This reservation is not awaiting arrival.",
+  "errReservationNotInStay": "This reservation is not currently in stay.",
+  "errRoomNoLongerAvailable": "This room is no longer available.",
+  "errRoomNotOfReservedType": "This room is not of the reserved type.",
+  "errCheckOutAfterCheckIn": "The departure date must be after the arrival date.",
+  "errNoRoomOfTypeAvailable": "No room of this type is available for this period. You can force the reservation if necessary.",
+
+  "errInvalidStockItemMissingId": "Invalid stock item: missing itemId.",
+  "errItemNotFoundInStock": "Item not found in stock.",
+  "errNoItemDelivered": "No item delivered.",
+  "errInvalidItemName": "Invalid item name.",
+  "errInvalidStore": "Invalid store.",
+  "errItemAlreadyExistsInStore": "This item already exists in this store.",
+  "errItemNotFoundInStockFor": "Item not found in stock: {name}",
+  "@errItemNotFoundInStockFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errInvalidServerName": "Invalid waiter name.",
+  "errInvalidEmail": "Invalid email.",
+  "errUserEmailAlreadyExists": "A user with this email already exists.",
+
+  "errTotalAmountInvalid": "Invalid total amount.",
+  "errPaymentAmountInvalid": "Invalid payment amount.",
+  "errEmptyPdfDocument": "Empty PDF document.",
+  "errFirestoreError": "Firestore error: {name}",
+  "@errFirestoreError": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errConsumptionLoadFailed": "Error while loading consumption: {name}",
+  "@errConsumptionLoadFailed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
   "clientDisabled": "Client disabled.",
   "clientAdded": "Client added.",
 
