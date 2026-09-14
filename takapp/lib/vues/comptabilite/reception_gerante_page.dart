@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 
 import 'package:takapp/controllers/auth_controller.dart';
 
+import 'package:takapp/l10n/app_localizations.dart';
+
 import 'package:takapp/services/pdf_service.dart';
 import 'package:takapp/services/printer_service.dart';
 
@@ -77,6 +79,8 @@ class _ReceptionGerantePageState extends State<ReceptionGerantePage> {
   /// =========================
 
   Future<void> _confirmReception(DocumentSnapshot doc) async {
+    final l10n = AppLocalizations.of(context);
+
     final user = context.read<AuthController>().currentUser;
 
     if (user == null) {
@@ -182,6 +186,8 @@ class _ReceptionGerantePageState extends State<ReceptionGerantePage> {
 
     final bytes = await pdfService.buildQuitusPdf(
       establishmentId: establishmentData['establishmentId'],
+      // Libellé porté par le quitus imprimé : le contenu des documents reste
+      // en français, indépendamment de la langue de l'utilisateur.
       accountType: 'Versement gérante',
       theoreticalAmount: amount,
       physicalAmount: amount,
@@ -201,15 +207,17 @@ class _ReceptionGerantePageState extends State<ReceptionGerantePage> {
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Réception validée et quitus imprimé.')),
+      SnackBar(content: Text(l10n.receptionValidatedQuitusPrinted)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.trim().isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -227,8 +235,8 @@ class _ReceptionGerantePageState extends State<ReceptionGerantePage> {
       appBar: AppBar(
         title: Text(
           establishmentName.trim().isNotEmpty
-              ? '$establishmentName - Réception gérante'
-              : 'Réception versements gérante',
+              ? '$establishmentName - ${l10n.actionManagerReception}'
+              : l10n.managerHandoverReceptionTitle,
         ),
       ),
 
@@ -286,6 +294,8 @@ class _ReceptionGerantePageState extends State<ReceptionGerantePage> {
     Stream<QuerySnapshot<Object?>> pendingStream, {
     required bool isMobile,
   }) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 2,
 
@@ -300,7 +310,7 @@ class _ReceptionGerantePageState extends State<ReceptionGerantePage> {
               alignment: Alignment.centerLeft,
 
               child: Text(
-                'Versements en attente',
+                l10n.pendingHandoversTitle,
 
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -322,15 +332,15 @@ class _ReceptionGerantePageState extends State<ReceptionGerantePage> {
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text('Erreur: ${snapshot.error}'));
+                    return Center(
+                      child: Text(l10n.errorPrefixed('${snapshot.error}')),
+                    );
                   }
 
                   final docs = snapshot.data?.docs ?? [];
 
                   if (docs.isEmpty) {
-                    return const Center(
-                      child: Text('Aucun versement en attente.'),
-                    );
+                    return Center(child: Text(l10n.noPendingHandover));
                   }
 
                   return ListView.separated(
@@ -344,6 +354,11 @@ class _ReceptionGerantePageState extends State<ReceptionGerantePage> {
                       final data = doc.data() as Map<String, dynamic>;
 
                       final amount = ((data['amount'] ?? 0) as num).toDouble();
+
+                      final countsLine = l10n.serversRoomsCounts(
+                        (data['handoverIds'] as List<dynamic>? ?? []).length,
+                        (data['roomInvoiceIds'] as List<dynamic>? ?? []).length,
+                      );
 
                       return Container(
                         padding: const EdgeInsets.all(12),
@@ -373,9 +388,7 @@ class _ReceptionGerantePageState extends State<ReceptionGerantePage> {
 
                                   const SizedBox(height: 6),
 
-                                  Text(
-                                    'Serveurs: ${(data['handoverIds'] as List<dynamic>? ?? []).length} • Chambres: ${(data['roomInvoiceIds'] as List<dynamic>? ?? []).length}',
-                                  ),
+                                  Text(countsLine),
 
                                   const SizedBox(height: 10),
 
@@ -385,7 +398,7 @@ class _ReceptionGerantePageState extends State<ReceptionGerantePage> {
                                     child: ElevatedButton(
                                       onPressed: () => _confirmReception(doc),
 
-                                      child: const Text('Valider'),
+                                      child: Text(l10n.commonValidate),
                                     ),
                                   ),
                                 ],
@@ -410,9 +423,7 @@ class _ReceptionGerantePageState extends State<ReceptionGerantePage> {
 
                                         const SizedBox(height: 6),
 
-                                        Text(
-                                          'Serveurs: ${(data['handoverIds'] as List<dynamic>? ?? []).length} • Chambres: ${(data['roomInvoiceIds'] as List<dynamic>? ?? []).length}',
-                                        ),
+                                        Text(countsLine),
                                       ],
                                     ),
                                   ),
@@ -422,7 +433,7 @@ class _ReceptionGerantePageState extends State<ReceptionGerantePage> {
                                   ElevatedButton(
                                     onPressed: () => _confirmReception(doc),
 
-                                    child: const Text('Valider'),
+                                    child: Text(l10n.commonValidate),
                                   ),
                                 ],
                               ),
@@ -446,6 +457,8 @@ class _ReceptionGerantePageState extends State<ReceptionGerantePage> {
     Stream<QuerySnapshot<Object?>> receivedStream, {
     required bool isMobile,
   }) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 2,
 
@@ -460,7 +473,7 @@ class _ReceptionGerantePageState extends State<ReceptionGerantePage> {
               alignment: Alignment.centerLeft,
 
               child: Text(
-                'Versements reçus',
+                l10n.handoversReceived,
 
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
@@ -482,13 +495,15 @@ class _ReceptionGerantePageState extends State<ReceptionGerantePage> {
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text('Erreur: ${snapshot.error}'));
+                    return Center(
+                      child: Text(l10n.errorPrefixed('${snapshot.error}')),
+                    );
                   }
 
                   final docs = snapshot.data?.docs ?? [];
 
                   if (docs.isEmpty) {
-                    return const Center(child: Text('Aucun versement reçu.'));
+                    return Center(child: Text(l10n.noHandoverReceived));
                   }
 
                   return ListView.separated(
@@ -529,7 +544,10 @@ class _ReceptionGerantePageState extends State<ReceptionGerantePage> {
                             const SizedBox(height: 6),
 
                             Text(
-                              'Reçu par : ${(data['receivedByAccountingName'] ?? '').toString()}',
+                              l10n.receivedByLine(
+                                (data['receivedByAccountingName'] ?? '')
+                                    .toString(),
+                              ),
                             ),
                           ],
                         ),

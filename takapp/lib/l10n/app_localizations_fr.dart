@@ -2571,4 +2571,186 @@ class AppLocalizationsFr extends AppLocalizations {
   String ingredientsCount(int count) {
     return '$count ingrédient(s)';
   }
+
+  @override
+  String get errAccessDenied => 'Accès refusé.';
+
+  @override
+  String get accountingTitle => 'Comptabilité';
+
+  @override
+  String get accountantWorkspaceSubtitle =>
+      'Réception, contrôle, dépenses, soldes et rapports';
+
+  @override
+  String get moduleReceptionsTitle => 'Réceptions & Contrôles';
+
+  @override
+  String get moduleReceptionsSubtitle =>
+      'Versements serveurs, gérante et factures non versées';
+
+  @override
+  String get actionReceiveHandovers => 'Réception des versements';
+
+  @override
+  String get actionReceiveHandoversSubtitle =>
+      'Contrôler les versements des serveurs';
+
+  @override
+  String get actionManagerReception => 'Réception gérante';
+
+  @override
+  String get actionManagerReceptionSubtitle =>
+      'Recevoir les versements transmis par la gérante';
+
+  @override
+  String get actionTrackUntransferred => 'Suivi non versés';
+
+  @override
+  String get actionTrackUntransferredSubtitle =>
+      'Suivre les factures non encore versées';
+
+  @override
+  String get moduleExpensesBalancesTitle => 'Dépenses & Soldes';
+
+  @override
+  String get moduleExpensesBalancesSubtitle =>
+      'Dépenses courantes et soldes précédents';
+
+  @override
+  String get expensesTitle => 'Dépenses';
+
+  @override
+  String get actionExpensesSubtitle => 'Enregistrer et consulter les dépenses';
+
+  @override
+  String get previousBalancesTitle => 'Soldes précédents';
+
+  @override
+  String get actionPreviousBalancesSubtitle =>
+      'Gérer les soldes d’ouverture ou antérieurs';
+
+  @override
+  String get moduleReportsTitle => 'Rapports & Points';
+
+  @override
+  String get moduleReportsSubtitle =>
+      'Synthèse hebdomadaire et suivi comptable';
+
+  @override
+  String get weeklyReportTitle => 'Point hebdomadaire';
+
+  @override
+  String get actionWeeklyReportSubtitle =>
+      'Produire le point hebdomadaire de comptabilité';
+
+  @override
+  String get expenseSaved => 'Dépense enregistrée.';
+
+  @override
+  String get newExpenseTitle => 'Nouvelle dépense';
+
+  @override
+  String get labelDesignation => 'Libellé';
+
+  @override
+  String get labelAccountType => 'Type de compte';
+
+  @override
+  String get expenseHistoryTitle => 'Historique des dépenses';
+
+  @override
+  String get noExpenseRecorded => 'Aucune dépense enregistrée.';
+
+  @override
+  String enteredByLine(String name) {
+    return 'Saisi par : $name';
+  }
+
+  @override
+  String get previousBalanceSaved => 'Solde précédent enregistré.';
+
+  @override
+  String get newPreviousBalanceTitle => 'Nouveau solde précédent';
+
+  @override
+  String get balanceHistoryTitle => 'Historique des soldes';
+
+  @override
+  String get noPreviousBalance => 'Aucun solde précédent.';
+
+  @override
+  String get untransferredFullTitle =>
+      'Suivi factures / encaissements non versés';
+
+  @override
+  String get noUntransferredInvoice => 'Aucune facture non versée.';
+
+  @override
+  String transferStatusLine(String status) {
+    return 'Statut transfert : $status';
+  }
+
+  @override
+  String get statusNotDeclared => 'non déclaré';
+
+  @override
+  String get untransferredServerCollections =>
+      'Encaissements serveurs non versés';
+
+  @override
+  String get noUntransferredServerCollection =>
+      'Aucun encaissement serveur non versé.';
+
+  @override
+  String errWeeklySummaryLoadFailed(String error) {
+    return 'Erreur chargement point hebdo : $error';
+  }
+
+  @override
+  String errPrintFailed(String error) {
+    return 'Erreur impression : $error';
+  }
+
+  @override
+  String get handoversReceived => 'Versements reçus';
+
+  @override
+  String get labelOutflows => 'Sorties';
+
+  @override
+  String get theoreticalBalance => 'Solde théorique';
+
+  @override
+  String get noHandoverAwaitingReception =>
+      'Aucun versement en attente de réception.';
+
+  @override
+  String get receptionConfirmed => 'Réception confirmée.';
+
+  @override
+  String get actionConfirmReception => 'Confirmer réception';
+
+  @override
+  String get receptionValidatedQuitusPrinted =>
+      'Réception validée et quitus imprimé.';
+
+  @override
+  String get managerHandoverReceptionTitle => 'Réception versements gérante';
+
+  @override
+  String get pendingHandoversTitle => 'Versements en attente';
+
+  @override
+  String serversRoomsCounts(int servers, int rooms) {
+    return 'Serveurs: $servers • Chambres: $rooms';
+  }
+
+  @override
+  String get noHandoverReceived => 'Aucun versement reçu.';
+
+  @override
+  String receivedByLine(String name) {
+    return 'Reçu par : $name';
+  }
 }

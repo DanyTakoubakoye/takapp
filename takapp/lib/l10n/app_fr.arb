@@ -1706,5 +1706,109 @@
         "type": "int"
       }
     }
+  },
+
+  "errAccessDenied": "Accès refusé.",
+  "accountingTitle": "Comptabilité",
+  "accountantWorkspaceSubtitle": "Réception, contrôle, dépenses, soldes et rapports",
+  "moduleReceptionsTitle": "Réceptions & Contrôles",
+  "moduleReceptionsSubtitle": "Versements serveurs, gérante et factures non versées",
+  "actionReceiveHandovers": "Réception des versements",
+  "actionReceiveHandoversSubtitle": "Contrôler les versements des serveurs",
+  "actionManagerReception": "Réception gérante",
+  "actionManagerReceptionSubtitle": "Recevoir les versements transmis par la gérante",
+  "actionTrackUntransferred": "Suivi non versés",
+  "actionTrackUntransferredSubtitle": "Suivre les factures non encore versées",
+  "moduleExpensesBalancesTitle": "Dépenses & Soldes",
+  "moduleExpensesBalancesSubtitle": "Dépenses courantes et soldes précédents",
+  "expensesTitle": "Dépenses",
+  "actionExpensesSubtitle": "Enregistrer et consulter les dépenses",
+  "previousBalancesTitle": "Soldes précédents",
+  "actionPreviousBalancesSubtitle": "Gérer les soldes d’ouverture ou antérieurs",
+  "moduleReportsTitle": "Rapports & Points",
+  "moduleReportsSubtitle": "Synthèse hebdomadaire et suivi comptable",
+  "weeklyReportTitle": "Point hebdomadaire",
+  "actionWeeklyReportSubtitle": "Produire le point hebdomadaire de comptabilité",
+
+  "expenseSaved": "Dépense enregistrée.",
+  "newExpenseTitle": "Nouvelle dépense",
+  "labelDesignation": "Libellé",
+  "labelAccountType": "Type de compte",
+  "expenseHistoryTitle": "Historique des dépenses",
+  "noExpenseRecorded": "Aucune dépense enregistrée.",
+  "enteredByLine": "Saisi par : {name}",
+  "@enteredByLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "previousBalanceSaved": "Solde précédent enregistré.",
+  "newPreviousBalanceTitle": "Nouveau solde précédent",
+  "balanceHistoryTitle": "Historique des soldes",
+  "noPreviousBalance": "Aucun solde précédent.",
+
+  "untransferredFullTitle": "Suivi factures / encaissements non versés",
+  "noUntransferredInvoice": "Aucune facture non versée.",
+  "transferStatusLine": "Statut transfert : {status}",
+  "@transferStatusLine": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "statusNotDeclared": "non déclaré",
+  "untransferredServerCollections": "Encaissements serveurs non versés",
+  "noUntransferredServerCollection": "Aucun encaissement serveur non versé.",
+
+  "errWeeklySummaryLoadFailed": "Erreur chargement point hebdo : {error}",
+  "@errWeeklySummaryLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errPrintFailed": "Erreur impression : {error}",
+  "@errPrintFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "handoversReceived": "Versements reçus",
+  "labelOutflows": "Sorties",
+  "theoreticalBalance": "Solde théorique",
+
+  "noHandoverAwaitingReception": "Aucun versement en attente de réception.",
+  "receptionConfirmed": "Réception confirmée.",
+  "actionConfirmReception": "Confirmer réception",
+
+  "receptionValidatedQuitusPrinted": "Réception validée et quitus imprimé.",
+  "managerHandoverReceptionTitle": "Réception versements gérante",
+  "pendingHandoversTitle": "Versements en attente",
+  "serversRoomsCounts": "Serveurs: {servers} • Chambres: {rooms}",
+  "@serversRoomsCounts": {
+    "placeholders": {
+      "servers": {
+        "type": "int"
+      },
+      "rooms": {
+        "type": "int"
+      }
+    }
+  },
+  "noHandoverReceived": "Aucun versement reçu.",
+  "receivedByLine": "Reçu par : {name}",
+  "@receivedByLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

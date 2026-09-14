@@ -1700,5 +1700,109 @@
         "type": "int"
       }
     }
+  },
+
+  "errAccessDenied": "Access denied.",
+  "accountingTitle": "Accounting",
+  "accountantWorkspaceSubtitle": "Reception, control, expenses, balances and reports",
+  "moduleReceptionsTitle": "Receptions & Controls",
+  "moduleReceptionsSubtitle": "Waiter and manager handovers, and untransferred invoices",
+  "actionReceiveHandovers": "Handover reception",
+  "actionReceiveHandoversSubtitle": "Check the waiters' handovers",
+  "actionManagerReception": "Manager reception",
+  "actionManagerReceptionSubtitle": "Receive the handovers sent by the manager",
+  "actionTrackUntransferred": "Untransferred tracking",
+  "actionTrackUntransferredSubtitle": "Track invoices not yet transferred",
+  "moduleExpensesBalancesTitle": "Expenses & Balances",
+  "moduleExpensesBalancesSubtitle": "Current expenses and previous balances",
+  "expensesTitle": "Expenses",
+  "actionExpensesSubtitle": "Record and review expenses",
+  "previousBalancesTitle": "Previous balances",
+  "actionPreviousBalancesSubtitle": "Manage opening or earlier balances",
+  "moduleReportsTitle": "Reports & Summaries",
+  "moduleReportsSubtitle": "Weekly summary and accounting tracking",
+  "weeklyReportTitle": "Weekly summary",
+  "actionWeeklyReportSubtitle": "Produce the weekly accounting summary",
+
+  "expenseSaved": "Expense recorded.",
+  "newExpenseTitle": "New expense",
+  "labelDesignation": "Label",
+  "labelAccountType": "Account type",
+  "expenseHistoryTitle": "Expense history",
+  "noExpenseRecorded": "No expense recorded.",
+  "enteredByLine": "Entered by: {name}",
+  "@enteredByLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+
+  "previousBalanceSaved": "Previous balance recorded.",
+  "newPreviousBalanceTitle": "New previous balance",
+  "balanceHistoryTitle": "Balance history",
+  "noPreviousBalance": "No previous balance.",
+
+  "untransferredFullTitle": "Untransferred invoices / collections tracking",
+  "noUntransferredInvoice": "No untransferred invoice.",
+  "transferStatusLine": "Transfer status: {status}",
+  "@transferStatusLine": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "statusNotDeclared": "not declared",
+  "untransferredServerCollections": "Untransferred waiter collections",
+  "noUntransferredServerCollection": "No untransferred waiter collection.",
+
+  "errWeeklySummaryLoadFailed": "Error loading the weekly summary: {error}",
+  "@errWeeklySummaryLoadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errPrintFailed": "Printing error: {error}",
+  "@errPrintFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "handoversReceived": "Handovers received",
+  "labelOutflows": "Outflows",
+  "theoreticalBalance": "Theoretical balance",
+
+  "noHandoverAwaitingReception": "No handover awaiting reception.",
+  "receptionConfirmed": "Reception confirmed.",
+  "actionConfirmReception": "Confirm reception",
+
+  "receptionValidatedQuitusPrinted": "Reception validated and receipt printed.",
+  "managerHandoverReceptionTitle": "Manager handover reception",
+  "pendingHandoversTitle": "Pending handovers",
+  "serversRoomsCounts": "Waiters: {servers} • Rooms: {rooms}",
+  "@serversRoomsCounts": {
+    "placeholders": {
+      "servers": {
+        "type": "int"
+      },
+      "rooms": {
+        "type": "int"
+      }
+    }
+  },
+  "noHandoverReceived": "No handover received.",
+  "receivedByLine": "Received by: {name}",
+  "@receivedByLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

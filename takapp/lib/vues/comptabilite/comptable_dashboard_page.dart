@@ -5,6 +5,8 @@ import 'package:takapp/controllers/auth_controller.dart';
 
 import 'package:takapp/core/constants/app_roles.dart';
 
+import 'package:takapp/l10n/app_localizations.dart';
+
 import 'package:takapp/vues/comptabilite/depenses_page.dart';
 import 'package:takapp/vues/comptabilite/point_hebdomadaire_page.dart';
 import 'package:takapp/vues/comptabilite/reception_gerante_page.dart';
@@ -19,6 +21,8 @@ class ComptableDashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     final auth = context.watch<AuthController>();
 
     final user = auth.currentUser;
@@ -41,8 +45,8 @@ class ComptableDashboardPage extends StatelessWidget {
 
     if (user.establishmentId.trim().isEmpty &&
         user.role != AppRoles.superAdmin) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -50,15 +54,16 @@ class ComptableDashboardPage extends StatelessWidget {
         user.role != AppRoles.gerante &&
         user.role != AppRoles.proprietaire &&
         user.role != AppRoles.superAdmin) {
-      return const Scaffold(body: Center(child: Text('Accès refusé.')));
+      return Scaffold(body: Center(child: Text(l10n.errAccessDenied)));
     }
 
     return Scaffold(
       appBar: AppBar(
+        // TAKHOTEL est la marque : seul le libellé métier est traduit.
         title: Text(
           user.establishmentName.trim().isNotEmpty
-              ? '${user.establishmentName} - Comptabilité'
-              : 'TAKHOTEL - Comptabilité',
+              ? '${user.establishmentName} - ${l10n.accountingTitle}'
+              : 'TAKHOTEL - ${l10n.accountingTitle}',
         ),
 
         actions: [
@@ -67,7 +72,7 @@ class ComptableDashboardPage extends StatelessWidget {
               context.read<AuthController>().logout();
             },
 
-            tooltip: 'Déconnexion',
+            tooltip: l10n.commonLogout,
 
             icon: const Icon(Icons.logout),
           ),
@@ -113,6 +118,8 @@ class _ComptableWelcomeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 2,
 
@@ -137,7 +144,7 @@ class _ComptableWelcomeCard extends StatelessWidget {
 
                 children: [
                   Text(
-                    'Bienvenue $userName',
+                    l10n.welcomeName(userName),
 
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
@@ -161,7 +168,7 @@ class _ComptableWelcomeCard extends StatelessWidget {
                   const SizedBox(height: 4),
 
                   Text(
-                    'Réception, contrôle, dépenses, soldes et rapports',
+                    l10n.accountantWorkspaceSubtitle,
 
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
@@ -183,20 +190,19 @@ class _ComptableModulesGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
     final user = auth.currentUser;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
-   
+
     final modules = [
       _ComptableModule(
-        title: 'Réceptions & Contrôles',
+        title: l10n.moduleReceptionsTitle,
 
-        subtitle: 'Versements serveurs, gérante et factures non versées',
+        subtitle: l10n.moduleReceptionsSubtitle,
 
         icon: Icons.fact_check_outlined,
 
@@ -204,9 +210,9 @@ class _ComptableModulesGrid extends StatelessWidget {
 
         actions: [
           _ComptableAction(
-            title: 'Réception des versements',
+            title: l10n.actionReceiveHandovers,
 
-            subtitle: 'Contrôler les versements des serveurs',
+            subtitle: l10n.actionReceiveHandoversSubtitle,
 
             icon: Icons.inventory_2_outlined,
 
@@ -214,9 +220,9 @@ class _ComptableModulesGrid extends StatelessWidget {
           ),
 
           _ComptableAction(
-            title: 'Réception gérante',
+            title: l10n.actionManagerReception,
 
-            subtitle: 'Recevoir les versements transmis par la gérante',
+            subtitle: l10n.actionManagerReceptionSubtitle,
 
             icon: Icons.move_to_inbox_outlined,
 
@@ -224,9 +230,9 @@ class _ComptableModulesGrid extends StatelessWidget {
           ),
 
           _ComptableAction(
-            title: 'Suivi non versés',
+            title: l10n.actionTrackUntransferred,
 
-            subtitle: 'Suivre les factures non encore versées',
+            subtitle: l10n.actionTrackUntransferredSubtitle,
 
             icon: Icons.visibility_outlined,
 
@@ -236,9 +242,9 @@ class _ComptableModulesGrid extends StatelessWidget {
       ),
 
       _ComptableModule(
-        title: 'Dépenses & Soldes',
+        title: l10n.moduleExpensesBalancesTitle,
 
-        subtitle: 'Dépenses courantes et soldes précédents',
+        subtitle: l10n.moduleExpensesBalancesSubtitle,
 
         icon: Icons.account_balance_wallet_outlined,
 
@@ -246,9 +252,9 @@ class _ComptableModulesGrid extends StatelessWidget {
 
         actions: [
           _ComptableAction(
-            title: 'Dépenses',
+            title: l10n.expensesTitle,
 
-            subtitle: 'Enregistrer et consulter les dépenses',
+            subtitle: l10n.actionExpensesSubtitle,
 
             icon: Icons.money_off_csred_outlined,
 
@@ -256,9 +262,9 @@ class _ComptableModulesGrid extends StatelessWidget {
           ),
 
           _ComptableAction(
-            title: 'Soldes précédents',
+            title: l10n.previousBalancesTitle,
 
-            subtitle: 'Gérer les soldes d’ouverture ou antérieurs',
+            subtitle: l10n.actionPreviousBalancesSubtitle,
 
             icon: Icons.account_balance_wallet_outlined,
 
@@ -268,9 +274,9 @@ class _ComptableModulesGrid extends StatelessWidget {
       ),
 
       _ComptableModule(
-        title: 'Rapports & Points',
+        title: l10n.moduleReportsTitle,
 
-        subtitle: 'Synthèse hebdomadaire et suivi comptable',
+        subtitle: l10n.moduleReportsSubtitle,
 
         icon: Icons.bar_chart_outlined,
 
@@ -278,9 +284,9 @@ class _ComptableModulesGrid extends StatelessWidget {
 
         actions: [
           _ComptableAction(
-            title: 'Point hebdomadaire',
+            title: l10n.weeklyReportTitle,
 
-            subtitle: 'Produire le point hebdomadaire de comptabilité',
+            subtitle: l10n.actionWeeklyReportSubtitle,
 
             icon: Icons.bar_chart_outlined,
 

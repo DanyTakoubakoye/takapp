@@ -4552,6 +4552,318 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'{count} ingrédient(s)'**
   String ingredientsCount(int count);
+
+  /// No description provided for @errAccessDenied.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accès refusé.'**
+  String get errAccessDenied;
+
+  /// No description provided for @accountingTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Comptabilité'**
+  String get accountingTitle;
+
+  /// No description provided for @accountantWorkspaceSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réception, contrôle, dépenses, soldes et rapports'**
+  String get accountantWorkspaceSubtitle;
+
+  /// No description provided for @moduleReceptionsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réceptions & Contrôles'**
+  String get moduleReceptionsTitle;
+
+  /// No description provided for @moduleReceptionsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Versements serveurs, gérante et factures non versées'**
+  String get moduleReceptionsSubtitle;
+
+  /// No description provided for @actionReceiveHandovers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réception des versements'**
+  String get actionReceiveHandovers;
+
+  /// No description provided for @actionReceiveHandoversSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Contrôler les versements des serveurs'**
+  String get actionReceiveHandoversSubtitle;
+
+  /// No description provided for @actionManagerReception.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réception gérante'**
+  String get actionManagerReception;
+
+  /// No description provided for @actionManagerReceptionSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recevoir les versements transmis par la gérante'**
+  String get actionManagerReceptionSubtitle;
+
+  /// No description provided for @actionTrackUntransferred.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suivi non versés'**
+  String get actionTrackUntransferred;
+
+  /// No description provided for @actionTrackUntransferredSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suivre les factures non encore versées'**
+  String get actionTrackUntransferredSubtitle;
+
+  /// No description provided for @moduleExpensesBalancesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dépenses & Soldes'**
+  String get moduleExpensesBalancesTitle;
+
+  /// No description provided for @moduleExpensesBalancesSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dépenses courantes et soldes précédents'**
+  String get moduleExpensesBalancesSubtitle;
+
+  /// No description provided for @expensesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dépenses'**
+  String get expensesTitle;
+
+  /// No description provided for @actionExpensesSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer et consulter les dépenses'**
+  String get actionExpensesSubtitle;
+
+  /// No description provided for @previousBalancesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Soldes précédents'**
+  String get previousBalancesTitle;
+
+  /// No description provided for @actionPreviousBalancesSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gérer les soldes d’ouverture ou antérieurs'**
+  String get actionPreviousBalancesSubtitle;
+
+  /// No description provided for @moduleReportsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rapports & Points'**
+  String get moduleReportsTitle;
+
+  /// No description provided for @moduleReportsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Synthèse hebdomadaire et suivi comptable'**
+  String get moduleReportsSubtitle;
+
+  /// No description provided for @weeklyReportTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Point hebdomadaire'**
+  String get weeklyReportTitle;
+
+  /// No description provided for @actionWeeklyReportSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Produire le point hebdomadaire de comptabilité'**
+  String get actionWeeklyReportSubtitle;
+
+  /// No description provided for @expenseSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dépense enregistrée.'**
+  String get expenseSaved;
+
+  /// No description provided for @newExpenseTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle dépense'**
+  String get newExpenseTitle;
+
+  /// No description provided for @labelDesignation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Libellé'**
+  String get labelDesignation;
+
+  /// No description provided for @labelAccountType.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type de compte'**
+  String get labelAccountType;
+
+  /// No description provided for @expenseHistoryTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Historique des dépenses'**
+  String get expenseHistoryTitle;
+
+  /// No description provided for @noExpenseRecorded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune dépense enregistrée.'**
+  String get noExpenseRecorded;
+
+  /// No description provided for @enteredByLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Saisi par : {name}'**
+  String enteredByLine(String name);
+
+  /// No description provided for @previousBalanceSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Solde précédent enregistré.'**
+  String get previousBalanceSaved;
+
+  /// No description provided for @newPreviousBalanceTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveau solde précédent'**
+  String get newPreviousBalanceTitle;
+
+  /// No description provided for @balanceHistoryTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Historique des soldes'**
+  String get balanceHistoryTitle;
+
+  /// No description provided for @noPreviousBalance.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun solde précédent.'**
+  String get noPreviousBalance;
+
+  /// No description provided for @untransferredFullTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suivi factures / encaissements non versés'**
+  String get untransferredFullTitle;
+
+  /// No description provided for @noUntransferredInvoice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune facture non versée.'**
+  String get noUntransferredInvoice;
+
+  /// No description provided for @transferStatusLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Statut transfert : {status}'**
+  String transferStatusLine(String status);
+
+  /// No description provided for @statusNotDeclared.
+  ///
+  /// In fr, this message translates to:
+  /// **'non déclaré'**
+  String get statusNotDeclared;
+
+  /// No description provided for @untransferredServerCollections.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaissements serveurs non versés'**
+  String get untransferredServerCollections;
+
+  /// No description provided for @noUntransferredServerCollection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun encaissement serveur non versé.'**
+  String get noUntransferredServerCollection;
+
+  /// No description provided for @errWeeklySummaryLoadFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur chargement point hebdo : {error}'**
+  String errWeeklySummaryLoadFailed(String error);
+
+  /// No description provided for @errPrintFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur impression : {error}'**
+  String errPrintFailed(String error);
+
+  /// No description provided for @handoversReceived.
+  ///
+  /// In fr, this message translates to:
+  /// **'Versements reçus'**
+  String get handoversReceived;
+
+  /// No description provided for @labelOutflows.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sorties'**
+  String get labelOutflows;
+
+  /// No description provided for @theoreticalBalance.
+  ///
+  /// In fr, this message translates to:
+  /// **'Solde théorique'**
+  String get theoreticalBalance;
+
+  /// No description provided for @noHandoverAwaitingReception.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun versement en attente de réception.'**
+  String get noHandoverAwaitingReception;
+
+  /// No description provided for @receptionConfirmed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réception confirmée.'**
+  String get receptionConfirmed;
+
+  /// No description provided for @actionConfirmReception.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer réception'**
+  String get actionConfirmReception;
+
+  /// No description provided for @receptionValidatedQuitusPrinted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réception validée et quitus imprimé.'**
+  String get receptionValidatedQuitusPrinted;
+
+  /// No description provided for @managerHandoverReceptionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réception versements gérante'**
+  String get managerHandoverReceptionTitle;
+
+  /// No description provided for @pendingHandoversTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Versements en attente'**
+  String get pendingHandoversTitle;
+
+  /// No description provided for @serversRoomsCounts.
+  ///
+  /// In fr, this message translates to:
+  /// **'Serveurs: {servers} • Chambres: {rooms}'**
+  String serversRoomsCounts(int servers, int rooms);
+
+  /// No description provided for @noHandoverReceived.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun versement reçu.'**
+  String get noHandoverReceived;
+
+  /// No description provided for @receivedByLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Reçu par : {name}'**
+  String receivedByLine(String name);
 }
 
 class _AppLocalizationsDelegate

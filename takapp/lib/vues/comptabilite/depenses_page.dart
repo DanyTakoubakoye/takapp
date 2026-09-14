@@ -25,6 +25,7 @@ class _DepensesPageState extends State<DepensesPage> {
 
   final TextEditingController amountController = TextEditingController();
 
+  // Valeur technique stockée en base.
   String selectedAccountType = AccountTypes.cash;
 
   List<String> get accountTypes => AccountTypes.all;
@@ -64,6 +65,8 @@ class _DepensesPageState extends State<DepensesPage> {
   /// =========================
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
+
     final auth = context.read<AuthController>();
 
     final controller = context.read<ComptabiliteController>();
@@ -75,9 +78,9 @@ class _DepensesPageState extends State<DepensesPage> {
     }
 
     if (user.establishmentId.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Établissement introuvable.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errEstablishmentNotFound)));
 
       return;
     }
@@ -89,7 +92,7 @@ class _DepensesPageState extends State<DepensesPage> {
     if (amount == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Montant invalide.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.invalidAmount)));
 
       return;
     }
@@ -99,6 +102,7 @@ class _DepensesPageState extends State<DepensesPage> {
 
       label: labelController.text.trim(),
 
+      // 'divers' est la catégorie technique par défaut enregistrée en base.
       category: categoryController.text.trim().isEmpty
           ? 'divers'
           : categoryController.text.trim(),
@@ -127,10 +131,8 @@ class _DepensesPageState extends State<DepensesPage> {
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Dépense enregistrée.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.expenseSaved)));
     } else if (controller.hasError) {
-      final l10n = AppLocalizations.of(context);
-
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(controller.errorText(l10n)!)));
@@ -139,6 +141,8 @@ class _DepensesPageState extends State<DepensesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     final comptaService = context.read<ComptabiliteService>();
 
     final controller = context.watch<ComptabiliteController>();
@@ -152,8 +156,8 @@ class _DepensesPageState extends State<DepensesPage> {
     }
 
     if (user.establishmentId.trim().isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -161,8 +165,8 @@ class _DepensesPageState extends State<DepensesPage> {
       appBar: AppBar(
         title: Text(
           user.establishmentName.trim().isNotEmpty
-              ? '${user.establishmentName} - Dépenses'
-              : 'Dépenses',
+              ? '${user.establishmentName} - ${l10n.expensesTitle}'
+              : l10n.expensesTitle,
         ),
       ),
 
@@ -234,6 +238,8 @@ class _DepensesPageState extends State<DepensesPage> {
     ComptabiliteController controller, {
     required bool isMobile,
   }) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 2,
 
@@ -250,7 +256,7 @@ class _DepensesPageState extends State<DepensesPage> {
               alignment: Alignment.centerLeft,
 
               child: Text(
-                'Nouvelle dépense',
+                l10n.newExpenseTitle,
 
                 style: Theme.of(context).textTheme.titleLarge,
               ),
@@ -261,10 +267,10 @@ class _DepensesPageState extends State<DepensesPage> {
             TextField(
               controller: labelController,
 
-              decoration: const InputDecoration(
-                labelText: 'Libellé',
+              decoration: InputDecoration(
+                labelText: l10n.labelDesignation,
 
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
             ),
 
@@ -273,10 +279,10 @@ class _DepensesPageState extends State<DepensesPage> {
             TextField(
               controller: categoryController,
 
-              decoration: const InputDecoration(
-                labelText: 'Catégorie',
+              decoration: InputDecoration(
+                labelText: l10n.labelCategory,
 
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
             ),
 
@@ -285,17 +291,18 @@ class _DepensesPageState extends State<DepensesPage> {
             DropdownButtonFormField<String>(
               initialValue: selectedAccountType,
 
-              decoration: const InputDecoration(
-                labelText: 'Type de compte',
+              decoration: InputDecoration(
+                labelText: l10n.labelAccountType,
 
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
 
+              // La valeur reste technique : seul le libellé est localisé.
               items: accountTypes.map((e) {
                 return DropdownMenuItem<String>(
                   value: e,
 
-                  child: Text(AccountTypes.labels[e] ?? e),
+                  child: Text(AccountTypes.label(l10n, e)),
                 );
               }).toList(),
 
@@ -319,10 +326,10 @@ class _DepensesPageState extends State<DepensesPage> {
                 decimal: true,
               ),
 
-              decoration: const InputDecoration(
-                labelText: 'Montant',
+              decoration: InputDecoration(
+                labelText: l10n.labelAmount,
 
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
             ),
 
@@ -346,7 +353,7 @@ class _DepensesPageState extends State<DepensesPage> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Enregistrer'),
+                    : Text(l10n.actionSave),
               ),
             ),
           ],
@@ -365,6 +372,8 @@ class _DepensesPageState extends State<DepensesPage> {
 
     required bool isMobile,
   }) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 2,
 
@@ -379,7 +388,7 @@ class _DepensesPageState extends State<DepensesPage> {
               alignment: Alignment.centerLeft,
 
               child: Text(
-                'Historique des dépenses',
+                l10n.expenseHistoryTitle,
 
                 style: Theme.of(context).textTheme.titleLarge,
               ),
@@ -397,15 +406,15 @@ class _DepensesPageState extends State<DepensesPage> {
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text('Erreur: ${snapshot.error}'));
+                    return Center(
+                      child: Text(l10n.errorPrefixed('${snapshot.error}')),
+                    );
                   }
 
                   final expenses = snapshot.data ?? [];
 
                   if (expenses.isEmpty) {
-                    return const Center(
-                      child: Text('Aucune dépense enregistrée.'),
-                    );
+                    return Center(child: Text(l10n.noExpenseRecorded));
                   }
 
                   return ListView.separated(
@@ -445,12 +454,13 @@ class _DepensesPageState extends State<DepensesPage> {
                                   const SizedBox(height: 6),
 
                                   Text(
-                                    '${expense.category} • ${AccountTypes.labels[expense.accountType] ?? expense.accountType}',
+                                    '${expense.category}'
+                                    ' • ${AccountTypes.label(l10n, expense.accountType)}',
                                   ),
 
                                   const SizedBox(height: 4),
 
-                                  Text('Saisi par : ${expense.createdByName}'),
+                                  Text(l10n.enteredByLine(expense.createdByName)),
 
                                   const SizedBox(height: 8),
 
@@ -486,7 +496,9 @@ class _DepensesPageState extends State<DepensesPage> {
                                         const SizedBox(height: 6),
 
                                         Text(
-                                          '${expense.category} • ${AccountTypes.labels[expense.accountType] ?? expense.accountType} • ${expense.createdByName}',
+                                          '${expense.category}'
+                                          ' • ${AccountTypes.label(l10n, expense.accountType)}'
+                                          ' • ${expense.createdByName}',
                                         ),
                                       ],
                                     ),

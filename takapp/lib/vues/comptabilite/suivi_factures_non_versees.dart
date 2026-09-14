@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/core/constants/app_payment_methods.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 
 class SuiviFacturesNonVerseesPage extends StatefulWidget {
   const SuiviFacturesNonVerseesPage({super.key});
@@ -63,20 +65,50 @@ class _SuiviFacturesNonVerseesPageState
     return handoverStatus == 'pending';
   }
 
+  // Les statuts restent des valeurs techniques en base : seul leur rendu est
+  // localisé. Un statut absent s'affiche « non déclaré », un statut inconnu
+  // est affiché tel quel.
+  String _transferStatusLabel(AppLocalizations l10n, String status) {
+    switch (status) {
+      case '':
+        return l10n.statusNotDeclared;
+      case 'declared':
+        return l10n.statusDeclared;
+      case 'received':
+        return l10n.statusReceived;
+      case 'validated':
+        return l10n.statusValidated;
+      default:
+        return status;
+    }
+  }
+
+  String _handoverStatusLabel(AppLocalizations l10n, String status) {
+    switch (status) {
+      case 'pending':
+        return l10n.statusPending;
+      case 'validated':
+        return l10n.statusValidated;
+      case 'received':
+        return l10n.statusReceived;
+      default:
+        return status;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
     final user = auth.currentUser;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     if (user.establishmentId.trim().isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -94,8 +126,8 @@ class _SuiviFacturesNonVerseesPageState
       appBar: AppBar(
         title: Text(
           user.establishmentName.trim().isNotEmpty
-              ? '${user.establishmentName} - Suivi non versés'
-              : 'Suivi factures / encaissements non versés',
+              ? '${user.establishmentName} - ${l10n.actionTrackUntransferred}'
+              : l10n.untransferredFullTitle,
         ),
       ),
       body: LayoutBuilder(
@@ -154,6 +186,8 @@ class _SuiviFacturesNonVerseesPageState
     Stream<QuerySnapshot<Map<String, dynamic>>> invoicesStream, {
     required bool isMobile,
   }) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -164,7 +198,7 @@ class _SuiviFacturesNonVerseesPageState
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Factures chambres encaissées non versées',
+                l10n.paidRoomInvoicesNotTransferred,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: isMobile ? 15 : 16,
@@ -181,7 +215,9 @@ class _SuiviFacturesNonVerseesPageState
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text('Erreur: ${snapshot.error}'));
+                    return Center(
+                      child: Text(l10n.errorPrefixed('${snapshot.error}')),
+                    );
                   }
 
                   final docs = (snapshot.data?.docs ?? []).where((doc) {
@@ -189,9 +225,7 @@ class _SuiviFacturesNonVerseesPageState
                   }).toList();
 
                   if (docs.isEmpty) {
-                    return const Center(
-                      child: Text('Aucune facture non versée.'),
-                    );
+                    return Center(child: Text(l10n.noUntransferredInvoice));
                   }
 
                   return ListView.separated(
@@ -200,6 +234,11 @@ class _SuiviFacturesNonVerseesPageState
                     itemBuilder: (context, index) {
                       final data = docs[index].data();
                       final total = ((data['total'] ?? 0) as num).toDouble();
+
+                      final transferStatus =
+                          (data['accountingTransferStatus'] ?? '')
+                              .toString()
+                              .trim();
 
                       return Container(
                         padding: const EdgeInsets.all(12),
@@ -213,14 +252,20 @@ class _SuiviFacturesNonVerseesPageState
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    '${(data['clientName'] ?? '').toString()} • Chambre ${(data['roomNumber'] ?? '').toString()}',
+                                    '${(data['clientName'] ?? '').toString()}'
+                                    ' • ${l10n.labelRoom((data['roomNumber'] ?? '').toString())}',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   const SizedBox(height: 6),
                                   Text(
-                                    'Statut transfert : ${(data['accountingTransferStatus'] ?? 'non déclaré').toString()}',
+                                    l10n.transferStatusLine(
+                                      _transferStatusLabel(
+                                        l10n,
+                                        transferStatus,
+                                      ),
+                                    ),
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
@@ -240,14 +285,20 @@ class _SuiviFacturesNonVerseesPageState
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '${(data['clientName'] ?? '').toString()} • Chambre ${(data['roomNumber'] ?? '').toString()}',
+                                          '${(data['clientName'] ?? '').toString()}'
+                                          ' • ${l10n.labelRoom((data['roomNumber'] ?? '').toString())}',
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                         const SizedBox(height: 6),
                                         Text(
-                                          'Statut transfert : ${(data['accountingTransferStatus'] ?? 'non déclaré').toString()}',
+                                          l10n.transferStatusLine(
+                                            _transferStatusLabel(
+                                              l10n,
+                                              transferStatus,
+                                            ),
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -277,6 +328,8 @@ class _SuiviFacturesNonVerseesPageState
     Stream<QuerySnapshot<Map<String, dynamic>>> paymentsStream, {
     required bool isMobile,
   }) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -287,7 +340,7 @@ class _SuiviFacturesNonVerseesPageState
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Encaissements serveurs non versés',
+                l10n.untransferredServerCollections,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: isMobile ? 15 : 16,
@@ -304,7 +357,9 @@ class _SuiviFacturesNonVerseesPageState
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text('Erreur: ${snapshot.error}'));
+                    return Center(
+                      child: Text(l10n.errorPrefixed('${snapshot.error}')),
+                    );
                   }
 
                   final docs = (snapshot.data?.docs ?? []).where((doc) {
@@ -312,8 +367,8 @@ class _SuiviFacturesNonVerseesPageState
                   }).toList();
 
                   if (docs.isEmpty) {
-                    return const Center(
-                      child: Text('Aucun encaissement serveur non versé.'),
+                    return Center(
+                      child: Text(l10n.noUntransferredServerCollection),
                     );
                   }
 
@@ -323,6 +378,11 @@ class _SuiviFacturesNonVerseesPageState
                     itemBuilder: (context, index) {
                       final data = docs[index].data();
                       final amount = ((data['amount'] ?? 0) as num).toDouble();
+
+                      // `method` et `handoverStatus` sont des codes techniques.
+                      final methodStatusLine =
+                          '${l10n.methodLine(AppPaymentMethods.label(l10n, (data['method'] ?? '').toString()))}'
+                          ' • ${l10n.statusLine(_handoverStatusLabel(l10n, (data['handoverStatus'] ?? '').toString().trim()))}';
 
                       return Container(
                         padding: const EdgeInsets.all(12),
@@ -342,9 +402,7 @@ class _SuiviFacturesNonVerseesPageState
                                     ),
                                   ),
                                   const SizedBox(height: 6),
-                                  Text(
-                                    'Mode : ${(data['method'] ?? '').toString()} • Statut : ${(data['handoverStatus'] ?? '').toString()}',
-                                  ),
+                                  Text(methodStatusLine),
                                   const SizedBox(height: 8),
                                   Text(
                                     '${amount.toStringAsFixed(0)} FCFA',
@@ -369,9 +427,7 @@ class _SuiviFacturesNonVerseesPageState
                                           ),
                                         ),
                                         const SizedBox(height: 6),
-                                        Text(
-                                          'Mode : ${(data['method'] ?? '').toString()} • Statut : ${(data['handoverStatus'] ?? '').toString()}',
-                                        ),
+                                        Text(methodStatusLine),
                                       ],
                                     ),
                                   ),

@@ -5,6 +5,8 @@ import 'package:takapp/controllers/auth_controller.dart';
 
 import 'package:takapp/core/constants/account_types.dart';
 
+import 'package:takapp/l10n/app_localizations.dart';
+
 import 'package:takapp/modeles/account_balance_model.dart';
 
 import 'package:takapp/services/comptabilite_service.dart';
@@ -20,6 +22,7 @@ class SoldesPrecedentsPage extends StatefulWidget {
 class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
   final TextEditingController amountController = TextEditingController();
 
+  // Valeur technique stockée en base.
   String selectedType = AccountTypes.cash;
 
   DateTime selectedDate = DateTime.now();
@@ -56,6 +59,8 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
   /// =========================
 
   Future<void> _save() async {
+    final l10n = AppLocalizations.of(context);
+
     final auth = context.read<AuthController>();
 
     final user = auth.currentUser;
@@ -65,9 +70,9 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
     }
 
     if (user.establishmentId.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Établissement introuvable.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errEstablishmentNotFound)));
 
       return;
     }
@@ -79,7 +84,7 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
     if (amount == null || amount <= 0) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Montant invalide.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.invalidAmount)));
 
       return;
     }
@@ -105,9 +110,9 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
 
       amountController.clear();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Solde précédent enregistré.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.previousBalanceSaved)));
     } catch (e) {
       if (!mounted) {
         return;
@@ -115,7 +120,7 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Erreur : $e')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errorPrefixed('$e'))));
     }
   }
 
@@ -143,19 +148,19 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     final auth = context.watch<AuthController>();
 
     final user = auth.currentUser;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     if (user.establishmentId.trim().isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -163,8 +168,8 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
       appBar: AppBar(
         title: Text(
           user.establishmentName.trim().isNotEmpty
-              ? '${user.establishmentName} - Soldes précédents'
-              : 'Soldes précédents',
+              ? '${user.establishmentName} - ${l10n.previousBalancesTitle}'
+              : l10n.previousBalancesTitle,
         ),
       ),
 
@@ -225,6 +230,8 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
   /// =========================
 
   Widget _buildFormCard({required bool isMobile}) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 2,
 
@@ -241,7 +248,7 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
               alignment: Alignment.centerLeft,
 
               child: Text(
-                'Nouveau solde précédent',
+                l10n.newPreviousBalanceTitle,
 
                 style: Theme.of(context).textTheme.titleLarge,
               ),
@@ -252,17 +259,18 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
             DropdownButtonFormField<String>(
               initialValue: selectedType,
 
-              decoration: const InputDecoration(
-                labelText: 'Type de compte',
+              decoration: InputDecoration(
+                labelText: l10n.labelAccountType,
 
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
 
+              // La valeur reste technique : seul le libellé est localisé.
               items: AccountTypes.all.map((e) {
                 return DropdownMenuItem<String>(
                   value: e,
 
-                  child: Text(AccountTypes.labels[e] ?? e),
+                  child: Text(AccountTypes.label(l10n, e)),
                 );
               }).toList(),
 
@@ -286,10 +294,10 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
                 decimal: true,
               ),
 
-              decoration: const InputDecoration(
-                labelText: 'Montant',
+              decoration: InputDecoration(
+                labelText: l10n.labelAmount,
 
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
               ),
             ),
 
@@ -304,7 +312,9 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
                 icon: const Icon(Icons.calendar_today_outlined),
 
                 label: Text(
-                  'Date : ${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
+                  l10n.dateLine(
+                    '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}',
+                  ),
                 ),
               ),
             ),
@@ -317,7 +327,7 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
               child: ElevatedButton(
                 onPressed: _save,
 
-                child: const Text('Enregistrer'),
+                child: Text(l10n.actionSave),
               ),
             ),
           ],
@@ -335,6 +345,8 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
 
     required bool isMobile,
   }) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 2,
 
@@ -349,7 +361,7 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
               alignment: Alignment.centerLeft,
 
               child: Text(
-                'Historique des soldes',
+                l10n.balanceHistoryTitle,
 
                 style: Theme.of(context).textTheme.titleLarge,
               ),
@@ -367,13 +379,15 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text('Erreur: ${snapshot.error}'));
+                    return Center(
+                      child: Text(l10n.errorPrefixed('${snapshot.error}')),
+                    );
                   }
 
                   final balances = snapshot.data ?? [];
 
                   if (balances.isEmpty) {
-                    return const Center(child: Text('Aucun solde précédent.'));
+                    return Center(child: Text(l10n.noPreviousBalance));
                   }
 
                   return ListView.separated(
@@ -401,7 +415,7 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
 
                                 children: [
                                   Text(
-                                    AccountTypes.labels[item.type] ?? item.type,
+                                    AccountTypes.label(l10n, item.type),
 
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -418,7 +432,7 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
 
                                   const SizedBox(height: 4),
 
-                                  Text('Saisi par : ${item.createdByName}'),
+                                  Text(l10n.enteredByLine(item.createdByName)),
 
                                   const SizedBox(height: 8),
 
@@ -442,8 +456,7 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
 
                                       children: [
                                         Text(
-                                          AccountTypes.labels[item.type] ??
-                                              item.type,
+                                          AccountTypes.label(l10n, item.type),
 
                                           style: const TextStyle(
                                             fontWeight: FontWeight.bold,
@@ -455,7 +468,8 @@ class _SoldesPrecedentsPageState extends State<SoldesPrecedentsPage> {
                                         const SizedBox(height: 6),
 
                                         Text(
-                                          '${item.date?.day}/${item.date?.month}/${item.date?.year} • ${item.createdByName}',
+                                          '${item.date?.day}/${item.date?.month}/${item.date?.year}'
+                                          ' • ${item.createdByName}',
                                         ),
                                       ],
                                     ),

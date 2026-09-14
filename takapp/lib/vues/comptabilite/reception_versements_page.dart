@@ -10,21 +10,37 @@ import 'package:takapp/services/comptabilite_service.dart';
 class ReceptionVersementsPage extends StatelessWidget {
   const ReceptionVersementsPage({super.key});
 
+  // `status` reste la valeur technique stockée : seul le rendu est localisé,
+  // et un statut inconnu est affiché tel quel.
+  String _statusLabel(AppLocalizations l10n, String status) {
+    switch (status) {
+      case 'pending':
+        return l10n.statusPending;
+      case 'declared':
+        return l10n.statusDeclared;
+      case 'received':
+        return l10n.statusReceived;
+      case 'validated':
+        return l10n.statusValidated;
+      default:
+        return status;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
     final comptaService = context.read<ComptabiliteService>();
     final user = auth.currentUser;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     if (user.establishmentId.trim().isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -34,8 +50,8 @@ class ReceptionVersementsPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           user.establishmentName.trim().isNotEmpty
-              ? '${user.establishmentName} - Réception des versements'
-              : 'Réception des versements',
+              ? '${user.establishmentName} - ${l10n.actionReceiveHandovers}'
+              : l10n.actionReceiveHandovers,
         ),
       ),
       body: Padding(
@@ -50,15 +66,15 @@ class ReceptionVersementsPage extends StatelessWidget {
             }
 
             if (snapshot.hasError) {
-              return Center(child: Text('Erreur: ${snapshot.error}'));
+              return Center(
+                child: Text(l10n.errorPrefixed('${snapshot.error}')),
+              );
             }
 
             final transfers = snapshot.data ?? [];
 
             if (transfers.isEmpty) {
-              return const Center(
-                child: Text('Aucun versement en attente de réception.'),
-              );
+              return Center(child: Text(l10n.noHandoverAwaitingReception));
             }
 
             return ListView.separated(
@@ -86,10 +102,14 @@ class ReceptionVersementsPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Montant : ${transfer.amount.toStringAsFixed(0)} FCFA',
+                          l10n.amountLine(transfer.amount.toStringAsFixed(0)),
                         ),
                         const SizedBox(height: 6),
-                        Text('Statut : ${transfer.status}'),
+                        Text(
+                          l10n.statusLine(
+                            _statusLabel(l10n, transfer.status),
+                          ),
+                        ),
                         const SizedBox(height: 12),
                         Align(
                           alignment: Alignment.centerRight,
@@ -110,13 +130,11 @@ class ReceptionVersementsPage extends StatelessWidget {
 
                               if (success) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Réception confirmée.'),
+                                  SnackBar(
+                                    content: Text(l10n.receptionConfirmed),
                                   ),
                                 );
                               } else if (controller.hasError) {
-                                final l10n = AppLocalizations.of(context);
-
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
@@ -127,7 +145,7 @@ class ReceptionVersementsPage extends StatelessWidget {
                               }
                             },
                             icon: const Icon(Icons.check_circle_outline),
-                            label: const Text('Confirmer réception'),
+                            label: Text(l10n.actionConfirmReception),
                           ),
                         ),
                       ],

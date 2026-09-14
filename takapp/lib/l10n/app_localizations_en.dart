@@ -2546,4 +2546,183 @@ class AppLocalizationsEn extends AppLocalizations {
   String ingredientsCount(int count) {
     return '$count ingredient(s)';
   }
+
+  @override
+  String get errAccessDenied => 'Access denied.';
+
+  @override
+  String get accountingTitle => 'Accounting';
+
+  @override
+  String get accountantWorkspaceSubtitle =>
+      'Reception, control, expenses, balances and reports';
+
+  @override
+  String get moduleReceptionsTitle => 'Receptions & Controls';
+
+  @override
+  String get moduleReceptionsSubtitle =>
+      'Waiter and manager handovers, and untransferred invoices';
+
+  @override
+  String get actionReceiveHandovers => 'Handover reception';
+
+  @override
+  String get actionReceiveHandoversSubtitle => 'Check the waiters\' handovers';
+
+  @override
+  String get actionManagerReception => 'Manager reception';
+
+  @override
+  String get actionManagerReceptionSubtitle =>
+      'Receive the handovers sent by the manager';
+
+  @override
+  String get actionTrackUntransferred => 'Untransferred tracking';
+
+  @override
+  String get actionTrackUntransferredSubtitle =>
+      'Track invoices not yet transferred';
+
+  @override
+  String get moduleExpensesBalancesTitle => 'Expenses & Balances';
+
+  @override
+  String get moduleExpensesBalancesSubtitle =>
+      'Current expenses and previous balances';
+
+  @override
+  String get expensesTitle => 'Expenses';
+
+  @override
+  String get actionExpensesSubtitle => 'Record and review expenses';
+
+  @override
+  String get previousBalancesTitle => 'Previous balances';
+
+  @override
+  String get actionPreviousBalancesSubtitle =>
+      'Manage opening or earlier balances';
+
+  @override
+  String get moduleReportsTitle => 'Reports & Summaries';
+
+  @override
+  String get moduleReportsSubtitle => 'Weekly summary and accounting tracking';
+
+  @override
+  String get weeklyReportTitle => 'Weekly summary';
+
+  @override
+  String get actionWeeklyReportSubtitle =>
+      'Produce the weekly accounting summary';
+
+  @override
+  String get expenseSaved => 'Expense recorded.';
+
+  @override
+  String get newExpenseTitle => 'New expense';
+
+  @override
+  String get labelDesignation => 'Label';
+
+  @override
+  String get labelAccountType => 'Account type';
+
+  @override
+  String get expenseHistoryTitle => 'Expense history';
+
+  @override
+  String get noExpenseRecorded => 'No expense recorded.';
+
+  @override
+  String enteredByLine(String name) {
+    return 'Entered by: $name';
+  }
+
+  @override
+  String get previousBalanceSaved => 'Previous balance recorded.';
+
+  @override
+  String get newPreviousBalanceTitle => 'New previous balance';
+
+  @override
+  String get balanceHistoryTitle => 'Balance history';
+
+  @override
+  String get noPreviousBalance => 'No previous balance.';
+
+  @override
+  String get untransferredFullTitle =>
+      'Untransferred invoices / collections tracking';
+
+  @override
+  String get noUntransferredInvoice => 'No untransferred invoice.';
+
+  @override
+  String transferStatusLine(String status) {
+    return 'Transfer status: $status';
+  }
+
+  @override
+  String get statusNotDeclared => 'not declared';
+
+  @override
+  String get untransferredServerCollections =>
+      'Untransferred waiter collections';
+
+  @override
+  String get noUntransferredServerCollection =>
+      'No untransferred waiter collection.';
+
+  @override
+  String errWeeklySummaryLoadFailed(String error) {
+    return 'Error loading the weekly summary: $error';
+  }
+
+  @override
+  String errPrintFailed(String error) {
+    return 'Printing error: $error';
+  }
+
+  @override
+  String get handoversReceived => 'Handovers received';
+
+  @override
+  String get labelOutflows => 'Outflows';
+
+  @override
+  String get theoreticalBalance => 'Theoretical balance';
+
+  @override
+  String get noHandoverAwaitingReception => 'No handover awaiting reception.';
+
+  @override
+  String get receptionConfirmed => 'Reception confirmed.';
+
+  @override
+  String get actionConfirmReception => 'Confirm reception';
+
+  @override
+  String get receptionValidatedQuitusPrinted =>
+      'Reception validated and receipt printed.';
+
+  @override
+  String get managerHandoverReceptionTitle => 'Manager handover reception';
+
+  @override
+  String get pendingHandoversTitle => 'Pending handovers';
+
+  @override
+  String serversRoomsCounts(int servers, int rooms) {
+    return 'Waiters: $servers • Rooms: $rooms';
+  }
+
+  @override
+  String get noHandoverReceived => 'No handover received.';
+
+  @override
+  String receivedByLine(String name) {
+    return 'Received by: $name';
+  }
 }

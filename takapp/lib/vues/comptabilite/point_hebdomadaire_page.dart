@@ -6,6 +6,8 @@ import 'package:provider/provider.dart';
 
 import 'package:takapp/controllers/auth_controller.dart';
 
+import 'package:takapp/l10n/app_localizations.dart';
+
 import 'package:takapp/services/comptabilite_service.dart';
 import 'package:takapp/services/pdf_service.dart';
 import 'package:takapp/services/printer_service.dart';
@@ -63,6 +65,8 @@ class _PointHebdomadairePageState extends State<PointHebdomadairePage> {
   /// =========================
 
   Future<void> _loadSummary() async {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.trim().isEmpty) {
       return;
     }
@@ -100,7 +104,7 @@ class _PointHebdomadairePageState extends State<PointHebdomadairePage> {
       }
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur chargement point hebdo : $e')),
+        SnackBar(content: Text(l10n.errWeeklySummaryLoadFailed('$e'))),
       );
     } finally {
       if (mounted) {
@@ -164,6 +168,8 @@ class _PointHebdomadairePageState extends State<PointHebdomadairePage> {
   /// =========================
 
   Future<void> _printReport() async {
+    final l10n = AppLocalizations.of(context);
+
     if (_summary == null) {
       return;
     }
@@ -206,12 +212,14 @@ class _PointHebdomadairePageState extends State<PointHebdomadairePage> {
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Erreur impression : $e')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errPrintFailed('$e'))));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     final formatter = DateFormat('dd/MM/yyyy');
 
     final entries = ((_summary?['entries'] ?? 0) as num).toDouble();
@@ -228,8 +236,8 @@ class _PointHebdomadairePageState extends State<PointHebdomadairePage> {
     final isMobile = width < 700;
 
     if (establishmentId.trim().isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -237,8 +245,8 @@ class _PointHebdomadairePageState extends State<PointHebdomadairePage> {
       appBar: AppBar(
         title: Text(
           establishmentName.trim().isNotEmpty
-              ? '$establishmentName - Point hebdomadaire'
-              : 'Point hebdomadaire',
+              ? '$establishmentName - ${l10n.weeklyReportTitle}'
+              : l10n.weeklyReportTitle,
         ),
 
         actions: [
@@ -273,7 +281,7 @@ class _PointHebdomadairePageState extends State<PointHebdomadairePage> {
                               onPressed: _pickStartDate,
 
                               child: Text(
-                                'Début : ${formatter.format(startDate)}',
+                                l10n.startLine(formatter.format(startDate)),
                               ),
                             ),
                           ),
@@ -286,7 +294,9 @@ class _PointHebdomadairePageState extends State<PointHebdomadairePage> {
                             child: OutlinedButton(
                               onPressed: _pickEndDate,
 
-                              child: Text('Fin : ${formatter.format(endDate)}'),
+                              child: Text(
+                                l10n.endLine(formatter.format(endDate)),
+                              ),
                             ),
                           ),
                         ],
@@ -298,7 +308,7 @@ class _PointHebdomadairePageState extends State<PointHebdomadairePage> {
                               onPressed: _pickStartDate,
 
                               child: Text(
-                                'Début : ${formatter.format(startDate)}',
+                                l10n.startLine(formatter.format(startDate)),
                               ),
                             ),
                           ),
@@ -309,7 +319,9 @@ class _PointHebdomadairePageState extends State<PointHebdomadairePage> {
                             child: OutlinedButton(
                               onPressed: _pickEndDate,
 
-                              child: Text('Fin : ${formatter.format(endDate)}'),
+                              child: Text(
+                                l10n.endLine(formatter.format(endDate)),
+                              ),
                             ),
                           ),
                         ],
@@ -326,7 +338,7 @@ class _PointHebdomadairePageState extends State<PointHebdomadairePage> {
                 child: ListView(
                   children: [
                     _SummaryCard(
-                      title: 'Versements reçus',
+                      title: l10n.handoversReceived,
 
                       amount: entries,
 
@@ -338,7 +350,7 @@ class _PointHebdomadairePageState extends State<PointHebdomadairePage> {
                     const SizedBox(height: 12),
 
                     _SummaryCard(
-                      title: 'Soldes précédents',
+                      title: l10n.previousBalancesTitle,
 
                       amount: openingBalances,
 
@@ -350,7 +362,7 @@ class _PointHebdomadairePageState extends State<PointHebdomadairePage> {
                     const SizedBox(height: 12),
 
                     _SummaryCard(
-                      title: 'Sorties',
+                      title: l10n.labelOutflows,
 
                       amount: expenses,
 
@@ -362,7 +374,7 @@ class _PointHebdomadairePageState extends State<PointHebdomadairePage> {
                     const SizedBox(height: 12),
 
                     _SummaryCard(
-                      title: 'Solde théorique',
+                      title: l10n.theoreticalBalance,
 
                       amount: balance,
 
