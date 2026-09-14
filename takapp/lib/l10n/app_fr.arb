@@ -2819,5 +2819,62 @@
     }
   },
   "homonymsExistHint": "Les homonymes existent : vous pouvez créer quand même.",
-  "actionCreateAnyway": "Créer quand même"
+  "actionCreateAnyway": "Créer quand même",
+
+  "errSelectItemAtLine": "Sélectionne l’article à la ligne {line}.",
+  "@errSelectItemAtLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "errItemNotFoundOrDeletedAtLine": "Article introuvable ou supprimé à la ligne {line}.",
+  "@errItemNotFoundOrDeletedAtLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "errAddAtLeastOneStockOut": "Ajoute au moins une sortie de stock.",
+  "stockOutSavedSuccess": "Sortie de stock enregistrée avec succès.",
+  "noStockAvailableInStore": "Aucun stock disponible dans ce magasin.",
+  "declareConsumptionTitle": "Déclarer une consommation",
+  "declareConsumptionHint": "Cette action diminue automatiquement le stock du magasin.",
+  "labelItemInStock": "Article en stock",
+  "actionSaveStockOut": "Enregistrer la sortie",
+  "errAddAtLeastOneItemToRequest": "Ajoute au moins un article à demander.",
+  "supplyRequestSentSuccess": "Demande d’approvisionnement envoyée avec succès.",
+  "noItemInRegistry": "Aucun article disponible dans le référentiel.",
+  "selectItemsAndQuantitiesHint": "Sélectionne les articles et les quantités à demander à la gérante.",
+  "hintRequestNote": "Ex: besoin urgent pour le service du soir",
+  "labelQuantityRequested": "Quantité demandée",
+  "actionSendRequest": "Envoyer la demande",
+  "noDeliveredRequestAwaitingReception": "Aucune demande livrée en attente de réception.",
+  "requestedOnLine": "Demandé le : {date}",
+  "@requestedOnLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "deliveredOnLine": "Livré le : {date}",
+  "@deliveredOnLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "receptionConfirmedSuccess": "Réception confirmée avec succès.",
+  "actionConfirmTheReception": "Confirmer la réception",
+
+  "newRequestTitle": "Nouvelle demande",
+  "labelNoteComment": "Note / commentaire",
+
+  "noLowStockDetected": "Aucun stock faible détecté.",
+  "thresholdUpdated": "Seuil mis à jour.",
+  "actionUpdateThreshold": "Mettre à jour le seuil"
 }

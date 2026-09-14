@@ -34,6 +34,7 @@ class StoreRequestHistoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final service = StockRequestService();
     final controller = context.watch<StockRequestController>();
     final auth = context.watch<AuthController>();
@@ -60,8 +61,8 @@ class StoreRequestHistoryPage extends StatelessWidget {
           final requests = snapshot.data ?? [];
 
           if (requests.isEmpty) {
-            return const Center(
-              child: Text('Aucune demande livrée en attente de réception.'),
+            return Center(
+              child: Text(l10n.noDeliveredRequestAwaitingReception),
             );
           }
 
@@ -87,13 +88,25 @@ class StoreRequestHistoryPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 6),
-                      Text('Rôle : ${item.requestedByRole}'),
-                      Text('Magasin : ${item.store}'),
+                      Text(l10n.roleLine(item.requestedByRole)),
+                      Text(l10n.storeNameLine(item.store)),
                       Text(
-                        'Demandé le : ${item.createdAt == null ? "-" : DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt!)}',
+                        l10n.requestedOnLine(
+                          item.createdAt == null
+                              ? '-'
+                              : DateFormat(
+                                  'dd/MM/yyyy HH:mm',
+                                ).format(item.createdAt!),
+                        ),
                       ),
                       Text(
-                        'Livré le : ${item.deliveredAt == null ? "-" : DateFormat('dd/MM/yyyy HH:mm').format(item.deliveredAt!)}',
+                        l10n.deliveredOnLine(
+                          item.deliveredAt == null
+                              ? '-'
+                              : DateFormat(
+                                  'dd/MM/yyyy HH:mm',
+                                ).format(item.deliveredAt!),
+                        ),
                       ),
                       if (item.note.trim().isNotEmpty)
                         Padding(
@@ -123,9 +136,9 @@ class StoreRequestHistoryPage extends StatelessWidget {
 
                                   if (success) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
+                                      SnackBar(
                                         content: Text(
-                                          'Réception confirmée avec succès.',
+                                          l10n.receptionConfirmedSuccess,
                                         ),
                                       ),
                                     );
@@ -154,7 +167,7 @@ class StoreRequestHistoryPage extends StatelessWidget {
                                   ),
                                 )
                               : const Icon(Icons.check_circle_outline),
-                          label: const Text('Confirmer la réception'),
+                          label: Text(l10n.actionConfirmTheReception),
                         ),
                       ),
                     ],

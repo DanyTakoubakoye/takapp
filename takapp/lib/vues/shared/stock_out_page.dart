@@ -54,6 +54,7 @@ class _StockOutPageState extends State<StockOutPage> {
   }
 
   Future<void> _submit(List<StoreStockModel> stocks) async {
+    final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthController>();
     final controller = context.read<StoreStockController>();
     final user = auth.currentUser;
@@ -78,7 +79,7 @@ class _StockOutPageState extends State<StockOutPage> {
 
       if (line.selectedStockId == null || line.selectedStockId!.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sélectionne l’article à la ligne ${i + 1}.')),
+          SnackBar(content: Text(l10n.errSelectItemAtLine(i + 1))),
         );
         return;
       }
@@ -89,11 +90,7 @@ class _StockOutPageState extends State<StockOutPage> {
 
       if (selectedMatches.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Article introuvable ou supprimé à la ligne ${i + 1}.',
-            ),
-          ),
+          SnackBar(content: Text(l10n.errItemNotFoundOrDeletedAtLine(i + 1))),
         );
         return;
       }
@@ -102,7 +99,7 @@ class _StockOutPageState extends State<StockOutPage> {
 
       if (quantity == null || quantity <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Quantité invalide à la ligne ${i + 1}.')),
+          SnackBar(content: Text(l10n.invalidQuantityAtLine(i + 1))),
         );
         return;
       }
@@ -126,8 +123,6 @@ class _StockOutPageState extends State<StockOutPage> {
       if (!mounted) return;
 
       if (!success) {
-        final l10n = AppLocalizations.of(context);
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(controller.errorText(l10n) ?? l10n.errUnknown),
@@ -139,7 +134,7 @@ class _StockOutPageState extends State<StockOutPage> {
 
     if (!hasValidLine) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ajoute au moins une sortie de stock.')),
+        SnackBar(content: Text(l10n.errAddAtLeastOneStockOut)),
       );
       return;
     }
@@ -148,7 +143,7 @@ class _StockOutPageState extends State<StockOutPage> {
 
     Navigator.pop(context);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Sortie de stock enregistrée avec succès.')),
+      SnackBar(content: Text(l10n.stockOutSavedSuccess)),
     );
   }
 
@@ -163,6 +158,7 @@ class _StockOutPageState extends State<StockOutPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final stockController = context.watch<StoreStockController>();
     final color = _storeColor();
     final isSmall = MediaQuery.of(context).size.width < 800;
@@ -183,9 +179,7 @@ class _StockOutPageState extends State<StockOutPage> {
           final stocks = snapshot.data ?? [];
 
           if (stocks.isEmpty) {
-            return const Center(
-              child: Text('Aucun stock disponible dans ce magasin.'),
-            );
+            return Center(child: Text(l10n.noStockAvailableInStore));
           }
 
           for (final line in _lines) {
@@ -207,12 +201,12 @@ class _StockOutPageState extends State<StockOutPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Déclarer une consommation',
+                          l10n.declareConsumptionTitle,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Cette action diminue automatiquement le stock du magasin.',
+                          l10n.declareConsumptionHint,
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         const SizedBox(height: 16),
@@ -259,8 +253,8 @@ class _StockOutPageState extends State<StockOutPage> {
                           const SizedBox(height: 8),
                           DropdownButtonFormField<String>(
                             initialValue: line.selectedStockId,
-                            decoration: const InputDecoration(
-                              labelText: 'Article en stock',
+                            decoration: InputDecoration(
+                              labelText: l10n.labelItemInStock,
                             ),
                             items: stocks.map((item) {
                               final label =
@@ -283,8 +277,8 @@ class _StockOutPageState extends State<StockOutPage> {
                             keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
                             ),
-                            decoration: const InputDecoration(
-                              labelText: 'Quantité utilisée',
+                            decoration: InputDecoration(
+                              labelText: l10n.labelQuantityUsed,
                             ),
                           ),
                         ],
@@ -302,7 +296,7 @@ class _StockOutPageState extends State<StockOutPage> {
                       });
                     },
                     icon: const Icon(Icons.add),
-                    label: const Text('Ajouter un article'),
+                    label: Text(l10n.actionAddItem),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -326,7 +320,7 @@ class _StockOutPageState extends State<StockOutPage> {
                             ),
                           )
                         : const Icon(Icons.remove_shopping_cart),
-                    label: const Text('Enregistrer la sortie'),
+                    label: Text(l10n.actionSaveStockOut),
                   ),
                 ),
               ],

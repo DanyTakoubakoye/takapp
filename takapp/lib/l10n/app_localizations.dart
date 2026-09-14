@@ -7294,6 +7294,162 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Créer quand même'**
   String get actionCreateAnyway;
+
+  /// No description provided for @errSelectItemAtLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionne l’article à la ligne {line}.'**
+  String errSelectItemAtLine(int line);
+
+  /// No description provided for @errItemNotFoundOrDeletedAtLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Article introuvable ou supprimé à la ligne {line}.'**
+  String errItemNotFoundOrDeletedAtLine(int line);
+
+  /// No description provided for @errAddAtLeastOneStockOut.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoute au moins une sortie de stock.'**
+  String get errAddAtLeastOneStockOut;
+
+  /// No description provided for @stockOutSavedSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sortie de stock enregistrée avec succès.'**
+  String get stockOutSavedSuccess;
+
+  /// No description provided for @noStockAvailableInStore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun stock disponible dans ce magasin.'**
+  String get noStockAvailableInStore;
+
+  /// No description provided for @declareConsumptionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déclarer une consommation'**
+  String get declareConsumptionTitle;
+
+  /// No description provided for @declareConsumptionHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette action diminue automatiquement le stock du magasin.'**
+  String get declareConsumptionHint;
+
+  /// No description provided for @labelItemInStock.
+  ///
+  /// In fr, this message translates to:
+  /// **'Article en stock'**
+  String get labelItemInStock;
+
+  /// No description provided for @actionSaveStockOut.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer la sortie'**
+  String get actionSaveStockOut;
+
+  /// No description provided for @errAddAtLeastOneItemToRequest.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoute au moins un article à demander.'**
+  String get errAddAtLeastOneItemToRequest;
+
+  /// No description provided for @supplyRequestSentSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demande d’approvisionnement envoyée avec succès.'**
+  String get supplyRequestSentSuccess;
+
+  /// No description provided for @noItemInRegistry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun article disponible dans le référentiel.'**
+  String get noItemInRegistry;
+
+  /// No description provided for @selectItemsAndQuantitiesHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionne les articles et les quantités à demander à la gérante.'**
+  String get selectItemsAndQuantitiesHint;
+
+  /// No description provided for @hintRequestNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex: besoin urgent pour le service du soir'**
+  String get hintRequestNote;
+
+  /// No description provided for @labelQuantityRequested.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quantité demandée'**
+  String get labelQuantityRequested;
+
+  /// No description provided for @actionSendRequest.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoyer la demande'**
+  String get actionSendRequest;
+
+  /// No description provided for @noDeliveredRequestAwaitingReception.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune demande livrée en attente de réception.'**
+  String get noDeliveredRequestAwaitingReception;
+
+  /// No description provided for @requestedOnLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demandé le : {date}'**
+  String requestedOnLine(String date);
+
+  /// No description provided for @deliveredOnLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Livré le : {date}'**
+  String deliveredOnLine(String date);
+
+  /// No description provided for @receptionConfirmedSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réception confirmée avec succès.'**
+  String get receptionConfirmedSuccess;
+
+  /// No description provided for @actionConfirmTheReception.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer la réception'**
+  String get actionConfirmTheReception;
+
+  /// No description provided for @newRequestTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle demande'**
+  String get newRequestTitle;
+
+  /// No description provided for @labelNoteComment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Note / commentaire'**
+  String get labelNoteComment;
+
+  /// No description provided for @noLowStockDetected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun stock faible détecté.'**
+  String get noLowStockDetected;
+
+  /// No description provided for @thresholdUpdated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Seuil mis à jour.'**
+  String get thresholdUpdated;
+
+  /// No description provided for @actionUpdateThreshold.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mettre à jour le seuil'**
+  String get actionUpdateThreshold;
 }
 
 class _AppLocalizationsDelegate

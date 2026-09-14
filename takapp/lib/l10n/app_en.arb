@@ -2813,5 +2813,62 @@
     }
   },
   "homonymsExistHint": "Namesakes do happen: you can still create it.",
-  "actionCreateAnyway": "Create anyway"
+  "actionCreateAnyway": "Create anyway",
+
+  "errSelectItemAtLine": "Select the item on line {line}.",
+  "@errSelectItemAtLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "errItemNotFoundOrDeletedAtLine": "Item not found or deleted on line {line}.",
+  "@errItemNotFoundOrDeletedAtLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "errAddAtLeastOneStockOut": "Add at least one stock out.",
+  "stockOutSavedSuccess": "Stock out saved successfully.",
+  "noStockAvailableInStore": "No stock available in this store.",
+  "declareConsumptionTitle": "Declare a consumption",
+  "declareConsumptionHint": "This action automatically decreases the store stock.",
+  "labelItemInStock": "Item in stock",
+  "actionSaveStockOut": "Save the stock out",
+  "errAddAtLeastOneItemToRequest": "Add at least one item to request.",
+  "supplyRequestSentSuccess": "Supply request sent successfully.",
+  "noItemInRegistry": "No item available in the registry.",
+  "selectItemsAndQuantitiesHint": "Select the items and quantities to request from the manager.",
+  "hintRequestNote": "E.g. urgently needed for the evening service",
+  "labelQuantityRequested": "Quantity requested",
+  "actionSendRequest": "Send the request",
+  "noDeliveredRequestAwaitingReception": "No delivered request awaiting reception.",
+  "requestedOnLine": "Requested on: {date}",
+  "@requestedOnLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "deliveredOnLine": "Delivered on: {date}",
+  "@deliveredOnLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "receptionConfirmedSuccess": "Reception confirmed successfully.",
+  "actionConfirmTheReception": "Confirm the reception",
+
+  "newRequestTitle": "New request",
+  "labelNoteComment": "Note / comment",
+
+  "noLowStockDetected": "No low stock detected.",
+  "thresholdUpdated": "Threshold updated.",
+  "actionUpdateThreshold": "Update the threshold"
 }

@@ -33,6 +33,7 @@ class LowStockPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final service = StoreStockService();
     final controller = context.watch<StoreStockController>();
     final isSmall = MediaQuery.of(context).size.width < 800;
@@ -57,13 +58,13 @@ class LowStockPage extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Erreur : ${snapshot.error}'));
+            return Center(child: Text(l10n.commonError('${snapshot.error}')));
           }
 
           final items = snapshot.data ?? [];
 
           if (items.isEmpty) {
-            return const Center(child: Text('Aucun stock faible détecté.'));
+            return Center(child: Text(l10n.noLowStockDetected));
           }
 
           return ListView.separated(
@@ -173,8 +174,8 @@ class LowStockPage extends StatelessWidget {
                                         ScaffoldMessenger.of(
                                           context,
                                         ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Seuil mis à jour.'),
+                                          SnackBar(
+                                            content: Text(l10n.thresholdUpdated),
                                           ),
                                         );
                                       } else {
@@ -206,7 +207,7 @@ class LowStockPage extends StatelessWidget {
                                       ),
                                     )
                                   : const Icon(Icons.edit_outlined),
-                              label: const Text('Mettre à jour le seuil'),
+                              label: Text(l10n.actionUpdateThreshold),
                             ),
                           ],
                         ),

@@ -4139,4 +4139,94 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get actionCreateAnyway => 'Create anyway';
+
+  @override
+  String errSelectItemAtLine(int line) {
+    return 'Select the item on line $line.';
+  }
+
+  @override
+  String errItemNotFoundOrDeletedAtLine(int line) {
+    return 'Item not found or deleted on line $line.';
+  }
+
+  @override
+  String get errAddAtLeastOneStockOut => 'Add at least one stock out.';
+
+  @override
+  String get stockOutSavedSuccess => 'Stock out saved successfully.';
+
+  @override
+  String get noStockAvailableInStore => 'No stock available in this store.';
+
+  @override
+  String get declareConsumptionTitle => 'Declare a consumption';
+
+  @override
+  String get declareConsumptionHint =>
+      'This action automatically decreases the store stock.';
+
+  @override
+  String get labelItemInStock => 'Item in stock';
+
+  @override
+  String get actionSaveStockOut => 'Save the stock out';
+
+  @override
+  String get errAddAtLeastOneItemToRequest =>
+      'Add at least one item to request.';
+
+  @override
+  String get supplyRequestSentSuccess => 'Supply request sent successfully.';
+
+  @override
+  String get noItemInRegistry => 'No item available in the registry.';
+
+  @override
+  String get selectItemsAndQuantitiesHint =>
+      'Select the items and quantities to request from the manager.';
+
+  @override
+  String get hintRequestNote => 'E.g. urgently needed for the evening service';
+
+  @override
+  String get labelQuantityRequested => 'Quantity requested';
+
+  @override
+  String get actionSendRequest => 'Send the request';
+
+  @override
+  String get noDeliveredRequestAwaitingReception =>
+      'No delivered request awaiting reception.';
+
+  @override
+  String requestedOnLine(String date) {
+    return 'Requested on: $date';
+  }
+
+  @override
+  String deliveredOnLine(String date) {
+    return 'Delivered on: $date';
+  }
+
+  @override
+  String get receptionConfirmedSuccess => 'Reception confirmed successfully.';
+
+  @override
+  String get actionConfirmTheReception => 'Confirm the reception';
+
+  @override
+  String get newRequestTitle => 'New request';
+
+  @override
+  String get labelNoteComment => 'Note / comment';
+
+  @override
+  String get noLowStockDetected => 'No low stock detected.';
+
+  @override
+  String get thresholdUpdated => 'Threshold updated.';
+
+  @override
+  String get actionUpdateThreshold => 'Update the threshold';
 }

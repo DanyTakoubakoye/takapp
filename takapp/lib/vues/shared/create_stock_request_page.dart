@@ -45,6 +45,7 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
   }
 
   Future<void> _submit(List<StockItemModel> items) async {
+    final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthController>();
     final controller = context.read<StockRequestController>();
     final user = auth.currentUser;
@@ -69,7 +70,7 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
 
       if (line.selectedItemId == null || line.selectedItemId!.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sélectionne l’article à la ligne ${i + 1}.')),
+          SnackBar(content: Text(l10n.errSelectItemAtLine(i + 1))),
         );
         return;
       }
@@ -80,11 +81,7 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
 
       if (selectedMatches.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Article introuvable ou supprimé à la ligne ${i + 1}.',
-            ),
-          ),
+          SnackBar(content: Text(l10n.errItemNotFoundOrDeletedAtLine(i + 1))),
         );
         return;
       }
@@ -93,7 +90,7 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
 
       if (quantity == null || quantity <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Quantité invalide à la ligne ${i + 1}.')),
+          SnackBar(content: Text(l10n.invalidQuantityAtLine(i + 1))),
         );
         return;
       }
@@ -116,7 +113,7 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
 
     if (requestItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ajoute au moins un article à demander.')),
+        SnackBar(content: Text(l10n.errAddAtLeastOneItemToRequest)),
       );
       return;
     }
@@ -136,13 +133,9 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
     if (success) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Demande d’approvisionnement envoyée avec succès.'),
-        ),
+        SnackBar(content: Text(l10n.supplyRequestSentSuccess)),
       );
     } else {
-      final l10n = AppLocalizations.of(context);
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(controller.errorText(l10n) ?? l10n.errUnknown),
@@ -170,6 +163,7 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final requestController = context.watch<StockRequestController>();
     final color = _storeColor();
     final isSmall = MediaQuery.of(context).size.width < 800;
@@ -190,9 +184,7 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
           final items = snapshot.data ?? [];
 
           if (items.isEmpty) {
-            return const Center(
-              child: Text('Aucun article disponible dans le référentiel.'),
-            );
+            return Center(child: Text(l10n.noItemInRegistry));
           }
 
           for (final line in _lines) {
@@ -214,22 +206,21 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Nouvelle demande',
+                          l10n.newRequestTitle,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Sélectionne les articles et les quantités à demander à la gérante.',
+                          l10n.selectItemsAndQuantitiesHint,
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         const SizedBox(height: 16),
                         TextField(
                           controller: _noteController,
                           maxLines: 3,
-                          decoration: const InputDecoration(
-                            labelText: 'Note / commentaire',
-                            hintText:
-                                'Ex: besoin urgent pour le service du soir',
+                          decoration: InputDecoration(
+                            labelText: l10n.labelNoteComment,
+                            hintText: l10n.hintRequestNote,
                           ),
                         ),
                       ],
@@ -271,8 +262,8 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
                           const SizedBox(height: 8),
                           DropdownButtonFormField<String>(
                             initialValue: line.selectedItemId,
-                            decoration: const InputDecoration(
-                              labelText: 'Article',
+                            decoration: InputDecoration(
+                              labelText: l10n.labelItem,
                             ),
                             items: items.map((item) {
                               return DropdownMenuItem<String>(
@@ -292,8 +283,8 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
                             keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
                             ),
-                            decoration: const InputDecoration(
-                              labelText: 'Quantité demandée',
+                            decoration: InputDecoration(
+                              labelText: l10n.labelQuantityRequested,
                             ),
                           ),
                         ],
@@ -311,7 +302,7 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
                       });
                     },
                     icon: const Icon(Icons.add),
-                    label: const Text('Ajouter un article'),
+                    label: Text(l10n.actionAddItem),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -335,7 +326,7 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
                             ),
                           )
                         : const Icon(Icons.send),
-                    label: const Text('Envoyer la demande'),
+                    label: Text(l10n.actionSendRequest),
                   ),
                 ),
               ],

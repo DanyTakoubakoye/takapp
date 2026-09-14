@@ -4180,4 +4180,97 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get actionCreateAnyway => 'Créer quand même';
+
+  @override
+  String errSelectItemAtLine(int line) {
+    return 'Sélectionne l’article à la ligne $line.';
+  }
+
+  @override
+  String errItemNotFoundOrDeletedAtLine(int line) {
+    return 'Article introuvable ou supprimé à la ligne $line.';
+  }
+
+  @override
+  String get errAddAtLeastOneStockOut => 'Ajoute au moins une sortie de stock.';
+
+  @override
+  String get stockOutSavedSuccess => 'Sortie de stock enregistrée avec succès.';
+
+  @override
+  String get noStockAvailableInStore =>
+      'Aucun stock disponible dans ce magasin.';
+
+  @override
+  String get declareConsumptionTitle => 'Déclarer une consommation';
+
+  @override
+  String get declareConsumptionHint =>
+      'Cette action diminue automatiquement le stock du magasin.';
+
+  @override
+  String get labelItemInStock => 'Article en stock';
+
+  @override
+  String get actionSaveStockOut => 'Enregistrer la sortie';
+
+  @override
+  String get errAddAtLeastOneItemToRequest =>
+      'Ajoute au moins un article à demander.';
+
+  @override
+  String get supplyRequestSentSuccess =>
+      'Demande d’approvisionnement envoyée avec succès.';
+
+  @override
+  String get noItemInRegistry =>
+      'Aucun article disponible dans le référentiel.';
+
+  @override
+  String get selectItemsAndQuantitiesHint =>
+      'Sélectionne les articles et les quantités à demander à la gérante.';
+
+  @override
+  String get hintRequestNote => 'Ex: besoin urgent pour le service du soir';
+
+  @override
+  String get labelQuantityRequested => 'Quantité demandée';
+
+  @override
+  String get actionSendRequest => 'Envoyer la demande';
+
+  @override
+  String get noDeliveredRequestAwaitingReception =>
+      'Aucune demande livrée en attente de réception.';
+
+  @override
+  String requestedOnLine(String date) {
+    return 'Demandé le : $date';
+  }
+
+  @override
+  String deliveredOnLine(String date) {
+    return 'Livré le : $date';
+  }
+
+  @override
+  String get receptionConfirmedSuccess => 'Réception confirmée avec succès.';
+
+  @override
+  String get actionConfirmTheReception => 'Confirmer la réception';
+
+  @override
+  String get newRequestTitle => 'Nouvelle demande';
+
+  @override
+  String get labelNoteComment => 'Note / commentaire';
+
+  @override
+  String get noLowStockDetected => 'Aucun stock faible détecté.';
+
+  @override
+  String get thresholdUpdated => 'Seuil mis à jour.';
+
+  @override
+  String get actionUpdateThreshold => 'Mettre à jour le seuil';
 }
