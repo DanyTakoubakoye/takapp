@@ -2933,5 +2933,29 @@
   "actionChangePhoto": "Changer la photo",
   "actionAddPhoto": "Ajouter une photo",
 
-  "noPhoto": "Aucune photo"
+  "noPhoto": "Aucune photo",
+
+  "periodLast7Days": "7 jours",
+  "periodLast30Days": "30 jours",
+  "hintPhysicalAmount": "Montant physique",
+  "hintTotalPhysicalBalance": "Solde physique total",
+  "labelFullNameRequired": "Nom complet *",
+  "labelEmailRequired": "Email *",
+  "labelTemporaryPasswordRequired": "Mot de passe temporaire *",
+  "labelNewMinimumThreshold": "Nouveau seuil minimum",
+  "directSupplyTitle": "Approvisionnement direct",
+  "errInvalidThreshold": "Seuil invalide.",
+  "actionClear": "Effacer",
+
+  "currentStockLine": "Stock actuel : {quantity} {unit}",
+  "@currentStockLine": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  }
 }

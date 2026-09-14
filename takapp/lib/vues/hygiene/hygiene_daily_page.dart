@@ -425,7 +425,7 @@ class _CleaningFormSheetState extends State<_CleaningFormSheet> {
             if (snapshot.hasError) {
               return Padding(
                 padding: const EdgeInsets.all(24),
-                child: SelectableText('Erreur : ${snapshot.error}'),
+                child: SelectableText(l10n.commonError('${snapshot.error}')),
               );
             }
 

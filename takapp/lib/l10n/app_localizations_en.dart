@@ -4320,4 +4320,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noPhoto => 'No photo';
+
+  @override
+  String get periodLast7Days => '7 days';
+
+  @override
+  String get periodLast30Days => '30 days';
+
+  @override
+  String get hintPhysicalAmount => 'Physical amount';
+
+  @override
+  String get hintTotalPhysicalBalance => 'Total physical balance';
+
+  @override
+  String get labelFullNameRequired => 'Full name *';
+
+  @override
+  String get labelEmailRequired => 'Email *';
+
+  @override
+  String get labelTemporaryPasswordRequired => 'Temporary password *';
+
+  @override
+  String get labelNewMinimumThreshold => 'New minimum threshold';
+
+  @override
+  String get directSupplyTitle => 'Direct supply';
+
+  @override
+  String get errInvalidThreshold => 'Invalid threshold.';
+
+  @override
+  String get actionClear => 'Clear';
+
+  @override
+  String currentStockLine(String quantity, String unit) {
+    return 'Current stock: $quantity $unit';
+  }
 }

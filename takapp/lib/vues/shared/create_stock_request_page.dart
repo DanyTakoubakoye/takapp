@@ -53,7 +53,7 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
     if (user == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errUserNotFound)));
       return;
     }
 
@@ -178,7 +178,7 @@ class _CreateStockRequestPageState extends State<CreateStockRequestPage> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Erreur : ${snapshot.error}'));
+            return Center(child: Text(l10n.commonError('${snapshot.error}')));
           }
 
           final items = snapshot.data ?? [];

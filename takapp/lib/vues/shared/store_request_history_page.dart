@@ -55,7 +55,7 @@ class StoreRequestHistoryPage extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Erreur : ${snapshot.error}'));
+            return Center(child: Text(l10n.commonError('${snapshot.error}')));
           }
 
           final requests = snapshot.data ?? [];
@@ -111,7 +111,7 @@ class StoreRequestHistoryPage extends StatelessWidget {
                       if (item.note.trim().isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 4),
-                          child: Text('Note : ${item.note}'),
+                          child: Text(l10n.noteLine(item.note)),
                         ),
                       const SizedBox(height: 12),
                       SizedBox(

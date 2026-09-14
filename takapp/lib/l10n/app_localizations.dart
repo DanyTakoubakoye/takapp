@@ -7600,6 +7600,78 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Aucune photo'**
   String get noPhoto;
+
+  /// No description provided for @periodLast7Days.
+  ///
+  /// In fr, this message translates to:
+  /// **'7 jours'**
+  String get periodLast7Days;
+
+  /// No description provided for @periodLast30Days.
+  ///
+  /// In fr, this message translates to:
+  /// **'30 jours'**
+  String get periodLast30Days;
+
+  /// No description provided for @hintPhysicalAmount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant physique'**
+  String get hintPhysicalAmount;
+
+  /// No description provided for @hintTotalPhysicalBalance.
+  ///
+  /// In fr, this message translates to:
+  /// **'Solde physique total'**
+  String get hintTotalPhysicalBalance;
+
+  /// No description provided for @labelFullNameRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom complet *'**
+  String get labelFullNameRequired;
+
+  /// No description provided for @labelEmailRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Email *'**
+  String get labelEmailRequired;
+
+  /// No description provided for @labelTemporaryPasswordRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mot de passe temporaire *'**
+  String get labelTemporaryPasswordRequired;
+
+  /// No description provided for @labelNewMinimumThreshold.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveau seuil minimum'**
+  String get labelNewMinimumThreshold;
+
+  /// No description provided for @directSupplyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approvisionnement direct'**
+  String get directSupplyTitle;
+
+  /// No description provided for @errInvalidThreshold.
+  ///
+  /// In fr, this message translates to:
+  /// **'Seuil invalide.'**
+  String get errInvalidThreshold;
+
+  /// No description provided for @actionClear.
+  ///
+  /// In fr, this message translates to:
+  /// **'Effacer'**
+  String get actionClear;
+
+  /// No description provided for @currentStockLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stock actuel : {quantity} {unit}'**
+  String currentStockLine(String quantity, String unit);
 }
 
 class _AppLocalizationsDelegate

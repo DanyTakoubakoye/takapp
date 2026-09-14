@@ -314,9 +314,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     final user = auth.currentUser;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     establishmentId = user.establishmentId.trim();
@@ -364,7 +362,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
             ),
           if (auth.canAccessHotel)
             IconButton(
-              tooltip: 'Clients',
+              tooltip: l10n.tileClientsTitle,
               onPressed: () {
                 Navigator.push(
                   context,
@@ -483,15 +481,15 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                     children: [
                       ElevatedButton(
                         onPressed: () => setState(() => _applyPeriod('today')),
-                        child: const Text("Aujourd'hui"),
+                        child: Text(l10n.today),
                       ),
                       OutlinedButton(
                         onPressed: () => setState(() => _applyPeriod('7d')),
-                        child: const Text('7 jours'),
+                        child: Text(l10n.periodLast7Days),
                       ),
                       OutlinedButton(
                         onPressed: () => setState(() => _applyPeriod('30d')),
-                        child: const Text('30 jours'),
+                        child: Text(l10n.periodLast30Days),
                       ),
                       OutlinedButton.icon(
                         onPressed: _pickCustomPeriod,
@@ -543,17 +541,17 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                   ),
                   ElevatedButton(
                     onPressed: () => setState(() => _applyPeriod('today')),
-                    child: const Text("Aujourd'hui"),
+                    child: Text(l10n.today),
                   ),
                   const SizedBox(width: 8),
                   OutlinedButton(
                     onPressed: () => setState(() => _applyPeriod('7d')),
-                    child: const Text('7 jours'),
+                    child: Text(l10n.periodLast7Days),
                   ),
                   const SizedBox(width: 8),
                   OutlinedButton(
                     onPressed: () => setState(() => _applyPeriod('30d')),
-                    child: const Text('30 jours'),
+                    child: Text(l10n.periodLast30Days),
                   ),
                   const SizedBox(width: 8),
                   OutlinedButton.icon(
@@ -630,9 +628,9 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                     child: TextField(
                       controller: physicalControllers[entry.key],
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        hintText: 'Montant physique',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        hintText: l10n.hintPhysicalAmount,
+                        border: const OutlineInputBorder(),
                         isDense: true,
                       ),
                     ),
@@ -653,7 +651,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                           physical: physical,
                         );
                       },
-                      child: const Text('Valider'),
+                      child: Text(l10n.commonValidate),
                     ),
                   ),
                 ],
@@ -681,9 +679,9 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                   child: TextField(
                     controller: physicalControllers['__total__'],
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      hintText: 'Solde physique total',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      hintText: l10n.hintTotalPhysicalBalance,
+                      border: const OutlineInputBorder(),
                       isDense: true,
                     ),
                   ),
@@ -704,7 +702,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                         physical: physical,
                       );
                     },
-                    child: const Text('Valider'),
+                    child: Text(l10n.commonValidate),
                   ),
                 ),
               ],
@@ -749,9 +747,9 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                 TextField(
                   controller: physicalControllers[entry.key],
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Solde physique',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.physicalBalance,
+                    border: const OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -771,7 +769,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                         physical: physical,
                       );
                     },
-                    child: const Text('Valider'),
+                    child: Text(l10n.commonValidate),
                   ),
                 ),
               ],
@@ -803,9 +801,9 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
               TextField(
                 controller: physicalControllers['__total__'],
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Solde physique total',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.hintTotalPhysicalBalance,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 10),
@@ -825,7 +823,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                       physical: physical,
                     );
                   },
-                  child: const Text('Valider'),
+                  child: Text(l10n.commonValidate),
                 ),
               ),
             ],
@@ -929,13 +927,15 @@ class _CreateTenantUserDialogState extends State<_CreateTenantUserDialog> {
             children: [
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: 'Nom complet *'),
+                decoration: InputDecoration(
+                  labelText: l10n.labelFullNameRequired,
+                ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(labelText: 'Email *'),
+                decoration: InputDecoration(labelText: l10n.labelEmailRequired),
               ),
               const SizedBox(height: 12),
               TextField(
@@ -947,8 +947,8 @@ class _CreateTenantUserDialogState extends State<_CreateTenantUserDialog> {
               TextField(
                 controller: passwordController,
                 obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Mot de passe temporaire *',
+                decoration: InputDecoration(
+                  labelText: l10n.labelTemporaryPasswordRequired,
                 ),
               ),
               const SizedBox(height: 12),

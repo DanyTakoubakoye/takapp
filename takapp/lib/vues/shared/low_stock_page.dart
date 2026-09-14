@@ -94,9 +94,14 @@ class LowStockPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 6),
-                      Text('Magasin : ${item.store}'),
+                      Text(l10n.storeNameLine(item.store)),
                       Text(
-                        'Stock actuel : ${item.quantity.toStringAsFixed(item.quantity % 1 == 0 ? 0 : 2)} ${item.unit}',
+                        l10n.currentStockLine(
+                          item.quantity.toStringAsFixed(
+                            item.quantity % 1 == 0 ? 0 : 2,
+                          ),
+                          item.unit,
+                        ),
                       ),
                       Text(
                         'Seuil minimum : ${item.minimumQuantity.toStringAsFixed(item.minimumQuantity % 1 == 0 ? 0 : 2)} ${item.unit}',
@@ -107,8 +112,8 @@ class LowStockPage extends StatelessWidget {
                         keyboardType: const TextInputType.numberWithOptions(
                           decimal: true,
                         ),
-                        decoration: const InputDecoration(
-                          labelText: 'Nouveau seuil minimum',
+                        decoration: InputDecoration(
+                          labelText: l10n.labelNewMinimumThreshold,
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -126,13 +131,13 @@ class LowStockPage extends StatelessWidget {
                                     builder: (context) => DirectStockSupplyPage(
                                       establishmentId: establishmentId,
                                       store: item.store,
-                                      title: 'Approvisionnement direct',
+                                      title: l10n.directSupplyTitle,
                                     ),
                                   ),
                                 );
                               },
                               icon: const Icon(Icons.add_shopping_cart),
-                              label: const Text('Approvisionner'),
+                              label: Text(l10n.actionSupply),
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: color,
                                 side: BorderSide(color: color),
@@ -154,8 +159,10 @@ class LowStockPage extends StatelessWidget {
                                         ScaffoldMessenger.of(
                                           context,
                                         ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text('Seuil invalide.'),
+                                          SnackBar(
+                                            content: Text(
+                                              l10n.errInvalidThreshold,
+                                            ),
                                           ),
                                         );
                                         return;

@@ -179,7 +179,7 @@ class _ClientsPageState extends State<ClientsPage> {
                 suffixIcon: _query.isEmpty
                     ? null
                     : IconButton(
-                        tooltip: 'Effacer',
+                        tooltip: l10n.actionClear,
                         icon: const Icon(Icons.close),
                         onPressed: () {
                           _searchController.clear();
@@ -201,7 +201,7 @@ class _ClientsPageState extends State<ClientsPage> {
 
                 if (snapshot.hasError) {
                   return Center(
-                    child: SelectableText('Erreur : ${snapshot.error}'),
+                    child: SelectableText(l10n.commonError('${snapshot.error}')),
                   );
                 }
 
@@ -536,7 +536,7 @@ class _ClientFormDialogState extends State<_ClientFormDialog> {
       actions: [
         TextButton(
           onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
-          child: const Text('Annuler'),
+          child: Text(l10n.commonCancel),
         ),
         ElevatedButton.icon(
           onPressed: _isSaving ? null : _save,
@@ -606,7 +606,7 @@ class _DuplicateWarningDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('Annuler'),
+          child: Text(l10n.commonCancel),
         ),
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(true),

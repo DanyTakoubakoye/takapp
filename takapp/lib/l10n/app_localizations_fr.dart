@@ -4366,4 +4366,42 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noPhoto => 'Aucune photo';
+
+  @override
+  String get periodLast7Days => '7 jours';
+
+  @override
+  String get periodLast30Days => '30 jours';
+
+  @override
+  String get hintPhysicalAmount => 'Montant physique';
+
+  @override
+  String get hintTotalPhysicalBalance => 'Solde physique total';
+
+  @override
+  String get labelFullNameRequired => 'Nom complet *';
+
+  @override
+  String get labelEmailRequired => 'Email *';
+
+  @override
+  String get labelTemporaryPasswordRequired => 'Mot de passe temporaire *';
+
+  @override
+  String get labelNewMinimumThreshold => 'Nouveau seuil minimum';
+
+  @override
+  String get directSupplyTitle => 'Approvisionnement direct';
+
+  @override
+  String get errInvalidThreshold => 'Seuil invalide.';
+
+  @override
+  String get actionClear => 'Effacer';
+
+  @override
+  String currentStockLine(String quantity, String unit) {
+    return 'Stock actuel : $quantity $unit';
+  }
 }

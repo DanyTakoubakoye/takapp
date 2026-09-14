@@ -62,7 +62,7 @@ class _StockOutPageState extends State<StockOutPage> {
     if (user == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errUserNotFound)));
       return;
     }
 
@@ -173,7 +173,7 @@ class _StockOutPageState extends State<StockOutPage> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Erreur : ${snapshot.error}'));
+            return Center(child: Text(l10n.commonError('${snapshot.error}')));
           }
 
           final stocks = snapshot.data ?? [];
@@ -212,7 +212,9 @@ class _StockOutPageState extends State<StockOutPage> {
                         const SizedBox(height: 16),
                         TextField(
                           controller: _reasonController,
-                          decoration: const InputDecoration(labelText: 'Motif'),
+                          decoration: InputDecoration(
+                            labelText: l10n.labelReason,
+                          ),
                         ),
                       ],
                     ),
