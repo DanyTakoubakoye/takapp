@@ -1511,5 +1511,200 @@
         "type": "String"
       }
     }
+  },
+
+  "actionCancel": "Annuler",
+  "actionClose": "Fermer",
+  "confirmationTitle": "Confirmation",
+  "labelClient": "Client",
+  "labelClientIfu": "IFU client",
+  "labelAddress": "Adresse",
+  "labelRoomWord": "Chambre",
+  "labelEntry": "Entrée",
+  "labelExit": "Sortie",
+  "labelNights": "Nuitées",
+  "labelPricePerNightShort": "Prix / nuit",
+  "labelExtras": "Extras",
+  "labelServices": "Services",
+  "labelPaymentStatus": "Statut paiement",
+  "labelFiscalStatus": "Statut fiscal",
+  "statusCertified": "Certifiée",
+  "statusNotCertified": "Non certifiée",
+  "labelMecefCode": "Code MECeF",
+  "labelCounters": "Compteurs",
+  "labelFiscalDate": "Date fiscale",
+  "paymentBank": "Banque",
+  "paymentCheque": "Chèque",
+  "aibNone": "Aucun AIB",
+  "errInvoiceDatesInvalidShort": "Dates de facture invalides.",
+  "actionFiscalizeWithCertilink": "Fiscaliser avec Certilink",
+
+  "roomInvoiceDetailTitle": "Détail facture chambre",
+  "errInvoiceNotCertifiedYet": "Cette facture n’est pas encore certifiée.",
+  "errInvoiceAlreadyCertified": "Cette facture est déjà certifiée.",
+  "invoiceCertifiedWithCode": "Facture certifiée avec Certilink Code MECeF : {code}",
+  "@invoiceCertifiedWithCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "tooltipPrintClassic": "Impression classique",
+  "tooltipPrintNormalized": "Impression normalisée",
+  "actionPrintClassicMode": "Imprimer en mode classique",
+  "actionPrintNormalizedMode": "Imprimer en mode normalisé",
+
+  "roomBillingTitle": "Facturation Chambre",
+  "errSaveInvoiceFirst": "Veuillez d’abord enregistrer la facture.",
+  "errFiscalizeFirst": "Cette facture n’est pas encore fiscalisée. Fiscalisez-la d’abord.",
+  "errFillRoomAndPeriodFirst": "Veuillez d’abord renseigner la chambre et la période.",
+  "extrasDetailsTitle": "Détails Extras",
+  "noConsumptionFound": "Aucune consommation trouvée.",
+  "extrasTotalLine": "Total extras : {amount} FCFA",
+  "@extrasTotalLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "errRequiredFieldsMissing": "Champs obligatoires manquants",
+  "errStartBeforeEnd": "La date d’entrée doit être antérieure ou égale à la date de sortie.",
+  "errInvalidNightPrice": "Prix de nuitée invalide",
+  "errInvoiceAlreadyExistsForPeriod": "Une facture existe déjà pour cette chambre et cette période.",
+  "invoiceCreatedSuccess": "Facture créée avec succès. Vous pouvez maintenant l’encaisser ou la fiscaliser.",
+  "errSaveInvoiceFailed": "Erreur lors de l’enregistrement de la facture : {error}",
+  "@errSaveInvoiceFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "actionChoose": "Choisir",
+  "paymentDialogTitle": "Encaissement",
+  "clientInfoTitle": "Informations client",
+  "labelClientAddress": "Adresse client",
+  "labelClientPhone": "Téléphone client",
+  "startLine": "Début : {date}",
+  "@startLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "endLine": "Fin : {date}",
+  "@endLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "labelOtherServices": "Autres services",
+  "actionSaveInvoice": "Enregistrer facture",
+  "actionSearchInvoice": "Rechercher une facture",
+  "actionNewInvoice": "Nouvelle facture",
+  "summaryTitle": "Résumé",
+  "labelBarRestoConsumptions": "Consommations bar/resto",
+  "invoiceAlreadyFiscalizedLabel": "Facture déjà fiscalisée",
+  "invoiceSavedAndFiscalized": "Facture enregistrée et fiscalisée.",
+  "invoiceSavedReady": "Facture enregistrée. Prête à être encaissée ou fiscalisée.",
+
+  "menuManagementTitle": "Gestion du menu",
+  "errItemNameRequired": "Veuillez renseigner le nom de l’article.",
+  "errCategoryRequired": "Veuillez renseigner la catégorie.",
+  "errValidPriceRequired": "Veuillez renseigner un prix valide.",
+  "errItemMustBelongToBarOrKitchen": "L’article doit appartenir au bar, à la cuisine, ou aux deux.",
+  "errAtLeastOneIngredient": "Veuillez définir au moins un ingrédient pour cet article.",
+  "menuItemSavedSuccess": "Article enregistré avec succès.",
+  "photoSaved": "Photo enregistrée.",
+  "errPhotoSaveFailed": "Erreur enregistrement photo : {error}",
+  "@errPhotoSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "addIngredientTitle": "Ajouter un ingrédient",
+  "labelQuantityPerUnitSold": "Quantité consommée par unité vendue",
+  "errFileEmptyOrUnreadable": "Fichier vide ou illisible.",
+  "errUnsupportedFormatExcel": "Format non supporté. Utilisez CSV ou Excel.",
+  "errNoUsableRowInFile": "Aucune ligne exploitable trouvée dans le fichier.",
+  "rowSkippedInvalidFields": "Ligne ignorée : nom/catégorie/prix invalide(s).",
+  "rowSkippedNoDepartment": "Article « {name} » ignoré : ni bar ni cuisine.",
+  "@rowSkippedNoDepartment": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "rowSkippedWithReason": "Ligne ignorée : {reason}",
+  "@rowSkippedWithReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "importedItemsCount": "{count} article(s) importé(s)",
+  "@importedItemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "skippedSuffix": " • {count} ignoré(s)",
+  "@skippedSuffix": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importResultTitle": "Résultat de l’import",
+  "departmentKitchenAndBar": "Cuisine + Bar",
+  "departmentKitchen": "Cuisine",
+  "newItemTitle": "Nouvel article",
+  "labelItemName": "Nom de l’article",
+  "helperNewOrExistingDish": "Tapez un nouveau nom, ou choisissez un plat existant",
+  "helperExistingDishPriceOnly": "Plat existant : seul le prix est modifiable",
+  "tooltipNewDish": "Nouveau plat",
+  "labelCompositionFree": "Composition (texte libre)",
+  "labelCategory": "Catégorie",
+  "hintCategoryExample": "Ex: boisson, plat, dessert, snack...",
+  "labelPrice": "Prix",
+  "dishPhotoTitle": "Photo du plat",
+  "labelAvailable": "Disponible",
+  "labelForKitchen": "Destiné à la cuisine",
+  "labelForBar": "Destiné au bar",
+  "labelFreeAccompaniment": "Donne droit à un accompagnement gratuit",
+  "labelFreeAccompanimentHint": "Le client pourra choisir 1 accompagnement offert.",
+  "recipeIngredientsTitle": "Recette / ingrédients",
+  "noIngredientAdded": "Aucun ingrédient ajouté.",
+  "actionImportExcelCsv": "Importer Excel / CSV",
+  "acceptedColumnsHint": "Colonnes acceptées : nom, composition, catégorie, prix, disponible, cuisine, bar.",
+  "noItemRecorded": "Aucun article enregistré.",
+  "menuItemsTitle": "Articles du menu",
+  "confirmDeleteItem": "Supprimer l’article « {name} » ?",
+  "@confirmDeleteItem": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "ingredientsCount": "{count} ingrédient(s)",
+  "@ingredientsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

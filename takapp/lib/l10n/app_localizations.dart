@@ -3916,6 +3916,642 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Unité : {unit}'**
   String unitLine(String unit);
+
+  /// No description provided for @actionCancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler'**
+  String get actionCancel;
+
+  /// No description provided for @actionClose.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fermer'**
+  String get actionClose;
+
+  /// No description provided for @confirmationTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmation'**
+  String get confirmationTitle;
+
+  /// No description provided for @labelClient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Client'**
+  String get labelClient;
+
+  /// No description provided for @labelClientIfu.
+  ///
+  /// In fr, this message translates to:
+  /// **'IFU client'**
+  String get labelClientIfu;
+
+  /// No description provided for @labelAddress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse'**
+  String get labelAddress;
+
+  /// No description provided for @labelRoomWord.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chambre'**
+  String get labelRoomWord;
+
+  /// No description provided for @labelEntry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrée'**
+  String get labelEntry;
+
+  /// No description provided for @labelExit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sortie'**
+  String get labelExit;
+
+  /// No description provided for @labelNights.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nuitées'**
+  String get labelNights;
+
+  /// No description provided for @labelPricePerNightShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prix / nuit'**
+  String get labelPricePerNightShort;
+
+  /// No description provided for @labelExtras.
+  ///
+  /// In fr, this message translates to:
+  /// **'Extras'**
+  String get labelExtras;
+
+  /// No description provided for @labelServices.
+  ///
+  /// In fr, this message translates to:
+  /// **'Services'**
+  String get labelServices;
+
+  /// No description provided for @labelPaymentStatus.
+  ///
+  /// In fr, this message translates to:
+  /// **'Statut paiement'**
+  String get labelPaymentStatus;
+
+  /// No description provided for @labelFiscalStatus.
+  ///
+  /// In fr, this message translates to:
+  /// **'Statut fiscal'**
+  String get labelFiscalStatus;
+
+  /// No description provided for @statusCertified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Certifiée'**
+  String get statusCertified;
+
+  /// No description provided for @statusNotCertified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non certifiée'**
+  String get statusNotCertified;
+
+  /// No description provided for @labelMecefCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code MECeF'**
+  String get labelMecefCode;
+
+  /// No description provided for @labelCounters.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compteurs'**
+  String get labelCounters;
+
+  /// No description provided for @labelFiscalDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date fiscale'**
+  String get labelFiscalDate;
+
+  /// No description provided for @paymentBank.
+  ///
+  /// In fr, this message translates to:
+  /// **'Banque'**
+  String get paymentBank;
+
+  /// No description provided for @paymentCheque.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chèque'**
+  String get paymentCheque;
+
+  /// No description provided for @aibNone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun AIB'**
+  String get aibNone;
+
+  /// No description provided for @errInvoiceDatesInvalidShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dates de facture invalides.'**
+  String get errInvoiceDatesInvalidShort;
+
+  /// No description provided for @actionFiscalizeWithCertilink.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fiscaliser avec Certilink'**
+  String get actionFiscalizeWithCertilink;
+
+  /// No description provided for @roomInvoiceDetailTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Détail facture chambre'**
+  String get roomInvoiceDetailTitle;
+
+  /// No description provided for @errInvoiceNotCertifiedYet.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette facture n’est pas encore certifiée.'**
+  String get errInvoiceNotCertifiedYet;
+
+  /// No description provided for @errInvoiceAlreadyCertified.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette facture est déjà certifiée.'**
+  String get errInvoiceAlreadyCertified;
+
+  /// No description provided for @invoiceCertifiedWithCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facture certifiée avec Certilink Code MECeF : {code}'**
+  String invoiceCertifiedWithCode(String code);
+
+  /// No description provided for @tooltipPrintClassic.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impression classique'**
+  String get tooltipPrintClassic;
+
+  /// No description provided for @tooltipPrintNormalized.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impression normalisée'**
+  String get tooltipPrintNormalized;
+
+  /// No description provided for @actionPrintClassicMode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Imprimer en mode classique'**
+  String get actionPrintClassicMode;
+
+  /// No description provided for @actionPrintNormalizedMode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Imprimer en mode normalisé'**
+  String get actionPrintNormalizedMode;
+
+  /// No description provided for @roomBillingTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facturation Chambre'**
+  String get roomBillingTitle;
+
+  /// No description provided for @errSaveInvoiceFirst.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez d’abord enregistrer la facture.'**
+  String get errSaveInvoiceFirst;
+
+  /// No description provided for @errFiscalizeFirst.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette facture n’est pas encore fiscalisée. Fiscalisez-la d’abord.'**
+  String get errFiscalizeFirst;
+
+  /// No description provided for @errFillRoomAndPeriodFirst.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez d’abord renseigner la chambre et la période.'**
+  String get errFillRoomAndPeriodFirst;
+
+  /// No description provided for @extrasDetailsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Détails Extras'**
+  String get extrasDetailsTitle;
+
+  /// No description provided for @noConsumptionFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune consommation trouvée.'**
+  String get noConsumptionFound;
+
+  /// No description provided for @extrasTotalLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total extras : {amount} FCFA'**
+  String extrasTotalLine(String amount);
+
+  /// No description provided for @errRequiredFieldsMissing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Champs obligatoires manquants'**
+  String get errRequiredFieldsMissing;
+
+  /// No description provided for @errStartBeforeEnd.
+  ///
+  /// In fr, this message translates to:
+  /// **'La date d’entrée doit être antérieure ou égale à la date de sortie.'**
+  String get errStartBeforeEnd;
+
+  /// No description provided for @errInvalidNightPrice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prix de nuitée invalide'**
+  String get errInvalidNightPrice;
+
+  /// No description provided for @errInvoiceAlreadyExistsForPeriod.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une facture existe déjà pour cette chambre et cette période.'**
+  String get errInvoiceAlreadyExistsForPeriod;
+
+  /// No description provided for @invoiceCreatedSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facture créée avec succès. Vous pouvez maintenant l’encaisser ou la fiscaliser.'**
+  String get invoiceCreatedSuccess;
+
+  /// No description provided for @errSaveInvoiceFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors de l’enregistrement de la facture : {error}'**
+  String errSaveInvoiceFailed(String error);
+
+  /// No description provided for @actionChoose.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir'**
+  String get actionChoose;
+
+  /// No description provided for @paymentDialogTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaissement'**
+  String get paymentDialogTitle;
+
+  /// No description provided for @clientInfoTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Informations client'**
+  String get clientInfoTitle;
+
+  /// No description provided for @labelClientAddress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse client'**
+  String get labelClientAddress;
+
+  /// No description provided for @labelClientPhone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Téléphone client'**
+  String get labelClientPhone;
+
+  /// No description provided for @startLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Début : {date}'**
+  String startLine(String date);
+
+  /// No description provided for @endLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fin : {date}'**
+  String endLine(String date);
+
+  /// No description provided for @labelOtherServices.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autres services'**
+  String get labelOtherServices;
+
+  /// No description provided for @actionSaveInvoice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer facture'**
+  String get actionSaveInvoice;
+
+  /// No description provided for @actionSearchInvoice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher une facture'**
+  String get actionSearchInvoice;
+
+  /// No description provided for @actionNewInvoice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle facture'**
+  String get actionNewInvoice;
+
+  /// No description provided for @summaryTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Résumé'**
+  String get summaryTitle;
+
+  /// No description provided for @labelBarRestoConsumptions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Consommations bar/resto'**
+  String get labelBarRestoConsumptions;
+
+  /// No description provided for @invoiceAlreadyFiscalizedLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facture déjà fiscalisée'**
+  String get invoiceAlreadyFiscalizedLabel;
+
+  /// No description provided for @invoiceSavedAndFiscalized.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facture enregistrée et fiscalisée.'**
+  String get invoiceSavedAndFiscalized;
+
+  /// No description provided for @invoiceSavedReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facture enregistrée. Prête à être encaissée ou fiscalisée.'**
+  String get invoiceSavedReady;
+
+  /// No description provided for @menuManagementTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gestion du menu'**
+  String get menuManagementTitle;
+
+  /// No description provided for @errItemNameRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez renseigner le nom de l’article.'**
+  String get errItemNameRequired;
+
+  /// No description provided for @errCategoryRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez renseigner la catégorie.'**
+  String get errCategoryRequired;
+
+  /// No description provided for @errValidPriceRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez renseigner un prix valide.'**
+  String get errValidPriceRequired;
+
+  /// No description provided for @errItemMustBelongToBarOrKitchen.
+  ///
+  /// In fr, this message translates to:
+  /// **'L’article doit appartenir au bar, à la cuisine, ou aux deux.'**
+  String get errItemMustBelongToBarOrKitchen;
+
+  /// No description provided for @errAtLeastOneIngredient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez définir au moins un ingrédient pour cet article.'**
+  String get errAtLeastOneIngredient;
+
+  /// No description provided for @menuItemSavedSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Article enregistré avec succès.'**
+  String get menuItemSavedSuccess;
+
+  /// No description provided for @photoSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo enregistrée.'**
+  String get photoSaved;
+
+  /// No description provided for @errPhotoSaveFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur enregistrement photo : {error}'**
+  String errPhotoSaveFailed(String error);
+
+  /// No description provided for @addIngredientTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un ingrédient'**
+  String get addIngredientTitle;
+
+  /// No description provided for @labelQuantityPerUnitSold.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quantité consommée par unité vendue'**
+  String get labelQuantityPerUnitSold;
+
+  /// No description provided for @errFileEmptyOrUnreadable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fichier vide ou illisible.'**
+  String get errFileEmptyOrUnreadable;
+
+  /// No description provided for @errUnsupportedFormatExcel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Format non supporté. Utilisez CSV ou Excel.'**
+  String get errUnsupportedFormatExcel;
+
+  /// No description provided for @errNoUsableRowInFile.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune ligne exploitable trouvée dans le fichier.'**
+  String get errNoUsableRowInFile;
+
+  /// No description provided for @rowSkippedInvalidFields.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ligne ignorée : nom/catégorie/prix invalide(s).'**
+  String get rowSkippedInvalidFields;
+
+  /// No description provided for @rowSkippedNoDepartment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Article « {name} » ignoré : ni bar ni cuisine.'**
+  String rowSkippedNoDepartment(String name);
+
+  /// No description provided for @rowSkippedWithReason.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ligne ignorée : {reason}'**
+  String rowSkippedWithReason(String reason);
+
+  /// No description provided for @importedItemsCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} article(s) importé(s)'**
+  String importedItemsCount(int count);
+
+  /// No description provided for @skippedSuffix.
+  ///
+  /// In fr, this message translates to:
+  /// **' • {count} ignoré(s)'**
+  String skippedSuffix(int count);
+
+  /// No description provided for @importResultTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Résultat de l’import'**
+  String get importResultTitle;
+
+  /// No description provided for @departmentKitchenAndBar.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cuisine + Bar'**
+  String get departmentKitchenAndBar;
+
+  /// No description provided for @newItemTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvel article'**
+  String get newItemTitle;
+
+  /// No description provided for @labelItemName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom de l’article'**
+  String get labelItemName;
+
+  /// No description provided for @helperNewOrExistingDish.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tapez un nouveau nom, ou choisissez un plat existant'**
+  String get helperNewOrExistingDish;
+
+  /// No description provided for @helperExistingDishPriceOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plat existant : seul le prix est modifiable'**
+  String get helperExistingDishPriceOnly;
+
+  /// No description provided for @tooltipNewDish.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveau plat'**
+  String get tooltipNewDish;
+
+  /// No description provided for @labelCompositionFree.
+  ///
+  /// In fr, this message translates to:
+  /// **'Composition (texte libre)'**
+  String get labelCompositionFree;
+
+  /// No description provided for @labelCategory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Catégorie'**
+  String get labelCategory;
+
+  /// No description provided for @hintCategoryExample.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex: boisson, plat, dessert, snack...'**
+  String get hintCategoryExample;
+
+  /// No description provided for @labelPrice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prix'**
+  String get labelPrice;
+
+  /// No description provided for @dishPhotoTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo du plat'**
+  String get dishPhotoTitle;
+
+  /// No description provided for @labelAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Disponible'**
+  String get labelAvailable;
+
+  /// No description provided for @labelForKitchen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Destiné à la cuisine'**
+  String get labelForKitchen;
+
+  /// No description provided for @labelForBar.
+  ///
+  /// In fr, this message translates to:
+  /// **'Destiné au bar'**
+  String get labelForBar;
+
+  /// No description provided for @labelFreeAccompaniment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Donne droit à un accompagnement gratuit'**
+  String get labelFreeAccompaniment;
+
+  /// No description provided for @labelFreeAccompanimentHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le client pourra choisir 1 accompagnement offert.'**
+  String get labelFreeAccompanimentHint;
+
+  /// No description provided for @recipeIngredientsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recette / ingrédients'**
+  String get recipeIngredientsTitle;
+
+  /// No description provided for @noIngredientAdded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun ingrédient ajouté.'**
+  String get noIngredientAdded;
+
+  /// No description provided for @actionImportExcelCsv.
+  ///
+  /// In fr, this message translates to:
+  /// **'Importer Excel / CSV'**
+  String get actionImportExcelCsv;
+
+  /// No description provided for @acceptedColumnsHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Colonnes acceptées : nom, composition, catégorie, prix, disponible, cuisine, bar.'**
+  String get acceptedColumnsHint;
+
+  /// No description provided for @noItemRecorded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun article enregistré.'**
+  String get noItemRecorded;
+
+  /// No description provided for @menuItemsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Articles du menu'**
+  String get menuItemsTitle;
+
+  /// No description provided for @confirmDeleteItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer l’article « {name} » ?'**
+  String confirmDeleteItem(String name);
+
+  /// No description provided for @ingredientsCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} ingrédient(s)'**
+  String ingredientsCount(int count);
 }
 
 class _AppLocalizationsDelegate

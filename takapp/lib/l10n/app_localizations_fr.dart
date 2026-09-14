@@ -2212,4 +2212,363 @@ class AppLocalizationsFr extends AppLocalizations {
   String unitLine(String unit) {
     return 'Unité : $unit';
   }
+
+  @override
+  String get actionCancel => 'Annuler';
+
+  @override
+  String get actionClose => 'Fermer';
+
+  @override
+  String get confirmationTitle => 'Confirmation';
+
+  @override
+  String get labelClient => 'Client';
+
+  @override
+  String get labelClientIfu => 'IFU client';
+
+  @override
+  String get labelAddress => 'Adresse';
+
+  @override
+  String get labelRoomWord => 'Chambre';
+
+  @override
+  String get labelEntry => 'Entrée';
+
+  @override
+  String get labelExit => 'Sortie';
+
+  @override
+  String get labelNights => 'Nuitées';
+
+  @override
+  String get labelPricePerNightShort => 'Prix / nuit';
+
+  @override
+  String get labelExtras => 'Extras';
+
+  @override
+  String get labelServices => 'Services';
+
+  @override
+  String get labelPaymentStatus => 'Statut paiement';
+
+  @override
+  String get labelFiscalStatus => 'Statut fiscal';
+
+  @override
+  String get statusCertified => 'Certifiée';
+
+  @override
+  String get statusNotCertified => 'Non certifiée';
+
+  @override
+  String get labelMecefCode => 'Code MECeF';
+
+  @override
+  String get labelCounters => 'Compteurs';
+
+  @override
+  String get labelFiscalDate => 'Date fiscale';
+
+  @override
+  String get paymentBank => 'Banque';
+
+  @override
+  String get paymentCheque => 'Chèque';
+
+  @override
+  String get aibNone => 'Aucun AIB';
+
+  @override
+  String get errInvoiceDatesInvalidShort => 'Dates de facture invalides.';
+
+  @override
+  String get actionFiscalizeWithCertilink => 'Fiscaliser avec Certilink';
+
+  @override
+  String get roomInvoiceDetailTitle => 'Détail facture chambre';
+
+  @override
+  String get errInvoiceNotCertifiedYet =>
+      'Cette facture n’est pas encore certifiée.';
+
+  @override
+  String get errInvoiceAlreadyCertified => 'Cette facture est déjà certifiée.';
+
+  @override
+  String invoiceCertifiedWithCode(String code) {
+    return 'Facture certifiée avec Certilink Code MECeF : $code';
+  }
+
+  @override
+  String get tooltipPrintClassic => 'Impression classique';
+
+  @override
+  String get tooltipPrintNormalized => 'Impression normalisée';
+
+  @override
+  String get actionPrintClassicMode => 'Imprimer en mode classique';
+
+  @override
+  String get actionPrintNormalizedMode => 'Imprimer en mode normalisé';
+
+  @override
+  String get roomBillingTitle => 'Facturation Chambre';
+
+  @override
+  String get errSaveInvoiceFirst => 'Veuillez d’abord enregistrer la facture.';
+
+  @override
+  String get errFiscalizeFirst =>
+      'Cette facture n’est pas encore fiscalisée. Fiscalisez-la d’abord.';
+
+  @override
+  String get errFillRoomAndPeriodFirst =>
+      'Veuillez d’abord renseigner la chambre et la période.';
+
+  @override
+  String get extrasDetailsTitle => 'Détails Extras';
+
+  @override
+  String get noConsumptionFound => 'Aucune consommation trouvée.';
+
+  @override
+  String extrasTotalLine(String amount) {
+    return 'Total extras : $amount FCFA';
+  }
+
+  @override
+  String get errRequiredFieldsMissing => 'Champs obligatoires manquants';
+
+  @override
+  String get errStartBeforeEnd =>
+      'La date d’entrée doit être antérieure ou égale à la date de sortie.';
+
+  @override
+  String get errInvalidNightPrice => 'Prix de nuitée invalide';
+
+  @override
+  String get errInvoiceAlreadyExistsForPeriod =>
+      'Une facture existe déjà pour cette chambre et cette période.';
+
+  @override
+  String get invoiceCreatedSuccess =>
+      'Facture créée avec succès. Vous pouvez maintenant l’encaisser ou la fiscaliser.';
+
+  @override
+  String errSaveInvoiceFailed(String error) {
+    return 'Erreur lors de l’enregistrement de la facture : $error';
+  }
+
+  @override
+  String get actionChoose => 'Choisir';
+
+  @override
+  String get paymentDialogTitle => 'Encaissement';
+
+  @override
+  String get clientInfoTitle => 'Informations client';
+
+  @override
+  String get labelClientAddress => 'Adresse client';
+
+  @override
+  String get labelClientPhone => 'Téléphone client';
+
+  @override
+  String startLine(String date) {
+    return 'Début : $date';
+  }
+
+  @override
+  String endLine(String date) {
+    return 'Fin : $date';
+  }
+
+  @override
+  String get labelOtherServices => 'Autres services';
+
+  @override
+  String get actionSaveInvoice => 'Enregistrer facture';
+
+  @override
+  String get actionSearchInvoice => 'Rechercher une facture';
+
+  @override
+  String get actionNewInvoice => 'Nouvelle facture';
+
+  @override
+  String get summaryTitle => 'Résumé';
+
+  @override
+  String get labelBarRestoConsumptions => 'Consommations bar/resto';
+
+  @override
+  String get invoiceAlreadyFiscalizedLabel => 'Facture déjà fiscalisée';
+
+  @override
+  String get invoiceSavedAndFiscalized => 'Facture enregistrée et fiscalisée.';
+
+  @override
+  String get invoiceSavedReady =>
+      'Facture enregistrée. Prête à être encaissée ou fiscalisée.';
+
+  @override
+  String get menuManagementTitle => 'Gestion du menu';
+
+  @override
+  String get errItemNameRequired => 'Veuillez renseigner le nom de l’article.';
+
+  @override
+  String get errCategoryRequired => 'Veuillez renseigner la catégorie.';
+
+  @override
+  String get errValidPriceRequired => 'Veuillez renseigner un prix valide.';
+
+  @override
+  String get errItemMustBelongToBarOrKitchen =>
+      'L’article doit appartenir au bar, à la cuisine, ou aux deux.';
+
+  @override
+  String get errAtLeastOneIngredient =>
+      'Veuillez définir au moins un ingrédient pour cet article.';
+
+  @override
+  String get menuItemSavedSuccess => 'Article enregistré avec succès.';
+
+  @override
+  String get photoSaved => 'Photo enregistrée.';
+
+  @override
+  String errPhotoSaveFailed(String error) {
+    return 'Erreur enregistrement photo : $error';
+  }
+
+  @override
+  String get addIngredientTitle => 'Ajouter un ingrédient';
+
+  @override
+  String get labelQuantityPerUnitSold => 'Quantité consommée par unité vendue';
+
+  @override
+  String get errFileEmptyOrUnreadable => 'Fichier vide ou illisible.';
+
+  @override
+  String get errUnsupportedFormatExcel =>
+      'Format non supporté. Utilisez CSV ou Excel.';
+
+  @override
+  String get errNoUsableRowInFile =>
+      'Aucune ligne exploitable trouvée dans le fichier.';
+
+  @override
+  String get rowSkippedInvalidFields =>
+      'Ligne ignorée : nom/catégorie/prix invalide(s).';
+
+  @override
+  String rowSkippedNoDepartment(String name) {
+    return 'Article « $name » ignoré : ni bar ni cuisine.';
+  }
+
+  @override
+  String rowSkippedWithReason(String reason) {
+    return 'Ligne ignorée : $reason';
+  }
+
+  @override
+  String importedItemsCount(int count) {
+    return '$count article(s) importé(s)';
+  }
+
+  @override
+  String skippedSuffix(int count) {
+    return ' • $count ignoré(s)';
+  }
+
+  @override
+  String get importResultTitle => 'Résultat de l’import';
+
+  @override
+  String get departmentKitchenAndBar => 'Cuisine + Bar';
+
+  @override
+  String get newItemTitle => 'Nouvel article';
+
+  @override
+  String get labelItemName => 'Nom de l’article';
+
+  @override
+  String get helperNewOrExistingDish =>
+      'Tapez un nouveau nom, ou choisissez un plat existant';
+
+  @override
+  String get helperExistingDishPriceOnly =>
+      'Plat existant : seul le prix est modifiable';
+
+  @override
+  String get tooltipNewDish => 'Nouveau plat';
+
+  @override
+  String get labelCompositionFree => 'Composition (texte libre)';
+
+  @override
+  String get labelCategory => 'Catégorie';
+
+  @override
+  String get hintCategoryExample => 'Ex: boisson, plat, dessert, snack...';
+
+  @override
+  String get labelPrice => 'Prix';
+
+  @override
+  String get dishPhotoTitle => 'Photo du plat';
+
+  @override
+  String get labelAvailable => 'Disponible';
+
+  @override
+  String get labelForKitchen => 'Destiné à la cuisine';
+
+  @override
+  String get labelForBar => 'Destiné au bar';
+
+  @override
+  String get labelFreeAccompaniment =>
+      'Donne droit à un accompagnement gratuit';
+
+  @override
+  String get labelFreeAccompanimentHint =>
+      'Le client pourra choisir 1 accompagnement offert.';
+
+  @override
+  String get recipeIngredientsTitle => 'Recette / ingrédients';
+
+  @override
+  String get noIngredientAdded => 'Aucun ingrédient ajouté.';
+
+  @override
+  String get actionImportExcelCsv => 'Importer Excel / CSV';
+
+  @override
+  String get acceptedColumnsHint =>
+      'Colonnes acceptées : nom, composition, catégorie, prix, disponible, cuisine, bar.';
+
+  @override
+  String get noItemRecorded => 'Aucun article enregistré.';
+
+  @override
+  String get menuItemsTitle => 'Articles du menu';
+
+  @override
+  String confirmDeleteItem(String name) {
+    return 'Supprimer l’article « $name » ?';
+  }
+
+  @override
+  String ingredientsCount(int count) {
+    return '$count ingrédient(s)';
+  }
 }

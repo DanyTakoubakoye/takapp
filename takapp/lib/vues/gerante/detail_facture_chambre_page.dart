@@ -57,6 +57,19 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
       currentInvoice.fiscalStatus == 'success' &&
       currentInvoice.fiscalMecefCode.trim().isNotEmpty;
 
+  // `status` reste la valeur technique stockée : seul le rendu est localisé,
+  // et une valeur inconnue est affichée telle quelle.
+  String _paymentStatusLabel(AppLocalizations l10n) {
+    switch (currentInvoice.status) {
+      case 'paid':
+        return l10n.statusPaidShort;
+      case 'unpaid':
+        return l10n.statusUnpaidShort;
+      default:
+        return currentInvoice.status;
+    }
+  }
+
   String _establishmentId(BuildContext context) {
     final user = context.read<AuthController>().currentUser;
     return user?.establishmentId.trim() ?? '';
@@ -80,12 +93,13 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
   }
 
   Future<void> _reloadInvoice(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
     final establishmentId = _establishmentId(context);
 
     if (establishmentId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Établissement introuvable.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errEstablishmentNotFound)));
       return;
     }
 
@@ -143,18 +157,18 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
   }
 
   Future<void> _printFiscalized(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+
     if (!isFiscalized) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Cette facture n’est pas encore certifiée.'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errInvoiceNotCertifiedYet)));
       return;
     }
 
     if (currentInvoice.startDate == null || currentInvoice.endDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Dates de facture invalides.')),
+        SnackBar(content: Text(l10n.errInvoiceDatesInvalidShort)),
       );
       return;
     }
@@ -193,6 +207,8 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
     await printer.printPdf(Uint8List.fromList(bytes));
   }
 
+  // Les valeurs envoyées à CertiLink sont des codes de l'API fiscale :
+  // elles ne sont jamais traduites.
   EmcfInvoiceRequestModel _buildEmcfRequest(
     String sellerName,
     String operatorId,
@@ -279,32 +295,34 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
   }
 
   Future<void> _fiscalizeInvoice(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthController>();
     final user = auth.currentUser;
 
     if (user == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errUserNotFound)));
       return;
     }
 
     final establishmentId = user.establishmentId.trim();
 
     if (establishmentId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Établissement introuvable.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errEstablishmentNotFound)));
       return;
     }
 
     if (isFiscalized) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cette facture est déjà certifiée.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errInvoiceAlreadyCertified)));
       return;
     }
 
+    // Valeur transmise à CertiLink en cas de nom manquant : non traduite.
     final sellerName = user.name.isNotEmpty ? user.name : 'Operateur';
     final operatorId = user.uid;
 
@@ -329,13 +347,13 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
       ScaffoldMessenger.of(this.context).showSnackBar(
         SnackBar(
           content: Text(
-            'Facture certifiée avec Certilink Code MECeF : ${fiscalController.confirmResult!.codeMECeFDGI}',
+            l10n.invoiceCertifiedWithCode(
+              fiscalController.confirmResult!.codeMECeFDGI,
+            ),
           ),
         ),
       );
     } else {
-      final l10n = AppLocalizations.of(this.context);
-
       ScaffoldMessenger.of(this.context).showSnackBar(
         SnackBar(
           content: Text(
@@ -391,25 +409,24 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final fiscalController = context.watch<FiscalizationController>();
     final auth = context.watch<AuthController>();
     final user = auth.currentUser;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     if (user.establishmentId.trim().isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Détail facture chambre'),
+        title: Text(l10n.roomInvoiceDetailTitle),
         actions: [
           IconButton(
             onPressed: isRefreshing ? null : () => _reloadInvoice(context),
@@ -424,13 +441,13 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
           IconButton(
             onPressed: () => _printClassic(context),
             icon: const Icon(Icons.print),
-            tooltip: 'Impression classique',
+            tooltip: l10n.tooltipPrintClassic,
           ),
           if (isFiscalized)
             IconButton(
               onPressed: () => _printFiscalized(context),
               icon: const Icon(Icons.verified),
-              tooltip: 'Impression normalisée',
+              tooltip: l10n.tooltipPrintNormalized,
             ),
         ],
       ),
@@ -441,55 +458,55 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                row('Client', currentInvoice.clientName, bold: true),
+                row(l10n.labelClient, currentInvoice.clientName, bold: true),
                 row(
-                  'IFU client',
+                  l10n.labelClientIfu,
                   currentInvoice.clientIfu.isEmpty
                       ? '-'
                       : currentInvoice.clientIfu,
                 ),
                 row(
-                  'Adresse',
+                  l10n.labelAddress,
                   currentInvoice.clientAddress.isEmpty
                       ? '-'
                       : currentInvoice.clientAddress,
                 ),
                 row(
-                  'Téléphone',
+                  l10n.labelPhone,
                   currentInvoice.clientPhone.isEmpty
                       ? '-'
                       : currentInvoice.clientPhone,
                 ),
-                row('Chambre', currentInvoice.roomNumber),
-                row('Entrée', formatDate(currentInvoice.startDate)),
-                row('Sortie', formatDate(currentInvoice.endDate)),
-                row('Nuitées', '${currentInvoice.nights}'),
+                row(l10n.labelRoomWord, currentInvoice.roomNumber),
+                row(l10n.labelEntry, formatDate(currentInvoice.startDate)),
+                row(l10n.labelExit, formatDate(currentInvoice.endDate)),
+                row(l10n.labelNights, '${currentInvoice.nights}'),
                 row(
-                  'Prix / nuit',
+                  l10n.labelPricePerNightShort,
                   '${currentInvoice.pricePerNight.toStringAsFixed(0)} FCFA',
                 ),
                 row(
-                  'Chambre',
+                  l10n.labelRoomWord,
                   '${currentInvoice.roomTotal.toStringAsFixed(0)} FCFA',
                 ),
                 row(
-                  'Extras',
+                  l10n.labelExtras,
                   '${currentInvoice.extrasTotal.toStringAsFixed(0)} FCFA',
                 ),
                 row(
-                  'Services',
+                  l10n.labelServices,
                   '${currentInvoice.servicesTotal.toStringAsFixed(0)} FCFA',
                 ),
                 const Divider(),
                 row(
-                  'TOTAL',
+                  l10n.labelTotalCaps,
                   '${currentInvoice.total.toStringAsFixed(0)} FCFA',
                   bold: true,
                 ),
-                row('Statut paiement', currentInvoice.status),
+                row(l10n.labelPaymentStatus, _paymentStatusLabel(l10n)),
                 row(
-                  'Statut fiscal',
-                  isFiscalized ? 'Certifiée' : 'Non certifiée',
+                  l10n.labelFiscalStatus,
+                  isFiscalized ? l10n.statusCertified : l10n.statusNotCertified,
                 ),
                 const SizedBox(height: 10),
                 Wrap(
@@ -497,13 +514,17 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
                   runSpacing: 10,
                   children: [
                     _buildStatusChip(
-                      currentInvoice.status == 'paid' ? 'Payée' : 'Non payée',
+                      currentInvoice.status == 'paid'
+                          ? l10n.statusPaidShort
+                          : l10n.statusUnpaidShort,
                       currentInvoice.status == 'paid'
                           ? Colors.green
                           : Colors.orange,
                     ),
                     _buildStatusChip(
-                      isFiscalized ? 'Certifiée' : 'Non certifiée',
+                      isFiscalized
+                          ? l10n.statusCertified
+                          : l10n.statusNotCertified,
                       isFiscalized ? Colors.blue : Colors.red,
                     ),
                   ],
@@ -511,11 +532,12 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
                 if (isFiscalized) ...[
                   const SizedBox(height: 16),
                   const Divider(),
-                  row('Code MECeF', currentInvoice.fiscalMecefCode),
+                  row(l10n.labelMecefCode, currentInvoice.fiscalMecefCode),
+                  // NIM : terme technique de l'API fiscale.
                   row('NIM', currentInvoice.fiscalNim),
-                  row('Compteurs', currentInvoice.fiscalCounter),
+                  row(l10n.labelCounters, currentInvoice.fiscalCounter),
                   row(
-                    'Date fiscale',
+                    l10n.labelFiscalDate,
                     currentInvoice.fiscalMachineDateTime.isEmpty
                         ? '-'
                         : currentInvoice.fiscalMachineDateTime,
@@ -527,7 +549,7 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
                   child: OutlinedButton.icon(
                     onPressed: () => _printClassic(context),
                     icon: const Icon(Icons.print_outlined),
-                    label: const Text('Imprimer en mode classique'),
+                    label: Text(l10n.actionPrintClassicMode),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -537,7 +559,7 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
                     child: OutlinedButton.icon(
                       onPressed: () => _printFiscalized(context),
                       icon: const Icon(Icons.verified_outlined),
-                      label: const Text('Imprimer en mode normalisé'),
+                      label: Text(l10n.actionPrintNormalizedMode),
                     ),
                   ),
                 if (!isFiscalized) ...[
@@ -555,7 +577,7 @@ class _DetailFactureChambrePageState extends State<DetailFactureChambrePage> {
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
                           : const Icon(Icons.verified),
-                      label: const Text('Fiscaliser avec Certilink'),
+                      label: Text(l10n.actionFiscalizeWithCertilink),
                     ),
                   ),
                 ],

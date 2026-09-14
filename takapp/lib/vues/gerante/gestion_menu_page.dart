@@ -7,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/menu_ingredient_model.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
 import 'package:takapp/modeles/stock_item_model.dart';
@@ -81,8 +82,10 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
   }
 
   Future<void> _saveMenuItem() async {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      _showSnack('Établissement introuvable.');
+      _showSnack(l10n.errEstablishmentNotFound);
       return;
     }
 
@@ -92,29 +95,27 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
     final price = double.tryParse(priceController.text.trim());
 
     if (name.isEmpty) {
-      _showSnack('Veuillez renseigner le nom de l’article.');
+      _showSnack(l10n.errItemNameRequired);
       return;
     }
 
     if (category.isEmpty) {
-      _showSnack('Veuillez renseigner la catégorie.');
+      _showSnack(l10n.errCategoryRequired);
       return;
     }
 
     if (price == null || price <= 0) {
-      _showSnack('Veuillez renseigner un prix valide.');
+      _showSnack(l10n.errValidPriceRequired);
       return;
     }
 
     if (!isForKitchen && !isForBar) {
-      _showSnack(
-        'L’article doit appartenir au bar, à la cuisine, ou aux deux.',
-      );
+      _showSnack(l10n.errItemMustBelongToBarOrKitchen);
       return;
     }
 
     if (_selectedExistingItem == null && _ingredients.isEmpty) {
-      _showSnack('Veuillez définir au moins un ingrédient pour cet article.');
+      _showSnack(l10n.errAtLeastOneIngredient);
       return;
     }
 
@@ -169,11 +170,11 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
 
       if (!mounted) return;
 
-      _showSnack('Article enregistré avec succès.');
+      _showSnack(l10n.menuItemSavedSuccess);
     } catch (e) {
       if (!mounted) return;
 
-      _showSnack('Erreur : $e');
+      _showSnack(l10n.errorPrefixed('$e'));
     } finally {
       if (mounted) {
         setState(() {
@@ -185,6 +186,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
 
   /// Enregistre immédiatement l'URL de la photo dans le plat sélectionné.
   Future<void> _savePhotoUrl(String url) async {
+    final l10n = AppLocalizations.of(context);
     final item = _selectedExistingItem;
     if (item == null) return;
     try {
@@ -195,16 +197,18 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
       );
       if (!mounted) return;
       setState(() => _selectedExistingItem = updated);
-      _showSnack('Photo enregistrée.');
+      _showSnack(l10n.photoSaved);
     } catch (e) {
       if (!mounted) return;
-      _showSnack('Erreur enregistrement photo : $e');
+      _showSnack(l10n.errPhotoSaveFailed('$e'));
     }
   }
 
   Future<void> _showAddIngredientDialog() async {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      _showSnack('Établissement introuvable.');
+      _showSnack(l10n.errEstablishmentNotFound);
       return;
     }
 
@@ -215,7 +219,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
     await showDialog<void>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Ajouter un ingrédient'),
+        title: Text(l10n.addIngredientTitle),
         content: SizedBox(
           width: 500,
           child: Column(
@@ -229,8 +233,8 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                   return DropdownButtonFormField<StockItemModel>(
                     initialValue: selectedItem,
                     isExpanded: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Article de stock',
+                    decoration: InputDecoration(
+                      labelText: l10n.labelStockItem,
                     ),
                     items: items
                         .map(
@@ -252,8 +256,8 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
-                decoration: const InputDecoration(
-                  labelText: 'Quantité consommée par unité vendue',
+                decoration: InputDecoration(
+                  labelText: l10n.labelQuantityPerUnitSold,
                 ),
               ),
             ],
@@ -262,7 +266,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Annuler'),
+            child: Text(l10n.actionCancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -287,7 +291,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
 
               Navigator.pop(context);
             },
-            child: const Text('Ajouter'),
+            child: Text(l10n.actionAdd),
           ),
         ],
       ),
@@ -297,8 +301,10 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
   }
 
   Future<void> _importMenuFile() async {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      _showSnack('Établissement introuvable.');
+      _showSnack(l10n.errEstablishmentNotFound);
       return;
     }
 
@@ -328,7 +334,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
       final bytes = file.bytes;
 
       if (bytes == null || bytes.isEmpty) {
-        throw Exception('Fichier vide ou illisible.');
+        throw Exception(l10n.errFileEmptyOrUnreadable);
       }
 
       List<Map<String, dynamic>> rows = [];
@@ -338,11 +344,11 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
       } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
         rows = _parseExcelRows(bytes);
       } else {
-        throw Exception('Format non supporté. Utilisez CSV ou Excel.');
+        throw Exception(l10n.errUnsupportedFormatExcel);
       }
 
       if (rows.isEmpty) {
-        throw Exception('Aucune ligne exploitable trouvée dans le fichier.');
+        throw Exception(l10n.errNoUsableRowInFile);
       }
 
       int successCount = 0;
@@ -398,9 +404,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
           if (name.isEmpty || category.isEmpty || price == null || price <= 0) {
             skippedCount++;
 
-            skippedReasons.add(
-              'Ligne ignorée : nom/catégorie/prix invalide(s).',
-            );
+            skippedReasons.add(l10n.rowSkippedInvalidFields);
 
             continue;
           }
@@ -419,7 +423,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
           if (!parsedIsForKitchen && !parsedIsForBar) {
             skippedCount++;
 
-            skippedReasons.add('Article "$name" ignoré : ni bar ni cuisine.');
+            skippedReasons.add(l10n.rowSkippedNoDepartment(name));
 
             continue;
           }
@@ -446,7 +450,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
         } catch (e) {
           skippedCount++;
 
-          skippedReasons.add('Ligne ignorée : $e');
+          skippedReasons.add(l10n.rowSkippedWithReason('$e'));
         }
       }
 
@@ -454,10 +458,10 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
 
       final summary = StringBuffer();
 
-      summary.write('$successCount article(s) importé(s)');
+      summary.write(l10n.importedItemsCount(successCount));
 
       if (skippedCount > 0) {
-        summary.write(' • $skippedCount ignoré(s)');
+        summary.write(l10n.skippedSuffix(skippedCount));
       }
 
       _showSnack(summary.toString());
@@ -466,7 +470,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
         await showDialog<void>(
           context: context,
           builder: (_) => AlertDialog(
-            title: const Text('Résultat de l’import'),
+            title: Text(l10n.importResultTitle),
             content: SizedBox(
               width: 500,
               child: SingleChildScrollView(
@@ -476,7 +480,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Fermer'),
+                child: Text(l10n.actionClose),
               ),
             ],
           ),
@@ -485,7 +489,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
     } catch (e) {
       if (!mounted) return;
 
-      _showSnack('Erreur import : $e');
+      _showSnack(l10n.errImportFailed('$e'));
     } finally {
       if (mounted) {
         setState(() {
@@ -592,6 +596,9 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
     return rows;
   }
 
+  /// Reconnaissance des en-têtes du fichier importé : ces libellés sont
+  /// comparés aux données du client, ce n'est pas de l'affichage. Les clés
+  /// renvoyées sont techniques. Ne pas traduire.
   String _normalizeHeader(String value) {
     final header = value
         .trim()
@@ -698,6 +705,8 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
     return header;
   }
 
+  /// Valeurs booléennes telles qu'elles peuvent être écrites dans le fichier
+  /// importé : données d'entrée, pas de l'affichage. Ne pas traduire.
   bool _parseBool(dynamic value, {required bool fallback}) {
     if (value == null) {
       return fallback;
@@ -752,6 +761,9 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
     return double.tryParse(text);
   }
 
+  /// Déduit le rattachement bar/cuisine à partir des catégories libres du
+  /// fichier importé. C'est de la classification de données d'entrée, pas de
+  /// l'affichage : ces listes restent en français et ne sont pas traduites.
   (bool, bool) _inferDepartments({
     required String category,
     required String department,
@@ -856,17 +868,17 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
     return (false, true);
   }
 
-  String _departmentLabel(MenuItemModel item) {
+  String _departmentLabel(AppLocalizations l10n, MenuItemModel item) {
     if (item.isForKitchen && item.isForBar) {
-      return 'Cuisine + Bar';
+      return l10n.departmentKitchenAndBar;
     }
 
     if (item.isForKitchen) {
-      return 'Cuisine';
+      return l10n.departmentKitchen;
     }
 
     if (item.isForBar) {
-      return 'Bar';
+      return l10n.storeNameBar;
     }
 
     return '-';
@@ -880,9 +892,11 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -906,7 +920,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Gestion du menu')),
+      appBar: AppBar(title: Text(l10n.menuManagementTitle)),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -946,17 +960,22 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
   }
 
   Widget _buildFormCard({required bool canBar, required bool canRestaurant}) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Nouvel article',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  l10n.newItemTitle,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
@@ -995,14 +1014,14 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                         controller: textController,
                         focusNode: focusNode,
                         decoration: InputDecoration(
-                          labelText: 'Nom de l’article',
+                          labelText: l10n.labelItemName,
                           prefixIcon: const Icon(Icons.fastfood_outlined),
                           helperText: _selectedExistingItem == null
-                              ? 'Tapez un nouveau nom, ou choisissez un plat existant'
-                              : 'Plat existant : seul le prix est modifiable',
+                              ? l10n.helperNewOrExistingDish
+                              : l10n.helperExistingDishPriceOnly,
                           suffixIcon: _selectedExistingItem != null
                               ? IconButton(
-                                  tooltip: 'Nouveau plat',
+                                  tooltip: l10n.tooltipNewDish,
                                   icon: const Icon(Icons.close),
                                   onPressed: () {
                                     setState(() {
@@ -1040,37 +1059,40 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
               TextField(
                 controller: compositionController,
                 enabled: _selectedExistingItem == null,
-                decoration: const InputDecoration(
-                  labelText: 'Composition (texte libre)',
-                  prefixIcon: Icon(Icons.notes_outlined),
+                decoration: InputDecoration(
+                  labelText: l10n.labelCompositionFree,
+                  prefixIcon: const Icon(Icons.notes_outlined),
                 ),
                 maxLines: 3,
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: categoryController,
-                decoration: const InputDecoration(
-                  labelText: 'Catégorie',
-                  prefixIcon: Icon(Icons.category_outlined),
-                  hintText: 'Ex: boisson, plat, dessert, snack...',
+                decoration: InputDecoration(
+                  labelText: l10n.labelCategory,
+                  prefixIcon: const Icon(Icons.category_outlined),
+                  hintText: l10n.hintCategoryExample,
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: priceController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Prix',
-                  prefixIcon: Icon(Icons.payments_outlined),
+                decoration: InputDecoration(
+                  labelText: l10n.labelPrice,
+                  prefixIcon: const Icon(Icons.payments_outlined),
                 ),
               ),
               if (_selectedExistingItem != null) ...[
                 const SizedBox(height: 16),
-                const Align(
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Photo du plat',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    l10n.dishPhotoTitle,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -1089,7 +1111,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                     isAvailable = value;
                   });
                 },
-                title: const Text('Disponible'),
+                title: Text(l10n.labelAvailable),
               ),
               // Un module non souscrit n'est pas proposé au rattachement.
               if (canRestaurant)
@@ -1100,7 +1122,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                       isForKitchen = value ?? false;
                     });
                   },
-                  title: const Text('Destiné à la cuisine'),
+                  title: Text(l10n.labelForKitchen),
                 ),
               if (canBar)
                 CheckboxListTile(
@@ -1110,7 +1132,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                       isForBar = value ?? false;
                     });
                   },
-                  title: const Text('Destiné au bar'),
+                  title: Text(l10n.labelForBar),
                 ),
               const SizedBox(height: 12),
               CheckboxListTile(
@@ -1120,18 +1142,18 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                     allowsFreeAccompaniment = value ?? false;
                   });
                 },
-                title: const Text('Donne droit à un accompagnement gratuit'),
-                subtitle: const Text(
-                  'Le client pourra choisir 1 accompagnement offert.',
-                  style: TextStyle(fontSize: 12),
+                title: Text(l10n.labelFreeAccompaniment),
+                subtitle: Text(
+                  l10n.labelFreeAccompanimentHint,
+                  style: const TextStyle(fontSize: 12),
                 ),
               ),
               Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Text(
-                      'Recette / ingrédients',
-                      style: TextStyle(
+                      l10n.recipeIngredientsTitle,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -1140,17 +1162,17 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                   OutlinedButton.icon(
                     onPressed: _showAddIngredientDialog,
                     icon: const Icon(Icons.add),
-                    label: const Text('Ajouter'),
+                    label: Text(l10n.actionAdd),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
               if (_ingredients.isEmpty)
-                const Align(
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Aucun ingrédient ajouté.',
-                    style: TextStyle(color: Colors.black54),
+                    l10n.noIngredientAdded,
+                    style: const TextStyle(color: Colors.black54),
                   ),
                 )
               else
@@ -1195,7 +1217,7 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                             color: Colors.white,
                           ),
                         )
-                      : const Text('Enregistrer'),
+                      : Text(l10n.actionSave),
                 ),
               ),
               const SizedBox(height: 12),
@@ -1210,15 +1232,15 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                           width: 20,
                           child: CircularProgressIndicator(strokeWidth: 2.3),
                         )
-                      : const Text('Importer Excel / CSV'),
+                      : Text(l10n.actionImportExcelCsv),
                 ),
               ),
               const SizedBox(height: 10),
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Colonnes acceptées : nom, composition, catégorie, prix, disponible, cuisine, bar.',
-                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                  l10n.acceptedColumnsHint,
+                  style: const TextStyle(fontSize: 12, color: Colors.black54),
                 ),
               ),
             ],
@@ -1229,6 +1251,8 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
   }
 
   Widget _buildListCard(UserModel? user) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(18),
@@ -1240,7 +1264,9 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
             }
 
             if (snapshot.hasError) {
-              return Center(child: Text('Erreur : ${snapshot.error}'));
+              return Center(
+                child: Text(l10n.errorPrefixed('${snapshot.error}')),
+              );
             }
 
             // On masque les articles d'un module non souscrit (ex. articles
@@ -1252,16 +1278,19 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
             _existingItems = snapshot.data ?? [];
 
             if (items.isEmpty) {
-              return const Center(child: Text('Aucun article enregistré.'));
+              return Center(child: Text(l10n.noItemRecorded));
             }
 
             return Column(
               children: [
-                const Align(
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'Articles du menu',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    l10n.menuItemsTitle,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -1275,7 +1304,9 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                       return ListTile(
                         title: Text(item.name),
                         subtitle: Text(
-                          '${item.category} • ${_departmentLabel(item)} • ${item.price.toStringAsFixed(0)} FCFA • ${item.ingredients.length} ingrédient(s)',
+                          '${item.category} • ${_departmentLabel(l10n, item)}'
+                          ' • ${item.price.toStringAsFixed(0)} FCFA'
+                          ' • ${l10n.ingredientsCount(item.ingredients.length)}',
                         ),
                         trailing: Wrap(
                           spacing: 8,
@@ -1294,20 +1325,20 @@ class _GestionMenuPageState extends State<GestionMenuPage> {
                                 final confirmed = await showDialog<bool>(
                                   context: context,
                                   builder: (_) => AlertDialog(
-                                    title: const Text('Confirmation'),
+                                    title: Text(l10n.confirmationTitle),
                                     content: Text(
-                                      'Supprimer l’article "${item.name}" ?',
+                                      l10n.confirmDeleteItem(item.name),
                                     ),
                                     actions: [
                                       TextButton(
                                         onPressed: () =>
                                             Navigator.pop(context, false),
-                                        child: const Text('Annuler'),
+                                        child: Text(l10n.actionCancel),
                                       ),
                                       ElevatedButton(
                                         onPressed: () =>
                                             Navigator.pop(context, true),
-                                        child: const Text('Supprimer'),
+                                        child: Text(l10n.actionDelete),
                                       ),
                                     ],
                                   ),

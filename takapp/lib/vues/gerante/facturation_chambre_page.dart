@@ -61,9 +61,28 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   bool isLoading = false;
   double consumptionTotal = 0;
 
+  // Valeurs techniques stockées en base et transmises à CertiLink.
   String paymentMethod = 'cash';
   String aibType = 'none';
   bool isCurrentInvoiceFiscalized = false;
+
+  /// Modes de paiement propres à cet écran : ce jeu de valeurs ('bank',
+  /// 'cheque') diffère de AppPaymentMethods ('bank_transfer', pas de chèque)
+  /// et alimente Firestore ainsi que mapPaymentMethod. On ne le change pas :
+  /// seuls les libellés sont localisés.
+  List<DropdownMenuItem<String>> _paymentMethodItems(AppLocalizations l10n) {
+    return [
+      DropdownMenuItem(value: 'cash', child: Text(l10n.paymentCash)),
+      DropdownMenuItem(
+        value: 'mobile_money',
+        child: Text(l10n.paymentMobileMoney),
+      ),
+      DropdownMenuItem(value: 'bank', child: Text(l10n.paymentBank)),
+      DropdownMenuItem(value: 'card', child: Text(l10n.paymentCard)),
+      DropdownMenuItem(value: 'credit', child: Text(l10n.paymentCredit)),
+      DropdownMenuItem(value: 'cheque', child: Text(l10n.paymentCheque)),
+    ];
+  }
 
   int get nights {
     if (startDate == null || endDate == null) return 0;
@@ -133,15 +152,16 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   }
 
   Future<void> _printFiscalizedInvoice() async {
+    final l10n = AppLocalizations.of(context);
     final establishmentId = _establishmentId(context);
 
     if (establishmentId.isEmpty) {
-      _showSnack('Établissement introuvable.');
+      _showSnack(l10n.errEstablishmentNotFound);
       return;
     }
 
     if (currentInvoiceId == null) {
-      _showSnack('Veuillez d’abord enregistrer la facture.');
+      _showSnack(l10n.errSaveInvoiceFirst);
       return;
     }
 
@@ -153,21 +173,19 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
     if (!mounted) return;
 
     if (invoice == null) {
-      _showSnack('Facture introuvable.');
+      _showSnack(l10n.errInvoiceNotFound);
       return;
     }
 
     if (!invoice.isFiscalized ||
         invoice.fiscalMecefCode.trim().isEmpty ||
         invoice.fiscalQrCode.trim().isEmpty) {
-      _showSnack(
-        'Cette facture n’est pas encore fiscalisée. Fiscalisez-la d’abord.',
-      );
+      _showSnack(l10n.errFiscalizeFirst);
       return;
     }
 
     if (invoice.startDate == null || invoice.endDate == null) {
-      _showSnack('Dates de facture invalides.');
+      _showSnack(l10n.errInvoiceDatesInvalidShort);
       return;
     }
 
@@ -206,6 +224,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   }
 
   Future<void> _loadConsumptionTotal() async {
+    final l10n = AppLocalizations.of(context);
     final establishmentId = _establishmentId(context);
 
     if (establishmentId.isEmpty ||
@@ -238,22 +257,23 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
         consumptionTotal = 0;
       });
 
-      _showSnack('Erreur lors du chargement des consommations : $e');
+      _showSnack(l10n.errConsumptionLoadFailed('$e'));
     }
   }
 
   Future<void> _showConsumptionDetails() async {
+    final l10n = AppLocalizations.of(context);
     final establishmentId = _establishmentId(context);
 
     if (establishmentId.isEmpty) {
-      _showSnack('Établissement introuvable.');
+      _showSnack(l10n.errEstablishmentNotFound);
       return;
     }
 
     if (roomController.text.trim().isEmpty ||
         startDate == null ||
         endDate == null) {
-      _showSnack('Veuillez d’abord renseigner la chambre et la période.');
+      _showSnack(l10n.errFillRoomAndPeriodFirst);
       return;
     }
 
@@ -264,7 +284,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
       builder: (dialogContext) {
         return AlertDialog(
           insetPadding: EdgeInsets.all(isSmall ? 12 : 24),
-          title: const Text('Détails Extras'),
+          title: Text(l10n.extrasDetailsTitle),
           content: SizedBox(
             width: isSmall ? double.maxFinite : 700,
             child: FutureBuilder<RoomConsumptionInvoiceModel>(
@@ -285,7 +305,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
                 if (snapshot.hasError) {
                   return SingleChildScrollView(
                     child: Text(
-                      'Erreur : ${snapshot.error}',
+                      l10n.errorPrefixed('${snapshot.error}'),
                       style: const TextStyle(color: Colors.red),
                     ),
                   );
@@ -293,9 +313,9 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
 
                 final invoice = snapshot.data;
                 if (invoice == null || invoice.lines.isEmpty) {
-                  return const SizedBox(
+                  return SizedBox(
                     height: 120,
-                    child: Center(child: Text('Aucune consommation trouvée.')),
+                    child: Center(child: Text(l10n.noConsumptionFound)),
                   );
                 }
 
@@ -306,19 +326,19 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Chambre ${invoice.roomNumber}',
+                        l10n.labelRoom(invoice.roomNumber),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Période : '
-                        '${DateFormat('dd/MM/yyyy').format(invoice.startDate)}'
-                        ' - '
-                        '${DateFormat('dd/MM/yyyy').format(invoice.endDate)}',
+                        l10n.periodLine(
+                          DateFormat('dd/MM/yyyy').format(invoice.startDate),
+                          DateFormat('dd/MM/yyyy').format(invoice.endDate),
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Total extras : ${invoice.total.toStringAsFixed(0)} FCFA',
+                        l10n.extrasTotalLine(invoice.total.toStringAsFixed(0)),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 12),
@@ -360,7 +380,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Fermer'),
+              child: Text(l10n.actionClose),
             ),
           ],
         );
@@ -369,10 +389,11 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   }
 
   Future<void> _saveInvoice() async {
+    final l10n = AppLocalizations.of(context);
     final establishmentId = _establishmentId(context);
 
     if (establishmentId.isEmpty) {
-      _showSnack('Établissement introuvable.');
+      _showSnack(l10n.errEstablishmentNotFound);
       return;
     }
 
@@ -380,20 +401,18 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
         roomController.text.trim().isEmpty ||
         startDate == null ||
         endDate == null) {
-      _showSnack('Champs obligatoires manquants');
+      _showSnack(l10n.errRequiredFieldsMissing);
       return;
     }
 
     if (startDate!.isAfter(endDate!)) {
-      _showSnack(
-        'La date d’entrée doit être antérieure ou égale à la date de sortie.',
-      );
+      _showSnack(l10n.errStartBeforeEnd);
       return;
     }
 
     final pricePerNight = double.tryParse(priceController.text.trim());
     if (pricePerNight == null || pricePerNight <= 0) {
-      _showSnack('Prix de nuitée invalide');
+      _showSnack(l10n.errInvalidNightPrice);
       return;
     }
 
@@ -409,9 +428,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
 
       if (alreadyExists) {
         if (!mounted) return;
-        _showSnack(
-          'Une facture existe déjà pour cette chambre et cette période.',
-        );
+        _showSnack(l10n.errInvoiceAlreadyExistsForPeriod);
         return;
       }
 
@@ -420,7 +437,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
       final user = context.read<AuthController>().currentUser;
 
       if (user == null) {
-        _showSnack('Utilisateur introuvable.');
+        _showSnack(l10n.errUserNotFound);
         return;
       }
 
@@ -480,12 +497,10 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
         isCurrentInvoiceFiscalized = false;
       });
 
-      _showSnack(
-        'Facture créée avec succès. Vous pouvez maintenant l’encaisser ou la fiscaliser.',
-      );
+      _showSnack(l10n.invoiceCreatedSuccess);
     } catch (e) {
       if (!mounted) return;
-      _showSnack('Erreur lors de l’enregistrement de la facture : $e');
+      _showSnack(l10n.errSaveInvoiceFailed('$e'));
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
@@ -493,6 +508,8 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
     }
   }
 
+  // Les valeurs envoyées à CertiLink sont des codes de l'API fiscale :
+  // elles ne sont jamais traduites.
   EmcfInvoiceRequestModel _buildEmcfRequest(String sellerName) {
     String? mapAibType(String value) {
       switch (value) {
@@ -575,31 +592,33 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   }
 
   Future<void> _fiscalizeInvoice() async {
+    final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthController>();
     final user = auth.currentUser;
 
     if (user == null) {
-      _showSnack('Utilisateur introuvable.');
+      _showSnack(l10n.errUserNotFound);
       return;
     }
 
     final establishmentId = user.establishmentId.trim();
 
     if (establishmentId.isEmpty) {
-      _showSnack('Établissement introuvable.');
+      _showSnack(l10n.errEstablishmentNotFound);
       return;
     }
 
     if (currentInvoiceId == null) {
-      _showSnack('Veuillez d’abord enregistrer la facture.');
+      _showSnack(l10n.errSaveInvoiceFirst);
       return;
     }
 
     if (isCurrentInvoiceFiscalized) {
-      _showSnack('Cette facture est déjà fiscalisée.');
+      _showSnack(l10n.errInvoiceAlreadyFiscalized);
       return;
     }
 
+    // Valeur transmise à CertiLink en cas de nom manquant : non traduite.
     final sellerName = user.name.isNotEmpty ? user.name : 'Operateur';
 
     final request = _buildEmcfRequest(sellerName);
@@ -620,11 +639,11 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
       });
 
       _showSnack(
-        'Facture fiscalisée avec Certilink. Code MECeF : ${fiscalController.confirmResult!.codeMECeFDGI}',
+        l10n.invoiceFiscalizedWithCode(
+          fiscalController.confirmResult!.codeMECeFDGI,
+        ),
       );
     } else {
-      final l10n = AppLocalizations.of(context);
-
       _showSnack(
         fiscalController.errorText(l10n) ?? l10n.errFiscalizationFailed,
       );
@@ -651,14 +670,16 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
     });
   }
 
-  String formatDate(DateTime? date) {
-    if (date == null) return 'Choisir';
+  String formatDate(AppLocalizations l10n, DateTime? date) {
+    if (date == null) return l10n.actionChoose;
     return DateFormat('dd/MM/yyyy').format(date);
   }
 
   Future<void> _printInvoice() async {
+    final l10n = AppLocalizations.of(context);
+
     if (startDate == null || endDate == null) {
-      _showSnack('Veuillez d’abord renseigner la facture.');
+      _showSnack(l10n.errSaveInvoiceFirst);
       return;
     }
 
@@ -689,32 +710,23 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   }
 
   void _showPaymentDialog(BuildContext context, String invoiceId) {
+    final l10n = AppLocalizations.of(context);
     String method = paymentMethod;
 
     showDialog(
       context: context,
       builder: (_) {
         return AlertDialog(
-          title: const Text('Encaissement'),
+          title: Text(l10n.paymentDialogTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<String>(
                 initialValue: method,
-                decoration: const InputDecoration(
-                  labelText: 'Mode de paiement',
+                decoration: InputDecoration(
+                  labelText: l10n.paymentMethodLabel,
                 ),
-                items: const [
-                  DropdownMenuItem(value: 'cash', child: Text('Cash')),
-                  DropdownMenuItem(
-                    value: 'mobile_money',
-                    child: Text('Mobile Money'),
-                  ),
-                  DropdownMenuItem(value: 'bank', child: Text('Banque')),
-                  DropdownMenuItem(value: 'card', child: Text('Carte')),
-                  DropdownMenuItem(value: 'credit', child: Text('Crédit')),
-                  DropdownMenuItem(value: 'cheque', child: Text('Chèque')),
-                ],
+                items: _paymentMethodItems(l10n),
                 onChanged: (v) {
                   if (v != null) method = v;
                 },
@@ -724,7 +736,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Annuler'),
+              child: Text(l10n.actionCancel),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -732,7 +744,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
 
                 if (user == null) {
                   Navigator.pop(context);
-                  _showSnack('Utilisateur introuvable.');
+                  _showSnack(l10n.errUserNotFound);
                   return;
                 }
 
@@ -740,7 +752,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
 
                 if (establishmentId.isEmpty) {
                   Navigator.pop(context);
-                  _showSnack('Établissement introuvable.');
+                  _showSnack(l10n.errEstablishmentNotFound);
                   return;
                 }
 
@@ -762,9 +774,9 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
                 });
 
                 navigator.pop();
-                _showSnack('Paiement enregistré');
+                _showSnack(l10n.paymentRecorded);
               },
-              child: const Text('Valider'),
+              child: Text(l10n.commonValidate),
             ),
           ],
         );
@@ -815,27 +827,26 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
     final user = auth.currentUser;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     final establishmentId = user.establishmentId.trim();
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     final isSmall = _isSmallScreen(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Facturation Chambre')),
+      appBar: AppBar(title: Text(l10n.roomBillingTitle)),
       body: isSmall
           ? _buildMobileLayout(establishmentId: establishmentId)
           : _buildDesktopLayout(establishmentId: establishmentId),
@@ -901,6 +912,8 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   }
 
   Widget _buildForm({required bool isMobile, required String establishmentId}) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       child: Padding(
         padding: EdgeInsets.all(isMobile ? 12 : 16),
@@ -910,38 +923,38 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
               ? const NeverScrollableScrollPhysics()
               : const AlwaysScrollableScrollPhysics(),
           children: [
-            const Text(
-              'Informations client',
-              style: TextStyle(fontWeight: FontWeight.bold),
+            Text(
+              l10n.clientInfoTitle,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: clientController,
-              decoration: const InputDecoration(labelText: 'Nom client'),
+              decoration: InputDecoration(labelText: l10n.labelClientName),
               onChanged: (_) => _invalidateCurrentInvoice(),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: clientIfuController,
-              decoration: const InputDecoration(labelText: 'IFU client'),
+              decoration: InputDecoration(labelText: l10n.labelClientIfu),
               onChanged: (_) => _invalidateCurrentInvoice(),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: clientAddressController,
-              decoration: const InputDecoration(labelText: 'Adresse client'),
+              decoration: InputDecoration(labelText: l10n.labelClientAddress),
               onChanged: (_) => _invalidateCurrentInvoice(),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: clientPhoneController,
-              decoration: const InputDecoration(labelText: 'Téléphone client'),
+              decoration: InputDecoration(labelText: l10n.labelClientPhone),
               onChanged: (_) => _invalidateCurrentInvoice(),
             ),
             const SizedBox(height: 12),
             TextField(
               controller: roomController,
-              decoration: const InputDecoration(labelText: 'Chambre'),
+              decoration: InputDecoration(labelText: l10n.labelRoomWord),
               onChanged: (_) async {
                 _invalidateCurrentInvoice();
                 await _loadConsumptionTotal();
@@ -951,12 +964,12 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
             if (isMobile) ...[
               OutlinedButton(
                 onPressed: () => _pickDate(true),
-                child: Text('Début : ${formatDate(startDate)}'),
+                child: Text(l10n.startLine(formatDate(l10n, startDate))),
               ),
               const SizedBox(height: 8),
               OutlinedButton(
                 onPressed: () => _pickDate(false),
-                child: Text('Fin : ${formatDate(endDate)}'),
+                child: Text(l10n.endLine(formatDate(l10n, endDate))),
               ),
             ] else
               Row(
@@ -964,14 +977,14 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => _pickDate(true),
-                      child: Text('Début: ${formatDate(startDate)}'),
+                      child: Text(l10n.startLine(formatDate(l10n, startDate))),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () => _pickDate(false),
-                      child: Text('Fin: ${formatDate(endDate)}'),
+                      child: Text(l10n.endLine(formatDate(l10n, endDate))),
                     ),
                   ),
                 ],
@@ -980,7 +993,9 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
             TextField(
               controller: priceController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Prix / nuit'),
+              decoration: InputDecoration(
+                labelText: l10n.labelPricePerNightShort,
+              ),
               onChanged: (_) {
                 _invalidateCurrentInvoice();
                 setState(() {});
@@ -990,7 +1005,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
             TextField(
               controller: servicesController,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: 'Autres services'),
+              decoration: InputDecoration(labelText: l10n.labelOtherServices),
               onChanged: (_) {
                 _invalidateCurrentInvoice();
                 setState(() {});
@@ -999,21 +1014,8 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               initialValue: paymentMethod,
-              decoration: const InputDecoration(labelText: 'Mode de paiement'),
-              items: const [
-                DropdownMenuItem(value: 'cash', child: Text('Espèces')),
-                DropdownMenuItem(
-                  value: 'mobile_money',
-                  child: Text('Mobile Money'),
-                ),
-                DropdownMenuItem(value: 'bank', child: Text('Banque')),
-                DropdownMenuItem(value: 'card', child: Text('Carte')),
-                DropdownMenuItem(
-                  value: 'credit',
-                  child: Text('Crédit / Vente à terme'),
-                ),
-                DropdownMenuItem(value: 'cheque', child: Text('Chèque')),
-              ],
+              decoration: InputDecoration(labelText: l10n.paymentMethodLabel),
+              items: _paymentMethodItems(l10n),
               onChanged: (value) {
                 if (value == null) return;
                 setState(() {
@@ -1025,11 +1027,12 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               initialValue: aibType,
+              // AIB : terme fiscal, conservé tel quel.
               decoration: const InputDecoration(labelText: 'AIB'),
-              items: const [
-                DropdownMenuItem(value: 'none', child: Text('Aucun AIB')),
-                DropdownMenuItem(value: 'aib1', child: Text('AIB 1%')),
-                DropdownMenuItem(value: 'aib5', child: Text('AIB 5%')),
+              items: [
+                DropdownMenuItem(value: 'none', child: Text(l10n.aibNone)),
+                const DropdownMenuItem(value: 'aib1', child: Text('AIB 1%')),
+                const DropdownMenuItem(value: 'aib5', child: Text('AIB 5%')),
               ],
               onChanged: (value) {
                 if (value == null) return;
@@ -1054,7 +1057,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
                         ),
                       )
                     : const Icon(Icons.save),
-                label: const Text('Enregistrer facture'),
+                label: Text(l10n.actionSaveInvoice),
               ),
             ),
             const SizedBox(height: 10),
@@ -1078,18 +1081,21 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
                     ),
                   );
                 },
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 14,
+                    horizontal: 12,
+                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.search, color: Colors.white),
-                      SizedBox(width: 10),
+                      const Icon(Icons.search, color: Colors.white),
+                      const SizedBox(width: 10),
                       Flexible(
                         child: Text(
-                          'Rechercher une facture',
+                          l10n.actionSearchInvoice,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -1107,7 +1113,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
               child: OutlinedButton.icon(
                 onPressed: _resetForm,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Nouvelle facture'),
+                label: Text(l10n.actionNewInvoice),
               ),
             ),
           ],
@@ -1117,6 +1123,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
   }
 
   Widget _buildSummary({required bool isMobile}) {
+    final l10n = AppLocalizations.of(context);
     final actionSpacing = isMobile ? 8.0 : 10.0;
 
     return Card(
@@ -1125,21 +1132,33 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text('Résumé', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text(
+              l10n.summaryTitle,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 10),
-            _row('Nuitées', '$nights'),
-            _row('Chambre', '${roomTotal.toStringAsFixed(0)} FCFA'),
+            _row(l10n.labelNights, '$nights'),
+            _row(l10n.labelRoomWord, '${roomTotal.toStringAsFixed(0)} FCFA'),
             _row(
-              'Consommations bar/resto',
+              l10n.labelBarRestoConsumptions,
               '${consumptionTotal.toStringAsFixed(0)} FCFA',
             ),
-            _row('Services', '${servicesTotal.toStringAsFixed(0)} FCFA'),
+            _row(
+              l10n.labelServices,
+              '${servicesTotal.toStringAsFixed(0)} FCFA',
+            ),
             const Divider(),
-            _row('TOTAL', '${total.toStringAsFixed(0)} FCFA', isBold: true),
+            _row(
+              l10n.labelTotalCaps,
+              '${total.toStringAsFixed(0)} FCFA',
+              isBold: true,
+            ),
             const SizedBox(height: 12),
             _row(
-              'Statut fiscal',
-              isCurrentInvoiceFiscalized ? 'Fiscalisée' : 'Non fiscalisée',
+              l10n.labelFiscalStatus,
+              isCurrentInvoiceFiscalized
+                  ? l10n.statusFiscalized
+                  : l10n.statusNotFiscalized,
               isBold: true,
             ),
             const SizedBox(height: 16),
@@ -1148,14 +1167,14 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
               child: ElevatedButton.icon(
                 onPressed: () {
                   if (currentInvoiceId == null) {
-                    _showSnack('Veuillez d’abord enregistrer la facture.');
+                    _showSnack(l10n.errSaveInvoiceFirst);
                     return;
                   }
 
                   _showPaymentDialog(context, currentInvoiceId!);
                 },
                 icon: const Icon(Icons.payment),
-                label: const Text('Encaisser'),
+                label: Text(l10n.actionCollect),
               ),
             ),
             SizedBox(height: actionSpacing),
@@ -1164,7 +1183,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
               child: OutlinedButton.icon(
                 onPressed: _showConsumptionDetails,
                 icon: const Icon(Icons.receipt_long),
-                label: const Text('Détails Extras'),
+                label: Text(l10n.extrasDetailsTitle),
               ),
             ),
             SizedBox(height: actionSpacing),
@@ -1173,7 +1192,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
               child: OutlinedButton.icon(
                 onPressed: _printInvoice,
                 icon: const Icon(Icons.print),
-                label: const Text('Imprimer facture'),
+                label: Text(l10n.actionPrintInvoice),
               ),
             ),
             SizedBox(height: actionSpacing),
@@ -1182,7 +1201,7 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
               child: OutlinedButton.icon(
                 onPressed: _printFiscalizedInvoice,
                 icon: const Icon(Icons.verified),
-                label: const Text('Imprimer facture normalisée'),
+                label: Text(l10n.actionPrintNormalizedInvoice),
               ),
             ),
             SizedBox(height: actionSpacing),
@@ -1203,8 +1222,8 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
                         : const Icon(Icons.verified),
                     label: Text(
                       isCurrentInvoiceFiscalized
-                          ? 'Facture déjà fiscalisée'
-                          : 'Fiscaliser avec Certilink',
+                          ? l10n.invoiceAlreadyFiscalizedLabel
+                          : l10n.actionFiscalizeWithCertilink,
                     ),
                   ),
                 );
@@ -1221,8 +1240,8 @@ class _FacturationChambrePageState extends State<FacturationChambrePage> {
                 ),
                 child: Text(
                   isCurrentInvoiceFiscalized
-                      ? 'Facture enregistrée et fiscalisée.'
-                      : 'Facture enregistrée. Prête à être encaissée ou fiscalisée.',
+                      ? l10n.invoiceSavedAndFiscalized
+                      : l10n.invoiceSavedReady,
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
               ),
