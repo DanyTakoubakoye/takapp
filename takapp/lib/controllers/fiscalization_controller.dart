@@ -101,13 +101,11 @@ class FiscalizationController extends ChangeNotifier {
       final config = await _certilinkConfigService.getConfig(establishmentId);
 
       if (!config.enabled) {
-        throw Exception('CertiLink est désactivé pour cet établissement.');
+        throw const AppError(AppErrorCode.certilinkDisabled);
       }
 
       if (config.tenantId.trim().isEmpty || config.apiKey.trim().isEmpty) {
-        throw Exception(
-          'Configuration CertiLink incomplète : tenantId ou apiKey manquant.',
-        );
+        throw const AppError(AppErrorCode.certilinkConfigMissingKeys);
       }
 
       final response = await _certilinkCertificationService.certifyInvoice(
@@ -218,6 +216,7 @@ class FiscalizationController extends ChangeNotifier {
         'name': item.name,
         'description': item.name,
         'quantity': item.quantity,
+        // Valeur transmise a e-MECeF : reste en francais.
         'unit': 'Unité',
         'unitPrice': item.price,
         'discountAmount': 0,

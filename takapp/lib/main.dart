@@ -52,15 +52,24 @@ Future<void> main() async {
 
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
+  // La langue est chargee avant les notifications : les canaux Android
+  // portent un nom visible dans les reglages du telephone, il doit etre
+  // dans la bonne langue des le premier lancement.
+  final localeController = LocaleController();
+  await localeController.load();
+
   final notificationService = NotificationService();
   await notificationService.init();
+  await notificationService.applyLocale(localeController.locale);
+
+  // Au changement de langue, les canaux sont recrees pour suivre.
+  localeController.addListener(() {
+    notificationService.applyLocale(localeController.locale);
+  });
 
   final authService = AuthService();
   final authController = AuthController(authService);
   await authController.initialize();
-
-  final localeController = LocaleController();
-  await localeController.load();
 
   runApp(
     MyApp(

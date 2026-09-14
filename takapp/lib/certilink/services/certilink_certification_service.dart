@@ -1,6 +1,7 @@
 import 'package:certilink_flutter_sdk/certilink_flutter_sdk.dart';
 
 import '../modeles/certilink_config_model.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 class CertilinkCertificationService {
   Future<CertiLinkInvoiceResponse> certifyInvoice({
@@ -13,15 +14,15 @@ class CertilinkCertificationService {
     DateTime? invoiceDate,
   }) async {
     if (!config.enabled) {
-      throw Exception('CertiLink est désactivé pour cet établissement.');
+      throw const AppError(AppErrorCode.certilinkDisabled);
     }
 
     if (config.tenantId.trim().isEmpty || config.apiKey.trim().isEmpty) {
-      throw Exception('Configuration CertiLink incomplète.');
+      throw const AppError(AppErrorCode.certilinkConfigIncomplete);
     }
 
     if (items.isEmpty) {
-      throw Exception('La facture doit contenir au moins un article.');
+      throw const AppError(AppErrorCode.invoiceNeedsOneItem);
     }
 
     final certilink = CertiLinkClient(
@@ -51,6 +52,8 @@ class CertilinkCertificationService {
                 'Article',
             description: item['description']?.toString() ?? '',
             quantity: _toDouble(item['quantity']),
+            // Valeur transmise a e-MECeF : reste en francais, comme le
+            // reste des donnees fiscales de la facture normalisee.
             unit: item['unit']?.toString() ?? 'Unité',
             unitPrice: _toDouble(item['unitPrice']),
             discountAmount: _toDouble(item['discountAmount']),

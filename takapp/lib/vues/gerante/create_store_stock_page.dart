@@ -7,6 +7,7 @@ import 'package:excel/excel.dart' as xlsx;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:takapp/l10n/app_localizations.dart';
+import 'package:takapp/core/errors/app_error.dart';
 
 class CreateStoreStockPage extends StatefulWidget {
   final String establishmentId;
@@ -179,8 +180,9 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
     final stockItemData = stockItemDoc.data();
 
     if (stockItemData == null) {
-      // Invariant interne : ce message n'est pas destiné à l'utilisateur.
-      throw Exception('Article introuvable dans stock_items');
+      // Invariant interne : ne devrait jamais remonter a l'utilisateur, mais
+      // reste traduisible si c'est le cas.
+      throw const AppError(AppErrorCode.itemNotFoundInStockItems);
     }
 
     final itemName = (stockItemData['name'] ?? '').toString();

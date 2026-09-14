@@ -2870,5 +2870,62 @@
 
   "noLowStockDetected": "No low stock detected.",
   "thresholdUpdated": "Threshold updated.",
-  "actionUpdateThreshold": "Update the threshold"
+  "actionUpdateThreshold": "Update the threshold",
+
+  "errInvalidIngredientStore": "Invalid ingredient: empty store for {name}",
+  "@errInvalidIngredientStore": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errInvalidIngredientItemId": "Invalid ingredient: empty id for {name}",
+  "@errInvalidIngredientItemId": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errInvalidIngredientUnit": "Invalid ingredient: empty unit for {name}",
+  "@errInvalidIngredientUnit": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errInvalidIngredientQuantity": "Invalid ingredient: zero or negative quantity for {name}",
+  "@errInvalidIngredientQuantity": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errMenuItemIdRequired": "Each ordered item must carry a menuItemId so the stock can be deducted.",
+  "errMenuItemIdMissingForCancel": "Cannot cancel: menuItemId missing for an item.",
+  "errCertilinkDisabled": "CertiLink is disabled for this establishment.",
+  "errCertilinkConfigIncomplete": "Incomplete CertiLink configuration.",
+  "errCertilinkConfigMissingKeys": "Incomplete CertiLink configuration: tenantId or apiKey missing.",
+  "errInvoiceNeedsOneItem": "The invoice must contain at least one item.",
+  "errItemNotFoundInStockItems": "Item not found in stock_items.",
+
+  "channelBarReady": "Bar ready",
+  "channelKitchenReady": "Kitchen ready",
+  "channelBarReadyDescription": "Notifications when a bar order is ready",
+  "channelKitchenReadyDescription": "Notifications when a kitchen order is ready",
+  "channelNewBarOrder": "New bar order",
+  "channelNewKitchenOrder": "New kitchen order",
+  "channelNewBarOrderDescription": "New order for the bar",
+  "channelNewKitchenOrderDescription": "New order for the kitchen",
+  "notifBarOrderReady": "Bar order ready",
+  "notifKitchenOrderReady": "Kitchen order ready",
+  "notifOrderReady": "Order ready",
+
+  "actionChangePhoto": "Change the photo",
+  "actionAddPhoto": "Add a photo",
+
+  "noPhoto": "No photo"
 }

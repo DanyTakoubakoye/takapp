@@ -221,9 +221,7 @@ class OrderService {
       final menuItemId = (itemMap['menuItemId'] ?? '').toString();
 
       if (menuItemId.isEmpty) {
-        throw Exception(
-          'Chaque article commandé doit contenir menuItemId pour permettre la déduction du stock.',
-        );
+        throw const AppError(AppErrorCode.menuItemIdRequired);
       }
 
       final menuSnap = await _menuItemsRef(
@@ -621,9 +619,7 @@ class OrderService {
       final menuItemId = item.menuItemId;
 
       if (menuItemId.isEmpty) {
-        throw Exception(
-          'Impossible d’annuler : menuItemId manquant pour un article.',
-        );
+        throw const AppError(AppErrorCode.menuItemIdMissingForCancel);
       }
 
       final menuSnap = await _menuItemsRef(

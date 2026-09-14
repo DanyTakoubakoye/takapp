@@ -6,6 +6,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:takapp/core/app_navigator.dart';
 
+import 'package:takapp/l10n/app_localizations.dart';
+
 import 'notification_web_helper_stub.dart'
     if (dart.library.html) 'notification_web_helper.dart';
 
@@ -15,6 +17,19 @@ class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
 
   factory NotificationService() => _instance;
+
+  /// Localisations courantes, fournies par [applyLocale].
+  ///
+  /// Le service tourne hors de l'arbre de widgets : pas de `BuildContext`,
+  /// donc pas d'accès direct à `AppLocalizations.of()`. Tant qu'elles ne
+  /// sont pas chargées, les libellés retombent sur le français.
+  AppLocalizations? _l10n;
+
+  /// Charge les libellés de [locale]. Pendant du service mobile, qui recrée
+  /// en plus les canaux Android ; sur le web il n'y a pas de canal.
+  Future<void> applyLocale(Locale locale) async {
+    _l10n = await AppLocalizations.delegate.load(locale);
+  }
 
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -106,7 +121,9 @@ class NotificationService {
 
             _alreadyShownNotificationIds.add(doc.id);
 
-            final title = (data['title'] ?? 'Commande prête').toString();
+            final title =
+                (data['title'] ?? _l10n?.notifOrderReady ?? 'Commande prête')
+                    .toString();
             final body = (data['body'] ?? '').toString();
             final source = (data['source'] ?? 'kitchen').toString();
 

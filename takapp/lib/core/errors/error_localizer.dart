@@ -237,6 +237,31 @@ String _messageFor(AppLocalizations l10n, AppError error) {
     case AppErrorCode.consumptionLoadFailed:
       return l10n.errConsumptionLoadFailed(error.name ?? '');
 
+    case AppErrorCode.invalidIngredientStore:
+      return l10n.errInvalidIngredientStore(error.name ?? '');
+    case AppErrorCode.invalidIngredientItemId:
+      return l10n.errInvalidIngredientItemId(error.name ?? '');
+    case AppErrorCode.invalidIngredientUnit:
+      return l10n.errInvalidIngredientUnit(error.name ?? '');
+    case AppErrorCode.invalidIngredientQuantity:
+      return l10n.errInvalidIngredientQuantity(error.name ?? '');
+
+    case AppErrorCode.menuItemIdRequired:
+      return l10n.errMenuItemIdRequired;
+    case AppErrorCode.menuItemIdMissingForCancel:
+      return l10n.errMenuItemIdMissingForCancel;
+    case AppErrorCode.itemNotFoundInStockItems:
+      return l10n.errItemNotFoundInStockItems;
+
+    case AppErrorCode.certilinkDisabled:
+      return l10n.errCertilinkDisabled;
+    case AppErrorCode.certilinkConfigIncomplete:
+      return l10n.errCertilinkConfigIncomplete;
+    case AppErrorCode.certilinkConfigMissingKeys:
+      return l10n.errCertilinkConfigMissingKeys;
+    case AppErrorCode.invoiceNeedsOneItem:
+      return l10n.errInvoiceNeedsOneItem;
+
     case AppErrorCode.stockNotFoundFor:
       return l10n.errStockNotFoundFor(error.name ?? '');
     case AppErrorCode.inconsistentUnit:

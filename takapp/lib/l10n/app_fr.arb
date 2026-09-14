@@ -2876,5 +2876,62 @@
 
   "noLowStockDetected": "Aucun stock faible détecté.",
   "thresholdUpdated": "Seuil mis à jour.",
-  "actionUpdateThreshold": "Mettre à jour le seuil"
+  "actionUpdateThreshold": "Mettre à jour le seuil",
+
+  "errInvalidIngredientStore": "Ingrédient invalide : magasin vide pour {name}",
+  "@errInvalidIngredientStore": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errInvalidIngredientItemId": "Ingrédient invalide : identifiant vide pour {name}",
+  "@errInvalidIngredientItemId": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errInvalidIngredientUnit": "Ingrédient invalide : unité vide pour {name}",
+  "@errInvalidIngredientUnit": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errInvalidIngredientQuantity": "Ingrédient invalide : quantité nulle ou négative pour {name}",
+  "@errInvalidIngredientQuantity": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errMenuItemIdRequired": "Chaque article commandé doit contenir menuItemId pour permettre la déduction du stock.",
+  "errMenuItemIdMissingForCancel": "Impossible d’annuler : menuItemId manquant pour un article.",
+  "errCertilinkDisabled": "CertiLink est désactivé pour cet établissement.",
+  "errCertilinkConfigIncomplete": "Configuration CertiLink incomplète.",
+  "errCertilinkConfigMissingKeys": "Configuration CertiLink incomplète : tenantId ou apiKey manquant.",
+  "errInvoiceNeedsOneItem": "La facture doit contenir au moins un article.",
+  "errItemNotFoundInStockItems": "Article introuvable dans stock_items.",
+
+  "channelBarReady": "Bar prêt",
+  "channelKitchenReady": "Cuisine prête",
+  "channelBarReadyDescription": "Notifications quand une commande bar est prête",
+  "channelKitchenReadyDescription": "Notifications quand une commande cuisine est prête",
+  "channelNewBarOrder": "Nouvelle commande bar",
+  "channelNewKitchenOrder": "Nouvelle commande cuisine",
+  "channelNewBarOrderDescription": "Nouvelle commande pour le bar",
+  "channelNewKitchenOrderDescription": "Nouvelle commande pour la cuisine",
+  "notifBarOrderReady": "Commande bar prête",
+  "notifKitchenOrderReady": "Commande cuisine prête",
+  "notifOrderReady": "Commande prête",
+
+  "actionChangePhoto": "Changer la photo",
+  "actionAddPhoto": "Ajouter une photo",
+
+  "noPhoto": "Aucune photo"
 }

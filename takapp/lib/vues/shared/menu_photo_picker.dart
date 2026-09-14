@@ -101,6 +101,7 @@ class _MenuPhotoPickerState extends State<MenuPhotoPicker> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final url = _displayUrl;
     final hasImage = url != null && url.trim().isNotEmpty;
 
@@ -126,15 +127,19 @@ class _MenuPhotoPickerState extends State<MenuPhotoPicker> {
                     child: Icon(Icons.broken_image_outlined, size: 40),
                   ),
                 )
-              : const Center(
+              : Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.image_outlined, size: 40, color: Colors.grey),
-                      SizedBox(height: 6),
+                      const Icon(
+                        Icons.image_outlined,
+                        size: 40,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(height: 6),
                       Text(
-                        'Aucune photo',
-                        style: TextStyle(color: Colors.grey),
+                        l10n.noPhoto,
+                        style: const TextStyle(color: Colors.grey),
                       ),
                     ],
                   ),
@@ -144,7 +149,9 @@ class _MenuPhotoPickerState extends State<MenuPhotoPicker> {
         OutlinedButton.icon(
           onPressed: _uploading ? null : _openSourceSheet,
           icon: const Icon(Icons.add_a_photo_outlined),
-          label: Text(hasImage ? 'Changer la photo' : 'Ajouter une photo'),
+          label: Text(
+            hasImage ? l10n.actionChangePhoto : l10n.actionAddPhoto,
+          ),
         ),
       ],
     );

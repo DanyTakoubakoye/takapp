@@ -649,13 +649,16 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.add_box_outlined, color: Colors.blue),
-                  SizedBox(width: 8),
+                  const Icon(Icons.add_box_outlined, color: Colors.blue),
+                  const SizedBox(width: 8),
                   Text(
-                    'Ajouter un article',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    l10n.actionAddItem,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               ),

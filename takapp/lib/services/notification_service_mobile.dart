@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:takapp/core/app_navigator.dart';
 import 'package:takapp/core/errors/app_error.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 
 class NotificationService {
   NotificationService._internal();
@@ -26,6 +27,47 @@ class NotificationService {
 
   /// Établissement courant, fixé au démarrage du listener
   String _currentEstablishmentId = '';
+
+  /// Localisations courantes, fournies par [applyLocale].
+  ///
+  /// Le service tourne hors de l'arbre de widgets : il n'a pas de
+  /// `BuildContext`, donc pas d'accès direct à `AppLocalizations.of()`.
+  /// Tant qu'elles ne sont pas chargées, les libellés retombent sur le
+  /// français, langue par défaut de l'application.
+  AppLocalizations? _l10n;
+
+  /// Charge les libellés de [locale] et recrée les canaux Android pour que
+  /// leur nom suive la langue dans les réglages du téléphone.
+  ///
+  /// À appeler au démarrage, puis à chaque changement de langue.
+  Future<void> applyLocale(Locale locale) async {
+    _l10n = await AppLocalizations.delegate.load(locale);
+    await _initLocalNotifications();
+  }
+
+  String get _barReady => _l10n?.channelBarReady ?? 'Bar prêt';
+
+  String get _kitchenReady => _l10n?.channelKitchenReady ?? 'Cuisine prête';
+
+  String get _barReadyDescription =>
+      _l10n?.channelBarReadyDescription ??
+      'Notifications quand une commande bar est prête';
+
+  String get _kitchenReadyDescription =>
+      _l10n?.channelKitchenReadyDescription ??
+      'Notifications quand une commande cuisine est prête';
+
+  String get _newBarOrder => _l10n?.channelNewBarOrder ?? 'Nouvelle commande bar';
+
+  String get _newKitchenOrder =>
+      _l10n?.channelNewKitchenOrder ?? 'Nouvelle commande cuisine';
+
+  String get _newBarOrderDescription =>
+      _l10n?.channelNewBarOrderDescription ?? 'Nouvelle commande pour le bar';
+
+  String get _newKitchenOrderDescription =>
+      _l10n?.channelNewKitchenOrderDescription ??
+      'Nouvelle commande pour la cuisine';
 
   // ⚠️ Nouveaux IDs de channel
   static const String kitchenChannelId = 'kitchen_ready_channel_v7';
@@ -86,11 +128,11 @@ class NotificationService {
   }) async {
     final channelId = source == 'bar' ? barChannelId : kitchenChannelId;
 
-    final channelName = source == 'bar' ? 'Bar prêt' : 'Cuisine prête';
+    final channelName = source == 'bar' ? _barReady : _kitchenReady;
 
     final channelDescription = source == 'bar'
-        ? 'Notifications quand une commande bar est prête'
-        : 'Notifications quand une commande cuisine est prête';
+        ? _barReadyDescription
+        : _kitchenReadyDescription;
 
     final AndroidNotificationSound sound = source == 'bar'
         ? const RawResourceAndroidNotificationSound('bar_ready')
@@ -206,39 +248,39 @@ class NotificationService {
 
     await _localNotifications.initialize(settings: initSettings);
 
-    const kitchenChannel = AndroidNotificationChannel(
+    final kitchenChannel = AndroidNotificationChannel(
       kitchenChannelId,
-      'Cuisine prête',
-      description: 'Notifications quand une commande cuisine est prête',
+      _kitchenReady,
+      description: _kitchenReadyDescription,
       importance: Importance.max,
       playSound: true,
-      sound: RawResourceAndroidNotificationSound('kitchen_ready'),
+      sound: const RawResourceAndroidNotificationSound('kitchen_ready'),
     );
 
-    const barChannel = AndroidNotificationChannel(
+    final barChannel = AndroidNotificationChannel(
       barChannelId,
-      'Bar prêt',
-      description: 'Notifications quand une commande bar est prête',
+      _barReady,
+      description: _barReadyDescription,
       importance: Importance.max,
       playSound: true,
-      sound: RawResourceAndroidNotificationSound('bar_ready'),
+      sound: const RawResourceAndroidNotificationSound('bar_ready'),
     );
-    const newKitchenOrderChannel = AndroidNotificationChannel(
+    final newKitchenOrderChannel = AndroidNotificationChannel(
       newKitchenOrderChannelId,
-      'Nouvelle commande cuisine',
-      description: 'Notifications nouvelle commande cuisine',
+      _newKitchenOrder,
+      description: _newKitchenOrderDescription,
       importance: Importance.max,
       playSound: true,
-      sound: RawResourceAndroidNotificationSound('kitchen_ready'),
+      sound: const RawResourceAndroidNotificationSound('kitchen_ready'),
     );
 
-    const newBarOrderChannel = AndroidNotificationChannel(
+    final newBarOrderChannel = AndroidNotificationChannel(
       newBarOrderChannelId,
-      'Nouvelle commande bar',
-      description: 'Notifications nouvelle commande bar',
+      _newBarOrder,
+      description: _newBarOrderDescription,
       importance: Importance.max,
       playSound: true,
-      sound: RawResourceAndroidNotificationSound('bar_ready'),
+      sound: const RawResourceAndroidNotificationSound('bar_ready'),
     );
 
     final androidPlugin = _localNotifications
@@ -265,23 +307,24 @@ class NotificationService {
 
     if (source == 'bar_new_order') {
       channelId = newBarOrderChannelId;
-      channelName = 'Nouvelle commande bar';
-      channelDescription = 'Nouvelle commande pour le bar';
+      channelName = _newBarOrder;
+      channelDescription = _newBarOrderDescription;
       sound = const RawResourceAndroidNotificationSound('bar_ready');
     } else if (source == 'kitchen_new_order') {
       channelId = newKitchenOrderChannelId;
-      channelName = 'Nouvelle commande cuisine';
-      channelDescription = 'Nouvelle commande pour la cuisine';
+      channelName = _newKitchenOrder;
+      channelDescription = _newKitchenOrderDescription;
       sound = const RawResourceAndroidNotificationSound('kitchen_ready');
     } else if (source == 'bar') {
       channelId = barChannelId;
-      channelName = 'Bar prêt';
-      channelDescription = 'Commande bar prête';
+      channelName = _barReady;
+      channelDescription = _l10n?.notifBarOrderReady ?? 'Commande bar prête';
       sound = const RawResourceAndroidNotificationSound('bar_ready');
     } else {
       channelId = kitchenChannelId;
-      channelName = 'Cuisine prête';
-      channelDescription = 'Commande cuisine prête';
+      channelName = _kitchenReady;
+      channelDescription =
+          _l10n?.notifKitchenOrderReady ?? 'Commande cuisine prête';
       sound = const RawResourceAndroidNotificationSound('kitchen_ready');
     }
 
@@ -313,12 +356,10 @@ class NotificationService {
     try {
       final bool isBar = department == 'bar';
       final channelId = isBar ? newBarOrderChannelId : newKitchenOrderChannelId;
-      final channelName = isBar
-          ? 'Nouvelle commande bar'
-          : 'Nouvelle commande cuisine';
+      final channelName = isBar ? _newBarOrder : _newKitchenOrder;
       final channelDescription = isBar
-          ? 'Nouvelle commande pour le bar'
-          : 'Nouvelle commande pour la cuisine';
+          ? _newBarOrderDescription
+          : _newKitchenOrderDescription;
       final AndroidNotificationSound sound = isBar
           ? const RawResourceAndroidNotificationSound('bar_ready')
           : const RawResourceAndroidNotificationSound('kitchen_ready');

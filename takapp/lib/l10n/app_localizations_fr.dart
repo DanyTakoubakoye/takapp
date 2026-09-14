@@ -4273,4 +4273,97 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get actionUpdateThreshold => 'Mettre à jour le seuil';
+
+  @override
+  String errInvalidIngredientStore(String name) {
+    return 'Ingrédient invalide : magasin vide pour $name';
+  }
+
+  @override
+  String errInvalidIngredientItemId(String name) {
+    return 'Ingrédient invalide : identifiant vide pour $name';
+  }
+
+  @override
+  String errInvalidIngredientUnit(String name) {
+    return 'Ingrédient invalide : unité vide pour $name';
+  }
+
+  @override
+  String errInvalidIngredientQuantity(String name) {
+    return 'Ingrédient invalide : quantité nulle ou négative pour $name';
+  }
+
+  @override
+  String get errMenuItemIdRequired =>
+      'Chaque article commandé doit contenir menuItemId pour permettre la déduction du stock.';
+
+  @override
+  String get errMenuItemIdMissingForCancel =>
+      'Impossible d’annuler : menuItemId manquant pour un article.';
+
+  @override
+  String get errCertilinkDisabled =>
+      'CertiLink est désactivé pour cet établissement.';
+
+  @override
+  String get errCertilinkConfigIncomplete =>
+      'Configuration CertiLink incomplète.';
+
+  @override
+  String get errCertilinkConfigMissingKeys =>
+      'Configuration CertiLink incomplète : tenantId ou apiKey manquant.';
+
+  @override
+  String get errInvoiceNeedsOneItem =>
+      'La facture doit contenir au moins un article.';
+
+  @override
+  String get errItemNotFoundInStockItems =>
+      'Article introuvable dans stock_items.';
+
+  @override
+  String get channelBarReady => 'Bar prêt';
+
+  @override
+  String get channelKitchenReady => 'Cuisine prête';
+
+  @override
+  String get channelBarReadyDescription =>
+      'Notifications quand une commande bar est prête';
+
+  @override
+  String get channelKitchenReadyDescription =>
+      'Notifications quand une commande cuisine est prête';
+
+  @override
+  String get channelNewBarOrder => 'Nouvelle commande bar';
+
+  @override
+  String get channelNewKitchenOrder => 'Nouvelle commande cuisine';
+
+  @override
+  String get channelNewBarOrderDescription => 'Nouvelle commande pour le bar';
+
+  @override
+  String get channelNewKitchenOrderDescription =>
+      'Nouvelle commande pour la cuisine';
+
+  @override
+  String get notifBarOrderReady => 'Commande bar prête';
+
+  @override
+  String get notifKitchenOrderReady => 'Commande cuisine prête';
+
+  @override
+  String get notifOrderReady => 'Commande prête';
+
+  @override
+  String get actionChangePhoto => 'Changer la photo';
+
+  @override
+  String get actionAddPhoto => 'Ajouter une photo';
+
+  @override
+  String get noPhoto => 'Aucune photo';
 }

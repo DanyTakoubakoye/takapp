@@ -7450,6 +7450,156 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Mettre à jour le seuil'**
   String get actionUpdateThreshold;
+
+  /// No description provided for @errInvalidIngredientStore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ingrédient invalide : magasin vide pour {name}'**
+  String errInvalidIngredientStore(String name);
+
+  /// No description provided for @errInvalidIngredientItemId.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ingrédient invalide : identifiant vide pour {name}'**
+  String errInvalidIngredientItemId(String name);
+
+  /// No description provided for @errInvalidIngredientUnit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ingrédient invalide : unité vide pour {name}'**
+  String errInvalidIngredientUnit(String name);
+
+  /// No description provided for @errInvalidIngredientQuantity.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ingrédient invalide : quantité nulle ou négative pour {name}'**
+  String errInvalidIngredientQuantity(String name);
+
+  /// No description provided for @errMenuItemIdRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chaque article commandé doit contenir menuItemId pour permettre la déduction du stock.'**
+  String get errMenuItemIdRequired;
+
+  /// No description provided for @errMenuItemIdMissingForCancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d’annuler : menuItemId manquant pour un article.'**
+  String get errMenuItemIdMissingForCancel;
+
+  /// No description provided for @errCertilinkDisabled.
+  ///
+  /// In fr, this message translates to:
+  /// **'CertiLink est désactivé pour cet établissement.'**
+  String get errCertilinkDisabled;
+
+  /// No description provided for @errCertilinkConfigIncomplete.
+  ///
+  /// In fr, this message translates to:
+  /// **'Configuration CertiLink incomplète.'**
+  String get errCertilinkConfigIncomplete;
+
+  /// No description provided for @errCertilinkConfigMissingKeys.
+  ///
+  /// In fr, this message translates to:
+  /// **'Configuration CertiLink incomplète : tenantId ou apiKey manquant.'**
+  String get errCertilinkConfigMissingKeys;
+
+  /// No description provided for @errInvoiceNeedsOneItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'La facture doit contenir au moins un article.'**
+  String get errInvoiceNeedsOneItem;
+
+  /// No description provided for @errItemNotFoundInStockItems.
+  ///
+  /// In fr, this message translates to:
+  /// **'Article introuvable dans stock_items.'**
+  String get errItemNotFoundInStockItems;
+
+  /// No description provided for @channelBarReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bar prêt'**
+  String get channelBarReady;
+
+  /// No description provided for @channelKitchenReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cuisine prête'**
+  String get channelKitchenReady;
+
+  /// No description provided for @channelBarReadyDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notifications quand une commande bar est prête'**
+  String get channelBarReadyDescription;
+
+  /// No description provided for @channelKitchenReadyDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notifications quand une commande cuisine est prête'**
+  String get channelKitchenReadyDescription;
+
+  /// No description provided for @channelNewBarOrder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle commande bar'**
+  String get channelNewBarOrder;
+
+  /// No description provided for @channelNewKitchenOrder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle commande cuisine'**
+  String get channelNewKitchenOrder;
+
+  /// No description provided for @channelNewBarOrderDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle commande pour le bar'**
+  String get channelNewBarOrderDescription;
+
+  /// No description provided for @channelNewKitchenOrderDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle commande pour la cuisine'**
+  String get channelNewKitchenOrderDescription;
+
+  /// No description provided for @notifBarOrderReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande bar prête'**
+  String get notifBarOrderReady;
+
+  /// No description provided for @notifKitchenOrderReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande cuisine prête'**
+  String get notifKitchenOrderReady;
+
+  /// No description provided for @notifOrderReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande prête'**
+  String get notifOrderReady;
+
+  /// No description provided for @actionChangePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Changer la photo'**
+  String get actionChangePhoto;
+
+  /// No description provided for @actionAddPhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une photo'**
+  String get actionAddPhoto;
+
+  /// No description provided for @noPhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune photo'**
+  String get noPhoto;
 }
 
 class _AppLocalizationsDelegate

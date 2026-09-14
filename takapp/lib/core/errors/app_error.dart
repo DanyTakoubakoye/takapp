@@ -193,6 +193,31 @@ enum AppErrorCode {
   stockNotFoundFor,
   inconsistentUnit,
   insufficientStockDetailed,
+
+  /// =========================
+  /// INGREDIENTS (RECETTES)
+  /// =========================
+  ///
+  /// Utilisent [AppError.name] (nom de l'ingredient concerne).
+  invalidIngredientStore,
+  invalidIngredientItemId,
+  invalidIngredientUnit,
+  invalidIngredientQuantity,
+
+  /// =========================
+  /// ARTICLES DE COMMANDE
+  /// =========================
+  menuItemIdRequired,
+  menuItemIdMissingForCancel,
+  itemNotFoundInStockItems,
+
+  /// =========================
+  /// CERTILINK
+  /// =========================
+  certilinkDisabled,
+  certilinkConfigIncomplete,
+  certilinkConfigMissingKeys,
+  invoiceNeedsOneItem,
 }
 
 /// Exception traduisible à l'affichage.

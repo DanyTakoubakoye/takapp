@@ -146,31 +146,19 @@ class StoreStockService {
       final quantity = toDouble(deduction['quantity']);
 
       if (store.isEmpty) {
-        throw Exception(
-          'Ingrédient invalide : '
-          'store vide pour $itemName',
-        );
+        throw AppError(AppErrorCode.invalidIngredientStore, name: itemName);
       }
 
       if (itemId.isEmpty) {
-        throw Exception(
-          'Ingrédient invalide : '
-          'itemId vide pour $itemName',
-        );
+        throw AppError(AppErrorCode.invalidIngredientItemId, name: itemName);
       }
 
       if (unit.isEmpty) {
-        throw Exception(
-          'Ingrédient invalide : '
-          'unité vide pour $itemName',
-        );
+        throw AppError(AppErrorCode.invalidIngredientUnit, name: itemName);
       }
 
       if (quantity <= 0) {
-        throw Exception(
-          'Ingrédient invalide : '
-          'quantité <= 0 pour $itemName',
-        );
+        throw AppError(AppErrorCode.invalidIngredientQuantity, name: itemName);
       }
 
       final query = await _stockCol(establishmentId: establishmentId)
