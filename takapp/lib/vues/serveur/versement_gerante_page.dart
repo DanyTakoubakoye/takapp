@@ -449,6 +449,7 @@ class _HandoverHistorySection extends StatelessWidget {
 
                                   final bytes = await pdfService
                                       .buildServerHandoverPdf(
+                                        l10n: l10n,
                                         establishmentName: "TAKHOTEL",
                                         handover: handover,
                                         payments: payments,

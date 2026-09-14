@@ -3602,4 +3602,175 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noStatus => 'Sans statut';
+
+  @override
+  String pdfPhoneLine(String phone) {
+    return 'Tél : $phone';
+  }
+
+  @override
+  String pdfIfuLine(String ifu) {
+    return 'IFU : $ifu';
+  }
+
+  @override
+  String get pdfHandoverValidationTitle => 'VALIDATION DE VERSEMENT';
+
+  @override
+  String pdfDeclaredAmountLine(String amount) {
+    return 'Montant déclaré : $amount';
+  }
+
+  @override
+  String pdfPaymentsCountLine(int count) {
+    return 'Nombre de paiements : $count';
+  }
+
+  @override
+  String get pdfColMethod => 'Méthode';
+
+  @override
+  String get pdfColMode => 'Mode';
+
+  @override
+  String get pdfColQty => 'Qté';
+
+  @override
+  String pdfTotalCapsLine(String amount) {
+    return 'TOTAL : $amount';
+  }
+
+  @override
+  String get pdfSimpleAccountingReportTitle => 'RAPPORT COMPTABLE SIMPLE';
+
+  @override
+  String pdfPeriodLine(String start, String end) {
+    return 'Période : $start - $end';
+  }
+
+  @override
+  String pdfEntriesLine(String amount) {
+    return 'Entrées : $amount';
+  }
+
+  @override
+  String pdfExitsLine(String amount) {
+    return 'Sorties : $amount';
+  }
+
+  @override
+  String pdfTheoreticalBalanceLine(String amount) {
+    return 'Solde théorique : $amount';
+  }
+
+  @override
+  String pdfEstablishmentIdLine(String id) {
+    return 'Établissement ID : $id';
+  }
+
+  @override
+  String get pdfOrderTicketTitle => 'TICKET DE COMMANDE';
+
+  @override
+  String pdfOrderLine(String number) {
+    return 'Commande : $number';
+  }
+
+  @override
+  String pdfClientTypeLine(String type) {
+    return 'Type client : $type';
+  }
+
+  @override
+  String pdfTableLine(String number) {
+    return 'Table : $number';
+  }
+
+  @override
+  String pdfRoomLine(String number) {
+    return 'Chambre : $number';
+  }
+
+  @override
+  String pdfNoteLine(String note) {
+    return 'Note : $note';
+  }
+
+  @override
+  String pdfSubtotalLine(String amount) {
+    return 'Sous-total : $amount';
+  }
+
+  @override
+  String pdfTotalLine(String amount) {
+    return 'Total : $amount';
+  }
+
+  @override
+  String get pdfPaymentReceiptTitle => 'REÇU D’ENCAISSEMENT';
+
+  @override
+  String pdfCashierLine(String name) {
+    return 'Encaisseur : $name';
+  }
+
+  @override
+  String pdfPaymentMethodLine(String method) {
+    return 'Mode de paiement : $method';
+  }
+
+  @override
+  String get pdfAmountReceived => 'Montant reçu';
+
+  @override
+  String get pdfThanksForVisit => 'Merci pour votre visite.';
+
+  @override
+  String get pdfServerHandoverSlipTitle => 'BORDEREAU DE VERSEMENT SERVEUR';
+
+  @override
+  String pdfDeclarationDateLine(String date) {
+    return 'Date déclaration : $date';
+  }
+
+  @override
+  String pdfStatusLine(String status) {
+    return 'Statut : $status';
+  }
+
+  @override
+  String get pdfIncludedPayments => 'Paiements inclus';
+
+  @override
+  String get pdfQuitusTitle => 'QUITUS DE VALIDATION';
+
+  @override
+  String pdfAccountLine(String account) {
+    return 'Compte : $account';
+  }
+
+  @override
+  String pdfTheoreticalAmountLine(String amount) {
+    return 'Montant théorique : $amount';
+  }
+
+  @override
+  String pdfPhysicalAmountLine(String amount) {
+    return 'Montant physique : $amount';
+  }
+
+  @override
+  String pdfValidatedByLine(String name) {
+    return 'Validé par : $name';
+  }
+
+  @override
+  String get pdfAmountsRecognizedEquivalent =>
+      'Les montants théorique et physique ont été reconnus équivalents.';
+
+  @override
+  String get labelTotalWord => 'Total';
+
+  @override
+  String get managerHandoverAccountLabel => 'Versement gérante';
 }

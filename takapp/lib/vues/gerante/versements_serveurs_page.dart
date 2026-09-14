@@ -395,6 +395,7 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
 
                         final bytes = await pdfService
                             .buildManagerValidationPdf(
+                              l10n: l10n,
                               handover: widget.handover,
                               payments: payments,
                             );

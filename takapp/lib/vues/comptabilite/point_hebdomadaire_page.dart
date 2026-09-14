@@ -189,6 +189,8 @@ class _PointHebdomadairePageState extends State<PointHebdomadairePage> {
       final balance = ((_summary?['balance'] ?? 0) as num).toDouble();
 
       final bytes = await pdfService.buildSimpleAccountingReportPdf(
+        l10n: l10n,
+
         establishmentId: establishmentId,
 
         establishmentName: establishmentName,

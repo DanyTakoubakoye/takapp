@@ -6316,6 +6316,246 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Sans statut'**
   String get noStatus;
+
+  /// No description provided for @pdfPhoneLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tél : {phone}'**
+  String pdfPhoneLine(String phone);
+
+  /// No description provided for @pdfIfuLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'IFU : {ifu}'**
+  String pdfIfuLine(String ifu);
+
+  /// No description provided for @pdfHandoverValidationTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'VALIDATION DE VERSEMENT'**
+  String get pdfHandoverValidationTitle;
+
+  /// No description provided for @pdfDeclaredAmountLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant déclaré : {amount}'**
+  String pdfDeclaredAmountLine(String amount);
+
+  /// No description provided for @pdfPaymentsCountLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nombre de paiements : {count}'**
+  String pdfPaymentsCountLine(int count);
+
+  /// No description provided for @pdfColMethod.
+  ///
+  /// In fr, this message translates to:
+  /// **'Méthode'**
+  String get pdfColMethod;
+
+  /// No description provided for @pdfColMode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode'**
+  String get pdfColMode;
+
+  /// No description provided for @pdfColQty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Qté'**
+  String get pdfColQty;
+
+  /// No description provided for @pdfTotalCapsLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'TOTAL : {amount}'**
+  String pdfTotalCapsLine(String amount);
+
+  /// No description provided for @pdfSimpleAccountingReportTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'RAPPORT COMPTABLE SIMPLE'**
+  String get pdfSimpleAccountingReportTitle;
+
+  /// No description provided for @pdfPeriodLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Période : {start} - {end}'**
+  String pdfPeriodLine(String start, String end);
+
+  /// No description provided for @pdfEntriesLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrées : {amount}'**
+  String pdfEntriesLine(String amount);
+
+  /// No description provided for @pdfExitsLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sorties : {amount}'**
+  String pdfExitsLine(String amount);
+
+  /// No description provided for @pdfTheoreticalBalanceLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Solde théorique : {amount}'**
+  String pdfTheoreticalBalanceLine(String amount);
+
+  /// No description provided for @pdfEstablishmentIdLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Établissement ID : {id}'**
+  String pdfEstablishmentIdLine(String id);
+
+  /// No description provided for @pdfOrderTicketTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'TICKET DE COMMANDE'**
+  String get pdfOrderTicketTitle;
+
+  /// No description provided for @pdfOrderLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande : {number}'**
+  String pdfOrderLine(String number);
+
+  /// No description provided for @pdfClientTypeLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type client : {type}'**
+  String pdfClientTypeLine(String type);
+
+  /// No description provided for @pdfTableLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Table : {number}'**
+  String pdfTableLine(String number);
+
+  /// No description provided for @pdfRoomLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chambre : {number}'**
+  String pdfRoomLine(String number);
+
+  /// No description provided for @pdfNoteLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Note : {note}'**
+  String pdfNoteLine(String note);
+
+  /// No description provided for @pdfSubtotalLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sous-total : {amount}'**
+  String pdfSubtotalLine(String amount);
+
+  /// No description provided for @pdfTotalLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total : {amount}'**
+  String pdfTotalLine(String amount);
+
+  /// No description provided for @pdfPaymentReceiptTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'REÇU D’ENCAISSEMENT'**
+  String get pdfPaymentReceiptTitle;
+
+  /// No description provided for @pdfCashierLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaisseur : {name}'**
+  String pdfCashierLine(String name);
+
+  /// No description provided for @pdfPaymentMethodLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode de paiement : {method}'**
+  String pdfPaymentMethodLine(String method);
+
+  /// No description provided for @pdfAmountReceived.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant reçu'**
+  String get pdfAmountReceived;
+
+  /// No description provided for @pdfThanksForVisit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Merci pour votre visite.'**
+  String get pdfThanksForVisit;
+
+  /// No description provided for @pdfServerHandoverSlipTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'BORDEREAU DE VERSEMENT SERVEUR'**
+  String get pdfServerHandoverSlipTitle;
+
+  /// No description provided for @pdfDeclarationDateLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date déclaration : {date}'**
+  String pdfDeclarationDateLine(String date);
+
+  /// No description provided for @pdfStatusLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Statut : {status}'**
+  String pdfStatusLine(String status);
+
+  /// No description provided for @pdfIncludedPayments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiements inclus'**
+  String get pdfIncludedPayments;
+
+  /// No description provided for @pdfQuitusTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'QUITUS DE VALIDATION'**
+  String get pdfQuitusTitle;
+
+  /// No description provided for @pdfAccountLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte : {account}'**
+  String pdfAccountLine(String account);
+
+  /// No description provided for @pdfTheoreticalAmountLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant théorique : {amount}'**
+  String pdfTheoreticalAmountLine(String amount);
+
+  /// No description provided for @pdfPhysicalAmountLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant physique : {amount}'**
+  String pdfPhysicalAmountLine(String amount);
+
+  /// No description provided for @pdfValidatedByLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Validé par : {name}'**
+  String pdfValidatedByLine(String name);
+
+  /// No description provided for @pdfAmountsRecognizedEquivalent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les montants théorique et physique ont été reconnus équivalents.'**
+  String get pdfAmountsRecognizedEquivalent;
+
+  /// No description provided for @labelTotalWord.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total'**
+  String get labelTotalWord;
+
+  /// No description provided for @managerHandoverAccountLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Versement gérante'**
+  String get managerHandoverAccountLabel;
 }
 
 class _AppLocalizationsDelegate

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/order_item_model.dart';
 import 'package:takapp/modeles/order_model.dart';
 import 'package:takapp/modeles/payment_model.dart';
@@ -48,6 +49,9 @@ class PdfService {
     String? establishmentAddress,
     String? establishmentPhone,
     String? establishmentIfu,
+
+    /// Null pour les documents fiscaux, qui restent en francais.
+    AppLocalizations? l10n,
   }) {
     return pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -62,10 +66,15 @@ class PdfService {
           pw.Text(establishmentAddress),
 
         if (establishmentPhone != null && establishmentPhone.trim().isNotEmpty)
-          pw.Text('Tél : $establishmentPhone'),
+          pw.Text(
+            l10n?.pdfPhoneLine(establishmentPhone) ??
+                'Tél : $establishmentPhone',
+          ),
 
         if (establishmentIfu != null && establishmentIfu.trim().isNotEmpty)
-          pw.Text('IFU : $establishmentIfu'),
+          pw.Text(
+            l10n?.pdfIfuLine(establishmentIfu) ?? 'IFU : $establishmentIfu',
+          ),
 
         pw.SizedBox(height: 6),
 
@@ -250,6 +259,7 @@ class PdfService {
   Future<List<int>> buildManagerValidationPdf({
     required ServerHandoverModel handover,
     required List<PaymentModel> payments,
+    required AppLocalizations l10n,
   }) async {
     final pdf = pw.Document();
 
@@ -260,25 +270,26 @@ class PdfService {
         build: (context) {
           return [
             pw.Text(
-              'VALIDATION DE VERSEMENT',
+              l10n.pdfHandoverValidationTitle,
               style: pw.TextStyle(fontSize: 22, fontWeight: pw.FontWeight.bold),
             ),
 
             pw.SizedBox(height: 20),
 
-            pw.Text('Serveur : ${handover.serveurName}'),
+            pw.Text(l10n.waiterLine(handover.serveurName)),
 
             pw.Text(
-              'Montant déclaré : '
-              '${handover.declaredAmount.toStringAsFixed(0)} FCFA',
+              l10n.pdfDeclaredAmountLine(
+                _formatAmount(handover.declaredAmount),
+              ),
             ),
 
-            pw.Text('Nombre de paiements : ${payments.length}'),
+            pw.Text(l10n.pdfPaymentsCountLine(payments.length)),
 
             pw.SizedBox(height: 20),
 
             pw.TableHelper.fromTextArray(
-              headers: const ['Commande', 'Méthode', 'Montant'],
+              headers: [l10n.labelOrder, l10n.pdfColMethod, l10n.labelAmount],
               data: payments.map((payment) {
                 return [
                   payment.orderNumber,
@@ -293,7 +304,7 @@ class PdfService {
             pw.Align(
               alignment: pw.Alignment.centerRight,
               child: pw.Text(
-                'TOTAL : ${total.toStringAsFixed(0)} FCFA',
+                l10n.pdfTotalCapsLine(_formatAmount(total)),
                 style: pw.TextStyle(
                   fontSize: 18,
                   fontWeight: pw.FontWeight.bold,
@@ -319,6 +330,7 @@ class PdfService {
     String? establishmentAddress,
     String? establishmentPhone,
     String? establishmentIfu,
+    required AppLocalizations l10n,
   }) async {
     final pdf = pw.Document();
 
@@ -330,7 +342,8 @@ class PdfService {
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               _buildHeader(
-                title: 'RAPPORT COMPTABLE SIMPLE',
+                l10n: l10n,
+                title: l10n.pdfSimpleAccountingReportTitle,
                 establishmentName: establishmentName.trim().isEmpty
                     ? 'TAKAPP'
                     : establishmentName,
@@ -342,7 +355,10 @@ class PdfService {
               pw.SizedBox(height: 8),
 
               pw.Text(
-                'Période : ${DateFormat('dd/MM/yyyy').format(startDate)} - ${DateFormat('dd/MM/yyyy').format(endDate)}',
+                l10n.pdfPeriodLine(
+                  DateFormat('dd/MM/yyyy').format(startDate),
+                  DateFormat('dd/MM/yyyy').format(endDate),
+                ),
               ),
 
               pw.SizedBox(height: 16),
@@ -356,12 +372,14 @@ class PdfService {
                 child: pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text('Entrées : ${_formatAmount(totalEntries)}'),
+                    pw.Text(l10n.pdfEntriesLine(_formatAmount(totalEntries))),
                     pw.SizedBox(height: 6),
-                    pw.Text('Sorties : ${_formatAmount(totalExpenses)}'),
+                    pw.Text(l10n.pdfExitsLine(_formatAmount(totalExpenses))),
                     pw.SizedBox(height: 6),
                     pw.Text(
-                      'Solde théorique : ${_formatAmount(theoreticalBalance)}',
+                      l10n.pdfTheoreticalBalanceLine(
+                        _formatAmount(theoreticalBalance),
+                      ),
                       style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
                     ),
                   ],
@@ -371,7 +389,7 @@ class PdfService {
               pw.SizedBox(height: 20),
 
               pw.Text(
-                'Établissement ID : $establishmentId',
+                l10n.pdfEstablishmentIdLine(establishmentId),
                 style: const pw.TextStyle(
                   fontSize: 9,
                   color: PdfColors.grey600,
@@ -399,6 +417,7 @@ class PdfService {
     String? establishmentAddress,
     String? establishmentPhone,
     String? establishmentIfu,
+    required AppLocalizations l10n,
   }) async {
     final pdf = pw.Document();
 
@@ -410,7 +429,8 @@ class PdfService {
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               _buildHeader(
-                title: 'TICKET DE COMMANDE',
+                l10n: l10n,
+                title: l10n.pdfOrderTicketTitle,
                 establishmentName: establishmentName,
                 establishmentAddress: establishmentAddress,
                 establishmentPhone: establishmentPhone,
@@ -419,17 +439,17 @@ class PdfService {
 
               pw.SizedBox(height: 8),
 
-              pw.Text('Commande : ${order.orderNumber}'),
-              pw.Text('Serveur : ${order.createdByName}'),
-              pw.Text('Type client : ${order.clientType}'),
+              pw.Text(l10n.pdfOrderLine(order.orderNumber)),
+              pw.Text(l10n.waiterLine(order.createdByName)),
+              pw.Text(l10n.pdfClientTypeLine(order.clientType)),
 
               if (order.tableNumber != null && order.tableNumber!.isNotEmpty)
-                pw.Text('Table : ${order.tableNumber}'),
+                pw.Text(l10n.pdfTableLine(order.tableNumber!)),
 
               if (order.roomNumber != null && order.roomNumber!.isNotEmpty)
-                pw.Text('Chambre : ${order.roomNumber}'),
+                pw.Text(l10n.pdfRoomLine(order.roomNumber!)),
 
-              pw.Text('Date : ${_formatDate(order.createdAt)}'),
+              pw.Text(l10n.dateLine(_formatDate(order.createdAt))),
 
               pw.SizedBox(height: 10),
 
@@ -446,9 +466,9 @@ class PdfService {
                       color: PdfColors.grey300,
                     ),
                     children: [
-                      _tableHeader('Article'),
-                      _tableHeader('Qté'),
-                      _tableHeader('Total'),
+                      _tableHeader(l10n.labelItem),
+                      _tableHeader(l10n.pdfColQty),
+                      _tableHeader(l10n.labelTotalWord),
                     ],
                   ),
 
@@ -464,7 +484,7 @@ class PdfService {
 
                               if (item.note.trim().isNotEmpty)
                                 pw.Text(
-                                  'Note: ${item.note}',
+                                  l10n.pdfNoteLine(item.note),
                                   style: const pw.TextStyle(fontSize: 9),
                                 ),
                             ],
@@ -487,9 +507,11 @@ class PdfService {
                 child: pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.end,
                   children: [
-                    pw.Text('Sous-total : ${_formatAmount(order.subtotal)}'),
+                    pw.Text(
+                      l10n.pdfSubtotalLine(_formatAmount(order.subtotal)),
+                    ),
 
-                    pw.Text('Total : ${_formatAmount(order.total)}'),
+                    pw.Text(l10n.pdfTotalLine(_formatAmount(order.total))),
                   ],
                 ),
               ),
@@ -515,6 +537,7 @@ class PdfService {
     String? establishmentAddress,
     String? establishmentPhone,
     String? establishmentIfu,
+    required AppLocalizations l10n,
   }) async {
     final pdf = pw.Document();
 
@@ -526,7 +549,8 @@ class PdfService {
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               _buildHeader(
-                title: 'REÇU D’ENCAISSEMENT',
+                l10n: l10n,
+                title: l10n.pdfPaymentReceiptTitle,
                 establishmentName: establishmentName,
                 establishmentAddress: establishmentAddress,
                 establishmentPhone: establishmentPhone,
@@ -535,13 +559,13 @@ class PdfService {
 
               pw.SizedBox(height: 8),
 
-              pw.Text('Commande : ${order.orderNumber}'),
+              pw.Text(l10n.pdfOrderLine(order.orderNumber)),
 
-              pw.Text('Encaisseur : ${payment.receivedByName}'),
+              pw.Text(l10n.pdfCashierLine(payment.receivedByName)),
 
-              pw.Text('Mode de paiement : ${payment.method}'),
+              pw.Text(l10n.pdfPaymentMethodLine(payment.method)),
 
-              pw.Text('Date : ${_formatDate(payment.createdAt)}'),
+              pw.Text(l10n.dateLine(_formatDate(payment.createdAt))),
 
               pw.SizedBox(height: 12),
 
@@ -554,7 +578,7 @@ class PdfService {
                 child: pw.Column(
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
                   children: [
-                    pw.Text('Montant reçu'),
+                    pw.Text(l10n.pdfAmountReceived),
 
                     pw.SizedBox(height: 6),
 
@@ -571,7 +595,7 @@ class PdfService {
 
               pw.SizedBox(height: 18),
 
-              pw.Text('Merci pour votre visite.'),
+              pw.Text(l10n.pdfThanksForVisit),
             ],
           );
         },
@@ -594,6 +618,7 @@ class PdfService {
     String? establishmentAddress,
     String? establishmentPhone,
     String? establishmentIfu,
+    required AppLocalizations l10n,
   }) async {
     final pdf = pw.Document();
 
@@ -603,7 +628,8 @@ class PdfService {
         build: (context) {
           return [
             _buildHeader(
-              title: 'BORDEREAU DE VERSEMENT SERVEUR',
+              l10n: l10n,
+              title: l10n.pdfServerHandoverSlipTitle,
               establishmentName: establishmentName,
               establishmentAddress: establishmentAddress,
               establishmentPhone: establishmentPhone,
@@ -612,20 +638,24 @@ class PdfService {
 
             pw.SizedBox(height: 8),
 
-            pw.Text('Serveur : ${handover.serveurName}'),
-
-            pw.Text('Date déclaration : ${_formatDate(handover.createdAt)}'),
-
-            pw.Text('Statut : ${handover.status}'),
+            pw.Text(l10n.waiterLine(handover.serveurName)),
 
             pw.Text(
-              'Montant déclaré : ${_formatAmount(handover.declaredAmount)}',
+              l10n.pdfDeclarationDateLine(_formatDate(handover.createdAt)),
+            ),
+
+            pw.Text(l10n.pdfStatusLine(handover.status)),
+
+            pw.Text(
+              l10n.pdfDeclaredAmountLine(
+                _formatAmount(handover.declaredAmount),
+              ),
             ),
 
             pw.SizedBox(height: 12),
 
             pw.Text(
-              'Paiements inclus',
+              l10n.pdfIncludedPayments,
               style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
             ),
 
@@ -637,9 +667,9 @@ class PdfService {
                 pw.TableRow(
                   decoration: const pw.BoxDecoration(color: PdfColors.grey300),
                   children: [
-                    _tableHeader('Commande'),
-                    _tableHeader('Mode'),
-                    _tableHeader('Montant'),
+                    _tableHeader(l10n.labelOrder),
+                    _tableHeader(l10n.pdfColMode),
+                    _tableHeader(l10n.labelAmount),
                   ],
                 ),
 
@@ -681,6 +711,7 @@ class PdfService {
     String? establishmentAddress,
     String? establishmentPhone,
     String? establishmentIfu,
+    required AppLocalizations l10n,
   }) async {
     final pdf = pw.Document();
 
@@ -692,7 +723,8 @@ class PdfService {
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               _buildHeader(
-                title: 'QUITUS DE VALIDATION',
+                l10n: l10n,
+                title: l10n.pdfQuitusTitle,
                 establishmentName: establishmentName,
                 establishmentAddress: establishmentAddress,
                 establishmentPhone: establishmentPhone,
@@ -701,23 +733,25 @@ class PdfService {
 
               pw.SizedBox(height: 12),
 
-              pw.Text('Compte : $accountType'),
+              pw.Text(l10n.pdfAccountLine(accountType)),
 
               pw.Text(
-                'Montant théorique : ${_formatAmount(theoreticalAmount)}',
+                l10n.pdfTheoreticalAmountLine(
+                  _formatAmount(theoreticalAmount),
+                ),
               ),
 
-              pw.Text('Montant physique : ${_formatAmount(physicalAmount)}'),
+              pw.Text(
+                l10n.pdfPhysicalAmountLine(_formatAmount(physicalAmount)),
+              ),
 
-              pw.Text('Date : ${_formatDate(date)}'),
+              pw.Text(l10n.dateLine(_formatDate(date))),
 
-              pw.Text('Validé par : $validatedByName'),
+              pw.Text(l10n.pdfValidatedByLine(validatedByName)),
 
               pw.SizedBox(height: 16),
 
-              pw.Text(
-                'Les montants théorique et physique ont été reconnus équivalents.',
-              ),
+              pw.Text(l10n.pdfAmountsRecognizedEquivalent),
             ],
           );
         },

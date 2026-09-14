@@ -250,6 +250,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     required double theoretical,
     required double physical,
   }) async {
+    final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthController>();
 
     final user = auth.currentUser;
@@ -280,6 +281,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     final printerService = context.read<PrinterService>();
 
     final bytes = await pdfService.buildQuitusPdf(
+      l10n: l10n,
       establishmentName: user.establishmentName,
       establishmentId: user.establishmentId,
       accountType: accountType,

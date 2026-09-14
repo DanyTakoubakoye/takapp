@@ -185,10 +185,9 @@ class _ReceptionGerantePageState extends State<ReceptionGerantePage> {
     final establishmentData = await _getEstablishmentData();
 
     final bytes = await pdfService.buildQuitusPdf(
+      l10n: l10n,
       establishmentId: establishmentData['establishmentId'],
-      // Libellé porté par le quitus imprimé : le contenu des documents reste
-      // en français, indépendamment de la langue de l'utilisateur.
-      accountType: 'Versement gérante',
+      accountType: l10n.managerHandoverAccountLabel,
       theoreticalAmount: amount,
       physicalAmount: amount,
       date: DateTime.now(),

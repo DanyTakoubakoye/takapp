@@ -2350,5 +2350,226 @@
   "createEstablishmentAdminTitle": "Create an establishment administrator",
   "labelEstablishment": "Establishment",
 
-  "noStatus": "No status"
+  "noStatus": "No status",
+
+  "pdfPhoneLine": "Phone: {phone}",
+  "@pdfPhoneLine": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfIfuLine": "TIN: {ifu}",
+  "@pdfIfuLine": {
+    "placeholders": {
+      "ifu": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfHandoverValidationTitle": "HANDOVER VALIDATION",
+  "pdfDeclaredAmountLine": "Declared amount: {amount}",
+  "@pdfDeclaredAmountLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfPaymentsCountLine": "Number of payments: {count}",
+  "@pdfPaymentsCountLine": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pdfColMethod": "Method",
+  "pdfColMode": "Mode",
+  "pdfColQty": "Qty",
+  "pdfTotalCapsLine": "TOTAL: {amount}",
+  "@pdfTotalCapsLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfSimpleAccountingReportTitle": "SIMPLE ACCOUNTING REPORT",
+  "pdfPeriodLine": "Period: {start} - {end}",
+  "@pdfPeriodLine": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfEntriesLine": "Inflows: {amount}",
+  "@pdfEntriesLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfExitsLine": "Outflows: {amount}",
+  "@pdfExitsLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfTheoreticalBalanceLine": "Theoretical balance: {amount}",
+  "@pdfTheoreticalBalanceLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfEstablishmentIdLine": "Establishment ID: {id}",
+  "@pdfEstablishmentIdLine": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfOrderTicketTitle": "ORDER TICKET",
+  "pdfOrderLine": "Order: {number}",
+  "@pdfOrderLine": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfClientTypeLine": "Client type: {type}",
+  "@pdfClientTypeLine": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfTableLine": "Table: {number}",
+  "@pdfTableLine": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfRoomLine": "Room: {number}",
+  "@pdfRoomLine": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfNoteLine": "Note: {note}",
+  "@pdfNoteLine": {
+    "placeholders": {
+      "note": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfSubtotalLine": "Subtotal: {amount}",
+  "@pdfSubtotalLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfTotalLine": "Total: {amount}",
+  "@pdfTotalLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfPaymentReceiptTitle": "PAYMENT RECEIPT",
+  "pdfCashierLine": "Cashier: {name}",
+  "@pdfCashierLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfPaymentMethodLine": "Payment method: {method}",
+  "@pdfPaymentMethodLine": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfAmountReceived": "Amount received",
+  "pdfThanksForVisit": "Thank you for your visit.",
+  "pdfServerHandoverSlipTitle": "WAITER HANDOVER SLIP",
+  "pdfDeclarationDateLine": "Declaration date: {date}",
+  "@pdfDeclarationDateLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfStatusLine": "Status: {status}",
+  "@pdfStatusLine": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfIncludedPayments": "Included payments",
+  "pdfQuitusTitle": "VALIDATION RECEIPT",
+  "pdfAccountLine": "Account: {account}",
+  "@pdfAccountLine": {
+    "placeholders": {
+      "account": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfTheoreticalAmountLine": "Theoretical amount: {amount}",
+  "@pdfTheoreticalAmountLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfPhysicalAmountLine": "Physical amount: {amount}",
+  "@pdfPhysicalAmountLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfValidatedByLine": "Validated by: {name}",
+  "@pdfValidatedByLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pdfAmountsRecognizedEquivalent": "The theoretical and physical amounts were recognized as equivalent.",
+
+  "labelTotalWord": "Total",
+
+  "managerHandoverAccountLabel": "Manager handover"
 }
