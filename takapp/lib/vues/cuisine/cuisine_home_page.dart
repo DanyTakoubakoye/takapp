@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/kitchen_order_model.dart';
 import 'package:takapp/modeles/order_item_model.dart';
 import 'package:takapp/services/cuisine_service.dart';
@@ -58,7 +59,10 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
     unlockWebSoundAfterUserInteraction();
   }
 
-  void _handleNewKitchenOrders(List<KitchenOrderModel> orders) {
+  void _handleNewKitchenOrders(
+    List<KitchenOrderModel> orders,
+    AppLocalizations l10n,
+  ) {
     if (_isFirstSnapshot) {
       for (final o in orders) {
         _knownOrderIds.add(o.id);
@@ -72,7 +76,7 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
       _knownOrderIds.add(o.id);
 
       try {
-        final clientLabel = _clientLabel(o);
+        final clientLabel = _clientLabel(o, l10n);
         final orderNumber = o.orderNumber;
 
         playWebNotificationSound(
@@ -85,13 +89,13 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
         }
 
         showWebNotification(
-          title: 'Nouvelle commande cuisine',
-          body: 'Commande $orderNumber - $clientLabel',
+          title: l10n.newKitchenOrderTitle,
+          body: l10n.orderNumberWithClient(orderNumber, clientLabel),
           establishmentId: widget.establishmentId,
           tag: 'takapp_kitchen_${widget.establishmentId}_${o.id}',
         );
 
-        _showNewOrderPopup(orderNumber, clientLabel);
+        _showNewOrderPopup(orderNumber, clientLabel, l10n);
       } catch (e) {}
     }
   }
@@ -99,6 +103,7 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
   Future<void> _showNewOrderPopup(
     String orderNumber,
     String clientLabel,
+    AppLocalizations l10n,
   ) async {
     if (_isPopupOpen) return;
     if (!mounted) return;
@@ -109,8 +114,8 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
       barrierDismissible: true,
       builder: (dialogContext) => AlertDialog(
         icon: const Icon(Icons.restaurant, color: Colors.deepOrange, size: 40),
-        title: const Text('Nouvelle commande cuisine'),
-        content: Text('Commande $orderNumber\n$clientLabel'),
+        title: Text(l10n.newKitchenOrderTitle),
+        content: Text('${l10n.orderNumberLine(orderNumber)}\n$clientLabel'),
         actions: [
           ElevatedButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
@@ -122,14 +127,14 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
     _isPopupOpen = false;
   }
 
-  String _clientLabel(KitchenOrderModel order) {
+  String _clientLabel(KitchenOrderModel order, AppLocalizations l10n) {
     switch (order.clientType) {
       case 'restaurant':
-        return 'Table ${order.tableNumber ?? "-"}';
+        return l10n.labelTable(order.tableNumber ?? '-');
       case 'hotel':
-        return 'Chambre ${order.roomNumber ?? "-"}';
+        return l10n.labelRoom(order.roomNumber ?? '-');
       case 'bar':
-        return 'Client Bar';
+        return l10n.labelBarClient;
       default:
         return order.clientType;
     }
@@ -149,15 +154,15 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
     }
   }
 
-  String _statusLabel(String status) {
+  String _statusLabel(String status, AppLocalizations l10n) {
     switch (status) {
       case 'pending':
       case 'sent':
-        return 'En attente';
+        return l10n.statusPending;
       case 'preparing':
-        return 'En préparation';
+        return l10n.statusPreparing;
       case 'ready':
-        return 'Prête';
+        return l10n.statusReady;
       default:
         return status;
     }
@@ -165,23 +170,20 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
     final cuisineService = context.read<CuisineService>();
     final user = auth.currentUser;
     final isSmallScreen = MediaQuery.of(context).size.width < 900;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     final establishmentId = user.establishmentId.trim();
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errEstablishmentNotFound)));
     }
 
     return Scaffold(
@@ -195,7 +197,11 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
             final name = (snapshot.data?.data()?['name'] ?? '')
                 .toString()
                 .toUpperCase();
-            return Text(name.isEmpty ? 'Cuisine' : '$name - Cuisine');
+            return Text(
+              name.isEmpty
+                  ? l10n.kitchenTitle
+                  : l10n.establishmentKitchenTitle(name),
+            );
           },
         ),
         actions: [
@@ -215,7 +221,7 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
             }
 
             if (snapshot.hasError) {
-              return Center(child: Text('Erreur: ${snapshot.error}'));
+              return Center(child: Text(l10n.commonError('${snapshot.error}')));
             }
 
             final allOrders = snapshot.data ?? [];
@@ -225,7 +231,7 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
                 .toList();
             // Alerte son + popup pour les nouvelles commandes cuisine
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              _handleNewKitchenOrders(kitchenOrders);
+              _handleNewKitchenOrders(kitchenOrders, l10n);
             });
 
             final pendingOrders = kitchenOrders
@@ -254,7 +260,7 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
                     const SizedBox(height: 12),
                     _KitchenSection(
                       establishmentId: establishmentId,
-                      title: 'En attente',
+                      title: l10n.statusPending,
                       orders: pendingOrders,
                       cuisineService: cuisineService,
                       statusColor: _statusColor,
@@ -265,7 +271,7 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
                     const SizedBox(height: 16),
                     _KitchenSection(
                       establishmentId: establishmentId,
-                      title: 'En préparation',
+                      title: l10n.statusPreparing,
                       orders: preparingOrders,
                       cuisineService: cuisineService,
                       statusColor: _statusColor,
@@ -276,7 +282,7 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
                     const SizedBox(height: 16),
                     _KitchenSection(
                       establishmentId: establishmentId,
-                      title: 'Prêtes',
+                      title: l10n.statusReadyPlural,
                       orders: readyOrders,
                       cuisineService: cuisineService,
                       statusColor: _statusColor,
@@ -302,7 +308,7 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
                       Expanded(
                         child: _KitchenSection(
                           establishmentId: establishmentId,
-                          title: 'En attente',
+                          title: l10n.statusPending,
                           orders: pendingOrders,
                           cuisineService: cuisineService,
                           statusColor: _statusColor,
@@ -315,7 +321,7 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
                       Expanded(
                         child: _KitchenSection(
                           establishmentId: establishmentId,
-                          title: 'En préparation',
+                          title: l10n.statusPreparing,
                           orders: preparingOrders,
                           cuisineService: cuisineService,
                           statusColor: _statusColor,
@@ -328,7 +334,7 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
                       Expanded(
                         child: _KitchenSection(
                           establishmentId: establishmentId,
-                          title: 'Prêtes',
+                          title: l10n.statusReadyPlural,
                           orders: readyOrders,
                           cuisineService: cuisineService,
                           statusColor: _statusColor,
@@ -356,6 +362,8 @@ class _WelcomeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -370,12 +378,12 @@ class _WelcomeCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Bienvenue : $userName',
+                    l10n.welcomeName(userName),
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Suivi des commandes cuisine de tous les serveurs',
+                    l10n.kitchenOrdersFollowUp,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ],
@@ -395,6 +403,7 @@ class _KitchenStockActionsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isSmallScreen = MediaQuery.of(context).size.width < 900;
 
     return Card(
@@ -421,7 +430,7 @@ class _KitchenStockActionsCard extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Gestion stock cuisine',
+                    l10n.kitchenStockManagementTitle,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -434,9 +443,8 @@ class _KitchenStockActionsCard extends StatelessWidget {
               Column(
                 children: [
                   _KitchenMainActionButton(
-                    title: 'Gestion de Stocks',
-                    subtitle:
-                        'Composer menu • Ajouter article\nDéclarer consommation • Demander approvisionnement',
+                    title: l10n.stockManagementCardTitle,
+                    subtitle: l10n.stockManagementCardSubtitleMobile,
                     color: Colors.blue,
                     icon: Icons.settings_applications_outlined,
                     onTap: () {
@@ -452,9 +460,8 @@ class _KitchenStockActionsCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   _KitchenMainActionButton(
-                    title: 'Consulter Stocks',
-                    subtitle:
-                        'Voir les stocks • Confirmer réception • Historique stocks',
+                    title: l10n.stockConsultationCardTitle,
+                    subtitle: l10n.stockConsultationCardSubtitle,
                     color: Colors.green,
                     icon: Icons.visibility_outlined,
                     onTap: () {
@@ -475,9 +482,8 @@ class _KitchenStockActionsCard extends StatelessWidget {
                 children: [
                   Expanded(
                     child: _KitchenMainActionButton(
-                      title: 'Gestion de Stocks',
-                      subtitle:
-                          'Composer menu • Ajouter article • Déclarer consommation • Demander approvisionnement',
+                      title: l10n.stockManagementCardTitle,
+                      subtitle: l10n.stockManagementCardSubtitle,
                       color: Colors.blue,
                       icon: Icons.settings_applications_outlined,
                       onTap: () {
@@ -495,9 +501,8 @@ class _KitchenStockActionsCard extends StatelessWidget {
                   const SizedBox(width: 14),
                   Expanded(
                     child: _KitchenMainActionButton(
-                      title: 'Consulter Stocks',
-                      subtitle:
-                          'Voir les stocks • Confirmer réception • Historique stocks',
+                      title: l10n.stockConsultationCardTitle,
+                      subtitle: l10n.stockConsultationCardSubtitle,
                       color: Colors.green,
                       icon: Icons.visibility_outlined,
                       onTap: () {
@@ -588,8 +593,9 @@ class _KitchenSection extends StatelessWidget {
   final List<KitchenOrderModel> orders;
   final CuisineService cuisineService;
   final Color Function(String status) statusColor;
-  final String Function(String status) statusLabel;
-  final String Function(KitchenOrderModel order) clientLabel;
+  final String Function(String status, AppLocalizations l10n) statusLabel;
+  final String Function(KitchenOrderModel order, AppLocalizations l10n)
+  clientLabel;
   final bool isMobile;
 
   const _KitchenSection({
@@ -631,9 +637,11 @@ class _KitchenSection extends StatelessWidget {
             const SizedBox(height: 12),
             if (isMobile)
               orders.isEmpty
-                  ? const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Center(child: Text('Aucune commande')),
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Center(
+                        child: Text(AppLocalizations.of(context).noOrders),
+                      ),
                     )
                   : ListView.separated(
                       shrinkWrap: true,
@@ -656,7 +664,7 @@ class _KitchenSection extends StatelessWidget {
             else
               Expanded(
                 child: orders.isEmpty
-                    ? const Center(child: Text('Aucune commande'))
+                    ? Center(child: Text(AppLocalizations.of(context).noOrders))
                     : ListView.separated(
                         itemCount: orders.length,
                         separatorBuilder: (_, _) => const SizedBox(height: 10),
@@ -688,12 +696,14 @@ class KitchenStockManagementPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return _KitchenStockMenuPage(
-      title: 'Gestion de Stocks',
+      title: l10n.stockManagementCardTitle,
       color: Colors.blue,
       actions: [
         _KitchenSubAction(
-          title: 'Composer menu',
+          title: l10n.actionComposeMenu,
           icon: Icons.food_bank_outlined,
           onTap: () {
             Navigator.push(
@@ -707,7 +717,7 @@ class KitchenStockManagementPage extends StatelessWidget {
           },
         ),
         _KitchenSubAction(
-          title: 'Ajouter article',
+          title: l10n.actionAddArticle,
           icon: Icons.add_box_outlined,
           onTap: () {
             Navigator.push(
@@ -720,7 +730,7 @@ class KitchenStockManagementPage extends StatelessWidget {
           },
         ),
         _KitchenSubAction(
-          title: 'Déclarer une consommation',
+          title: l10n.actionDeclareConsumption,
           icon: Icons.remove_shopping_cart_outlined,
           onTap: () {
             Navigator.push(
@@ -729,15 +739,15 @@ class KitchenStockManagementPage extends StatelessWidget {
                 builder: (_) => StockOutPage(
                   establishmentId: establishmentId,
                   store: 'restaurant',
-                  title: 'Sortie de stock - Restaurant',
-                  defaultReason: 'Préparation cuisine',
+                  title: l10n.stockOutRestaurantTitle,
+                  defaultReason: l10n.reasonKitchenPreparation,
                 ),
               ),
             );
           },
         ),
         _KitchenSubAction(
-          title: 'Demander un approvisionnement',
+          title: l10n.actionRequestSupply,
           icon: Icons.playlist_add_circle_outlined,
           onTap: () {
             Navigator.push(
@@ -747,7 +757,7 @@ class KitchenStockManagementPage extends StatelessWidget {
                   establishmentId: establishmentId,
                   store: 'restaurant',
                   requestedByRole: 'chef_cuisine',
-                  title: 'Demande approvisionnement - Restaurant',
+                  title: l10n.supplyRequestRestaurantTitle,
                 ),
               ),
             );
@@ -768,12 +778,14 @@ class KitchenStockConsultationPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return _KitchenStockMenuPage(
-      title: 'Consulter Stocks',
+      title: l10n.stockConsultationCardTitle,
       color: Colors.green,
       actions: [
         _KitchenSubAction(
-          title: 'Voir les stocks',
+          title: l10n.actionViewStocks,
           icon: Icons.inventory_2_outlined,
           onTap: () {
             Navigator.push(
@@ -782,14 +794,14 @@ class KitchenStockConsultationPage extends StatelessWidget {
                 builder: (_) => StoreStockPage(
                   establishmentId: establishmentId,
                   store: 'restaurant',
-                  title: 'Stock Restaurant',
+                  title: l10n.stockRestaurantTitle,
                 ),
               ),
             );
           },
         ),
         _KitchenSubAction(
-          title: 'Confirmer une réception',
+          title: l10n.actionConfirmAReception,
           icon: Icons.check_circle_outline,
           onTap: () {
             Navigator.push(
@@ -798,14 +810,14 @@ class KitchenStockConsultationPage extends StatelessWidget {
                 builder: (_) => StoreRequestHistoryPage(
                   establishmentId: establishmentId,
                   store: 'restaurant',
-                  title: 'Réceptions à confirmer - Restaurant',
+                  title: l10n.receptionsToConfirmRestaurantTitle,
                 ),
               ),
             );
           },
         ),
         _KitchenSubAction(
-          title: 'Historique stocks',
+          title: l10n.actionStockHistory,
           icon: Icons.history,
           onTap: () {
             Navigator.push(
@@ -814,7 +826,7 @@ class KitchenStockConsultationPage extends StatelessWidget {
                 builder: (_) => StockMovementHistoryPage(
                   establishmentId: establishmentId,
                   store: 'restaurant',
-                  title: 'Historique mouvements - Restaurant',
+                  title: l10n.movementHistoryRestaurantTitle,
                 ),
               ),
             );
@@ -916,8 +928,9 @@ class _KitchenOrderCard extends StatelessWidget {
   final KitchenOrderModel order;
   final CuisineService cuisineService;
   final Color Function(String status) statusColor;
-  final String Function(String status) statusLabel;
-  final String Function(KitchenOrderModel order) clientLabel;
+  final String Function(String status, AppLocalizations l10n) statusLabel;
+  final String Function(KitchenOrderModel order, AppLocalizations l10n)
+  clientLabel;
 
   const _KitchenOrderCard({
     required this.establishmentId,
@@ -928,7 +941,7 @@ class _KitchenOrderCard extends StatelessWidget {
     required this.clientLabel,
   });
 
-  Future<void> _createKitchenReadyNotification() async {
+  Future<void> _createKitchenReadyNotification(AppLocalizations l10n) async {
     final firestore = FirebaseFirestore.instance;
 
     final orderDoc = await firestore
@@ -952,12 +965,12 @@ class _KitchenOrderCard extends StatelessWidget {
     final tableNumber = (data['tableNumber'] ?? '').toString();
     final roomNumber = (data['roomNumber'] ?? '').toString();
 
-    String clientLabel = 'client';
+    String clientLabel = l10n.clientGeneric;
 
     if (clientType == 'hotel' && roomNumber.isNotEmpty) {
-      clientLabel = 'la chambre $roomNumber';
+      clientLabel = l10n.roomLowercaseLine(roomNumber);
     } else if (tableNumber.isNotEmpty) {
-      clientLabel = 'la table $tableNumber';
+      clientLabel = l10n.tableLowercaseLine(tableNumber);
     }
 
     await firestore
@@ -967,8 +980,8 @@ class _KitchenOrderCard extends StatelessWidget {
         .doc('kitchen_${order.id}_ready')
         .set({
           'establishmentId': establishmentId,
-          'title': 'Commande cuisine prête',
-          'body': 'La commande de $clientLabel est prête en cuisine.',
+          'title': l10n.kitchenOrderReadyTitle,
+          'body': l10n.kitchenOrderReadyBody(clientLabel),
           'createdAt': FieldValue.serverTimestamp(),
           'updatedAt': FieldValue.serverTimestamp(),
           'isRead': false,
@@ -981,6 +994,8 @@ class _KitchenOrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       color: statusColor(order.kitchenStatus),
       child: Padding(
@@ -993,11 +1008,11 @@ class _KitchenOrderCard extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 6),
-            Text('Serveur : ${order.createdByName}'),
+            Text(l10n.waiterLine(order.createdByName)),
             const SizedBox(height: 4),
-            Text('Client : ${clientLabel(order)}'),
+            Text(l10n.clientLine(clientLabel(order, l10n))),
             const SizedBox(height: 4),
-            Text('Total : ${order.total.toStringAsFixed(0)} FCFA'),
+            Text(l10n.totalLine(order.total.toStringAsFixed(0))),
             const SizedBox(height: 6),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -1006,7 +1021,7 @@ class _KitchenOrderCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                statusLabel(order.kitchenStatus),
+                statusLabel(order.kitchenStatus, l10n),
                 style: const TextStyle(fontWeight: FontWeight.w700),
               ),
             ),
@@ -1025,22 +1040,22 @@ class _KitchenOrderCard extends StatelessWidget {
                 }
 
                 if (snapshot.hasError) {
-                  return Text('Erreur articles: ${snapshot.error}');
+                  return Text(l10n.kitchenItemsError('${snapshot.error}'));
                 }
 
                 final items = snapshot.data ?? [];
 
                 if (items.isEmpty) {
-                  return const Text('Aucun article cuisine.');
+                  return Text(l10n.noKitchenItems);
                 }
 
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Divider(),
-                    const Text(
-                      'Articles cuisine',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    Text(
+                      l10n.kitchenItems,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     ...items.map(
@@ -1058,7 +1073,9 @@ class _KitchenOrderCard extends StatelessWidget {
                                   Text(item.name),
                                   if (item.accompanimentName.trim().isNotEmpty)
                                     Text(
-                                      'Accompagnement : ${item.accompanimentName}',
+                                      l10n.accompanimentPlainLine(
+                                        item.accompanimentName,
+                                      ),
                                       style: const TextStyle(
                                         fontSize: 12,
                                         color: Color(0xFF8D6E63),
@@ -1067,7 +1084,7 @@ class _KitchenOrderCard extends StatelessWidget {
                                     ),
                                   if (item.note.trim().isNotEmpty)
                                     Text(
-                                      'Note : ${item.note}',
+                                      l10n.noteLine(item.note),
                                       style: const TextStyle(
                                         fontSize: 12,
                                         color: Colors.black54,
@@ -1100,12 +1117,12 @@ class _KitchenOrderCard extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.restaurant_menu),
-                    label: const Text('Passer en préparation'),
+                    label: Text(l10n.actionSetPreparing),
                   ),
                 if (order.kitchenStatus == 'preparing')
                   ElevatedButton.icon(
                     onPressed: () async {
-                      await _createKitchenReadyNotification();
+                      await _createKitchenReadyNotification(l10n);
 
                       await cuisineService.updateKitchenStatus(
                         establishmentId: establishmentId,
@@ -1114,7 +1131,7 @@ class _KitchenOrderCard extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.check_circle_outline),
-                    label: const Text('Marquer prête'),
+                    label: Text(l10n.actionMarkReady),
                   ),
                 if (order.kitchenStatus == 'ready')
                   OutlinedButton.icon(
@@ -1126,7 +1143,7 @@ class _KitchenOrderCard extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.undo),
-                    label: const Text('Revenir en préparation'),
+                    label: Text(l10n.actionBackToPreparing),
                   ),
                 if (order.kitchenStatus == 'ready')
                   ElevatedButton.icon(
@@ -1138,7 +1155,7 @@ class _KitchenOrderCard extends StatelessWidget {
                       );
                     },
                     icon: const Icon(Icons.delivery_dining),
-                    label: const Text('Servi'),
+                    label: Text(l10n.actionServed),
                   ),
               ],
             ),

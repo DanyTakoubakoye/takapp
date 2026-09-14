@@ -5,6 +5,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import 'package:takapp/l10n/app_localizations.dart';
+
 class StockItemFormPage extends StatefulWidget {
   final String establishmentId;
 
@@ -31,6 +33,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
   bool _isSaving = false;
   bool _isImporting = false;
   String? _importMessage;
+  bool _importHasError = false;
 
   String get establishmentId => widget.establishmentId.trim();
 
@@ -50,8 +53,10 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
   }
 
   Future<void> _saveSingleItem() async {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      _showMessage('Établissement introuvable.');
+      _showMessage(l10n.errEstablishmentNotFound);
       return;
     }
 
@@ -76,10 +81,10 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
       _unitController.clear();
 
       if (!mounted) return;
-      _showMessage('Article enregistré avec succès.');
+      _showMessage(l10n.menuItemSavedSuccess);
     } catch (e) {
       if (!mounted) return;
-      _showMessage('Erreur lors de l’enregistrement : $e');
+      _showMessage(l10n.errSaveFailed('$e'));
     } finally {
       if (mounted) {
         setState(() => _isSaving = false);
@@ -88,14 +93,17 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
   }
 
   Future<void> _importFromExcel() async {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      _showMessage('Établissement introuvable.');
+      _showMessage(l10n.errEstablishmentNotFound);
       return;
     }
 
     setState(() {
       _isImporting = true;
       _importMessage = null;
+      _importHasError = false;
     });
 
     try {
@@ -108,7 +116,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
       if (result == null || result.files.isEmpty) {
         setState(() {
           _isImporting = false;
-          _importMessage = 'Import annulé.';
+          _importMessage = l10n.importCancelled;
         });
         return;
       }
@@ -118,9 +126,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
       final bytes = file.bytes;
 
       if (bytes == null || bytes.isEmpty) {
-        throw Exception(
-          'Impossible de lire le fichier. Sélectionne un fichier valide.',
-        );
+        throw Exception(l10n.errCannotReadFile);
       }
 
       List<Map<String, dynamic>> rows;
@@ -128,13 +134,13 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
       if (fileName.endsWith('.xlsx')) {
         rows = _readXlsxRows(bytes);
       } else if (fileName.endsWith('.xls')) {
-        rows = _readXlsRows(bytes);
+        rows = _readXlsRows(bytes, l10n);
       } else {
-        throw Exception('Format non supporté. Utilise .xlsx ou .xls');
+        throw Exception(l10n.errUnsupportedFormatXlsx);
       }
 
       if (rows.isEmpty) {
-        throw Exception('Aucune ligne exploitable trouvée dans le fichier.');
+        throw Exception(l10n.errNoUsableRow);
       }
 
       final cleanedRows = rows
@@ -144,9 +150,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
           .toList();
 
       if (cleanedRows.isEmpty) {
-        throw Exception(
-          'Aucune ligne valide après normalisation. Vérifie les colonnes.',
-        );
+        throw Exception(l10n.errNoValidRowAfterNormalization);
       }
 
       final batch = _firestore.batch();
@@ -170,15 +174,16 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
       await batch.commit();
 
       setState(() {
-        _importMessage =
-            '${cleanedRows.length} article(s) importé(s) avec succès.';
+        _importHasError = false;
+        _importMessage = l10n.importedItemsSuccessCount(cleanedRows.length);
       });
 
       if (!mounted) return;
       _showMessage(_importMessage!);
     } catch (e) {
       setState(() {
-        _importMessage = 'Erreur import : $e';
+        _importHasError = true;
+        _importMessage = l10n.errImportFailed('$e');
       });
 
       if (!mounted) return;
@@ -222,11 +227,12 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
     return rows;
   }
 
-  List<Map<String, dynamic>> _readXlsRows(Uint8List bytes) {
+  List<Map<String, dynamic>> _readXlsRows(
+    Uint8List bytes,
+    AppLocalizations l10n,
+  ) {
     if (kIsWeb) {
-      throw Exception(
-        'Le support .xls hérité n’est pas prévu ici pour Flutter Web. Utilise plutôt un fichier .xlsx sur le web.',
-      );
+      throw Exception(l10n.errXlsNotSupportedWeb);
     }
 
     final reader = XlsReader.fromBytes(bytes);
@@ -349,7 +355,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
-          return 'Champ obligatoire';
+          return AppLocalizations.of(context).errRequiredField;
         }
 
         return null;
@@ -358,25 +364,27 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
   }
 
   Widget _buildImportInfoCard() {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       color: Colors.blue.shade50,
-      child: const Padding(
-        padding: EdgeInsets.all(14),
+      child: Padding(
+        padding: const EdgeInsets.all(14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Format Excel attendu',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              l10n.excelExpectedFormat,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
-            Text('Colonnes recommandées :'),
-            SizedBox(height: 4),
-            Text('name | category | unit | store | isActive'),
-            SizedBox(height: 8),
-            Text('Exemple de ligne :'),
-            SizedBox(height: 4),
-            Text('Eau minérale | Boisson | bouteille | bar | true'),
+            const SizedBox(height: 8),
+            Text(l10n.recommendedColumns),
+            const SizedBox(height: 4),
+            const Text('name | category | unit | store | isActive'),
+            const SizedBox(height: 8),
+            Text(l10n.exampleRowLabel),
+            const SizedBox(height: 4),
+            Text(l10n.stockImportExampleRow),
           ],
         ),
       ),
@@ -385,16 +393,15 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isSmall = MediaQuery.of(context).size.width < 700;
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errEstablishmentNotFound)));
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Gestion des articles de stock')),
+      appBar: AppBar(title: Text(l10n.stockItemsManagementTitle)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Center(
@@ -414,7 +421,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Nouvel article',
+                          l10n.newItemTitle,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         const SizedBox(height: 16),
@@ -425,20 +432,20 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
                               if (isSmall) ...[
                                 _buildTextField(
                                   controller: _nameController,
-                                  label: 'Nom',
-                                  hint: 'Ex. Eau minérale 50cl',
+                                  label: l10n.labelName,
+                                  hint: l10n.hintItemNameExample,
                                 ),
                                 const SizedBox(height: 12),
                                 _buildTextField(
                                   controller: _categoryController,
-                                  label: 'Catégorie',
-                                  hint: 'Ex. Boisson',
+                                  label: l10n.labelCategory,
+                                  hint: l10n.hintCategoryDrink,
                                 ),
                                 const SizedBox(height: 12),
                                 _buildTextField(
                                   controller: _unitController,
-                                  label: 'Unité',
-                                  hint: 'Ex. bouteille, kg, carton',
+                                  label: l10n.labelUnit,
+                                  hint: l10n.hintUnitExamples,
                                 ),
                               ] else
                                 Row(
@@ -446,24 +453,24 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
                                     Expanded(
                                       child: _buildTextField(
                                         controller: _nameController,
-                                        label: 'Nom',
-                                        hint: 'Ex. Eau minérale 50cl',
+                                        label: l10n.labelName,
+                                        hint: l10n.hintItemNameExample,
                                       ),
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: _buildTextField(
                                         controller: _categoryController,
-                                        label: 'Catégorie',
-                                        hint: 'Ex. Boisson',
+                                        label: l10n.labelCategory,
+                                        hint: l10n.hintCategoryDrink,
                                       ),
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: _buildTextField(
                                         controller: _unitController,
-                                        label: 'Unité',
-                                        hint: 'Ex. bouteille, kg, carton',
+                                        label: l10n.labelUnit,
+                                        hint: l10n.hintUnitExamples,
                                       ),
                                     ),
                                   ],
@@ -473,7 +480,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
                                 DropdownButtonFormField<String>(
                                   initialValue: _selectedStore,
                                   decoration: InputDecoration(
-                                    labelText: 'Store',
+                                    labelText: l10n.labelStore,
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
                                     ),
@@ -494,7 +501,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
                                 const SizedBox(height: 12),
                                 SwitchListTile(
                                   contentPadding: EdgeInsets.zero,
-                                  title: const Text('Article actif'),
+                                  title: Text(l10n.labelActiveItem),
                                   value: _isActive,
                                   onChanged: (value) {
                                     setState(() => _isActive = value);
@@ -507,7 +514,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
                                       child: DropdownButtonFormField<String>(
                                         initialValue: _selectedStore,
                                         decoration: InputDecoration(
-                                          labelText: 'Store',
+                                          labelText: l10n.labelStore,
                                           border: OutlineInputBorder(
                                             borderRadius: BorderRadius.circular(
                                               12,
@@ -534,7 +541,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: SwitchListTile(
-                                        title: const Text('Article actif'),
+                                        title: Text(l10n.labelActiveItem),
                                         value: _isActive,
                                         onChanged: (value) {
                                           setState(() => _isActive = value);
@@ -559,8 +566,8 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
                                       : const Icon(Icons.save),
                                   label: Text(
                                     _isSaving
-                                        ? 'Enregistrement...'
-                                        : 'Enregistrer',
+                                        ? l10n.savingInProgress
+                                        : l10n.actionSave,
                                   ),
                                 ),
                               ),
@@ -585,14 +592,11 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Import Excel',
+                          l10n.excelImportTitle,
                           style: Theme.of(context).textTheme.titleLarge,
                         ),
                         const SizedBox(height: 8),
-                        const Text(
-                          'Le fichier peut être en .xlsx ou .xls. '
-                          'Chaque ligne valide sera ajoutée dans stock_items de cet établissement avec un id Firestore automatique.',
-                        ),
+                        Text(l10n.excelImportStockDescription),
                         const SizedBox(height: 16),
                         Wrap(
                           spacing: 12,
@@ -611,8 +615,8 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
                                   : const Icon(Icons.upload_file),
                               label: Text(
                                 _isImporting
-                                    ? 'Import en cours...'
-                                    : 'Importer depuis Excel',
+                                    ? l10n.importingInProgress
+                                    : l10n.actionImportFromExcel,
                               ),
                             ),
                           ],
@@ -622,7 +626,7 @@ class _StockItemFormPageState extends State<StockItemFormPage> {
                           Text(
                             _importMessage!,
                             style: TextStyle(
-                              color: _importMessage!.startsWith('Erreur')
+                              color: _importHasError
                                   ? Colors.red
                                   : Colors.green.shade700,
                               fontWeight: FontWeight.w600,

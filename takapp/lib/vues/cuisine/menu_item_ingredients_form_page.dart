@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/services/menu_ingredient_service.dart';
 
 import 'package:excel/excel.dart' as xlsx;
@@ -101,6 +102,8 @@ class _MenuItemIngredientsFormPageState
   }
 
   Future<void> _savePhotoUrl(String url) async {
+    final l10n = AppLocalizations.of(context);
+
     if (selectedMenuItemId == null) return;
     try {
       await _service.updateMenuItemImage(
@@ -110,23 +113,25 @@ class _MenuItemIngredientsFormPageState
       );
       if (!mounted) return;
       setState(() => _selectedItemAdresse = url);
-      _showMessage('Photo enregistrée.');
+      _showMessage(l10n.photoSaved);
     } catch (e) {
       if (!mounted) return;
-      _showMessage('Erreur enregistrement photo : $e');
+      _showMessage(l10n.errPhotoSaveFailed('$e'));
     }
   }
 
   Future<void> _save(
     List<DocumentSnapshot<Map<String, dynamic>>> stockItems,
   ) async {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      _showMessage('Établissement introuvable.');
+      _showMessage(l10n.errEstablishmentNotFound);
       return;
     }
 
     if (selectedMenuItemId == null) {
-      _showMessage('Veuillez choisir un article cuisine.');
+      _showMessage(l10n.errPickKitchenItem);
       return;
     }
 
@@ -138,7 +143,7 @@ class _MenuItemIngredientsFormPageState
       final stockItem = _findDocById(stockItems, line.selectedStockItemId);
 
       if (stockItem == null) {
-        _showMessage('Veuillez choisir tous les ingrédients.');
+        _showMessage(l10n.errPickAllIngredients);
         return;
       }
 
@@ -146,7 +151,7 @@ class _MenuItemIngredientsFormPageState
       final quantity = int.tryParse(line.quantityController.text.trim());
 
       if (quantity == null || quantity <= 0) {
-        _showMessage('Chaque quantité doit être un nombre entier positif.');
+        _showMessage(l10n.errQuantityMustBePositiveInteger);
         return;
       }
 
@@ -172,7 +177,7 @@ class _MenuItemIngredientsFormPageState
 
       if (!mounted) return;
 
-      _showMessage('Ingrédients cuisine enregistrés avec succès.');
+      _showMessage(l10n.kitchenIngredientsSaved);
 
       setState(() {
         selectedMenuItemId = null;
@@ -188,7 +193,7 @@ class _MenuItemIngredientsFormPageState
           ..add(_IngredientLine());
       });
     } catch (e) {
-      _showMessage('Erreur lors de l’enregistrement : $e');
+      _showMessage(l10n.errSaveFailed('$e'));
     } finally {
       if (mounted) {
         setState(() => isSaving = false);
@@ -197,9 +202,11 @@ class _MenuItemIngredientsFormPageState
   }
 
   Future<void> _createDish() async {
+    final l10n = AppLocalizations.of(context);
     final name = _newDishController.text.trim();
+
     if (name.isEmpty) {
-      _showMessage('Saisissez le nom du plat.');
+      _showMessage(l10n.errDishNameRequired);
       return;
     }
     setState(() => isSaving = true);
@@ -211,10 +218,10 @@ class _MenuItemIngredientsFormPageState
       );
       _newDishController.clear();
       if (!mounted) return;
-      _showMessage('Plat « $name » créé. Vous pouvez maintenant le composer.');
+      _showMessage(l10n.dishCreatedCompose(name));
     } catch (e) {
       if (!mounted) return;
-      _showMessage('Erreur : $e');
+      _showMessage(l10n.commonError('$e'));
     } finally {
       if (mounted) setState(() => isSaving = false);
     }
@@ -228,8 +235,10 @@ class _MenuItemIngredientsFormPageState
     List<DocumentSnapshot<Map<String, dynamic>>> menuItems,
     List<DocumentSnapshot<Map<String, dynamic>>> stockItems,
   ) async {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      _showMessage('Établissement introuvable.');
+      _showMessage(l10n.errEstablishmentNotFound);
       return;
     }
 
@@ -243,7 +252,7 @@ class _MenuItemIngredientsFormPageState
 
     final bytes = result.files.first.bytes;
     if (bytes == null) {
-      _showMessage('Impossible de lire le fichier.');
+      _showMessage(l10n.errFileUnreadable);
       return;
     }
 
@@ -270,13 +279,13 @@ class _MenuItemIngredientsFormPageState
       // 3. Lire l'Excel
       final excel = xlsx.Excel.decodeBytes(bytes);
       if (excel.tables.isEmpty) {
-        _showMessage('Fichier Excel vide.');
+        _showMessage(l10n.errEmptyExcelFile);
         return;
       }
       final sheet = excel.tables.values.first;
       final rows = sheet.rows;
       if (rows.length < 2) {
-        _showMessage('Le fichier ne contient aucune ligne de données.');
+        _showMessage(l10n.errNoDataRow);
         return;
       }
 
@@ -354,7 +363,7 @@ class _MenuItemIngredientsFormPageState
       );
     } catch (e) {
       if (!mounted) return;
-      _showMessage('Erreur lors de l\'import : $e');
+      _showMessage(l10n.errImportFailed('$e'));
     } finally {
       if (mounted) setState(() => isSaving = false);
     }
@@ -366,10 +375,12 @@ class _MenuItemIngredientsFormPageState
     required List<String> ingredientsNonTrouves,
     required int lignesIgnorees,
   }) async {
+    final l10n = AppLocalizations.of(context);
+
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Rapport d\'import'),
+        title: Text(l10n.importReportTitle),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -380,20 +391,20 @@ class _MenuItemIngredientsFormPageState
                   const Icon(Icons.check_circle, color: Colors.green, size: 20),
                   const SizedBox(width: 8),
                   Text(
-                    '$importes recette(s) importée(s)',
+                    l10n.importedRecipesCount(importes),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               if (lignesIgnorees > 0) ...[
                 const SizedBox(height: 8),
-                Text('$lignesIgnorees ligne(s) ignorée(s) (incomplètes).'),
+                Text(l10n.ignoredRowsCount(lignesIgnorees)),
               ],
               if (platsNonTrouves.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                const Text(
-                  'Plats non trouvés :',
-                  style: TextStyle(
+                Text(
+                  l10n.dishesNotFound,
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.orange,
                   ),
@@ -403,9 +414,9 @@ class _MenuItemIngredientsFormPageState
               ],
               if (ingredientsNonTrouves.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                const Text(
-                  'Ingrédients non trouvés :',
-                  style: TextStyle(
+                Text(
+                  l10n.ingredientsNotFound,
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.orange,
                   ),
@@ -416,10 +427,12 @@ class _MenuItemIngredientsFormPageState
               if (platsNonTrouves.isNotEmpty ||
                   ingredientsNonTrouves.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                const Text(
-                  'Vérifiez que ces noms correspondent exactement à ceux '
-                  'saisis dans l\'application.',
-                  style: TextStyle(fontStyle: FontStyle.italic, fontSize: 12),
+                Text(
+                  l10n.checkNamesMatchApp,
+                  style: const TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ],
@@ -448,16 +461,15 @@ class _MenuItemIngredientsFormPageState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isSmallScreen = MediaQuery.of(context).size.width < 800;
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errEstablishmentNotFound)));
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Composition articles cuisine')),
+      appBar: AppBar(title: Text(l10n.kitchenItemsCompositionTitle)),
       body: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: _menuItemsStream,
         builder: (context, menuSnapshot) {
@@ -467,7 +479,7 @@ class _MenuItemIngredientsFormPageState
 
           if (menuSnapshot.hasError) {
             return Center(
-              child: Text('Erreur menuItems : ${menuSnapshot.error}'),
+              child: Text(l10n.errMenuItemsStream('${menuSnapshot.error}')),
             );
           }
 
@@ -482,7 +494,9 @@ class _MenuItemIngredientsFormPageState
 
               if (stockSnapshot.hasError) {
                 return Center(
-                  child: Text('Erreur stock_items : ${stockSnapshot.error}'),
+                  child: Text(
+                    l10n.errStockItemsStream('${stockSnapshot.error}'),
+                  ),
                 );
               }
 
@@ -526,17 +540,17 @@ class _MenuItemIngredientsFormPageState
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
-                                        'Créer un nouveau plat',
-                                        style: TextStyle(
+                                      Text(
+                                        l10n.createNewDishTitle,
+                                        style: const TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 15,
                                         ),
                                       ),
                                       const SizedBox(height: 4),
-                                      const Text(
-                                        'Le prix sera fixé par la gérante.',
-                                        style: TextStyle(
+                                      Text(
+                                        l10n.priceSetByManager,
+                                        style: const TextStyle(
                                           fontSize: 12,
                                           color: Colors.black54,
                                         ),
@@ -550,11 +564,12 @@ class _MenuItemIngredientsFormPageState
                                               enabled: !isSaving,
                                               textCapitalization:
                                                   TextCapitalization.words,
-                                              decoration: const InputDecoration(
-                                                labelText: 'Nom du plat',
-                                                hintText: 'Ex : Poulet braisé',
-                                                border: OutlineInputBorder(),
-                                                prefixIcon: Icon(
+                                              decoration: InputDecoration(
+                                                labelText: l10n.labelDishName,
+                                                hintText: l10n.hintDishExample,
+                                                border:
+                                                    const OutlineInputBorder(),
+                                                prefixIcon: const Icon(
                                                   Icons.restaurant,
                                                 ),
                                               ),
@@ -566,17 +581,17 @@ class _MenuItemIngredientsFormPageState
                                                 ? null
                                                 : _createDish,
                                             icon: const Icon(Icons.add),
-                                            label: const Text('Créer'),
+                                            label: Text(l10n.actionCreate),
                                           ),
                                         ],
                                       ),
                                       const SizedBox(height: 10),
                                       DropdownButtonFormField<String>(
                                         initialValue: _newDishCategory,
-                                        decoration: const InputDecoration(
-                                          labelText: 'Catégorie',
-                                          border: OutlineInputBorder(),
-                                          prefixIcon: Icon(
+                                        decoration: InputDecoration(
+                                          labelText: l10n.labelCategory,
+                                          border: const OutlineInputBorder(),
+                                          prefixIcon: const Icon(
                                             Icons.category_outlined,
                                           ),
                                           isDense: true,
@@ -608,10 +623,10 @@ class _MenuItemIngredientsFormPageState
                                     )
                                     ? selectedMenuItemId
                                     : null,
-                                decoration: const InputDecoration(
-                                  labelText: 'Article cuisine',
-                                  border: OutlineInputBorder(),
-                                  prefixIcon: Icon(Icons.restaurant_menu),
+                                decoration: InputDecoration(
+                                  labelText: l10n.labelKitchenItem,
+                                  border: const OutlineInputBorder(),
+                                  prefixIcon: const Icon(Icons.restaurant_menu),
                                 ),
                                 items: menuItems.map((doc) {
                                   return DropdownMenuItem<String>(
@@ -643,7 +658,7 @@ class _MenuItemIngredientsFormPageState
                                       },
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Veuillez choisir un article cuisine';
+                                    return l10n.errPickKitchenItem;
                                   }
                                   return null;
                                 },
@@ -653,21 +668,20 @@ class _MenuItemIngredientsFormPageState
                                 controller: _compositionController,
                                 enabled: !isSaving,
                                 maxLines: 2,
-                                decoration: const InputDecoration(
-                                  labelText: 'Composition (optionnel)',
-                                  hintText:
-                                      'Laissez vide pour afficher la liste des ingrédients',
-                                  border: OutlineInputBorder(),
-                                  prefixIcon: Icon(Icons.notes_outlined),
+                                decoration: InputDecoration(
+                                  labelText: l10n.labelCompositionOptional,
+                                  hintText: l10n.hintCompositionEmpty,
+                                  border: const OutlineInputBorder(),
+                                  prefixIcon: const Icon(Icons.notes_outlined),
                                 ),
                               ),
                               if (selectedMenuItemId != null) ...[
                                 const SizedBox(height: 16),
-                                const Align(
+                                Align(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
-                                    'Photo du plat',
-                                    style: TextStyle(
+                                    l10n.dishPhotoTitle,
+                                    style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -692,12 +706,10 @@ class _MenuItemIngredientsFormPageState
                                               value ?? false;
                                         });
                                       },
-                                title: const Text(
-                                  'Donne droit à un accompagnement gratuit',
-                                ),
-                                subtitle: const Text(
-                                  'Le client pourra choisir 1 accompagnement offert.',
-                                  style: TextStyle(fontSize: 12),
+                                title: Text(l10n.labelFreeAccompaniment),
+                                subtitle: Text(
+                                  l10n.labelFreeAccompanimentHint,
+                                  style: const TextStyle(fontSize: 12),
                                 ),
                                 contentPadding: EdgeInsets.zero,
                               ),
@@ -706,7 +718,7 @@ class _MenuItemIngredientsFormPageState
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      'Ingrédients cuisine',
+                                      l10n.kitchenIngredientsTitle,
                                       style: Theme.of(context)
                                           .textTheme
                                           .titleMedium
@@ -720,7 +732,7 @@ class _MenuItemIngredientsFormPageState
                                         ? null
                                         : _addIngredientLine,
                                     icon: const Icon(Icons.add),
-                                    label: const Text('Ajouter'),
+                                    label: Text(l10n.actionAdd),
                                   ),
                                 ],
                               ),
@@ -761,8 +773,8 @@ class _MenuItemIngredientsFormPageState
                                       : const Icon(Icons.save),
                                   label: Text(
                                     isSaving
-                                        ? 'Enregistrement...'
-                                        : 'Valider la composition cuisine',
+                                        ? l10n.savingInProgress
+                                        : l10n.actionValidateKitchenComposition,
                                   ),
                                 ),
                               ),
@@ -786,6 +798,8 @@ class _MenuItemIngredientsFormPageState
     List<DocumentSnapshot<Map<String, dynamic>>> menuItems,
     List<DocumentSnapshot<Map<String, dynamic>>> stockItems,
   ) {
+    final l10n = AppLocalizations.of(context);
+
     return Row(
       children: [
         Container(
@@ -799,7 +813,7 @@ class _MenuItemIngredientsFormPageState
         const SizedBox(width: 12),
         Expanded(
           child: Text(
-            'Définir les ingrédients cuisine',
+            l10n.defineKitchenIngredientsTitle,
             style: Theme.of(
               context,
             ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
@@ -810,13 +824,15 @@ class _MenuItemIngredientsFormPageState
               ? null
               : () => _importFromExcel(menuItems, stockItems),
           icon: const Icon(Icons.upload_file),
-          label: const Text('Importer Excel'),
+          label: Text(l10n.actionImportExcel),
         ),
       ],
     );
   }
 
   Widget _formatHint() {
+    final l10n = AppLocalizations.of(context);
+
     return Container(
       margin: const EdgeInsets.only(top: 12),
       padding: const EdgeInsets.all(12),
@@ -825,35 +841,33 @@ class _MenuItemIngredientsFormPageState
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.deepOrange.withValues(alpha: 0.25)),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Format Excel attendu',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            l10n.excelExpectedFormat,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 8),
-          Text('Une ligne par ingrédient (le nom du plat est répété).'),
-          SizedBox(height: 8),
-          Text('Colonnes :'),
-          SizedBox(height: 4),
-          Text(
+          const SizedBox(height: 8),
+          Text(l10n.oneRowPerIngredient),
+          const SizedBox(height: 8),
+          Text(l10n.columnsLabel),
+          const SizedBox(height: 4),
+          const Text(
             'plat | ingredient | quantite',
             style: TextStyle(fontFamily: 'monospace'),
           ),
-          SizedBox(height: 8),
-          Text('Exemple :'),
-          SizedBox(height: 4),
+          const SizedBox(height: 8),
+          Text(l10n.exampleLabel),
+          const SizedBox(height: 4),
           Text(
-            'Poulet braisé | Poulet | 1\n'
-            'Poulet braisé | Oignon | 2',
-            style: TextStyle(fontFamily: 'monospace'),
+            l10n.recipeImportExampleRows,
+            style: const TextStyle(fontFamily: 'monospace'),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
-            'Les noms des plats et ingrédients doivent déjà exister '
-            'dans l\'application.',
-            style: TextStyle(fontStyle: FontStyle.italic, fontSize: 12),
+            l10n.namesMustExistInApp,
+            style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 12),
           ),
         ],
       ),
@@ -865,6 +879,7 @@ class _MenuItemIngredientsFormPageState
     required List<DocumentSnapshot<Map<String, dynamic>>> stockItems,
     required bool isSmallScreen,
   }) {
+    final l10n = AppLocalizations.of(context);
     final line = ingredientLines[index];
 
     final ingredientDropdown = DropdownButtonFormField<String>(
@@ -872,7 +887,7 @@ class _MenuItemIngredientsFormPageState
           ? line.selectedStockItemId
           : null,
       decoration: InputDecoration(
-        labelText: 'Ingrédient ${index + 1}',
+        labelText: l10n.labelIngredientIndex(index + 1),
         border: const OutlineInputBorder(),
         prefixIcon: const Icon(Icons.inventory_2_outlined),
       ),
@@ -895,7 +910,7 @@ class _MenuItemIngredientsFormPageState
             },
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Choisissez un ingrédient';
+          return l10n.errChooseIngredient;
         }
         return null;
       },
@@ -905,16 +920,16 @@ class _MenuItemIngredientsFormPageState
       controller: line.quantityController,
       enabled: !isSaving,
       keyboardType: TextInputType.number,
-      decoration: const InputDecoration(
-        labelText: 'Quantité',
-        border: OutlineInputBorder(),
-        prefixIcon: Icon(Icons.numbers),
+      decoration: InputDecoration(
+        labelText: l10n.labelQuantity,
+        border: const OutlineInputBorder(),
+        prefixIcon: const Icon(Icons.numbers),
       ),
       validator: (value) {
         final quantity = int.tryParse((value ?? '').trim());
 
         if (quantity == null || quantity <= 0) {
-          return 'Quantité invalide';
+          return l10n.errInvalidQuantity;
         }
 
         return null;
@@ -922,7 +937,7 @@ class _MenuItemIngredientsFormPageState
     );
 
     final deleteButton = IconButton(
-      tooltip: 'Retirer cette ligne',
+      tooltip: l10n.tooltipRemoveLine,
       onPressed: ingredientLines.length == 1 || isSaving
           ? null
           : () => _removeIngredientLine(index),

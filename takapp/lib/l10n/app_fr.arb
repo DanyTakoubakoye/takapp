@@ -1809,5 +1809,199 @@
         "type": "String"
       }
     }
-  }
+  },
+  "stockItemsManagementTitle": "Gestion des articles de stock",
+  "labelName": "Nom",
+  "labelUnit": "Unité",
+  "labelStore": "Store",
+  "labelActiveItem": "Article actif",
+  "errRequiredField": "Champ obligatoire",
+  "hintItemNameExample": "Ex. Eau minérale 50cl",
+  "hintCategoryDrink": "Ex. Boisson",
+  "hintUnitExamples": "Ex. bouteille, kg, carton",
+  "excelExpectedFormat": "Format Excel attendu",
+  "recommendedColumns": "Colonnes recommandées :",
+  "exampleRowLabel": "Exemple de ligne :",
+  "stockImportExampleRow": "Eau minérale | Boisson | bouteille | bar | true",
+  "errCannotReadFile": "Impossible de lire le fichier. Sélectionne un fichier valide.",
+  "errUnsupportedFormatXlsx": "Format non supporté. Utilise .xlsx ou .xls",
+  "errNoValidRowAfterNormalization": "Aucune ligne valide après normalisation. Vérifie les colonnes.",
+  "errXlsNotSupportedWeb": "Le support .xls hérité n’est pas prévu ici pour Flutter Web. Utilise plutôt un fichier .xlsx sur le web.",
+  "importedItemsSuccessCount": "{count} article(s) importé(s) avec succès.",
+  "@importedItemsSuccessCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "excelImportTitle": "Import Excel",
+  "excelImportStockDescription": "Le fichier peut être en .xlsx ou .xls. Chaque ligne valide sera ajoutée dans stock_items de cet établissement avec un id Firestore automatique.",
+  "actionImportFromExcel": "Importer depuis Excel",
+
+  "kitchenTitle": "Cuisine",
+  "establishmentKitchenTitle": "{name} - Cuisine",
+  "@establishmentKitchenTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "newKitchenOrderTitle": "Nouvelle commande cuisine",
+  "orderNumberLine": "Commande {number}",
+  "@orderNumberLine": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "orderNumberWithClient": "Commande {number} - {client}",
+  "@orderNumberWithClient": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      },
+      "client": {
+        "type": "String"
+      }
+    }
+  },
+  "kitchenOrdersFollowUp": "Suivi des commandes cuisine de tous les serveurs",
+  "kitchenStockManagementTitle": "Gestion stock cuisine",
+  "stockManagementCardTitle": "Gestion de Stocks",
+  "stockManagementCardSubtitleMobile": "Composer menu • Ajouter article\nDéclarer consommation • Demander approvisionnement",
+  "stockManagementCardSubtitle": "Composer menu • Ajouter article • Déclarer consommation • Demander approvisionnement",
+  "stockConsultationCardTitle": "Consulter Stocks",
+  "stockConsultationCardSubtitle": "Voir les stocks • Confirmer réception • Historique stocks",
+  "actionComposeMenu": "Composer menu",
+  "actionAddArticle": "Ajouter article",
+  "actionDeclareConsumption": "Déclarer une consommation",
+  "actionRequestSupply": "Demander un approvisionnement",
+  "actionViewStocks": "Voir les stocks",
+  "actionConfirmAReception": "Confirmer une réception",
+  "actionStockHistory": "Historique stocks",
+  "stockOutRestaurantTitle": "Sortie de stock - Restaurant",
+  "reasonKitchenPreparation": "Préparation cuisine",
+  "supplyRequestRestaurantTitle": "Demande approvisionnement - Restaurant",
+  "stockRestaurantTitle": "Stock Restaurant",
+  "receptionsToConfirmRestaurantTitle": "Réceptions à confirmer - Restaurant",
+  "movementHistoryRestaurantTitle": "Historique mouvements - Restaurant",
+  "kitchenOrderReadyTitle": "Commande cuisine prête",
+  "kitchenOrderReadyBody": "La commande de {client} est prête en cuisine.",
+  "@kitchenOrderReadyBody": {
+    "placeholders": {
+      "client": {
+        "type": "String"
+      }
+    }
+  },
+  "clientGeneric": "client",
+  "roomLowercaseLine": "la chambre {number}",
+  "@roomLowercaseLine": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "tableLowercaseLine": "la table {number}",
+  "@tableLowercaseLine": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "noKitchenItems": "Aucun article cuisine.",
+  "accompanimentPlainLine": "Accompagnement : {name}",
+  "@accompanimentPlainLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "actionServed": "Servi",
+
+  "statusReadyPlural": "Prêtes",
+
+  "errPickKitchenItem": "Veuillez choisir un article cuisine.",
+  "errPickAllIngredients": "Veuillez choisir tous les ingrédients.",
+  "errQuantityMustBePositiveInteger": "Chaque quantité doit être un nombre entier positif.",
+  "kitchenIngredientsSaved": "Ingrédients cuisine enregistrés avec succès.",
+  "dishCreatedCompose": "Plat « {name} » créé. Vous pouvez maintenant le composer.",
+  "@dishCreatedCompose": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errEmptyExcelFile": "Fichier Excel vide.",
+  "errNoDataRow": "Le fichier ne contient aucune ligne de données.",
+  "importReportTitle": "Rapport d’import",
+  "importedRecipesCount": "{count} recette(s) importée(s)",
+  "@importedRecipesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ignoredRowsCount": "{count} ligne(s) ignorée(s) (incomplètes).",
+  "@ignoredRowsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dishesNotFound": "Plats non trouvés :",
+  "ingredientsNotFound": "Ingrédients non trouvés :",
+  "checkNamesMatchApp": "Vérifiez que ces noms correspondent exactement à ceux saisis dans l’application.",
+  "kitchenItemsCompositionTitle": "Composition articles cuisine",
+  "errMenuItemsStream": "Erreur menuItems : {error}",
+  "@errMenuItemsStream": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errStockItemsStream": "Erreur stock_items : {error}",
+  "@errStockItemsStream": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewDishTitle": "Créer un nouveau plat",
+  "priceSetByManager": "Le prix sera fixé par la gérante.",
+  "labelDishName": "Nom du plat",
+  "hintDishExample": "Ex : Poulet braisé",
+  "labelKitchenItem": "Article cuisine",
+  "labelCompositionOptional": "Composition (optionnel)",
+  "hintCompositionEmpty": "Laissez vide pour afficher la liste des ingrédients",
+  "kitchenIngredientsTitle": "Ingrédients cuisine",
+  "actionValidateKitchenComposition": "Valider la composition cuisine",
+  "defineKitchenIngredientsTitle": "Définir les ingrédients cuisine",
+  "actionImportExcel": "Importer Excel",
+  "oneRowPerIngredient": "Une ligne par ingrédient (le nom du plat est répété).",
+  "columnsLabel": "Colonnes :",
+  "recipeImportExampleRows": "Poulet braisé | Poulet | 1\nPoulet braisé | Oignon | 2",
+  "namesMustExistInApp": "Les noms des plats et ingrédients doivent déjà exister dans l’application.",
+  "labelIngredientIndex": "Ingrédient {index}",
+  "@labelIngredientIndex": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "errChooseIngredient": "Choisissez un ingrédient",
+  "errInvalidQuantity": "Quantité invalide",
+  "tooltipRemoveLine": "Retirer cette ligne"
 }

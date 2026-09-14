@@ -4864,6 +4864,546 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Reçu par : {name}'**
   String receivedByLine(String name);
+
+  /// No description provided for @stockItemsManagementTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gestion des articles de stock'**
+  String get stockItemsManagementTitle;
+
+  /// No description provided for @labelName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom'**
+  String get labelName;
+
+  /// No description provided for @labelUnit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Unité'**
+  String get labelUnit;
+
+  /// No description provided for @labelStore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Store'**
+  String get labelStore;
+
+  /// No description provided for @labelActiveItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Article actif'**
+  String get labelActiveItem;
+
+  /// No description provided for @errRequiredField.
+  ///
+  /// In fr, this message translates to:
+  /// **'Champ obligatoire'**
+  String get errRequiredField;
+
+  /// No description provided for @hintItemNameExample.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. Eau minérale 50cl'**
+  String get hintItemNameExample;
+
+  /// No description provided for @hintCategoryDrink.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. Boisson'**
+  String get hintCategoryDrink;
+
+  /// No description provided for @hintUnitExamples.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. bouteille, kg, carton'**
+  String get hintUnitExamples;
+
+  /// No description provided for @excelExpectedFormat.
+  ///
+  /// In fr, this message translates to:
+  /// **'Format Excel attendu'**
+  String get excelExpectedFormat;
+
+  /// No description provided for @recommendedColumns.
+  ///
+  /// In fr, this message translates to:
+  /// **'Colonnes recommandées :'**
+  String get recommendedColumns;
+
+  /// No description provided for @exampleRowLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Exemple de ligne :'**
+  String get exampleRowLabel;
+
+  /// No description provided for @stockImportExampleRow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Eau minérale | Boisson | bouteille | bar | true'**
+  String get stockImportExampleRow;
+
+  /// No description provided for @errCannotReadFile.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de lire le fichier. Sélectionne un fichier valide.'**
+  String get errCannotReadFile;
+
+  /// No description provided for @errUnsupportedFormatXlsx.
+  ///
+  /// In fr, this message translates to:
+  /// **'Format non supporté. Utilise .xlsx ou .xls'**
+  String get errUnsupportedFormatXlsx;
+
+  /// No description provided for @errNoValidRowAfterNormalization.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune ligne valide après normalisation. Vérifie les colonnes.'**
+  String get errNoValidRowAfterNormalization;
+
+  /// No description provided for @errXlsNotSupportedWeb.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le support .xls hérité n’est pas prévu ici pour Flutter Web. Utilise plutôt un fichier .xlsx sur le web.'**
+  String get errXlsNotSupportedWeb;
+
+  /// No description provided for @importedItemsSuccessCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} article(s) importé(s) avec succès.'**
+  String importedItemsSuccessCount(int count);
+
+  /// No description provided for @excelImportTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Import Excel'**
+  String get excelImportTitle;
+
+  /// No description provided for @excelImportStockDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le fichier peut être en .xlsx ou .xls. Chaque ligne valide sera ajoutée dans stock_items de cet établissement avec un id Firestore automatique.'**
+  String get excelImportStockDescription;
+
+  /// No description provided for @actionImportFromExcel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Importer depuis Excel'**
+  String get actionImportFromExcel;
+
+  /// No description provided for @kitchenTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cuisine'**
+  String get kitchenTitle;
+
+  /// No description provided for @establishmentKitchenTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} - Cuisine'**
+  String establishmentKitchenTitle(String name);
+
+  /// No description provided for @newKitchenOrderTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle commande cuisine'**
+  String get newKitchenOrderTitle;
+
+  /// No description provided for @orderNumberLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande {number}'**
+  String orderNumberLine(String number);
+
+  /// No description provided for @orderNumberWithClient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande {number} - {client}'**
+  String orderNumberWithClient(String number, String client);
+
+  /// No description provided for @kitchenOrdersFollowUp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suivi des commandes cuisine de tous les serveurs'**
+  String get kitchenOrdersFollowUp;
+
+  /// No description provided for @kitchenStockManagementTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gestion stock cuisine'**
+  String get kitchenStockManagementTitle;
+
+  /// No description provided for @stockManagementCardTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gestion de Stocks'**
+  String get stockManagementCardTitle;
+
+  /// No description provided for @stockManagementCardSubtitleMobile.
+  ///
+  /// In fr, this message translates to:
+  /// **'Composer menu • Ajouter article\nDéclarer consommation • Demander approvisionnement'**
+  String get stockManagementCardSubtitleMobile;
+
+  /// No description provided for @stockManagementCardSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Composer menu • Ajouter article • Déclarer consommation • Demander approvisionnement'**
+  String get stockManagementCardSubtitle;
+
+  /// No description provided for @stockConsultationCardTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Consulter Stocks'**
+  String get stockConsultationCardTitle;
+
+  /// No description provided for @stockConsultationCardSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir les stocks • Confirmer réception • Historique stocks'**
+  String get stockConsultationCardSubtitle;
+
+  /// No description provided for @actionComposeMenu.
+  ///
+  /// In fr, this message translates to:
+  /// **'Composer menu'**
+  String get actionComposeMenu;
+
+  /// No description provided for @actionAddArticle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter article'**
+  String get actionAddArticle;
+
+  /// No description provided for @actionDeclareConsumption.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déclarer une consommation'**
+  String get actionDeclareConsumption;
+
+  /// No description provided for @actionRequestSupply.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demander un approvisionnement'**
+  String get actionRequestSupply;
+
+  /// No description provided for @actionViewStocks.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir les stocks'**
+  String get actionViewStocks;
+
+  /// No description provided for @actionConfirmAReception.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer une réception'**
+  String get actionConfirmAReception;
+
+  /// No description provided for @actionStockHistory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Historique stocks'**
+  String get actionStockHistory;
+
+  /// No description provided for @stockOutRestaurantTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sortie de stock - Restaurant'**
+  String get stockOutRestaurantTitle;
+
+  /// No description provided for @reasonKitchenPreparation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Préparation cuisine'**
+  String get reasonKitchenPreparation;
+
+  /// No description provided for @supplyRequestRestaurantTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demande approvisionnement - Restaurant'**
+  String get supplyRequestRestaurantTitle;
+
+  /// No description provided for @stockRestaurantTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stock Restaurant'**
+  String get stockRestaurantTitle;
+
+  /// No description provided for @receptionsToConfirmRestaurantTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réceptions à confirmer - Restaurant'**
+  String get receptionsToConfirmRestaurantTitle;
+
+  /// No description provided for @movementHistoryRestaurantTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Historique mouvements - Restaurant'**
+  String get movementHistoryRestaurantTitle;
+
+  /// No description provided for @kitchenOrderReadyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande cuisine prête'**
+  String get kitchenOrderReadyTitle;
+
+  /// No description provided for @kitchenOrderReadyBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'La commande de {client} est prête en cuisine.'**
+  String kitchenOrderReadyBody(String client);
+
+  /// No description provided for @clientGeneric.
+  ///
+  /// In fr, this message translates to:
+  /// **'client'**
+  String get clientGeneric;
+
+  /// No description provided for @roomLowercaseLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'la chambre {number}'**
+  String roomLowercaseLine(String number);
+
+  /// No description provided for @tableLowercaseLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'la table {number}'**
+  String tableLowercaseLine(String number);
+
+  /// No description provided for @noKitchenItems.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun article cuisine.'**
+  String get noKitchenItems;
+
+  /// No description provided for @accompanimentPlainLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accompagnement : {name}'**
+  String accompanimentPlainLine(String name);
+
+  /// No description provided for @actionServed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Servi'**
+  String get actionServed;
+
+  /// No description provided for @statusReadyPlural.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prêtes'**
+  String get statusReadyPlural;
+
+  /// No description provided for @errPickKitchenItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez choisir un article cuisine.'**
+  String get errPickKitchenItem;
+
+  /// No description provided for @errPickAllIngredients.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez choisir tous les ingrédients.'**
+  String get errPickAllIngredients;
+
+  /// No description provided for @errQuantityMustBePositiveInteger.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chaque quantité doit être un nombre entier positif.'**
+  String get errQuantityMustBePositiveInteger;
+
+  /// No description provided for @kitchenIngredientsSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ingrédients cuisine enregistrés avec succès.'**
+  String get kitchenIngredientsSaved;
+
+  /// No description provided for @dishCreatedCompose.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plat « {name} » créé. Vous pouvez maintenant le composer.'**
+  String dishCreatedCompose(String name);
+
+  /// No description provided for @errEmptyExcelFile.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fichier Excel vide.'**
+  String get errEmptyExcelFile;
+
+  /// No description provided for @errNoDataRow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le fichier ne contient aucune ligne de données.'**
+  String get errNoDataRow;
+
+  /// No description provided for @importReportTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rapport d’import'**
+  String get importReportTitle;
+
+  /// No description provided for @importedRecipesCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} recette(s) importée(s)'**
+  String importedRecipesCount(int count);
+
+  /// No description provided for @ignoredRowsCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} ligne(s) ignorée(s) (incomplètes).'**
+  String ignoredRowsCount(int count);
+
+  /// No description provided for @dishesNotFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plats non trouvés :'**
+  String get dishesNotFound;
+
+  /// No description provided for @ingredientsNotFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ingrédients non trouvés :'**
+  String get ingredientsNotFound;
+
+  /// No description provided for @checkNamesMatchApp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vérifiez que ces noms correspondent exactement à ceux saisis dans l’application.'**
+  String get checkNamesMatchApp;
+
+  /// No description provided for @kitchenItemsCompositionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Composition articles cuisine'**
+  String get kitchenItemsCompositionTitle;
+
+  /// No description provided for @errMenuItemsStream.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur menuItems : {error}'**
+  String errMenuItemsStream(String error);
+
+  /// No description provided for @errStockItemsStream.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur stock_items : {error}'**
+  String errStockItemsStream(String error);
+
+  /// No description provided for @createNewDishTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer un nouveau plat'**
+  String get createNewDishTitle;
+
+  /// No description provided for @priceSetByManager.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le prix sera fixé par la gérante.'**
+  String get priceSetByManager;
+
+  /// No description provided for @labelDishName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom du plat'**
+  String get labelDishName;
+
+  /// No description provided for @hintDishExample.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex : Poulet braisé'**
+  String get hintDishExample;
+
+  /// No description provided for @labelKitchenItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Article cuisine'**
+  String get labelKitchenItem;
+
+  /// No description provided for @labelCompositionOptional.
+  ///
+  /// In fr, this message translates to:
+  /// **'Composition (optionnel)'**
+  String get labelCompositionOptional;
+
+  /// No description provided for @hintCompositionEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Laissez vide pour afficher la liste des ingrédients'**
+  String get hintCompositionEmpty;
+
+  /// No description provided for @kitchenIngredientsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ingrédients cuisine'**
+  String get kitchenIngredientsTitle;
+
+  /// No description provided for @actionValidateKitchenComposition.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valider la composition cuisine'**
+  String get actionValidateKitchenComposition;
+
+  /// No description provided for @defineKitchenIngredientsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Définir les ingrédients cuisine'**
+  String get defineKitchenIngredientsTitle;
+
+  /// No description provided for @actionImportExcel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Importer Excel'**
+  String get actionImportExcel;
+
+  /// No description provided for @oneRowPerIngredient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une ligne par ingrédient (le nom du plat est répété).'**
+  String get oneRowPerIngredient;
+
+  /// No description provided for @columnsLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Colonnes :'**
+  String get columnsLabel;
+
+  /// No description provided for @recipeImportExampleRows.
+  ///
+  /// In fr, this message translates to:
+  /// **'Poulet braisé | Poulet | 1\nPoulet braisé | Oignon | 2'**
+  String get recipeImportExampleRows;
+
+  /// No description provided for @namesMustExistInApp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les noms des plats et ingrédients doivent déjà exister dans l’application.'**
+  String get namesMustExistInApp;
+
+  /// No description provided for @labelIngredientIndex.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ingrédient {index}'**
+  String labelIngredientIndex(int index);
+
+  /// No description provided for @errChooseIngredient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez un ingrédient'**
+  String get errChooseIngredient;
+
+  /// No description provided for @errInvalidQuantity.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quantité invalide'**
+  String get errInvalidQuantity;
+
+  /// No description provided for @tooltipRemoveLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer cette ligne'**
+  String get tooltipRemoveLine;
 }
 
 class _AppLocalizationsDelegate

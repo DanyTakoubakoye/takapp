@@ -2753,4 +2753,323 @@ class AppLocalizationsFr extends AppLocalizations {
   String receivedByLine(String name) {
     return 'Reçu par : $name';
   }
+
+  @override
+  String get stockItemsManagementTitle => 'Gestion des articles de stock';
+
+  @override
+  String get labelName => 'Nom';
+
+  @override
+  String get labelUnit => 'Unité';
+
+  @override
+  String get labelStore => 'Store';
+
+  @override
+  String get labelActiveItem => 'Article actif';
+
+  @override
+  String get errRequiredField => 'Champ obligatoire';
+
+  @override
+  String get hintItemNameExample => 'Ex. Eau minérale 50cl';
+
+  @override
+  String get hintCategoryDrink => 'Ex. Boisson';
+
+  @override
+  String get hintUnitExamples => 'Ex. bouteille, kg, carton';
+
+  @override
+  String get excelExpectedFormat => 'Format Excel attendu';
+
+  @override
+  String get recommendedColumns => 'Colonnes recommandées :';
+
+  @override
+  String get exampleRowLabel => 'Exemple de ligne :';
+
+  @override
+  String get stockImportExampleRow =>
+      'Eau minérale | Boisson | bouteille | bar | true';
+
+  @override
+  String get errCannotReadFile =>
+      'Impossible de lire le fichier. Sélectionne un fichier valide.';
+
+  @override
+  String get errUnsupportedFormatXlsx =>
+      'Format non supporté. Utilise .xlsx ou .xls';
+
+  @override
+  String get errNoValidRowAfterNormalization =>
+      'Aucune ligne valide après normalisation. Vérifie les colonnes.';
+
+  @override
+  String get errXlsNotSupportedWeb =>
+      'Le support .xls hérité n’est pas prévu ici pour Flutter Web. Utilise plutôt un fichier .xlsx sur le web.';
+
+  @override
+  String importedItemsSuccessCount(int count) {
+    return '$count article(s) importé(s) avec succès.';
+  }
+
+  @override
+  String get excelImportTitle => 'Import Excel';
+
+  @override
+  String get excelImportStockDescription =>
+      'Le fichier peut être en .xlsx ou .xls. Chaque ligne valide sera ajoutée dans stock_items de cet établissement avec un id Firestore automatique.';
+
+  @override
+  String get actionImportFromExcel => 'Importer depuis Excel';
+
+  @override
+  String get kitchenTitle => 'Cuisine';
+
+  @override
+  String establishmentKitchenTitle(String name) {
+    return '$name - Cuisine';
+  }
+
+  @override
+  String get newKitchenOrderTitle => 'Nouvelle commande cuisine';
+
+  @override
+  String orderNumberLine(String number) {
+    return 'Commande $number';
+  }
+
+  @override
+  String orderNumberWithClient(String number, String client) {
+    return 'Commande $number - $client';
+  }
+
+  @override
+  String get kitchenOrdersFollowUp =>
+      'Suivi des commandes cuisine de tous les serveurs';
+
+  @override
+  String get kitchenStockManagementTitle => 'Gestion stock cuisine';
+
+  @override
+  String get stockManagementCardTitle => 'Gestion de Stocks';
+
+  @override
+  String get stockManagementCardSubtitleMobile =>
+      'Composer menu • Ajouter article\nDéclarer consommation • Demander approvisionnement';
+
+  @override
+  String get stockManagementCardSubtitle =>
+      'Composer menu • Ajouter article • Déclarer consommation • Demander approvisionnement';
+
+  @override
+  String get stockConsultationCardTitle => 'Consulter Stocks';
+
+  @override
+  String get stockConsultationCardSubtitle =>
+      'Voir les stocks • Confirmer réception • Historique stocks';
+
+  @override
+  String get actionComposeMenu => 'Composer menu';
+
+  @override
+  String get actionAddArticle => 'Ajouter article';
+
+  @override
+  String get actionDeclareConsumption => 'Déclarer une consommation';
+
+  @override
+  String get actionRequestSupply => 'Demander un approvisionnement';
+
+  @override
+  String get actionViewStocks => 'Voir les stocks';
+
+  @override
+  String get actionConfirmAReception => 'Confirmer une réception';
+
+  @override
+  String get actionStockHistory => 'Historique stocks';
+
+  @override
+  String get stockOutRestaurantTitle => 'Sortie de stock - Restaurant';
+
+  @override
+  String get reasonKitchenPreparation => 'Préparation cuisine';
+
+  @override
+  String get supplyRequestRestaurantTitle =>
+      'Demande approvisionnement - Restaurant';
+
+  @override
+  String get stockRestaurantTitle => 'Stock Restaurant';
+
+  @override
+  String get receptionsToConfirmRestaurantTitle =>
+      'Réceptions à confirmer - Restaurant';
+
+  @override
+  String get movementHistoryRestaurantTitle =>
+      'Historique mouvements - Restaurant';
+
+  @override
+  String get kitchenOrderReadyTitle => 'Commande cuisine prête';
+
+  @override
+  String kitchenOrderReadyBody(String client) {
+    return 'La commande de $client est prête en cuisine.';
+  }
+
+  @override
+  String get clientGeneric => 'client';
+
+  @override
+  String roomLowercaseLine(String number) {
+    return 'la chambre $number';
+  }
+
+  @override
+  String tableLowercaseLine(String number) {
+    return 'la table $number';
+  }
+
+  @override
+  String get noKitchenItems => 'Aucun article cuisine.';
+
+  @override
+  String accompanimentPlainLine(String name) {
+    return 'Accompagnement : $name';
+  }
+
+  @override
+  String get actionServed => 'Servi';
+
+  @override
+  String get statusReadyPlural => 'Prêtes';
+
+  @override
+  String get errPickKitchenItem => 'Veuillez choisir un article cuisine.';
+
+  @override
+  String get errPickAllIngredients => 'Veuillez choisir tous les ingrédients.';
+
+  @override
+  String get errQuantityMustBePositiveInteger =>
+      'Chaque quantité doit être un nombre entier positif.';
+
+  @override
+  String get kitchenIngredientsSaved =>
+      'Ingrédients cuisine enregistrés avec succès.';
+
+  @override
+  String dishCreatedCompose(String name) {
+    return 'Plat « $name » créé. Vous pouvez maintenant le composer.';
+  }
+
+  @override
+  String get errEmptyExcelFile => 'Fichier Excel vide.';
+
+  @override
+  String get errNoDataRow => 'Le fichier ne contient aucune ligne de données.';
+
+  @override
+  String get importReportTitle => 'Rapport d’import';
+
+  @override
+  String importedRecipesCount(int count) {
+    return '$count recette(s) importée(s)';
+  }
+
+  @override
+  String ignoredRowsCount(int count) {
+    return '$count ligne(s) ignorée(s) (incomplètes).';
+  }
+
+  @override
+  String get dishesNotFound => 'Plats non trouvés :';
+
+  @override
+  String get ingredientsNotFound => 'Ingrédients non trouvés :';
+
+  @override
+  String get checkNamesMatchApp =>
+      'Vérifiez que ces noms correspondent exactement à ceux saisis dans l’application.';
+
+  @override
+  String get kitchenItemsCompositionTitle => 'Composition articles cuisine';
+
+  @override
+  String errMenuItemsStream(String error) {
+    return 'Erreur menuItems : $error';
+  }
+
+  @override
+  String errStockItemsStream(String error) {
+    return 'Erreur stock_items : $error';
+  }
+
+  @override
+  String get createNewDishTitle => 'Créer un nouveau plat';
+
+  @override
+  String get priceSetByManager => 'Le prix sera fixé par la gérante.';
+
+  @override
+  String get labelDishName => 'Nom du plat';
+
+  @override
+  String get hintDishExample => 'Ex : Poulet braisé';
+
+  @override
+  String get labelKitchenItem => 'Article cuisine';
+
+  @override
+  String get labelCompositionOptional => 'Composition (optionnel)';
+
+  @override
+  String get hintCompositionEmpty =>
+      'Laissez vide pour afficher la liste des ingrédients';
+
+  @override
+  String get kitchenIngredientsTitle => 'Ingrédients cuisine';
+
+  @override
+  String get actionValidateKitchenComposition =>
+      'Valider la composition cuisine';
+
+  @override
+  String get defineKitchenIngredientsTitle => 'Définir les ingrédients cuisine';
+
+  @override
+  String get actionImportExcel => 'Importer Excel';
+
+  @override
+  String get oneRowPerIngredient =>
+      'Une ligne par ingrédient (le nom du plat est répété).';
+
+  @override
+  String get columnsLabel => 'Colonnes :';
+
+  @override
+  String get recipeImportExampleRows =>
+      'Poulet braisé | Poulet | 1\nPoulet braisé | Oignon | 2';
+
+  @override
+  String get namesMustExistInApp =>
+      'Les noms des plats et ingrédients doivent déjà exister dans l’application.';
+
+  @override
+  String labelIngredientIndex(int index) {
+    return 'Ingrédient $index';
+  }
+
+  @override
+  String get errChooseIngredient => 'Choisissez un ingrédient';
+
+  @override
+  String get errInvalidQuantity => 'Quantité invalide';
+
+  @override
+  String get tooltipRemoveLine => 'Retirer cette ligne';
 }
