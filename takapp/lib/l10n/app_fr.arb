@@ -1199,5 +1199,152 @@
     }
   },
   "labelQuantityDelivered": "Quantité livrée",
-  "actionValidateDelivery": "Valider la livraison"
+  "actionValidateDelivery": "Valider la livraison",
+
+  "amountLine": "Montant : {amount} FCFA",
+  "@amountLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "labelTotalCaps": "TOTAL",
+  "labelStatus": "Statut",
+  "actionOpen": "Ouvrir",
+  "noResult": "Aucun résultat",
+  "dateLine": "Date : {date}",
+  "@dateLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "roomLine": "Chambre : {number}",
+  "@roomLine": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "labelClientName": "Nom du client",
+  "labelRoomNumber": "Numéro de chambre",
+  "actionViewDetails": "Voir détails",
+
+  "statusDeclared": "Déclaré",
+  "noElementSelected": "Aucun élément sélectionné.",
+  "transferDeclaredToAccounting": "Versement déclaré à la comptabilité.",
+  "managerToAccountingTitle": "Versement gérante → comptabilité",
+  "validatedServerHandovers": "Versements serveurs validés",
+  "noServerHandoverAvailable": "Aucun versement serveur disponible.",
+  "paidRoomInvoicesNotTransferred": "Factures chambres encaissées non versées",
+  "noRoomInvoiceAvailable": "Aucune facture chambre disponible.",
+  "transferSummary": "Résumé du versement",
+  "serverHandoversLabel": "Versements serveurs",
+  "roomInvoicesLabel": "Factures chambres",
+  "actionDeclareToAccounting": "Déclarer à la comptabilité",
+  "managerTransferHistory": "Historique versements gérante",
+  "noTransferRecorded": "Aucun versement enregistré.",
+
+  "statusPaidShort": "Payée",
+  "statusUnpaidShort": "Non payée",
+  "errSearchFailed": "Erreur lors de la recherche : {error}",
+  "@errSearchFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "searchByClientOption": "Recherche par client",
+  "searchByRoomOption": "Recherche par chambre",
+  "searchByClientShort": "Par client",
+  "searchByRoomShort": "Par chambre",
+  "arrivalLine": "Entrée : {date}",
+  "@arrivalLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "departureLine": "Sortie : {date}",
+  "@departureLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "mecefCodeLine": "Code MECeF : {code}",
+  "@mecefCodeLine": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "searchRoomInvoicesTitle": "Recherche factures chambre",
+
+  "serverHandoversTitle": "Versements des serveurs",
+  "noPendingHandover": "Aucun versement en attente.",
+  "declaredAmountLine": "Montant déclaré : {amount} FCFA",
+  "@declaredAmountLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "includedPaymentsLine": "Paiements inclus : {count}",
+  "@includedPaymentsLine": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "errObservedAmountInvalid": "Montant constaté invalide.",
+  "ordersValidated": "Commandes validées.",
+  "ordersRejected": "Commandes rejetées.",
+  "handoverTitleFor": "Versement - {name}",
+  "@handoverTitleFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "labelObservedAmount": "Montant constaté",
+  "noPaymentFound": "Aucun paiement trouvé.",
+  "methodAmountLine": "{method} • {amount} FCFA",
+  "@methodAmountLine": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "suffixAlreadyValidated": " • déjà validée",
+  "suffixRejected": " • rejetée",
+  "actionRejectSelection": "Rejeter sélection",
+  "actionValidateSelection": "Valider sélection",
+
+  "supplyRequestsForStore": "Demandes - {store}",
+  "@supplyRequestsForStore": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      }
+    }
+  },
+  "filterRequests": "Filtrer les demandes",
+  "filterDelivered": "Livrées",
+  "filterReceived": "Réceptionnées",
+  "noRequestFound": "Aucune demande trouvée."
 }

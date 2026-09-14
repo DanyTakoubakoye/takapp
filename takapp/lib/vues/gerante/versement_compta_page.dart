@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../controllers/auth_controller.dart';
+import '../../l10n/app_localizations.dart';
 
 class VersementComptaPage extends StatefulWidget {
   final String establishmentId;
@@ -29,6 +30,21 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
 
   double get totalSelected => selectedServerTotal + selectedRoomTotal;
 
+  // `status` reste la valeur technique stockée : seul le rendu est localisé,
+  // et une valeur inconnue est affichée telle quelle.
+  String _statusLabel(AppLocalizations l10n, String status) {
+    switch (status) {
+      case 'pending':
+        return l10n.statusPending;
+      case 'declared':
+        return l10n.statusDeclared;
+      case 'received':
+        return l10n.statusReceived;
+      default:
+        return status;
+    }
+  }
+
   void _toggleHandover(String id, double amount, bool selected) {
     setState(() {
       if (selected) {
@@ -54,17 +70,19 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
   }
 
   Future<void> _submitTransfer() async {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Établissement introuvable.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errEstablishmentNotFound)));
       return;
     }
 
     if (selectedHandoverIds.isEmpty && selectedRoomInvoiceIds.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Aucun élément sélectionné.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.noElementSelected)));
       return;
     }
 
@@ -75,7 +93,7 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
     if (user == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errUserNotFound)));
       return;
     }
 
@@ -145,7 +163,7 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Versement déclaré à la comptabilité.')),
+        SnackBar(content: Text(l10n.transferDeclaredToAccounting)),
       );
     } finally {
       if (mounted) {
@@ -158,9 +176,11 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -187,7 +207,7 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
         .snapshots();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Versement gérante → comptabilité')),
+      appBar: AppBar(title: Text(l10n.managerToAccountingTitle)),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final bool isMobile = constraints.maxWidth < 900;
@@ -197,24 +217,24 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
               padding: const EdgeInsets.all(12),
               child: Column(
                 children: [
-                  _buildSummaryCard(),
+                  _buildSummaryCard(l10n),
                   const SizedBox(height: 12),
                   Expanded(
                     child: ListView(
                       children: [
                         SizedBox(
                           height: 340,
-                          child: _buildHandoversCard(handoversStream),
+                          child: _buildHandoversCard(l10n, handoversStream),
                         ),
                         const SizedBox(height: 12),
                         SizedBox(
                           height: 340,
-                          child: _buildInvoicesCard(invoicesStream),
+                          child: _buildInvoicesCard(l10n, invoicesStream),
                         ),
                         const SizedBox(height: 12),
                         SizedBox(
                           height: 360,
-                          child: _buildHistoryCard(transfersStream),
+                          child: _buildHistoryCard(l10n, transfersStream),
                         ),
                       ],
                     ),
@@ -232,9 +252,13 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
                   flex: 3,
                   child: Column(
                     children: [
-                      Expanded(child: _buildHandoversCard(handoversStream)),
+                      Expanded(
+                        child: _buildHandoversCard(l10n, handoversStream),
+                      ),
                       const SizedBox(height: 16),
-                      Expanded(child: _buildInvoicesCard(invoicesStream)),
+                      Expanded(
+                        child: _buildInvoicesCard(l10n, invoicesStream),
+                      ),
                     ],
                   ),
                 ),
@@ -243,9 +267,11 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
                   flex: 2,
                   child: Column(
                     children: [
-                      _buildSummaryCard(),
+                      _buildSummaryCard(l10n),
                       const SizedBox(height: 16),
-                      Expanded(child: _buildHistoryCard(transfersStream)),
+                      Expanded(
+                        child: _buildHistoryCard(l10n, transfersStream),
+                      ),
                     ],
                   ),
                 ),
@@ -257,7 +283,10 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
     );
   }
 
-  Widget _buildHandoversCard(Stream<QuerySnapshot<Object?>> handoversStream) {
+  Widget _buildHandoversCard(
+    AppLocalizations l10n,
+    Stream<QuerySnapshot<Object?>> handoversStream,
+  ) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -265,11 +294,14 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
         padding: const EdgeInsets.all(14),
         child: Column(
           children: [
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Versements serveurs validés',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                l10n.validatedServerHandovers,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
             ),
             const SizedBox(height: 10),
@@ -282,7 +314,9 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text('Erreur: ${snapshot.error}'));
+                    return Center(
+                      child: Text(l10n.errorPrefixed('${snapshot.error}')),
+                    );
                   }
 
                   final docs = (snapshot.data?.docs ?? []).where((doc) {
@@ -293,8 +327,8 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
                   }).toList();
 
                   if (docs.isEmpty) {
-                    return const Center(
-                      child: Text('Aucun versement serveur disponible.'),
+                    return Center(
+                      child: Text(l10n.noServerHandoverAvailable),
                     );
                   }
 
@@ -321,7 +355,7 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
                           },
                           title: Text((data['serveurName'] ?? '').toString()),
                           subtitle: Text(
-                            'Montant : ${amount.toStringAsFixed(0)} FCFA',
+                            l10n.amountLine(amount.toStringAsFixed(0)),
                           ),
                           controlAffinity: ListTileControlAffinity.leading,
                         ),
@@ -337,7 +371,10 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
     );
   }
 
-  Widget _buildInvoicesCard(Stream<QuerySnapshot<Object?>> invoicesStream) {
+  Widget _buildInvoicesCard(
+    AppLocalizations l10n,
+    Stream<QuerySnapshot<Object?>> invoicesStream,
+  ) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -345,11 +382,14 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
         padding: const EdgeInsets.all(14),
         child: Column(
           children: [
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Factures chambres encaissées non versées',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                l10n.paidRoomInvoicesNotTransferred,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
             ),
             const SizedBox(height: 10),
@@ -362,7 +402,9 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text('Erreur: ${snapshot.error}'));
+                    return Center(
+                      child: Text(l10n.errorPrefixed('${snapshot.error}')),
+                    );
                   }
 
                   final docs = (snapshot.data?.docs ?? []).where((doc) {
@@ -373,9 +415,7 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
                   }).toList();
 
                   if (docs.isEmpty) {
-                    return const Center(
-                      child: Text('Aucune facture chambre disponible.'),
-                    );
+                    return Center(child: Text(l10n.noRoomInvoiceAvailable));
                   }
 
                   return ListView.separated(
@@ -399,10 +439,10 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
                             _toggleRoomInvoice(doc.id, amount, value ?? false);
                           },
                           title: Text(
-                            '${(data['clientName'] ?? '').toString()} • Chambre ${(data['roomNumber'] ?? '').toString()}',
+                            '${(data['clientName'] ?? '').toString()} • ${l10n.labelRoom((data['roomNumber'] ?? '').toString())}',
                           ),
                           subtitle: Text(
-                            'Montant : ${amount.toStringAsFixed(0)} FCFA',
+                            l10n.amountLine(amount.toStringAsFixed(0)),
                           ),
                           controlAffinity: ListTileControlAffinity.leading,
                         ),
@@ -418,7 +458,7 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
     );
   }
 
-  Widget _buildSummaryCard() {
+  Widget _buildSummaryCard(AppLocalizations l10n) {
     return Card(
       elevation: 3,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -426,25 +466,28 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
         padding: const EdgeInsets.all(14),
         child: Column(
           children: [
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Résumé du versement',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                l10n.transferSummary,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
             ),
             const SizedBox(height: 12),
             _line(
-              'Versements serveurs',
+              l10n.serverHandoversLabel,
               '${selectedServerTotal.toStringAsFixed(0)} FCFA',
             ),
             _line(
-              'Factures chambres',
+              l10n.roomInvoicesLabel,
               '${selectedRoomTotal.toStringAsFixed(0)} FCFA',
             ),
             const Divider(),
             _line(
-              'TOTAL',
+              l10n.labelTotalCaps,
               '${totalSelected.toStringAsFixed(0)} FCFA',
               isBold: true,
             ),
@@ -463,7 +506,7 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text('Déclarer à la comptabilité'),
+                    : Text(l10n.actionDeclareToAccounting),
               ),
             ),
           ],
@@ -472,7 +515,10 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
     );
   }
 
-  Widget _buildHistoryCard(Stream<QuerySnapshot<Object?>> transfersStream) {
+  Widget _buildHistoryCard(
+    AppLocalizations l10n,
+    Stream<QuerySnapshot<Object?>> transfersStream,
+  ) {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -480,11 +526,14 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
         padding: const EdgeInsets.all(14),
         child: Column(
           children: [
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Historique versements gérante',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                l10n.managerTransferHistory,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
             ),
             const SizedBox(height: 10),
@@ -497,15 +546,15 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text('Erreur: ${snapshot.error}'));
+                    return Center(
+                      child: Text(l10n.errorPrefixed('${snapshot.error}')),
+                    );
                   }
 
                   final docs = snapshot.data?.docs ?? [];
 
                   if (docs.isEmpty) {
-                    return const Center(
-                      child: Text('Aucun versement enregistré.'),
-                    );
+                    return Center(child: Text(l10n.noTransferRecorded));
                   }
 
                   return ListView.separated(
@@ -521,7 +570,9 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
                       return ListTile(
                         contentPadding: EdgeInsets.zero,
                         title: Text('${amount.toStringAsFixed(0)} FCFA'),
-                        subtitle: Text('Statut : $status'),
+                        subtitle: Text(
+                          l10n.statusLine(_statusLabel(l10n, status)),
+                        ),
                         leading: CircleAvatar(
                           radius: 18,
                           child: Text('${index + 1}'),

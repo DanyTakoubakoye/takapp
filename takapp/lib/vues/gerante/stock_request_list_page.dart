@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:takapp/core/constants/app_roles.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/stock_request_model.dart';
 import 'package:takapp/services/stock_request_service.dart';
 import 'package:takapp/vues/gerante/stock_delivery_page.dart';
@@ -19,6 +21,7 @@ class StockRequestListPage extends StatefulWidget {
 }
 
 class _StockRequestListPageState extends State<StockRequestListPage> {
+  // Valeur technique : elle est comparée à `item.status` tel qu'il est stocké.
   String statusFilter = 'pending';
 
   String get establishmentId => widget.establishmentId.trim();
@@ -36,27 +39,29 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
     }
   }
 
-  String _storeLabel(String store) {
+  // `store` et `status` restent des valeurs techniques en base : seul leur
+  // rendu est localisé, et une valeur inconnue est affichée telle quelle.
+  String _storeLabel(AppLocalizations l10n, String store) {
     switch (store) {
       case 'restaurant':
-        return 'Restaurant';
+        return l10n.storeNameRestaurant;
       case 'bar':
-        return 'Bar';
+        return l10n.storeNameBar;
       case 'hotel':
-        return 'Hôtel';
+        return l10n.storeNameHotel;
       default:
         return store;
     }
   }
 
-  String _statusLabel(String status) {
+  String _statusLabel(AppLocalizations l10n, String status) {
     switch (status) {
       case 'pending':
-        return 'En attente';
+        return l10n.statusPending;
       case 'delivered':
-        return 'Livrée';
+        return l10n.statusDelivered;
       case 'received':
-        return 'Réceptionnée';
+        return l10n.statusReceived;
       default:
         return status;
     }
@@ -86,15 +91,26 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
     return service.streamAllRequests(establishmentId: establishmentId);
   }
 
+  /// Les `value` des options restent techniques : seul le libellé est traduit.
+  List<DropdownMenuItem<String>> _statusFilterItems(AppLocalizations l10n) {
+    return [
+      DropdownMenuItem(value: 'pending', child: Text(l10n.statusPending)),
+      DropdownMenuItem(value: 'delivered', child: Text(l10n.filterDelivered)),
+      DropdownMenuItem(value: 'received', child: Text(l10n.filterReceived)),
+      DropdownMenuItem(value: 'all', child: Text(l10n.categoryAll)),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final service = StockRequestService();
 
     final isSmall = MediaQuery.of(context).size.width < 800;
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -102,8 +118,10 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
       appBar: AppBar(
         title: Text(
           widget.storeFilter == null
-              ? 'Demandes d’approvisionnement'
-              : 'Demandes - ${_storeLabel(widget.storeFilter!)}',
+              ? l10n.supplyRequests
+              : l10n.supplyRequestsForStore(
+                  _storeLabel(l10n, widget.storeFilter!),
+                ),
         ),
       ),
       body: Padding(
@@ -118,27 +136,10 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                         children: [
                           DropdownButtonFormField<String>(
                             initialValue: statusFilter,
-                            decoration: const InputDecoration(
-                              labelText: 'Statut',
+                            decoration: InputDecoration(
+                              labelText: l10n.labelStatus,
                             ),
-                            items: const [
-                              DropdownMenuItem(
-                                value: 'pending',
-                                child: Text('En attente'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'delivered',
-                                child: Text('Livrées'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'received',
-                                child: Text('Réceptionnées'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'all',
-                                child: Text('Toutes'),
-                              ),
-                            ],
+                            items: _statusFilterItems(l10n),
                             onChanged: (value) {
                               if (value == null) {
                                 return;
@@ -153,37 +154,22 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                       )
                     : Row(
                         children: [
-                          const Expanded(
+                          Expanded(
                             child: Text(
-                              'Filtrer les demandes',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              l10n.filterRequests,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                           SizedBox(
                             width: 220,
                             child: DropdownButtonFormField<String>(
                               initialValue: statusFilter,
-                              decoration: const InputDecoration(
-                                labelText: 'Statut',
+                              decoration: InputDecoration(
+                                labelText: l10n.labelStatus,
                               ),
-                              items: const [
-                                DropdownMenuItem(
-                                  value: 'pending',
-                                  child: Text('En attente'),
-                                ),
-                                DropdownMenuItem(
-                                  value: 'delivered',
-                                  child: Text('Livrées'),
-                                ),
-                                DropdownMenuItem(
-                                  value: 'received',
-                                  child: Text('Réceptionnées'),
-                                ),
-                                DropdownMenuItem(
-                                  value: 'all',
-                                  child: Text('Toutes'),
-                                ),
-                              ],
+                              items: _statusFilterItems(l10n),
                               onChanged: (value) {
                                 if (value == null) {
                                   return;
@@ -209,7 +195,9 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text('Erreur : ${snapshot.error}'));
+                    return Center(
+                      child: Text(l10n.errorPrefixed('${snapshot.error}')),
+                    );
                   }
 
                   final allItems = snapshot.data ?? [];
@@ -223,7 +211,7 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                   }).toList();
 
                   if (items.isEmpty) {
-                    return const Center(child: Text('Aucune demande trouvée.'));
+                    return Center(child: Text(l10n.noRequestFound));
                   }
 
                   return ListView.separated(
@@ -243,7 +231,7 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                _storeLabel(item.store),
+                                _storeLabel(l10n, item.store),
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
@@ -251,15 +239,26 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                                 ),
                               ),
                               const SizedBox(height: 6),
-                              Text('Demandé par : ${item.requestedByName}'),
-                              Text('Rôle : ${item.requestedByRole}'),
+                              Text(l10n.requestedByLine(item.requestedByName)),
+                              // Le rôle stocké est une clé technique.
                               Text(
-                                'Date : ${item.createdAt == null ? "-" : DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt!)}',
+                                l10n.roleLine(
+                                  AppRoles.label(l10n, item.requestedByRole),
+                                ),
+                              ),
+                              Text(
+                                l10n.dateLine(
+                                  item.createdAt == null
+                                      ? '-'
+                                      : DateFormat(
+                                          'dd/MM/yyyy HH:mm',
+                                        ).format(item.createdAt!),
+                                ),
                               ),
                               if (item.note.trim().isNotEmpty)
                                 Padding(
                                   padding: const EdgeInsets.only(top: 4),
-                                  child: Text('Note : ${item.note}'),
+                                  child: Text(l10n.noteLine(item.note)),
                                 ),
                               const SizedBox(height: 8),
                               Wrap(
@@ -276,7 +275,7 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
-                                      _storeLabel(item.store),
+                                      _storeLabel(l10n, item.store),
                                       style: TextStyle(
                                         color: storeColor,
                                         fontWeight: FontWeight.w700,
@@ -289,11 +288,13 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                                       vertical: 6,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: statusColor.withValues(alpha: 0.12),
+                                      color: statusColor.withValues(
+                                        alpha: 0.12,
+                                      ),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: Text(
-                                      _statusLabel(item.status),
+                                      _statusLabel(l10n, item.status),
                                       style: TextStyle(
                                         color: statusColor,
                                         fontWeight: FontWeight.w700,
@@ -324,7 +325,7 @@ class _StockRequestListPageState extends State<StockRequestListPage> {
                                       icon: const Icon(
                                         Icons.visibility_outlined,
                                       ),
-                                      label: const Text('Ouvrir'),
+                                      label: Text(l10n.actionOpen),
                                     ),
                                   ],
                                 ),

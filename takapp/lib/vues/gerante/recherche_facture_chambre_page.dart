@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/room_invoice_model.dart';
 import 'package:takapp/services/room_invoice_service.dart';
 import 'package:takapp/vues/gerante/detail_facture_chambre_page.dart';
@@ -37,6 +38,7 @@ class _RechercheFactureChambrePageState
   }
 
   Future<void> _search() async {
+    final l10n = AppLocalizations.of(context);
     final query = searchController.text.trim();
 
     if (query.isEmpty) {
@@ -47,9 +49,9 @@ class _RechercheFactureChambrePageState
     }
 
     if (establishmentId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Établissement introuvable.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errEstablishmentNotFound)));
       return;
     }
 
@@ -76,9 +78,9 @@ class _RechercheFactureChambrePageState
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de la recherche : $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errSearchFailed('$e'))));
     } finally {
       if (mounted) {
         setState(() {
@@ -88,7 +90,8 @@ class _RechercheFactureChambrePageState
     }
   }
 
-  Widget _buildPaymentChip(RoomInvoiceModel invoice) {
+  Widget _buildPaymentChip(AppLocalizations l10n, RoomInvoiceModel invoice) {
+    // `status` reste la valeur technique stockée : seul le rendu est localisé.
     final isPaid = invoice.status == 'paid';
 
     return Container(
@@ -100,7 +103,7 @@ class _RechercheFactureChambrePageState
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        isPaid ? 'Payée' : 'Non payée',
+        isPaid ? l10n.statusPaidShort : l10n.statusUnpaidShort,
         style: TextStyle(
           color: isPaid ? Colors.green : Colors.orange,
           fontWeight: FontWeight.w700,
@@ -109,7 +112,7 @@ class _RechercheFactureChambrePageState
     );
   }
 
-  Widget _buildFiscalChip(RoomInvoiceModel invoice) {
+  Widget _buildFiscalChip(AppLocalizations l10n, RoomInvoiceModel invoice) {
     final isFiscalized =
         invoice.isFiscalized && invoice.fiscalStatus == 'success';
 
@@ -122,7 +125,7 @@ class _RechercheFactureChambrePageState
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        isFiscalized ? 'Fiscalisée' : 'Non fiscalisée',
+        isFiscalized ? l10n.statusFiscalized : l10n.statusNotFiscalized,
         style: TextStyle(
           color: isFiscalized ? Colors.blue : Colors.red,
           fontWeight: FontWeight.w700,
@@ -131,7 +134,7 @@ class _RechercheFactureChambrePageState
     );
   }
 
-  Widget _buildSearchModeSelector(bool isSmall) {
+  Widget _buildSearchModeSelector(AppLocalizations l10n, bool isSmall) {
     if (isSmall) {
       return Card(
         child: Padding(
@@ -150,12 +153,12 @@ class _RechercheFactureChambrePageState
                 RadioListTile<bool>(
                   contentPadding: EdgeInsets.zero,
                   value: true,
-                  title: const Text('Recherche par client'),
+                  title: Text(l10n.searchByClientOption),
                 ),
                 RadioListTile<bool>(
                   contentPadding: EdgeInsets.zero,
                   value: false,
-                  title: const Text('Recherche par chambre'),
+                  title: Text(l10n.searchByRoomOption),
                 ),
               ],
             ),
@@ -181,13 +184,13 @@ class _RechercheFactureChambrePageState
               Expanded(
                 child: RadioListTile<bool>(
                   value: true,
-                  title: const Text('Par client'),
+                  title: Text(l10n.searchByClientShort),
                 ),
               ),
               Expanded(
                 child: RadioListTile<bool>(
                   value: false,
-                  title: const Text('Par chambre'),
+                  title: Text(l10n.searchByRoomShort),
                 ),
               ),
             ],
@@ -197,14 +200,16 @@ class _RechercheFactureChambrePageState
     );
   }
 
-  Widget _buildSearchField() {
+  Widget _buildSearchField(AppLocalizations l10n) {
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: TextField(
           controller: searchController,
           decoration: InputDecoration(
-            labelText: searchByClient ? 'Nom du client' : 'Numéro de chambre',
+            labelText: searchByClient
+                ? l10n.labelClientName
+                : l10n.labelRoomNumber,
             prefixIcon: const Icon(Icons.search),
             suffixIcon: IconButton(
               icon: const Icon(Icons.arrow_forward),
@@ -217,7 +222,11 @@ class _RechercheFactureChambrePageState
     );
   }
 
-  Widget _buildInvoiceCard(RoomInvoiceModel invoice, bool isSmall) {
+  Widget _buildInvoiceCard(
+    AppLocalizations l10n,
+    RoomInvoiceModel invoice,
+    bool isSmall,
+  ) {
     return Card(
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
@@ -239,7 +248,7 @@ class _RechercheFactureChambrePageState
             children: [
               Text(
                 searchByClient
-                    ? 'Chambre ${invoice.roomNumber}'
+                    ? l10n.labelRoom(invoice.roomNumber)
                     : invoice.clientName,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
@@ -248,35 +257,35 @@ class _RechercheFactureChambrePageState
               ),
               const SizedBox(height: 6),
               if (searchByClient)
-                Text('Client : ${invoice.clientName}')
+                Text(l10n.clientLine(invoice.clientName))
               else
-                Text('Chambre : ${invoice.roomNumber}'),
-              Text('Entrée : ${_formatDate(invoice.startDate)}'),
-              Text('Sortie : ${_formatDate(invoice.endDate)}'),
+                Text(l10n.roomLine(invoice.roomNumber)),
+              Text(l10n.arrivalLine(_formatDate(invoice.startDate))),
+              Text(l10n.departureLine(_formatDate(invoice.endDate))),
               const SizedBox(height: 4),
               Text(
-                'Montant : ${invoice.total.toStringAsFixed(0)} FCFA',
+                l10n.amountLine(invoice.total.toStringAsFixed(0)),
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 10),
               if (isSmall) ...[
-                _buildPaymentChip(invoice),
+                _buildPaymentChip(l10n, invoice),
                 const SizedBox(height: 8),
-                _buildFiscalChip(invoice),
+                _buildFiscalChip(l10n, invoice),
               ] else
                 Wrap(
                   spacing: 10,
                   runSpacing: 8,
                   children: [
-                    _buildPaymentChip(invoice),
-                    _buildFiscalChip(invoice),
+                    _buildPaymentChip(l10n, invoice),
+                    _buildFiscalChip(l10n, invoice),
                   ],
                 ),
               if (invoice.isFiscalized &&
                   invoice.fiscalMecefCode.trim().isNotEmpty) ...[
                 const SizedBox(height: 10),
                 Text(
-                  'Code MECeF : ${invoice.fiscalMecefCode}',
+                  l10n.mecefCodeLine(invoice.fiscalMecefCode),
                   style: const TextStyle(fontSize: 12),
                 ),
               ],
@@ -284,7 +293,7 @@ class _RechercheFactureChambrePageState
               Align(
                 alignment: Alignment.centerRight,
                 child: Text(
-                  'Voir détails',
+                  l10n.actionViewDetails,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.primary,
                     fontWeight: FontWeight.w600,
@@ -298,13 +307,13 @@ class _RechercheFactureChambrePageState
     );
   }
 
-  Widget _buildResults(bool isSmall) {
+  Widget _buildResults(AppLocalizations l10n, bool isSmall) {
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
     if (results.isEmpty) {
-      return const Center(child: Text('Aucun résultat'));
+      return Center(child: Text(l10n.noResult));
     }
 
     return ListView.separated(
@@ -313,7 +322,7 @@ class _RechercheFactureChambrePageState
       itemBuilder: (context, index) {
         final invoice = results[index];
 
-        return _buildInvoiceCard(invoice, isSmall);
+        return _buildInvoiceCard(l10n, invoice, isSmall);
       },
     );
   }
@@ -326,25 +335,26 @@ class _RechercheFactureChambrePageState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isSmall = _isSmallScreen(context);
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Recherche factures chambre')),
+      appBar: AppBar(title: Text(l10n.searchRoomInvoicesTitle)),
       body: Padding(
         padding: EdgeInsets.all(isSmall ? 12 : 16),
         child: Column(
           children: [
-            _buildSearchModeSelector(isSmall),
+            _buildSearchModeSelector(l10n, isSmall),
             const SizedBox(height: 12),
-            _buildSearchField(),
+            _buildSearchField(l10n),
             const SizedBox(height: 16),
-            Expanded(child: _buildResults(isSmall)),
+            Expanded(child: _buildResults(l10n, isSmall)),
           ],
         ),
       ),

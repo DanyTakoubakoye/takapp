@@ -1745,4 +1745,194 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get actionValidateDelivery => 'Confirm the delivery';
+
+  @override
+  String amountLine(String amount) {
+    return 'Amount: $amount FCFA';
+  }
+
+  @override
+  String get labelTotalCaps => 'TOTAL';
+
+  @override
+  String get labelStatus => 'Status';
+
+  @override
+  String get actionOpen => 'Open';
+
+  @override
+  String get noResult => 'No result';
+
+  @override
+  String dateLine(String date) {
+    return 'Date: $date';
+  }
+
+  @override
+  String roomLine(String number) {
+    return 'Room: $number';
+  }
+
+  @override
+  String get labelClientName => 'Client name';
+
+  @override
+  String get labelRoomNumber => 'Room number';
+
+  @override
+  String get actionViewDetails => 'View details';
+
+  @override
+  String get statusDeclared => 'Declared';
+
+  @override
+  String get noElementSelected => 'No item selected.';
+
+  @override
+  String get transferDeclaredToAccounting => 'Transfer declared to accounting.';
+
+  @override
+  String get managerToAccountingTitle => 'Manager → accounting transfer';
+
+  @override
+  String get validatedServerHandovers => 'Validated waiter handovers';
+
+  @override
+  String get noServerHandoverAvailable => 'No waiter handover available.';
+
+  @override
+  String get paidRoomInvoicesNotTransferred =>
+      'Paid room invoices not yet transferred';
+
+  @override
+  String get noRoomInvoiceAvailable => 'No room invoice available.';
+
+  @override
+  String get transferSummary => 'Transfer summary';
+
+  @override
+  String get serverHandoversLabel => 'Waiter handovers';
+
+  @override
+  String get roomInvoicesLabel => 'Room invoices';
+
+  @override
+  String get actionDeclareToAccounting => 'Declare to accounting';
+
+  @override
+  String get managerTransferHistory => 'Manager transfer history';
+
+  @override
+  String get noTransferRecorded => 'No transfer recorded.';
+
+  @override
+  String get statusPaidShort => 'Paid';
+
+  @override
+  String get statusUnpaidShort => 'Unpaid';
+
+  @override
+  String errSearchFailed(String error) {
+    return 'Search error: $error';
+  }
+
+  @override
+  String get searchByClientOption => 'Search by client';
+
+  @override
+  String get searchByRoomOption => 'Search by room';
+
+  @override
+  String get searchByClientShort => 'By client';
+
+  @override
+  String get searchByRoomShort => 'By room';
+
+  @override
+  String arrivalLine(String date) {
+    return 'Check-in: $date';
+  }
+
+  @override
+  String departureLine(String date) {
+    return 'Check-out: $date';
+  }
+
+  @override
+  String mecefCodeLine(String code) {
+    return 'MECeF code: $code';
+  }
+
+  @override
+  String get searchRoomInvoicesTitle => 'Search room invoices';
+
+  @override
+  String get serverHandoversTitle => 'Waiter handovers';
+
+  @override
+  String get noPendingHandover => 'No pending handover.';
+
+  @override
+  String declaredAmountLine(String amount) {
+    return 'Declared amount: $amount FCFA';
+  }
+
+  @override
+  String includedPaymentsLine(int count) {
+    return 'Payments included: $count';
+  }
+
+  @override
+  String get errObservedAmountInvalid => 'Invalid observed amount.';
+
+  @override
+  String get ordersValidated => 'Orders validated.';
+
+  @override
+  String get ordersRejected => 'Orders rejected.';
+
+  @override
+  String handoverTitleFor(String name) {
+    return 'Handover - $name';
+  }
+
+  @override
+  String get labelObservedAmount => 'Observed amount';
+
+  @override
+  String get noPaymentFound => 'No payment found.';
+
+  @override
+  String methodAmountLine(String method, String amount) {
+    return '$method • $amount FCFA';
+  }
+
+  @override
+  String get suffixAlreadyValidated => ' • already validated';
+
+  @override
+  String get suffixRejected => ' • rejected';
+
+  @override
+  String get actionRejectSelection => 'Reject selection';
+
+  @override
+  String get actionValidateSelection => 'Validate selection';
+
+  @override
+  String supplyRequestsForStore(String store) {
+    return 'Requests - $store';
+  }
+
+  @override
+  String get filterRequests => 'Filter requests';
+
+  @override
+  String get filterDelivered => 'Delivered';
+
+  @override
+  String get filterReceived => 'Received';
+
+  @override
+  String get noRequestFound => 'No request found.';
 }

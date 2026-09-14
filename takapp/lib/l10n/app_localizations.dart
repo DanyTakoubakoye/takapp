@@ -3130,6 +3130,336 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Valider la livraison'**
   String get actionValidateDelivery;
+
+  /// No description provided for @amountLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant : {amount} FCFA'**
+  String amountLine(String amount);
+
+  /// No description provided for @labelTotalCaps.
+  ///
+  /// In fr, this message translates to:
+  /// **'TOTAL'**
+  String get labelTotalCaps;
+
+  /// No description provided for @labelStatus.
+  ///
+  /// In fr, this message translates to:
+  /// **'Statut'**
+  String get labelStatus;
+
+  /// No description provided for @actionOpen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouvrir'**
+  String get actionOpen;
+
+  /// No description provided for @noResult.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun résultat'**
+  String get noResult;
+
+  /// No description provided for @dateLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Date : {date}'**
+  String dateLine(String date);
+
+  /// No description provided for @roomLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chambre : {number}'**
+  String roomLine(String number);
+
+  /// No description provided for @labelClientName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom du client'**
+  String get labelClientName;
+
+  /// No description provided for @labelRoomNumber.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro de chambre'**
+  String get labelRoomNumber;
+
+  /// No description provided for @actionViewDetails.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir détails'**
+  String get actionViewDetails;
+
+  /// No description provided for @statusDeclared.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déclaré'**
+  String get statusDeclared;
+
+  /// No description provided for @noElementSelected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun élément sélectionné.'**
+  String get noElementSelected;
+
+  /// No description provided for @transferDeclaredToAccounting.
+  ///
+  /// In fr, this message translates to:
+  /// **'Versement déclaré à la comptabilité.'**
+  String get transferDeclaredToAccounting;
+
+  /// No description provided for @managerToAccountingTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Versement gérante → comptabilité'**
+  String get managerToAccountingTitle;
+
+  /// No description provided for @validatedServerHandovers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Versements serveurs validés'**
+  String get validatedServerHandovers;
+
+  /// No description provided for @noServerHandoverAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun versement serveur disponible.'**
+  String get noServerHandoverAvailable;
+
+  /// No description provided for @paidRoomInvoicesNotTransferred.
+  ///
+  /// In fr, this message translates to:
+  /// **'Factures chambres encaissées non versées'**
+  String get paidRoomInvoicesNotTransferred;
+
+  /// No description provided for @noRoomInvoiceAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune facture chambre disponible.'**
+  String get noRoomInvoiceAvailable;
+
+  /// No description provided for @transferSummary.
+  ///
+  /// In fr, this message translates to:
+  /// **'Résumé du versement'**
+  String get transferSummary;
+
+  /// No description provided for @serverHandoversLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Versements serveurs'**
+  String get serverHandoversLabel;
+
+  /// No description provided for @roomInvoicesLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Factures chambres'**
+  String get roomInvoicesLabel;
+
+  /// No description provided for @actionDeclareToAccounting.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déclarer à la comptabilité'**
+  String get actionDeclareToAccounting;
+
+  /// No description provided for @managerTransferHistory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Historique versements gérante'**
+  String get managerTransferHistory;
+
+  /// No description provided for @noTransferRecorded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun versement enregistré.'**
+  String get noTransferRecorded;
+
+  /// No description provided for @statusPaidShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Payée'**
+  String get statusPaidShort;
+
+  /// No description provided for @statusUnpaidShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non payée'**
+  String get statusUnpaidShort;
+
+  /// No description provided for @errSearchFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors de la recherche : {error}'**
+  String errSearchFailed(String error);
+
+  /// No description provided for @searchByClientOption.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recherche par client'**
+  String get searchByClientOption;
+
+  /// No description provided for @searchByRoomOption.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recherche par chambre'**
+  String get searchByRoomOption;
+
+  /// No description provided for @searchByClientShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Par client'**
+  String get searchByClientShort;
+
+  /// No description provided for @searchByRoomShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Par chambre'**
+  String get searchByRoomShort;
+
+  /// No description provided for @arrivalLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrée : {date}'**
+  String arrivalLine(String date);
+
+  /// No description provided for @departureLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sortie : {date}'**
+  String departureLine(String date);
+
+  /// No description provided for @mecefCodeLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code MECeF : {code}'**
+  String mecefCodeLine(String code);
+
+  /// No description provided for @searchRoomInvoicesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recherche factures chambre'**
+  String get searchRoomInvoicesTitle;
+
+  /// No description provided for @serverHandoversTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Versements des serveurs'**
+  String get serverHandoversTitle;
+
+  /// No description provided for @noPendingHandover.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun versement en attente.'**
+  String get noPendingHandover;
+
+  /// No description provided for @declaredAmountLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant déclaré : {amount} FCFA'**
+  String declaredAmountLine(String amount);
+
+  /// No description provided for @includedPaymentsLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiements inclus : {count}'**
+  String includedPaymentsLine(int count);
+
+  /// No description provided for @errObservedAmountInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant constaté invalide.'**
+  String get errObservedAmountInvalid;
+
+  /// No description provided for @ordersValidated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commandes validées.'**
+  String get ordersValidated;
+
+  /// No description provided for @ordersRejected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commandes rejetées.'**
+  String get ordersRejected;
+
+  /// No description provided for @handoverTitleFor.
+  ///
+  /// In fr, this message translates to:
+  /// **'Versement - {name}'**
+  String handoverTitleFor(String name);
+
+  /// No description provided for @labelObservedAmount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant constaté'**
+  String get labelObservedAmount;
+
+  /// No description provided for @noPaymentFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun paiement trouvé.'**
+  String get noPaymentFound;
+
+  /// No description provided for @methodAmountLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'{method} • {amount} FCFA'**
+  String methodAmountLine(String method, String amount);
+
+  /// No description provided for @suffixAlreadyValidated.
+  ///
+  /// In fr, this message translates to:
+  /// **' • déjà validée'**
+  String get suffixAlreadyValidated;
+
+  /// No description provided for @suffixRejected.
+  ///
+  /// In fr, this message translates to:
+  /// **' • rejetée'**
+  String get suffixRejected;
+
+  /// No description provided for @actionRejectSelection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rejeter sélection'**
+  String get actionRejectSelection;
+
+  /// No description provided for @actionValidateSelection.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valider sélection'**
+  String get actionValidateSelection;
+
+  /// No description provided for @supplyRequestsForStore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demandes - {store}'**
+  String supplyRequestsForStore(String store);
+
+  /// No description provided for @filterRequests.
+  ///
+  /// In fr, this message translates to:
+  /// **'Filtrer les demandes'**
+  String get filterRequests;
+
+  /// No description provided for @filterDelivered.
+  ///
+  /// In fr, this message translates to:
+  /// **'Livrées'**
+  String get filterDelivered;
+
+  /// No description provided for @filterReceived.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réceptionnées'**
+  String get filterReceived;
+
+  /// No description provided for @noRequestFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune demande trouvée.'**
+  String get noRequestFound;
 }
 
 class _AppLocalizationsDelegate

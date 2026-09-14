@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/core/constants/app_payment_methods.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/payment_model.dart';
 import 'package:takapp/modeles/server_handover_model.dart';
 import 'package:takapp/services/gerante_handover_service.dart';
@@ -16,18 +18,19 @@ class VersementsServeursPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final safeEstablishmentId = establishmentId.trim();
 
     if (safeEstablishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     final service = GeranteHandoverService();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Versements des serveurs')),
+      appBar: AppBar(title: Text(l10n.serverHandoversTitle)),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: StreamBuilder<List<ServerHandoverModel>>(
@@ -40,13 +43,15 @@ class VersementsServeursPage extends StatelessWidget {
             }
 
             if (snapshot.hasError) {
-              return Center(child: Text('Erreur: ${snapshot.error}'));
+              return Center(
+                child: Text(l10n.errorPrefixed('${snapshot.error}')),
+              );
             }
 
             final handovers = snapshot.data ?? [];
 
             if (handovers.isEmpty) {
-              return const Center(child: Text('Aucun versement en attente.'));
+              return Center(child: Text(l10n.noPendingHandover));
             }
 
             return ListView.separated(
@@ -70,11 +75,13 @@ class VersementsServeursPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Montant déclaré : ${handover.declaredAmount.toStringAsFixed(0)} FCFA',
+                          l10n.declaredAmountLine(
+                            handover.declaredAmount.toStringAsFixed(0),
+                          ),
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Paiements inclus : ${handover.paymentIds.length}',
+                          l10n.includedPaymentsLine(handover.paymentIds.length),
                         ),
                         const SizedBox(height: 12),
                         Align(
@@ -92,7 +99,7 @@ class VersementsServeursPage extends StatelessWidget {
                               );
                             },
                             icon: const Icon(Icons.visibility_outlined),
-                            label: const Text('Ouvrir'),
+                            label: Text(l10n.actionOpen),
                           ),
                         ),
                       ],
@@ -147,23 +154,24 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
   }
 
   Future<void> _validate() async {
+    final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthController>();
     final user = auth.currentUser;
 
     if (user == null) {
-      _showSnack('Utilisateur introuvable.');
+      _showSnack(l10n.errUserNotFound);
       return;
     }
 
     if (establishmentId.isEmpty) {
-      _showSnack('Établissement introuvable.');
+      _showSnack(l10n.errEstablishmentNotFound);
       return;
     }
 
     final amount = double.tryParse(validatedAmountController.text.trim());
 
     if (amount == null) {
-      _showSnack('Montant constaté invalide.');
+      _showSnack(l10n.errObservedAmountInvalid);
       return;
     }
 
@@ -179,27 +187,28 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
     if (!mounted) return;
 
     Navigator.pop(context);
-    _showSnack('Commandes validées.');
+    _showSnack(l10n.ordersValidated);
   }
 
   Future<void> _reject() async {
+    final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthController>();
     final user = auth.currentUser;
 
     if (user == null) {
-      _showSnack('Utilisateur introuvable.');
+      _showSnack(l10n.errUserNotFound);
       return;
     }
 
     if (establishmentId.isEmpty) {
-      _showSnack('Établissement introuvable.');
+      _showSnack(l10n.errEstablishmentNotFound);
       return;
     }
 
     final amount = double.tryParse(validatedAmountController.text.trim());
 
     if (amount == null) {
-      _showSnack('Montant constaté invalide.');
+      _showSnack(l10n.errObservedAmountInvalid);
       return;
     }
 
@@ -215,7 +224,7 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
     if (!mounted) return;
 
     Navigator.pop(context);
-    _showSnack('Commandes rejetées.');
+    _showSnack(l10n.ordersRejected);
   }
 
   void _showSnack(String message) {
@@ -226,17 +235,20 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final pdfService = context.read<PdfService>();
     final printerService = context.read<PrinterService>();
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('Versement - ${widget.handover.serveurName}')),
+      appBar: AppBar(
+        title: Text(l10n.handoverTitleFor(widget.handover.serveurName)),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -250,7 +262,9 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          'Montant déclaré : ${widget.handover.declaredAmount.toStringAsFixed(0)} FCFA',
+                          l10n.declaredAmountLine(
+                            widget.handover.declaredAmount.toStringAsFixed(0),
+                          ),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -258,8 +272,8 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
                       TextField(
                         controller: validatedAmountController,
                         keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          labelText: 'Montant constaté',
+                        decoration: InputDecoration(
+                          labelText: l10n.labelObservedAmount,
                         ),
                       ),
                     ],
@@ -286,16 +300,16 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
 
                         if (snapshot.hasError) {
                           return Center(
-                            child: Text('Erreur: ${snapshot.error}'),
+                            child: Text(
+                              l10n.errorPrefixed('${snapshot.error}'),
+                            ),
                           );
                         }
 
                         final payments = snapshot.data ?? [];
 
                         if (payments.isEmpty) {
-                          return const Center(
-                            child: Text('Aucun paiement trouvé.'),
-                          );
+                          return Center(child: Text(l10n.noPaymentFound));
                         }
 
                         return ListView.separated(
@@ -328,10 +342,22 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
                                       });
                                     },
                               title: Text(payment.orderNumber),
+                              // `method` est un code technique : on le rend
+                              // via le libellé localisé partagé.
                               subtitle: Text(
-                                '${payment.method} • ${payment.amount.toStringAsFixed(0)} FCFA'
-                                '${alreadyValidated ? " • déjà validée" : ""}'
-                                '${alreadyRejected ? " • rejetée" : ""}',
+                                l10n.methodAmountLine(
+                                      AppPaymentMethods.label(
+                                        l10n,
+                                        payment.method,
+                                      ),
+                                      payment.amount.toStringAsFixed(0),
+                                    ) +
+                                    (alreadyValidated
+                                        ? l10n.suffixAlreadyValidated
+                                        : '') +
+                                    (alreadyRejected
+                                        ? l10n.suffixRejected
+                                        : ''),
                               ),
                             );
                           },
@@ -347,14 +373,14 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: selectedPaymentIds.isEmpty ? null : _reject,
-                      child: const Text('Rejeter sélection'),
+                      child: Text(l10n.actionRejectSelection),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: ElevatedButton(
                       onPressed: selectedPaymentIds.isEmpty ? null : _validate,
-                      child: const Text('Valider sélection'),
+                      child: Text(l10n.actionValidateSelection),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -378,7 +404,7 @@ class _GeranteHandoverDetailPageState extends State<GeranteHandoverDetailPage> {
                         );
                       },
                       icon: const Icon(Icons.print_outlined),
-                      label: const Text('Imprimer'),
+                      label: Text(l10n.actionPrint),
                     ),
                   ),
                 ],

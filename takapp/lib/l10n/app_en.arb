@@ -1193,5 +1193,152 @@
     }
   },
   "labelQuantityDelivered": "Quantity delivered",
-  "actionValidateDelivery": "Confirm the delivery"
+  "actionValidateDelivery": "Confirm the delivery",
+
+  "amountLine": "Amount: {amount} FCFA",
+  "@amountLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "labelTotalCaps": "TOTAL",
+  "labelStatus": "Status",
+  "actionOpen": "Open",
+  "noResult": "No result",
+  "dateLine": "Date: {date}",
+  "@dateLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "roomLine": "Room: {number}",
+  "@roomLine": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "labelClientName": "Client name",
+  "labelRoomNumber": "Room number",
+  "actionViewDetails": "View details",
+
+  "statusDeclared": "Declared",
+  "noElementSelected": "No item selected.",
+  "transferDeclaredToAccounting": "Transfer declared to accounting.",
+  "managerToAccountingTitle": "Manager → accounting transfer",
+  "validatedServerHandovers": "Validated waiter handovers",
+  "noServerHandoverAvailable": "No waiter handover available.",
+  "paidRoomInvoicesNotTransferred": "Paid room invoices not yet transferred",
+  "noRoomInvoiceAvailable": "No room invoice available.",
+  "transferSummary": "Transfer summary",
+  "serverHandoversLabel": "Waiter handovers",
+  "roomInvoicesLabel": "Room invoices",
+  "actionDeclareToAccounting": "Declare to accounting",
+  "managerTransferHistory": "Manager transfer history",
+  "noTransferRecorded": "No transfer recorded.",
+
+  "statusPaidShort": "Paid",
+  "statusUnpaidShort": "Unpaid",
+  "errSearchFailed": "Search error: {error}",
+  "@errSearchFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "searchByClientOption": "Search by client",
+  "searchByRoomOption": "Search by room",
+  "searchByClientShort": "By client",
+  "searchByRoomShort": "By room",
+  "arrivalLine": "Check-in: {date}",
+  "@arrivalLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "departureLine": "Check-out: {date}",
+  "@departureLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "mecefCodeLine": "MECeF code: {code}",
+  "@mecefCodeLine": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "searchRoomInvoicesTitle": "Search room invoices",
+
+  "serverHandoversTitle": "Waiter handovers",
+  "noPendingHandover": "No pending handover.",
+  "declaredAmountLine": "Declared amount: {amount} FCFA",
+  "@declaredAmountLine": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "includedPaymentsLine": "Payments included: {count}",
+  "@includedPaymentsLine": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "errObservedAmountInvalid": "Invalid observed amount.",
+  "ordersValidated": "Orders validated.",
+  "ordersRejected": "Orders rejected.",
+  "handoverTitleFor": "Handover - {name}",
+  "@handoverTitleFor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "labelObservedAmount": "Observed amount",
+  "noPaymentFound": "No payment found.",
+  "methodAmountLine": "{method} • {amount} FCFA",
+  "@methodAmountLine": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "suffixAlreadyValidated": " • already validated",
+  "suffixRejected": " • rejected",
+  "actionRejectSelection": "Reject selection",
+  "actionValidateSelection": "Validate selection",
+
+  "supplyRequestsForStore": "Requests - {store}",
+  "@supplyRequestsForStore": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      }
+    }
+  },
+  "filterRequests": "Filter requests",
+  "filterDelivered": "Delivered",
+  "filterReceived": "Received",
+  "noRequestFound": "No request found."
 }

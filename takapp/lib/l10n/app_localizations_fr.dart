@@ -1761,4 +1761,195 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get actionValidateDelivery => 'Valider la livraison';
+
+  @override
+  String amountLine(String amount) {
+    return 'Montant : $amount FCFA';
+  }
+
+  @override
+  String get labelTotalCaps => 'TOTAL';
+
+  @override
+  String get labelStatus => 'Statut';
+
+  @override
+  String get actionOpen => 'Ouvrir';
+
+  @override
+  String get noResult => 'Aucun résultat';
+
+  @override
+  String dateLine(String date) {
+    return 'Date : $date';
+  }
+
+  @override
+  String roomLine(String number) {
+    return 'Chambre : $number';
+  }
+
+  @override
+  String get labelClientName => 'Nom du client';
+
+  @override
+  String get labelRoomNumber => 'Numéro de chambre';
+
+  @override
+  String get actionViewDetails => 'Voir détails';
+
+  @override
+  String get statusDeclared => 'Déclaré';
+
+  @override
+  String get noElementSelected => 'Aucun élément sélectionné.';
+
+  @override
+  String get transferDeclaredToAccounting =>
+      'Versement déclaré à la comptabilité.';
+
+  @override
+  String get managerToAccountingTitle => 'Versement gérante → comptabilité';
+
+  @override
+  String get validatedServerHandovers => 'Versements serveurs validés';
+
+  @override
+  String get noServerHandoverAvailable => 'Aucun versement serveur disponible.';
+
+  @override
+  String get paidRoomInvoicesNotTransferred =>
+      'Factures chambres encaissées non versées';
+
+  @override
+  String get noRoomInvoiceAvailable => 'Aucune facture chambre disponible.';
+
+  @override
+  String get transferSummary => 'Résumé du versement';
+
+  @override
+  String get serverHandoversLabel => 'Versements serveurs';
+
+  @override
+  String get roomInvoicesLabel => 'Factures chambres';
+
+  @override
+  String get actionDeclareToAccounting => 'Déclarer à la comptabilité';
+
+  @override
+  String get managerTransferHistory => 'Historique versements gérante';
+
+  @override
+  String get noTransferRecorded => 'Aucun versement enregistré.';
+
+  @override
+  String get statusPaidShort => 'Payée';
+
+  @override
+  String get statusUnpaidShort => 'Non payée';
+
+  @override
+  String errSearchFailed(String error) {
+    return 'Erreur lors de la recherche : $error';
+  }
+
+  @override
+  String get searchByClientOption => 'Recherche par client';
+
+  @override
+  String get searchByRoomOption => 'Recherche par chambre';
+
+  @override
+  String get searchByClientShort => 'Par client';
+
+  @override
+  String get searchByRoomShort => 'Par chambre';
+
+  @override
+  String arrivalLine(String date) {
+    return 'Entrée : $date';
+  }
+
+  @override
+  String departureLine(String date) {
+    return 'Sortie : $date';
+  }
+
+  @override
+  String mecefCodeLine(String code) {
+    return 'Code MECeF : $code';
+  }
+
+  @override
+  String get searchRoomInvoicesTitle => 'Recherche factures chambre';
+
+  @override
+  String get serverHandoversTitle => 'Versements des serveurs';
+
+  @override
+  String get noPendingHandover => 'Aucun versement en attente.';
+
+  @override
+  String declaredAmountLine(String amount) {
+    return 'Montant déclaré : $amount FCFA';
+  }
+
+  @override
+  String includedPaymentsLine(int count) {
+    return 'Paiements inclus : $count';
+  }
+
+  @override
+  String get errObservedAmountInvalid => 'Montant constaté invalide.';
+
+  @override
+  String get ordersValidated => 'Commandes validées.';
+
+  @override
+  String get ordersRejected => 'Commandes rejetées.';
+
+  @override
+  String handoverTitleFor(String name) {
+    return 'Versement - $name';
+  }
+
+  @override
+  String get labelObservedAmount => 'Montant constaté';
+
+  @override
+  String get noPaymentFound => 'Aucun paiement trouvé.';
+
+  @override
+  String methodAmountLine(String method, String amount) {
+    return '$method • $amount FCFA';
+  }
+
+  @override
+  String get suffixAlreadyValidated => ' • déjà validée';
+
+  @override
+  String get suffixRejected => ' • rejetée';
+
+  @override
+  String get actionRejectSelection => 'Rejeter sélection';
+
+  @override
+  String get actionValidateSelection => 'Valider sélection';
+
+  @override
+  String supplyRequestsForStore(String store) {
+    return 'Demandes - $store';
+  }
+
+  @override
+  String get filterRequests => 'Filtrer les demandes';
+
+  @override
+  String get filterDelivered => 'Livrées';
+
+  @override
+  String get filterReceived => 'Réceptionnées';
+
+  @override
+  String get noRequestFound => 'Aucune demande trouvée.';
 }
