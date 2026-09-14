@@ -5404,6 +5404,270 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Retirer cette ligne'**
   String get tooltipRemoveLine;
+
+  /// No description provided for @barTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bar'**
+  String get barTitle;
+
+  /// No description provided for @establishmentBarTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} - Bar'**
+  String establishmentBarTitle(String name);
+
+  /// No description provided for @newBarOrderTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvelle commande bar'**
+  String get newBarOrderTitle;
+
+  /// No description provided for @barOrdersFollowUp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suivi des commandes bar de tous les serveurs'**
+  String get barOrdersFollowUp;
+
+  /// No description provided for @barStockTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stock Bar'**
+  String get barStockTitle;
+
+  /// No description provided for @actionSupply.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approvisionnement'**
+  String get actionSupply;
+
+  /// No description provided for @supplyRequestBarTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demande approvisionnement Bar'**
+  String get supplyRequestBarTitle;
+
+  /// No description provided for @actionStockOut.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sortie Stock'**
+  String get actionStockOut;
+
+  /// No description provided for @stockOutBarTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sortie Stock Bar'**
+  String get stockOutBarTitle;
+
+  /// No description provided for @reasonBarConsumption.
+  ///
+  /// In fr, this message translates to:
+  /// **'Consommation Bar'**
+  String get reasonBarConsumption;
+
+  /// No description provided for @actionMovements.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mouvements'**
+  String get actionMovements;
+
+  /// No description provided for @movementHistoryBarTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Historique mouvements Bar'**
+  String get movementHistoryBarTitle;
+
+  /// No description provided for @actionReceptions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réceptions'**
+  String get actionReceptions;
+
+  /// No description provided for @receptionsBarTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réceptions Bar'**
+  String get receptionsBarTitle;
+
+  /// No description provided for @actionBarItems.
+  ///
+  /// In fr, this message translates to:
+  /// **'Articles Bar'**
+  String get actionBarItems;
+
+  /// No description provided for @actionIngredients.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ingrédients'**
+  String get actionIngredients;
+
+  /// No description provided for @errBarItemsLoad.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur articles bar : {error}'**
+  String errBarItemsLoad(String error);
+
+  /// No description provided for @barStockItemsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Articles de stock - Bar'**
+  String get barStockItemsTitle;
+
+  /// No description provided for @newBarItemTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvel article du bar'**
+  String get newBarItemTitle;
+
+  /// No description provided for @storeAutoSetToBar.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le store est automatiquement défini sur : bar'**
+  String get storeAutoSetToBar;
+
+  /// No description provided for @errItemAlreadyExists.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cet article existe déjà.'**
+  String get errItemAlreadyExists;
+
+  /// No description provided for @barItemSavedSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Article du bar enregistré avec succès.'**
+  String get barItemSavedSuccess;
+
+  /// No description provided for @actionSaveItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer l’article'**
+  String get actionSaveItem;
+
+  /// No description provided for @hintBarItemNameExample.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. Coca-Cola 33cl'**
+  String get hintBarItemNameExample;
+
+  /// No description provided for @hintBarCategoryExample.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. Boisson gazeuse'**
+  String get hintBarCategoryExample;
+
+  /// No description provided for @hintBarUnitExamples.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. bouteille, canette, carton'**
+  String get hintBarUnitExamples;
+
+  /// No description provided for @cocktailCreatedCompose.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cocktail « {name} » créé. Vous pouvez maintenant le composer.'**
+  String cocktailCreatedCompose(String name);
+
+  /// No description provided for @barIngredientsSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ingrédients du cocktail enregistrés avec succès.'**
+  String get barIngredientsSaved;
+
+  /// No description provided for @importedCompositionsCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} composition(s) importée(s)'**
+  String importedCompositionsCount(int count);
+
+  /// No description provided for @cocktailsNotFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cocktails / articles non trouvés :'**
+  String get cocktailsNotFound;
+
+  /// No description provided for @oneRowPerBarIngredient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une ligne par ingrédient (le nom du cocktail est répété).'**
+  String get oneRowPerBarIngredient;
+
+  /// No description provided for @cocktailImportExampleRows.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mojito | Rhum | 1\nMojito | Menthe | 1'**
+  String get cocktailImportExampleRows;
+
+  /// No description provided for @barNamesMustExistInApp.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les noms des cocktails et ingrédients doivent déjà exister dans l’application.'**
+  String get barNamesMustExistInApp;
+
+  /// No description provided for @barCocktailsCompositionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Composition cocktails bar'**
+  String get barCocktailsCompositionTitle;
+
+  /// No description provided for @createNewCocktailTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer un nouveau cocktail'**
+  String get createNewCocktailTitle;
+
+  /// No description provided for @labelCocktailName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom du cocktail'**
+  String get labelCocktailName;
+
+  /// No description provided for @hintCocktailExample.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex : Mojito'**
+  String get hintCocktailExample;
+
+  /// No description provided for @labelBarItemOrCocktail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cocktail / article du bar'**
+  String get labelBarItemOrCocktail;
+
+  /// No description provided for @errPickBarItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez choisir un article du bar.'**
+  String get errPickBarItem;
+
+  /// No description provided for @barIngredientsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ingrédients du bar'**
+  String get barIngredientsTitle;
+
+  /// No description provided for @actionValidateCocktailComposition.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valider la composition du cocktail'**
+  String get actionValidateCocktailComposition;
+
+  /// No description provided for @defineCocktailIngredientsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Définir les ingrédients des cocktails'**
+  String get defineCocktailIngredientsTitle;
+
+  /// No description provided for @cocktailPhotoTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo du cocktail'**
+  String get cocktailPhotoTitle;
+
+  /// No description provided for @errPickCocktailOrBarItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez choisir un cocktail ou article du bar.'**
+  String get errPickCocktailOrBarItem;
 }
 
 class _AppLocalizationsDelegate

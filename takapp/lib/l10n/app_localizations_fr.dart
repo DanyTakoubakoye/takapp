@@ -3072,4 +3072,153 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tooltipRemoveLine => 'Retirer cette ligne';
+
+  @override
+  String get barTitle => 'Bar';
+
+  @override
+  String establishmentBarTitle(String name) {
+    return '$name - Bar';
+  }
+
+  @override
+  String get newBarOrderTitle => 'Nouvelle commande bar';
+
+  @override
+  String get barOrdersFollowUp =>
+      'Suivi des commandes bar de tous les serveurs';
+
+  @override
+  String get barStockTitle => 'Stock Bar';
+
+  @override
+  String get actionSupply => 'Approvisionnement';
+
+  @override
+  String get supplyRequestBarTitle => 'Demande approvisionnement Bar';
+
+  @override
+  String get actionStockOut => 'Sortie Stock';
+
+  @override
+  String get stockOutBarTitle => 'Sortie Stock Bar';
+
+  @override
+  String get reasonBarConsumption => 'Consommation Bar';
+
+  @override
+  String get actionMovements => 'Mouvements';
+
+  @override
+  String get movementHistoryBarTitle => 'Historique mouvements Bar';
+
+  @override
+  String get actionReceptions => 'Réceptions';
+
+  @override
+  String get receptionsBarTitle => 'Réceptions Bar';
+
+  @override
+  String get actionBarItems => 'Articles Bar';
+
+  @override
+  String get actionIngredients => 'Ingrédients';
+
+  @override
+  String errBarItemsLoad(String error) {
+    return 'Erreur articles bar : $error';
+  }
+
+  @override
+  String get barStockItemsTitle => 'Articles de stock - Bar';
+
+  @override
+  String get newBarItemTitle => 'Nouvel article du bar';
+
+  @override
+  String get storeAutoSetToBar =>
+      'Le store est automatiquement défini sur : bar';
+
+  @override
+  String get errItemAlreadyExists => 'Cet article existe déjà.';
+
+  @override
+  String get barItemSavedSuccess => 'Article du bar enregistré avec succès.';
+
+  @override
+  String get actionSaveItem => 'Enregistrer l’article';
+
+  @override
+  String get hintBarItemNameExample => 'Ex. Coca-Cola 33cl';
+
+  @override
+  String get hintBarCategoryExample => 'Ex. Boisson gazeuse';
+
+  @override
+  String get hintBarUnitExamples => 'Ex. bouteille, canette, carton';
+
+  @override
+  String cocktailCreatedCompose(String name) {
+    return 'Cocktail « $name » créé. Vous pouvez maintenant le composer.';
+  }
+
+  @override
+  String get barIngredientsSaved =>
+      'Ingrédients du cocktail enregistrés avec succès.';
+
+  @override
+  String importedCompositionsCount(int count) {
+    return '$count composition(s) importée(s)';
+  }
+
+  @override
+  String get cocktailsNotFound => 'Cocktails / articles non trouvés :';
+
+  @override
+  String get oneRowPerBarIngredient =>
+      'Une ligne par ingrédient (le nom du cocktail est répété).';
+
+  @override
+  String get cocktailImportExampleRows =>
+      'Mojito | Rhum | 1\nMojito | Menthe | 1';
+
+  @override
+  String get barNamesMustExistInApp =>
+      'Les noms des cocktails et ingrédients doivent déjà exister dans l’application.';
+
+  @override
+  String get barCocktailsCompositionTitle => 'Composition cocktails bar';
+
+  @override
+  String get createNewCocktailTitle => 'Créer un nouveau cocktail';
+
+  @override
+  String get labelCocktailName => 'Nom du cocktail';
+
+  @override
+  String get hintCocktailExample => 'Ex : Mojito';
+
+  @override
+  String get labelBarItemOrCocktail => 'Cocktail / article du bar';
+
+  @override
+  String get errPickBarItem => 'Veuillez choisir un article du bar.';
+
+  @override
+  String get barIngredientsTitle => 'Ingrédients du bar';
+
+  @override
+  String get actionValidateCocktailComposition =>
+      'Valider la composition du cocktail';
+
+  @override
+  String get defineCocktailIngredientsTitle =>
+      'Définir les ingrédients des cocktails';
+
+  @override
+  String get cocktailPhotoTitle => 'Photo du cocktail';
+
+  @override
+  String get errPickCocktailOrBarItem =>
+      'Veuillez choisir un cocktail ou article du bar.';
 }

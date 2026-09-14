@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 
 class BarStockItemFormPage extends StatefulWidget {
   final String establishmentId;
@@ -57,8 +58,10 @@ class _BarStockItemFormPageState extends State<BarStockItemFormPage> {
   /// =========================
 
   Future<void> _saveBarItem() async {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.trim().isEmpty) {
-      _showMessage('Établissement introuvable.');
+      _showMessage(l10n.errEstablishmentNotFound);
 
       return;
     }
@@ -89,7 +92,7 @@ class _BarStockItemFormPageState extends State<BarStockItemFormPage> {
           .get();
 
       if (existing.docs.isNotEmpty) {
-        throw Exception('Cet article existe déjà.');
+        throw Exception(l10n.errItemAlreadyExists);
       }
 
       /// =========================
@@ -132,11 +135,11 @@ class _BarStockItemFormPageState extends State<BarStockItemFormPage> {
 
       if (!mounted) return;
 
-      _showMessage('Article du bar enregistré avec succès.');
+      _showMessage(l10n.barItemSavedSuccess);
     } catch (e) {
       if (!mounted) return;
 
-      _showMessage('Erreur lors de l’enregistrement : $e');
+      _showMessage(l10n.errSaveFailed('$e'));
     } finally {
       if (mounted) {
         setState(() {
@@ -180,7 +183,7 @@ class _BarStockItemFormPageState extends State<BarStockItemFormPage> {
 
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
-          return 'Champ obligatoire';
+          return AppLocalizations.of(context).errRequiredField;
         }
 
         return null;
@@ -190,18 +193,19 @@ class _BarStockItemFormPageState extends State<BarStockItemFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isSmall = MediaQuery.of(context).size.width < 700;
 
     if (establishmentId.trim().isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Articles de stock - Bar')),
+        appBar: AppBar(title: Text(l10n.barStockItemsTitle)),
 
-        body: const Center(child: Text('Établissement introuvable.')),
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Articles de stock - Bar')),
+      appBar: AppBar(title: Text(l10n.barStockItemsTitle)),
 
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -228,17 +232,17 @@ class _BarStockItemFormPageState extends State<BarStockItemFormPage> {
 
                     children: [
                       Text(
-                        'Nouvel article du bar',
+                        l10n.newBarItemTitle,
 
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
 
                       const SizedBox(height: 8),
 
-                      const Text(
-                        'Le store est automatiquement défini sur : bar',
+                      Text(
+                        l10n.storeAutoSetToBar,
 
-                        style: TextStyle(fontWeight: FontWeight.w500),
+                        style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
 
                       const SizedBox(height: 20),
@@ -247,9 +251,9 @@ class _BarStockItemFormPageState extends State<BarStockItemFormPage> {
                         _buildTextField(
                           controller: _nameController,
 
-                          label: 'Nom',
+                          label: l10n.labelName,
 
-                          hint: 'Ex. Coca-Cola 33cl',
+                          hint: l10n.hintBarItemNameExample,
                         ),
 
                         const SizedBox(height: 12),
@@ -257,9 +261,9 @@ class _BarStockItemFormPageState extends State<BarStockItemFormPage> {
                         _buildTextField(
                           controller: _categoryController,
 
-                          label: 'Catégorie',
+                          label: l10n.labelCategory,
 
-                          hint: 'Ex. Boisson gazeuse',
+                          hint: l10n.hintBarCategoryExample,
                         ),
 
                         const SizedBox(height: 12),
@@ -267,9 +271,9 @@ class _BarStockItemFormPageState extends State<BarStockItemFormPage> {
                         _buildTextField(
                           controller: _unitController,
 
-                          label: 'Unité',
+                          label: l10n.labelUnit,
 
-                          hint: 'Ex. bouteille, canette, carton',
+                          hint: l10n.hintBarUnitExamples,
                         ),
                       ] else ...[
                         Row(
@@ -278,9 +282,9 @@ class _BarStockItemFormPageState extends State<BarStockItemFormPage> {
                               child: _buildTextField(
                                 controller: _nameController,
 
-                                label: 'Nom',
+                                label: l10n.labelName,
 
-                                hint: 'Ex. Coca-Cola 33cl',
+                                hint: l10n.hintBarItemNameExample,
                               ),
                             ),
 
@@ -290,9 +294,9 @@ class _BarStockItemFormPageState extends State<BarStockItemFormPage> {
                               child: _buildTextField(
                                 controller: _categoryController,
 
-                                label: 'Catégorie',
+                                label: l10n.labelCategory,
 
-                                hint: 'Ex. Boisson gazeuse',
+                                hint: l10n.hintBarCategoryExample,
                               ),
                             ),
 
@@ -302,9 +306,9 @@ class _BarStockItemFormPageState extends State<BarStockItemFormPage> {
                               child: _buildTextField(
                                 controller: _unitController,
 
-                                label: 'Unité',
+                                label: l10n.labelUnit,
 
-                                hint: 'Ex. bouteille, canette, carton',
+                                hint: l10n.hintBarUnitExamples,
                               ),
                             ),
                           ],
@@ -316,7 +320,7 @@ class _BarStockItemFormPageState extends State<BarStockItemFormPage> {
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
 
-                        title: const Text('Article actif'),
+                        title: Text(l10n.labelActiveItem),
 
                         value: _isActive,
 
@@ -351,8 +355,8 @@ class _BarStockItemFormPageState extends State<BarStockItemFormPage> {
 
                           label: Text(
                             _isSaving
-                                ? 'Enregistrement...'
-                                : 'Enregistrer l’article',
+                                ? l10n.savingInProgress
+                                : l10n.actionSaveItem,
                           ),
                         ),
                       ),

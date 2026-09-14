@@ -3040,4 +3040,148 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tooltipRemoveLine => 'Remove this row';
+
+  @override
+  String get barTitle => 'Bar';
+
+  @override
+  String establishmentBarTitle(String name) {
+    return '$name - Bar';
+  }
+
+  @override
+  String get newBarOrderTitle => 'New bar order';
+
+  @override
+  String get barOrdersFollowUp => 'Bar order tracking for all waiters';
+
+  @override
+  String get barStockTitle => 'Bar stock';
+
+  @override
+  String get actionSupply => 'Supply';
+
+  @override
+  String get supplyRequestBarTitle => 'Bar supply request';
+
+  @override
+  String get actionStockOut => 'Stock out';
+
+  @override
+  String get stockOutBarTitle => 'Bar stock out';
+
+  @override
+  String get reasonBarConsumption => 'Bar consumption';
+
+  @override
+  String get actionMovements => 'Movements';
+
+  @override
+  String get movementHistoryBarTitle => 'Bar movement history';
+
+  @override
+  String get actionReceptions => 'Receptions';
+
+  @override
+  String get receptionsBarTitle => 'Bar receptions';
+
+  @override
+  String get actionBarItems => 'Bar items';
+
+  @override
+  String get actionIngredients => 'Ingredients';
+
+  @override
+  String errBarItemsLoad(String error) {
+    return 'Bar items error: $error';
+  }
+
+  @override
+  String get barStockItemsTitle => 'Stock items - Bar';
+
+  @override
+  String get newBarItemTitle => 'New bar item';
+
+  @override
+  String get storeAutoSetToBar => 'The store is automatically set to: bar';
+
+  @override
+  String get errItemAlreadyExists => 'This item already exists.';
+
+  @override
+  String get barItemSavedSuccess => 'Bar item saved successfully.';
+
+  @override
+  String get actionSaveItem => 'Save item';
+
+  @override
+  String get hintBarItemNameExample => 'E.g. Coca-Cola 33cl';
+
+  @override
+  String get hintBarCategoryExample => 'E.g. Soft drink';
+
+  @override
+  String get hintBarUnitExamples => 'E.g. bottle, can, box';
+
+  @override
+  String cocktailCreatedCompose(String name) {
+    return 'Cocktail « $name » created. You can now compose it.';
+  }
+
+  @override
+  String get barIngredientsSaved => 'Cocktail ingredients saved successfully.';
+
+  @override
+  String importedCompositionsCount(int count) {
+    return '$count composition(s) imported';
+  }
+
+  @override
+  String get cocktailsNotFound => 'Cocktails / items not found:';
+
+  @override
+  String get oneRowPerBarIngredient =>
+      'One row per ingredient (the cocktail name is repeated).';
+
+  @override
+  String get cocktailImportExampleRows => 'Mojito | Rum | 1\nMojito | Mint | 1';
+
+  @override
+  String get barNamesMustExistInApp =>
+      'Cocktail and ingredient names must already exist in the app.';
+
+  @override
+  String get barCocktailsCompositionTitle => 'Bar cocktail composition';
+
+  @override
+  String get createNewCocktailTitle => 'Create a new cocktail';
+
+  @override
+  String get labelCocktailName => 'Cocktail name';
+
+  @override
+  String get hintCocktailExample => 'E.g. Mojito';
+
+  @override
+  String get labelBarItemOrCocktail => 'Cocktail / bar item';
+
+  @override
+  String get errPickBarItem => 'Please choose a bar item.';
+
+  @override
+  String get barIngredientsTitle => 'Bar ingredients';
+
+  @override
+  String get actionValidateCocktailComposition =>
+      'Validate cocktail composition';
+
+  @override
+  String get defineCocktailIngredientsTitle => 'Define cocktail ingredients';
+
+  @override
+  String get cocktailPhotoTitle => 'Cocktail photo';
+
+  @override
+  String get errPickCocktailOrBarItem =>
+      'Please choose a cocktail or bar item.';
 }

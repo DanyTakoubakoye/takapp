@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/services/bar_service.dart';
 import 'package:takapp/services/notification_service_mobile.dart';
 import 'package:takapp/vues/bar/bar_stock_item_form_page.dart';
@@ -53,6 +54,7 @@ class _BarHomePageState extends State<BarHomePage> {
 
   void _handleNewBarOrders(
     List<QueryDocumentSnapshot<Map<String, dynamic>>> docs,
+    AppLocalizations l10n,
   ) {
     // Au tout premier chargement, on mémorise sans alerter
     if (_isFirstSnapshot) {
@@ -68,7 +70,7 @@ class _BarHomePageState extends State<BarHomePage> {
       _knownOrderIds.add(d.id);
 
       final data = d.data();
-      final clientLabel = _clientLabel(data);
+      final clientLabel = _clientLabel(data, l10n);
       final orderNumber = (data['orderNumber'] ?? '').toString();
 
       // Son
@@ -82,20 +84,21 @@ class _BarHomePageState extends State<BarHomePage> {
 
       // Notification navigateur
       showWebNotification(
-        title: 'Nouvelle commande bar',
-        body: 'Commande $orderNumber - $clientLabel',
+        title: l10n.newBarOrderTitle,
+        body: l10n.orderNumberWithClient(orderNumber, clientLabel),
         establishmentId: widget.establishmentId,
         tag: 'takapp_bar_${widget.establishmentId}_${d.id}',
       );
 
       // Popup in-app (une seule à la fois)
-      _showNewOrderPopup(orderNumber, clientLabel);
+      _showNewOrderPopup(orderNumber, clientLabel, l10n);
     }
   }
 
   Future<void> _showNewOrderPopup(
     String orderNumber,
     String clientLabel,
+    AppLocalizations l10n,
   ) async {
     if (_isPopupOpen) return;
     if (!mounted) return;
@@ -106,8 +109,8 @@ class _BarHomePageState extends State<BarHomePage> {
       barrierDismissible: true,
       builder: (dialogContext) => AlertDialog(
         icon: const Icon(Icons.local_bar, color: Colors.indigo, size: 40),
-        title: const Text('Nouvelle commande bar'),
-        content: Text('Commande $orderNumber\n$clientLabel'),
+        title: Text(l10n.newBarOrderTitle),
+        content: Text('${l10n.orderNumberLine(orderNumber)}\n$clientLabel'),
         actions: [
           ElevatedButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
@@ -134,43 +137,44 @@ class _BarHomePageState extends State<BarHomePage> {
     }
   }
 
-  String _statusLabel(String status) {
+  String _statusLabel(String status, AppLocalizations l10n) {
     switch (status) {
       case 'pending':
-        return 'En attente';
+        return l10n.statusPending;
       case 'preparing':
-        return 'En préparation';
+        return l10n.statusPreparing;
       case 'ready':
-        return 'Prête';
+        return l10n.statusReady;
       case 'served':
-        return 'Servie';
+        return l10n.statusServed;
       default:
         return status;
     }
   }
 
-  String _clientLabel(Map<String, dynamic> data) {
+  String _clientLabel(Map<String, dynamic> data, AppLocalizations l10n) {
     final clientType = (data['clientType'] ?? '').toString();
     final tableNumber = (data['tableNumber'] ?? '').toString().trim();
     final roomNumber = (data['roomNumber'] ?? '').toString().trim();
 
     if (clientType == 'hotel' && roomNumber.isNotEmpty) {
-      return 'Chambre $roomNumber';
+      return l10n.labelRoom(roomNumber);
     }
 
     if (tableNumber.isNotEmpty) {
-      return 'Table $tableNumber';
+      return l10n.labelTable(tableNumber);
     }
 
     if (clientType == 'bar') {
-      return 'Client Bar';
+      return l10n.labelBarClient;
     }
 
-    return clientType.isNotEmpty ? clientType : 'Client';
+    return clientType.isNotEmpty ? clientType : l10n.labelClient;
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final establishmentId = widget.establishmentId;
     final auth = context.watch<AuthController>();
     final user = auth.currentUser;
@@ -185,7 +189,9 @@ class _BarHomePageState extends State<BarHomePage> {
             final name = (snapshot.data?.data()?['name'] ?? '')
                 .toString()
                 .toUpperCase();
-            return Text(name.isEmpty ? 'Bar' : '$name - Bar');
+            return Text(
+              name.isEmpty ? l10n.barTitle : l10n.establishmentBarTitle(name),
+            );
           },
         ),
         actions: [
@@ -196,7 +202,7 @@ class _BarHomePageState extends State<BarHomePage> {
         ],
       ),
       body: user == null
-          ? const Center(child: Text('Utilisateur introuvable'))
+          ? Center(child: Text(l10n.errUserNotFound))
           : Padding(
               padding: const EdgeInsets.all(12),
               child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
@@ -207,7 +213,9 @@ class _BarHomePageState extends State<BarHomePage> {
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text('Erreur : ${snapshot.error}'));
+                    return Center(
+                      child: Text(l10n.commonError('${snapshot.error}')),
+                    );
                   }
 
                   final docs = (snapshot.data?.docs ?? []).where((d) {
@@ -216,7 +224,7 @@ class _BarHomePageState extends State<BarHomePage> {
                   }).toList();
                   // Alerte son + popup pour les nouvelles commandes bar
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    _handleNewBarOrders(docs);
+                    _handleNewBarOrders(docs, l10n);
                   });
 
                   final pending = docs
@@ -246,7 +254,7 @@ class _BarHomePageState extends State<BarHomePage> {
                           const SizedBox(height: 12),
                           _BarSection(
                             establishmentId: establishmentId,
-                            title: 'En attente',
+                            title: l10n.statusPending,
                             docs: pending,
                             isMobile: true,
                             colorResolver: _statusColor,
@@ -257,7 +265,7 @@ class _BarHomePageState extends State<BarHomePage> {
                           const SizedBox(height: 16),
                           _BarSection(
                             establishmentId: establishmentId,
-                            title: 'En préparation',
+                            title: l10n.statusPreparing,
                             docs: preparing,
                             isMobile: true,
                             colorResolver: _statusColor,
@@ -268,7 +276,7 @@ class _BarHomePageState extends State<BarHomePage> {
                           const SizedBox(height: 16),
                           _BarSection(
                             establishmentId: establishmentId,
-                            title: 'Prêtes',
+                            title: l10n.statusReadyPlural,
                             docs: ready,
                             isMobile: true,
                             colorResolver: _statusColor,
@@ -294,7 +302,7 @@ class _BarHomePageState extends State<BarHomePage> {
                             Expanded(
                               child: _BarSection(
                                 establishmentId: establishmentId,
-                                title: 'En attente',
+                                title: l10n.statusPending,
                                 docs: pending,
                                 isMobile: false,
                                 colorResolver: _statusColor,
@@ -307,7 +315,7 @@ class _BarHomePageState extends State<BarHomePage> {
                             Expanded(
                               child: _BarSection(
                                 establishmentId: establishmentId,
-                                title: 'En préparation',
+                                title: l10n.statusPreparing,
                                 docs: preparing,
                                 isMobile: false,
                                 colorResolver: _statusColor,
@@ -320,7 +328,7 @@ class _BarHomePageState extends State<BarHomePage> {
                             Expanded(
                               child: _BarSection(
                                 establishmentId: establishmentId,
-                                title: 'Prêtes',
+                                title: l10n.statusReadyPlural,
                                 docs: ready,
                                 isMobile: false,
                                 colorResolver: _statusColor,
@@ -348,6 +356,8 @@ class _WelcomeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -362,12 +372,12 @@ class _WelcomeCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Bienvenue : $userName',
+                    l10n.welcomeName(userName),
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Suivi des commandes bar de tous les serveurs',
+                    l10n.barOrdersFollowUp,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ],
@@ -387,6 +397,8 @@ class _BarStockActionsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(14),
@@ -396,7 +408,7 @@ class _BarStockActionsCard extends StatelessWidget {
           children: [
             ElevatedButton.icon(
               icon: const Icon(Icons.inventory_2_outlined),
-              label: const Text('Stock Bar'),
+              label: Text(l10n.barStockTitle),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -404,7 +416,7 @@ class _BarStockActionsCard extends StatelessWidget {
                     builder: (_) => StoreStockPage(
                       establishmentId: establishmentId,
                       store: 'bar',
-                      title: 'Stock Bar',
+                      title: l10n.barStockTitle,
                     ),
                   ),
                 );
@@ -412,7 +424,7 @@ class _BarStockActionsCard extends StatelessWidget {
             ),
             ElevatedButton.icon(
               icon: const Icon(Icons.playlist_add),
-              label: const Text('Approvisionnement'),
+              label: Text(l10n.actionSupply),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -421,7 +433,7 @@ class _BarStockActionsCard extends StatelessWidget {
                       establishmentId: establishmentId,
                       store: 'bar',
                       requestedByRole: 'barman',
-                      title: 'Demande approvisionnement Bar',
+                      title: l10n.supplyRequestBarTitle,
                     ),
                   ),
                 );
@@ -429,7 +441,7 @@ class _BarStockActionsCard extends StatelessWidget {
             ),
             ElevatedButton.icon(
               icon: const Icon(Icons.remove_shopping_cart),
-              label: const Text('Sortie Stock'),
+              label: Text(l10n.actionStockOut),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -437,8 +449,8 @@ class _BarStockActionsCard extends StatelessWidget {
                     builder: (_) => StockOutPage(
                       establishmentId: establishmentId,
                       store: 'bar',
-                      title: 'Sortie Stock Bar',
-                      defaultReason: 'Consommation Bar',
+                      title: l10n.stockOutBarTitle,
+                      defaultReason: l10n.reasonBarConsumption,
                     ),
                   ),
                 );
@@ -446,7 +458,7 @@ class _BarStockActionsCard extends StatelessWidget {
             ),
             ElevatedButton.icon(
               icon: const Icon(Icons.history),
-              label: const Text('Mouvements'),
+              label: Text(l10n.actionMovements),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -454,7 +466,7 @@ class _BarStockActionsCard extends StatelessWidget {
                     builder: (_) => StockMovementHistoryPage(
                       establishmentId: establishmentId,
                       store: 'bar',
-                      title: 'Historique mouvements Bar',
+                      title: l10n.movementHistoryBarTitle,
                     ),
                   ),
                 );
@@ -462,7 +474,7 @@ class _BarStockActionsCard extends StatelessWidget {
             ),
             ElevatedButton.icon(
               icon: const Icon(Icons.checklist),
-              label: const Text('Réceptions'),
+              label: Text(l10n.actionReceptions),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -470,7 +482,7 @@ class _BarStockActionsCard extends StatelessWidget {
                     builder: (_) => StoreRequestHistoryPage(
                       establishmentId: establishmentId,
                       store: 'bar',
-                      title: 'Réceptions Bar',
+                      title: l10n.receptionsBarTitle,
                     ),
                   ),
                 );
@@ -478,7 +490,7 @@ class _BarStockActionsCard extends StatelessWidget {
             ),
             ElevatedButton.icon(
               icon: const Icon(Icons.fastfood),
-              label: const Text('Articles Bar'),
+              label: Text(l10n.actionBarItems),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -491,7 +503,7 @@ class _BarStockActionsCard extends StatelessWidget {
             ),
             ElevatedButton.icon(
               icon: const Icon(Icons.local_drink),
-              label: const Text('Ingrédients'),
+              label: Text(l10n.actionIngredients),
               onPressed: () {
                 Navigator.push(
                   context,
@@ -516,9 +528,10 @@ class _BarSection extends StatelessWidget {
   final List<QueryDocumentSnapshot<Map<String, dynamic>>> docs;
   final bool isMobile;
   final Color Function(String) colorResolver;
-  final String Function(String) statusLabelResolver;
+  final String Function(String, AppLocalizations) statusLabelResolver;
   final BarService barService;
-  final String Function(Map<String, dynamic>) clientLabelResolver;
+  final String Function(Map<String, dynamic>, AppLocalizations)
+  clientLabelResolver;
 
   const _BarSection({
     required this.establishmentId,
@@ -559,9 +572,11 @@ class _BarSection extends StatelessWidget {
             const SizedBox(height: 12),
             if (isMobile)
               docs.isEmpty
-                  ? const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Center(child: Text('Aucune commande')),
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Center(
+                        child: Text(AppLocalizations.of(context).noOrders),
+                      ),
                     )
                   : ListView.separated(
                       shrinkWrap: true,
@@ -582,7 +597,7 @@ class _BarSection extends StatelessWidget {
             else
               Expanded(
                 child: docs.isEmpty
-                    ? const Center(child: Text('Aucune commande'))
+                    ? Center(child: Text(AppLocalizations.of(context).noOrders))
                     : ListView.separated(
                         itemCount: docs.length,
                         separatorBuilder: (_, _) => const SizedBox(height: 10),
@@ -609,9 +624,10 @@ class _BarOrderCard extends StatelessWidget {
   final String establishmentId;
   final QueryDocumentSnapshot<Map<String, dynamic>> doc;
   final Color Function(String) colorResolver;
-  final String Function(String) statusLabelResolver;
+  final String Function(String, AppLocalizations) statusLabelResolver;
   final BarService barService;
-  final String Function(Map<String, dynamic>) clientLabelResolver;
+  final String Function(Map<String, dynamic>, AppLocalizations)
+  clientLabelResolver;
 
   const _BarOrderCard({
     required this.establishmentId,
@@ -624,13 +640,14 @@ class _BarOrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final data = doc.data();
     final orderId = doc.id;
     final status = (data['barStatus'] ?? 'pending').toString();
 
     final orderNumber = (data['orderNumber'] ?? '').toString();
     final serveurName = (data['createdByName'] ?? '').toString();
-    final clientLabel = clientLabelResolver(data);
+    final clientLabel = clientLabelResolver(data, l10n);
 
     final totalValue = data['total'];
     final double total = totalValue is num
@@ -658,7 +675,7 @@ class _BarOrderCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: Colors.red.shade200),
             ),
-            child: Text('Erreur articles bar : ${itemSnapshot.error}'),
+            child: Text(l10n.errBarItemsLoad('${itemSnapshot.error}')),
           );
         }
 
@@ -683,11 +700,11 @@ class _BarOrderCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 6),
-                Text('Serveur : $serveurName'),
+                Text(l10n.waiterLine(serveurName)),
                 const SizedBox(height: 4),
-                Text('Client : $clientLabel'),
+                Text(l10n.clientLine(clientLabel)),
                 const SizedBox(height: 4),
-                Text('Total : ${total.toStringAsFixed(0)} FCFA'),
+                Text(l10n.totalLine(total.toStringAsFixed(0))),
                 const SizedBox(height: 6),
                 Container(
                   padding: const EdgeInsets.symmetric(
@@ -699,15 +716,15 @@ class _BarOrderCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    statusLabelResolver(status),
+                    statusLabelResolver(status, l10n),
                     style: const TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ),
                 const SizedBox(height: 12),
                 const Divider(),
-                const Text(
-                  'Articles bar',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                Text(
+                  l10n.barItems,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
                 ...items.map(
@@ -733,7 +750,7 @@ class _BarOrderCard extends StatelessWidget {
                           );
                         },
                         icon: const Icon(Icons.local_bar),
-                        label: const Text('Passer en préparation'),
+                        label: Text(l10n.actionSetPreparing),
                       ),
                     if (status == 'preparing')
                       ElevatedButton.icon(
@@ -745,7 +762,7 @@ class _BarOrderCard extends StatelessWidget {
                           );
                         },
                         icon: const Icon(Icons.check_circle_outline),
-                        label: const Text('Marquer prête'),
+                        label: Text(l10n.actionMarkReady),
                       ),
                     if (status == 'ready')
                       OutlinedButton.icon(
@@ -757,7 +774,7 @@ class _BarOrderCard extends StatelessWidget {
                           );
                         },
                         icon: const Icon(Icons.undo),
-                        label: const Text('Revenir'),
+                        label: Text(l10n.actionRevert),
                       ),
                     if (status == 'ready')
                       ElevatedButton.icon(
@@ -769,7 +786,7 @@ class _BarOrderCard extends StatelessWidget {
                           );
                         },
                         icon: const Icon(Icons.delivery_dining),
-                        label: const Text('Servi'),
+                        label: Text(l10n.actionServed),
                       ),
                   ],
                 ),

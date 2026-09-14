@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import 'package:takapp/l10n/app_localizations.dart';
+
 import 'package:takapp/core/constants/bar_categories.dart';
 import 'package:takapp/services/menu_ingredient_service.dart';
 import 'package:takapp/vues/shared/menu_photo_picker.dart';
@@ -101,9 +103,11 @@ class _BarMenuItemIngredientsFormPageState
 
   /// Crée un nouveau cocktail / article bar (sans prix).
   Future<void> _createDish() async {
+    final l10n = AppLocalizations.of(context);
     final name = _newDishController.text.trim();
+
     if (name.isEmpty) {
-      _showMessage('Saisissez le nom du cocktail.');
+      _showMessage(l10n.errCocktailNameRequired);
       return;
     }
     setState(() => isSaving = true);
@@ -115,12 +119,10 @@ class _BarMenuItemIngredientsFormPageState
       );
       _newDishController.clear();
       if (!mounted) return;
-      _showMessage(
-        'Cocktail « $name » créé. Vous pouvez maintenant le composer.',
-      );
+      _showMessage(l10n.cocktailCreatedCompose(name));
     } catch (e) {
       if (!mounted) return;
-      _showMessage('Erreur : $e');
+      _showMessage(l10n.commonError('$e'));
     } finally {
       if (mounted) setState(() => isSaving = false);
     }
@@ -128,6 +130,8 @@ class _BarMenuItemIngredientsFormPageState
 
   /// Enregistre immédiatement l'URL de la photo dans l'article sélectionné.
   Future<void> _savePhotoUrl(String url) async {
+    final l10n = AppLocalizations.of(context);
+
     if (selectedMenuItemId == null) return;
     try {
       await _service.updateMenuItemImage(
@@ -137,23 +141,25 @@ class _BarMenuItemIngredientsFormPageState
       );
       if (!mounted) return;
       setState(() => _selectedItemAdresse = url);
-      _showMessage('Photo enregistrée.');
+      _showMessage(l10n.photoSaved);
     } catch (e) {
       if (!mounted) return;
-      _showMessage('Erreur enregistrement photo : $e');
+      _showMessage(l10n.errPhotoSaveFailed('$e'));
     }
   }
 
   Future<void> _save(
     List<DocumentSnapshot<Map<String, dynamic>>> stockItems,
   ) async {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.trim().isEmpty) {
-      _showMessage('Établissement introuvable.');
+      _showMessage(l10n.errEstablishmentNotFound);
       return;
     }
 
     if (selectedMenuItemId == null) {
-      _showMessage('Veuillez choisir un cocktail ou article du bar.');
+      _showMessage(l10n.errPickCocktailOrBarItem);
       return;
     }
 
@@ -167,7 +173,7 @@ class _BarMenuItemIngredientsFormPageState
       final stockItem = _findDocById(stockItems, line.selectedStockItemId);
 
       if (stockItem == null) {
-        _showMessage('Veuillez choisir tous les ingrédients.');
+        _showMessage(l10n.errPickAllIngredients);
         return;
       }
 
@@ -176,7 +182,7 @@ class _BarMenuItemIngredientsFormPageState
       final quantity = int.tryParse(line.quantityController.text.trim());
 
       if (quantity == null || quantity <= 0) {
-        _showMessage('Chaque quantité doit être un nombre entier positif.');
+        _showMessage(l10n.errQuantityMustBePositiveInteger);
         return;
       }
 
@@ -204,7 +210,7 @@ class _BarMenuItemIngredientsFormPageState
 
       if (!mounted) return;
 
-      _showMessage('Ingrédients du cocktail enregistrés avec succès.');
+      _showMessage(l10n.barIngredientsSaved);
 
       setState(() {
         selectedMenuItemId = null;
@@ -220,7 +226,7 @@ class _BarMenuItemIngredientsFormPageState
           ..add(_IngredientLine());
       });
     } catch (e) {
-      _showMessage('Erreur lors de l’enregistrement : $e');
+      _showMessage(l10n.errSaveFailed('$e'));
     } finally {
       if (mounted) {
         setState(() {
@@ -238,8 +244,10 @@ class _BarMenuItemIngredientsFormPageState
     List<DocumentSnapshot<Map<String, dynamic>>> menuItems,
     List<DocumentSnapshot<Map<String, dynamic>>> stockItems,
   ) async {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.trim().isEmpty) {
-      _showMessage('Établissement introuvable.');
+      _showMessage(l10n.errEstablishmentNotFound);
       return;
     }
 
@@ -252,7 +260,7 @@ class _BarMenuItemIngredientsFormPageState
 
     final bytes = result.files.first.bytes;
     if (bytes == null) {
-      _showMessage('Impossible de lire le fichier.');
+      _showMessage(l10n.errFileUnreadable);
       return;
     }
 
@@ -275,13 +283,13 @@ class _BarMenuItemIngredientsFormPageState
 
       final excel = xlsx.Excel.decodeBytes(bytes);
       if (excel.tables.isEmpty) {
-        _showMessage('Fichier Excel vide.');
+        _showMessage(l10n.errEmptyExcelFile);
         return;
       }
       final sheet = excel.tables.values.first;
       final rows = sheet.rows;
       if (rows.length < 2) {
-        _showMessage('Le fichier ne contient aucune ligne de données.');
+        _showMessage(l10n.errNoDataRow);
         return;
       }
 
@@ -355,7 +363,7 @@ class _BarMenuItemIngredientsFormPageState
       );
     } catch (e) {
       if (!mounted) return;
-      _showMessage('Erreur lors de l\'import : $e');
+      _showMessage(l10n.errImportFailed('$e'));
     } finally {
       if (mounted) setState(() => isSaving = false);
     }
@@ -367,10 +375,12 @@ class _BarMenuItemIngredientsFormPageState
     required List<String> ingredientsNonTrouves,
     required int lignesIgnorees,
   }) async {
+    final l10n = AppLocalizations.of(context);
+
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Rapport d\'import'),
+        title: Text(l10n.importReportTitle),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -381,20 +391,20 @@ class _BarMenuItemIngredientsFormPageState
                   const Icon(Icons.check_circle, color: Colors.green, size: 20),
                   const SizedBox(width: 8),
                   Text(
-                    '$importes composition(s) importée(s)',
+                    l10n.importedCompositionsCount(importes),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               if (lignesIgnorees > 0) ...[
                 const SizedBox(height: 8),
-                Text('$lignesIgnorees ligne(s) ignorée(s) (incomplètes).'),
+                Text(l10n.ignoredRowsCount(lignesIgnorees)),
               ],
               if (cocktailsNonTrouves.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                const Text(
-                  'Cocktails / articles non trouvés :',
-                  style: TextStyle(
+                Text(
+                  l10n.cocktailsNotFound,
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.orange,
                   ),
@@ -404,9 +414,9 @@ class _BarMenuItemIngredientsFormPageState
               ],
               if (ingredientsNonTrouves.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                const Text(
-                  'Ingrédients non trouvés :',
-                  style: TextStyle(
+                Text(
+                  l10n.ingredientsNotFound,
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.orange,
                   ),
@@ -417,10 +427,12 @@ class _BarMenuItemIngredientsFormPageState
               if (cocktailsNonTrouves.isNotEmpty ||
                   ingredientsNonTrouves.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                const Text(
-                  'Vérifiez que ces noms correspondent exactement à ceux '
-                  'saisis dans l\'application.',
-                  style: TextStyle(fontStyle: FontStyle.italic, fontSize: 12),
+                Text(
+                  l10n.checkNamesMatchApp,
+                  style: const TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ],
@@ -437,6 +449,8 @@ class _BarMenuItemIngredientsFormPageState
   }
 
   Widget _formatHint() {
+    final l10n = AppLocalizations.of(context);
+
     return Container(
       margin: const EdgeInsets.only(top: 12),
       padding: const EdgeInsets.all(12),
@@ -445,35 +459,33 @@ class _BarMenuItemIngredientsFormPageState
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: Colors.blueGrey.withValues(alpha: 0.25)),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Format Excel attendu',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            l10n.excelExpectedFormat,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 8),
-          Text('Une ligne par ingrédient (le nom du cocktail est répété).'),
-          SizedBox(height: 8),
-          Text('Colonnes :'),
-          SizedBox(height: 4),
-          Text(
+          const SizedBox(height: 8),
+          Text(l10n.oneRowPerBarIngredient),
+          const SizedBox(height: 8),
+          Text(l10n.columnsLabel),
+          const SizedBox(height: 4),
+          const Text(
             'cocktail | ingredient | quantite',
             style: TextStyle(fontFamily: 'monospace'),
           ),
-          SizedBox(height: 8),
-          Text('Exemple :'),
-          SizedBox(height: 4),
+          const SizedBox(height: 8),
+          Text(l10n.exampleLabel),
+          const SizedBox(height: 4),
           Text(
-            'Mojito | Rhum | 1\n'
-            'Mojito | Menthe | 1',
-            style: TextStyle(fontFamily: 'monospace'),
+            l10n.cocktailImportExampleRows,
+            style: const TextStyle(fontFamily: 'monospace'),
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
-            'Les noms des cocktails et ingrédients doivent déjà exister '
-            'dans l\'application.',
-            style: TextStyle(fontStyle: FontStyle.italic, fontSize: 12),
+            l10n.barNamesMustExistInApp,
+            style: const TextStyle(fontStyle: FontStyle.italic, fontSize: 12),
           ),
         ],
       ),
@@ -493,17 +505,18 @@ class _BarMenuItemIngredientsFormPageState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isSmallScreen = MediaQuery.of(context).size.width < 800;
 
     if (establishmentId.trim().isEmpty) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Composition cocktails bar')),
-        body: const Center(child: Text('Établissement introuvable.')),
+        appBar: AppBar(title: Text(l10n.barCocktailsCompositionTitle)),
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Composition cocktails bar')),
+      appBar: AppBar(title: Text(l10n.barCocktailsCompositionTitle)),
       body: SafeArea(
         child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
           stream: _menuItemsStream,
@@ -514,7 +527,7 @@ class _BarMenuItemIngredientsFormPageState
 
             if (menuSnapshot.hasError) {
               return Center(
-                child: Text('Erreur menuItems : ${menuSnapshot.error}'),
+                child: Text(l10n.errMenuItemsStream('${menuSnapshot.error}')),
               );
             }
 
@@ -529,7 +542,9 @@ class _BarMenuItemIngredientsFormPageState
 
                 if (stockSnapshot.hasError) {
                   return Center(
-                    child: Text('Erreur stock_items : ${stockSnapshot.error}'),
+                    child: Text(
+                      l10n.errStockItemsStream('${stockSnapshot.error}'),
+                    ),
                   );
                 }
 
@@ -576,17 +591,17 @@ class _BarMenuItemIngredientsFormPageState
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        const Text(
-                                          'Créer un nouveau cocktail',
-                                          style: TextStyle(
+                                        Text(
+                                          l10n.createNewCocktailTitle,
+                                          style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 15,
                                           ),
                                         ),
                                         const SizedBox(height: 4),
-                                        const Text(
-                                          'Le prix sera fixé par la gérante.',
-                                          style: TextStyle(
+                                        Text(
+                                          l10n.priceSetByManager,
+                                          style: const TextStyle(
                                             fontSize: 12,
                                             color: Colors.black54,
                                           ),
@@ -600,17 +615,17 @@ class _BarMenuItemIngredientsFormPageState
                                                 enabled: !isSaving,
                                                 textCapitalization:
                                                     TextCapitalization.words,
-                                                decoration:
-                                                    const InputDecoration(
-                                                      labelText:
-                                                          'Nom du cocktail',
-                                                      hintText: 'Ex : Mojito',
-                                                      border:
-                                                          OutlineInputBorder(),
-                                                      prefixIcon: Icon(
-                                                        Icons.local_bar,
-                                                      ),
-                                                    ),
+                                                decoration: InputDecoration(
+                                                  labelText:
+                                                      l10n.labelCocktailName,
+                                                  hintText:
+                                                      l10n.hintCocktailExample,
+                                                  border:
+                                                      const OutlineInputBorder(),
+                                                  prefixIcon: const Icon(
+                                                    Icons.local_bar,
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                             const SizedBox(width: 10),
@@ -619,17 +634,17 @@ class _BarMenuItemIngredientsFormPageState
                                                   ? null
                                                   : _createDish,
                                               icon: const Icon(Icons.add),
-                                              label: const Text('Créer'),
+                                              label: Text(l10n.actionCreate),
                                             ),
                                           ],
                                         ),
                                         const SizedBox(height: 10),
                                         DropdownButtonFormField<String>(
                                           initialValue: _newDishCategory,
-                                          decoration: const InputDecoration(
-                                            labelText: 'Catégorie',
-                                            border: OutlineInputBorder(),
-                                            prefixIcon: Icon(
+                                          decoration: InputDecoration(
+                                            labelText: l10n.labelCategory,
+                                            border: const OutlineInputBorder(),
+                                            prefixIcon: const Icon(
                                               Icons.category_outlined,
                                             ),
                                             isDense: true,
@@ -681,10 +696,12 @@ class _BarMenuItemIngredientsFormPageState
                                       })
                                       ? selectedMenuItemId
                                       : null,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Cocktail / article du bar',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.local_bar_outlined),
+                                  decoration: InputDecoration(
+                                    labelText: l10n.labelBarItemOrCocktail,
+                                    border: const OutlineInputBorder(),
+                                    prefixIcon: const Icon(
+                                      Icons.local_bar_outlined,
+                                    ),
                                   ),
                                   items: menuItems.map((doc) {
                                     return DropdownMenuItem<String>(
@@ -712,7 +729,7 @@ class _BarMenuItemIngredientsFormPageState
                                         },
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
-                                      return 'Veuillez choisir un article du bar';
+                                      return l10n.errPickBarItem;
                                     }
                                     return null;
                                   },
@@ -724,22 +741,23 @@ class _BarMenuItemIngredientsFormPageState
                                   controller: _compositionController,
                                   enabled: !isSaving,
                                   maxLines: 2,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Composition (optionnel)',
-                                    hintText:
-                                        'Laissez vide pour afficher la liste des ingrédients',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.notes_outlined),
+                                  decoration: InputDecoration(
+                                    labelText: l10n.labelCompositionOptional,
+                                    hintText: l10n.hintCompositionEmpty,
+                                    border: const OutlineInputBorder(),
+                                    prefixIcon: const Icon(
+                                      Icons.notes_outlined,
+                                    ),
                                   ),
                                 ),
 
                                 if (selectedMenuItemId != null) ...[
                                   const SizedBox(height: 16),
-                                  const Align(
+                                  Align(
                                     alignment: Alignment.centerLeft,
                                     child: Text(
-                                      'Photo du cocktail',
-                                      style: TextStyle(
+                                      l10n.cocktailPhotoTitle,
+                                      style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -760,7 +778,7 @@ class _BarMenuItemIngredientsFormPageState
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        'Ingrédients du bar',
+                                        l10n.barIngredientsTitle,
                                         style: Theme.of(context)
                                             .textTheme
                                             .titleMedium
@@ -774,7 +792,7 @@ class _BarMenuItemIngredientsFormPageState
                                           ? null
                                           : _addIngredientLine,
                                       icon: const Icon(Icons.add),
-                                      label: const Text('Ajouter'),
+                                      label: Text(l10n.actionAdd),
                                     ),
                                   ],
                                 ),
@@ -821,8 +839,9 @@ class _BarMenuItemIngredientsFormPageState
                                         : const Icon(Icons.save),
                                     label: Text(
                                       isSaving
-                                          ? 'Enregistrement...'
-                                          : 'Valider la composition du cocktail',
+                                          ? l10n.savingInProgress
+                                          : l10n
+                                                .actionValidateCocktailComposition,
                                     ),
                                   ),
                                 ),
@@ -847,6 +866,8 @@ class _BarMenuItemIngredientsFormPageState
     List<DocumentSnapshot<Map<String, dynamic>>> menuItems,
     List<DocumentSnapshot<Map<String, dynamic>>> stockItems,
   ) {
+    final l10n = AppLocalizations.of(context);
+
     return Row(
       children: [
         Container(
@@ -860,7 +881,7 @@ class _BarMenuItemIngredientsFormPageState
         const SizedBox(width: 12),
         Expanded(
           child: Text(
-            'Définir les ingrédients des cocktails',
+            l10n.defineCocktailIngredientsTitle,
             style: Theme.of(
               context,
             ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
@@ -871,7 +892,7 @@ class _BarMenuItemIngredientsFormPageState
               ? null
               : () => _importFromExcel(menuItems, stockItems),
           icon: const Icon(Icons.upload_file),
-          label: const Text('Importer Excel'),
+          label: Text(l10n.actionImportExcel),
         ),
       ],
     );
@@ -882,6 +903,7 @@ class _BarMenuItemIngredientsFormPageState
     required List<DocumentSnapshot<Map<String, dynamic>>> stockItems,
     required bool isSmallScreen,
   }) {
+    final l10n = AppLocalizations.of(context);
     final line = ingredientLines[index];
 
     final ingredientDropdown = DropdownButtonFormField<String>(
@@ -892,7 +914,7 @@ class _BarMenuItemIngredientsFormPageState
           ? line.selectedStockItemId
           : null,
       decoration: InputDecoration(
-        labelText: 'Ingrédient ${index + 1}',
+        labelText: l10n.labelIngredientIndex(index + 1),
         border: const OutlineInputBorder(),
         prefixIcon: const Icon(Icons.liquor_outlined),
       ),
@@ -914,7 +936,7 @@ class _BarMenuItemIngredientsFormPageState
             },
       validator: (value) {
         if (value == null || value.isEmpty) {
-          return 'Choisissez un ingrédient';
+          return l10n.errChooseIngredient;
         }
         return null;
       },
@@ -924,22 +946,22 @@ class _BarMenuItemIngredientsFormPageState
       controller: line.quantityController,
       enabled: !isSaving,
       keyboardType: TextInputType.number,
-      decoration: const InputDecoration(
-        labelText: 'Quantité',
-        border: OutlineInputBorder(),
-        prefixIcon: Icon(Icons.numbers),
+      decoration: InputDecoration(
+        labelText: l10n.labelQuantity,
+        border: const OutlineInputBorder(),
+        prefixIcon: const Icon(Icons.numbers),
       ),
       validator: (value) {
         final quantity = int.tryParse((value ?? '').trim());
         if (quantity == null || quantity <= 0) {
-          return 'Quantité invalide';
+          return l10n.errInvalidQuantity;
         }
         return null;
       },
     );
 
     final deleteButton = IconButton(
-      tooltip: 'Retirer cette ligne',
+      tooltip: l10n.tooltipRemoveLine,
       onPressed: ingredientLines.length == 1 || isSaving
           ? null
           : () => _removeIngredientLine(index),

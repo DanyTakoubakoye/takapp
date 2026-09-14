@@ -1997,5 +1997,79 @@
   },
   "errChooseIngredient": "Choose an ingredient",
   "errInvalidQuantity": "Invalid quantity",
-  "tooltipRemoveLine": "Remove this row"
+  "tooltipRemoveLine": "Remove this row",
+
+  "barTitle": "Bar",
+  "establishmentBarTitle": "{name} - Bar",
+  "@establishmentBarTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "newBarOrderTitle": "New bar order",
+  "barOrdersFollowUp": "Bar order tracking for all waiters",
+  "barStockTitle": "Bar stock",
+  "actionSupply": "Supply",
+  "supplyRequestBarTitle": "Bar supply request",
+  "actionStockOut": "Stock out",
+  "stockOutBarTitle": "Bar stock out",
+  "reasonBarConsumption": "Bar consumption",
+  "actionMovements": "Movements",
+  "movementHistoryBarTitle": "Bar movement history",
+  "actionReceptions": "Receptions",
+  "receptionsBarTitle": "Bar receptions",
+  "actionBarItems": "Bar items",
+  "actionIngredients": "Ingredients",
+  "errBarItemsLoad": "Bar items error: {error}",
+  "@errBarItemsLoad": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "barStockItemsTitle": "Stock items - Bar",
+  "newBarItemTitle": "New bar item",
+  "storeAutoSetToBar": "The store is automatically set to: bar",
+  "errItemAlreadyExists": "This item already exists.",
+  "barItemSavedSuccess": "Bar item saved successfully.",
+  "actionSaveItem": "Save item",
+  "hintBarItemNameExample": "E.g. Coca-Cola 33cl",
+  "hintBarCategoryExample": "E.g. Soft drink",
+  "hintBarUnitExamples": "E.g. bottle, can, box",
+  "cocktailCreatedCompose": "Cocktail \u00ab {name} \u00bb created. You can now compose it.",
+  "@cocktailCreatedCompose": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "barIngredientsSaved": "Cocktail ingredients saved successfully.",
+  "importedCompositionsCount": "{count} composition(s) imported",
+  "@importedCompositionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cocktailsNotFound": "Cocktails / items not found:",
+  "oneRowPerBarIngredient": "One row per ingredient (the cocktail name is repeated).",
+  "cocktailImportExampleRows": "Mojito | Rum | 1\nMojito | Mint | 1",
+  "barNamesMustExistInApp": "Cocktail and ingredient names must already exist in the app.",
+  "barCocktailsCompositionTitle": "Bar cocktail composition",
+  "createNewCocktailTitle": "Create a new cocktail",
+  "labelCocktailName": "Cocktail name",
+  "hintCocktailExample": "E.g. Mojito",
+  "labelBarItemOrCocktail": "Cocktail / bar item",
+  "errPickBarItem": "Please choose a bar item.",
+  "barIngredientsTitle": "Bar ingredients",
+  "actionValidateCocktailComposition": "Validate cocktail composition",
+  "defineCocktailIngredientsTitle": "Define cocktail ingredients",
+
+  "cocktailPhotoTitle": "Cocktail photo",
+  "errPickCocktailOrBarItem": "Please choose a cocktail or bar item."
 }

@@ -2003,5 +2003,79 @@
   },
   "errChooseIngredient": "Choisissez un ingrédient",
   "errInvalidQuantity": "Quantité invalide",
-  "tooltipRemoveLine": "Retirer cette ligne"
+  "tooltipRemoveLine": "Retirer cette ligne",
+
+  "barTitle": "Bar",
+  "establishmentBarTitle": "{name} - Bar",
+  "@establishmentBarTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "newBarOrderTitle": "Nouvelle commande bar",
+  "barOrdersFollowUp": "Suivi des commandes bar de tous les serveurs",
+  "barStockTitle": "Stock Bar",
+  "actionSupply": "Approvisionnement",
+  "supplyRequestBarTitle": "Demande approvisionnement Bar",
+  "actionStockOut": "Sortie Stock",
+  "stockOutBarTitle": "Sortie Stock Bar",
+  "reasonBarConsumption": "Consommation Bar",
+  "actionMovements": "Mouvements",
+  "movementHistoryBarTitle": "Historique mouvements Bar",
+  "actionReceptions": "Réceptions",
+  "receptionsBarTitle": "Réceptions Bar",
+  "actionBarItems": "Articles Bar",
+  "actionIngredients": "Ingrédients",
+  "errBarItemsLoad": "Erreur articles bar : {error}",
+  "@errBarItemsLoad": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "barStockItemsTitle": "Articles de stock - Bar",
+  "newBarItemTitle": "Nouvel article du bar",
+  "storeAutoSetToBar": "Le store est automatiquement défini sur : bar",
+  "errItemAlreadyExists": "Cet article existe déjà.",
+  "barItemSavedSuccess": "Article du bar enregistré avec succès.",
+  "actionSaveItem": "Enregistrer l’article",
+  "hintBarItemNameExample": "Ex. Coca-Cola 33cl",
+  "hintBarCategoryExample": "Ex. Boisson gazeuse",
+  "hintBarUnitExamples": "Ex. bouteille, canette, carton",
+  "cocktailCreatedCompose": "Cocktail « {name} » créé. Vous pouvez maintenant le composer.",
+  "@cocktailCreatedCompose": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "barIngredientsSaved": "Ingrédients du cocktail enregistrés avec succès.",
+  "importedCompositionsCount": "{count} composition(s) importée(s)",
+  "@importedCompositionsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cocktailsNotFound": "Cocktails / articles non trouvés :",
+  "oneRowPerBarIngredient": "Une ligne par ingrédient (le nom du cocktail est répété).",
+  "cocktailImportExampleRows": "Mojito | Rhum | 1\nMojito | Menthe | 1",
+  "barNamesMustExistInApp": "Les noms des cocktails et ingrédients doivent déjà exister dans l’application.",
+  "barCocktailsCompositionTitle": "Composition cocktails bar",
+  "createNewCocktailTitle": "Créer un nouveau cocktail",
+  "labelCocktailName": "Nom du cocktail",
+  "hintCocktailExample": "Ex : Mojito",
+  "labelBarItemOrCocktail": "Cocktail / article du bar",
+  "errPickBarItem": "Veuillez choisir un article du bar.",
+  "barIngredientsTitle": "Ingrédients du bar",
+  "actionValidateCocktailComposition": "Valider la composition du cocktail",
+  "defineCocktailIngredientsTitle": "Définir les ingrédients des cocktails",
+
+  "cocktailPhotoTitle": "Photo du cocktail",
+  "errPickCocktailOrBarItem": "Veuillez choisir un cocktail ou article du bar."
 }
