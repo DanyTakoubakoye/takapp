@@ -4036,4 +4036,148 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get labelAction => 'Action';
+
+  @override
+  String get hygieneRoomsToPrepareTitle => 'Hygiène — chambres à préparer';
+
+  @override
+  String get noRoomSimple => 'Aucune chambre.';
+
+  @override
+  String roomsToCleanHint(int count) {
+    return '$count chambre(s) à nettoyer. Touchez une chambre pour déclarer le ménage.';
+  }
+
+  @override
+  String get noRoomToCleanHint =>
+      'Aucune chambre à nettoyer pour le moment. Touchez une chambre pour déclarer un ménage.';
+
+  @override
+  String errSelectProductAtLine(int line) {
+    return 'Sélectionne le produit à la ligne $line.';
+  }
+
+  @override
+  String errProductNotFoundAtLine(int line) {
+    return 'Produit introuvable à la ligne $line.';
+  }
+
+  @override
+  String get errAddAtLeastOneProductUsed =>
+      'Ajoute au moins un produit utilisé.';
+
+  @override
+  String cleaningRecordedForRoom(String room) {
+    return 'Ménage enregistré pour la chambre $room.';
+  }
+
+  @override
+  String get declareCleaningTitle => 'Déclarer le ménage';
+
+  @override
+  String get labelPreparedRoomNumber => 'Numéro de chambre préparée';
+
+  @override
+  String get hintCleaningNotes => 'Ex: draps changés, serviettes renouvelées';
+
+  @override
+  String get noProductInHotelStock => 'Aucun produit dans le stock hôtel.';
+
+  @override
+  String get canSaveWithoutItem =>
+      'Vous pouvez tout de même enregistrer sans article (sauf si un article est requis).';
+
+  @override
+  String get labelProductUsed => 'Produit utilisé';
+
+  @override
+  String get labelQuantityUsed => 'Quantité utilisée';
+
+  @override
+  String get actionAddProduct => 'Ajouter un produit';
+
+  @override
+  String get actionSaveCleaning => 'Enregistrer le ménage';
+
+  @override
+  String labelProductIndex(int index) {
+    return 'Produit $index';
+  }
+
+  @override
+  String get labelNote => 'Note';
+
+  @override
+  String get disableClientTitle => 'Désactiver ce client ?';
+
+  @override
+  String disableClientBody(String name) {
+    return 'La fiche de « $name » ne sera plus proposée, mais les séjours et factures existants ne sont pas supprimés.';
+  }
+
+  @override
+  String get actionAddClient => 'Ajouter un client';
+
+  @override
+  String get noClientRegistered =>
+      'Aucun client enregistré.\nCréez votre première fiche client.';
+
+  @override
+  String get actionViewHistory => 'Voir l’historique';
+
+  @override
+  String get clientUpdated => 'Client modifié.';
+
+  @override
+  String get editClientTitle => 'Modifier le client';
+
+  @override
+  String get newClientTitle => 'Nouveau client';
+
+  @override
+  String get labelNameOrCompany => 'Nom ou raison sociale';
+
+  @override
+  String get hintClientNameExample => 'Ex. Kossi ADJOVI, SARL BENIN TRADE...';
+
+  @override
+  String get clientTypeIndividual => 'Particulier';
+
+  @override
+  String get clientTypeCompany => 'Entreprise';
+
+  @override
+  String get hintPhoneExample => 'Ex. 97 00 00 00';
+
+  @override
+  String get labelIfuOptional => 'IFU (optionnel)';
+
+  @override
+  String get hintIfuPurpose =>
+      'Identifiant fiscal, surtout pour les entreprises';
+
+  @override
+  String get labelAddressOptional => 'Adresse (optionnel)';
+
+  @override
+  String get labelEmailOptional => 'Email (optionnel)';
+
+  @override
+  String get duplicateClientTitle => 'Client déjà existant ?';
+
+  @override
+  String get duplicateClientBody =>
+      'Un ou plusieurs clients ressemblent à celui que vous créez :';
+
+  @override
+  String nameDotPhone(String name, String phone) {
+    return '$name · $phone';
+  }
+
+  @override
+  String get homonymsExistHint =>
+      'Les homonymes existent : vous pouvez créer quand même.';
+
+  @override
+  String get actionCreateAnyway => 'Créer quand même';
 }

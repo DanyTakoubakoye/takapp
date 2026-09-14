@@ -33,16 +33,16 @@ class _HygieneDailyPageState extends State<HygieneDailyPage> {
     _roomsStream = _roomService.streamRooms(establishmentId: establishmentId);
   }
 
-  String _statusLabel(String status) {
+  String _statusLabel(String status, AppLocalizations l10n) {
     switch (status) {
       case 'available':
-        return 'Libre';
+        return l10n.roomStatusAvailable;
       case 'occupied':
-        return 'Occupée';
+        return l10n.roomStatusOccupied;
       case 'cleaning':
-        return 'À nettoyer';
+        return l10n.roomStatusCleaning;
       case 'maintenance':
-        return 'Maintenance';
+        return l10n.roomStatusMaintenance;
       default:
         return status;
     }
@@ -94,6 +94,7 @@ class _HygieneDailyPageState extends State<HygieneDailyPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final width = MediaQuery.of(context).size.width;
     final crossAxisCount = width < 500
         ? 2
@@ -104,17 +105,17 @@ class _HygieneDailyPageState extends State<HygieneDailyPage> {
         : 6;
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Hygiène — chambres à préparer'),
+        title: Text(l10n.hygieneRoomsToPrepareTitle),
         actions: [
           IconButton(
-            tooltip: 'Saisie manuelle',
+            tooltip: l10n.manualEntry,
             onPressed: () => _openCleaningForm(),
             icon: const Icon(Icons.edit_note),
           ),
@@ -132,16 +133,18 @@ class _HygieneDailyPageState extends State<HygieneDailyPage> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: SelectableText('Erreur : ${snapshot.error}'));
+            return Center(
+              child: SelectableText(l10n.commonError('${snapshot.error}')),
+            );
           }
 
           final rooms = snapshot.data ?? [];
 
           if (rooms.isEmpty) {
-            return const Center(
+            return Center(
               child: Padding(
-                padding: EdgeInsets.all(24),
-                child: Text('Aucune chambre.', textAlign: TextAlign.center),
+                padding: const EdgeInsets.all(24),
+                child: Text(l10n.noRoomSimple, textAlign: TextAlign.center),
               ),
             );
           }
@@ -168,10 +171,8 @@ class _HygieneDailyPageState extends State<HygieneDailyPage> {
                 padding: const EdgeInsets.all(12),
                 child: Text(
                   cleaningCount > 0
-                      ? '$cleaningCount chambre(s) à nettoyer. '
-                            'Touchez une chambre pour déclarer le ménage.'
-                      : 'Aucune chambre à nettoyer pour le moment. '
-                            'Touchez une chambre pour déclarer un ménage.',
+                      ? l10n.roomsToCleanHint(cleaningCount)
+                      : l10n.noRoomToCleanHint,
                   style: const TextStyle(fontStyle: FontStyle.italic),
                 ),
               ),
@@ -227,7 +228,7 @@ class _HygieneDailyPageState extends State<HygieneDailyPage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              _statusLabel(room.status),
+                              _statusLabel(room.status, l10n),
                               style: TextStyle(
                                 fontSize: 11,
                                 color: color,
@@ -300,6 +301,7 @@ class _CleaningFormSheetState extends State<_CleaningFormSheet> {
   }
 
   Future<void> _submit(List<StoreStockModel> stocks) async {
+    final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthController>();
     final controller = context.read<HygieneDailyController>();
     final user = auth.currentUser;
@@ -307,14 +309,14 @@ class _CleaningFormSheetState extends State<_CleaningFormSheet> {
     if (user == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errUserNotFound)));
       return;
     }
 
     final room = _roomController.text.trim();
     if (room.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez saisir le numéro de chambre.')),
+        SnackBar(content: Text(l10n.errRoomNumberRequired)),
       );
       return;
     }
@@ -333,7 +335,7 @@ class _CleaningFormSheetState extends State<_CleaningFormSheet> {
       if (line.selectedStockId == null || line.selectedStockId!.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Sélectionne le produit à la ligne ${i + 1}.'),
+            content: Text(l10n.errSelectProductAtLine(i + 1)),
           ),
         );
         return;
@@ -345,7 +347,7 @@ class _CleaningFormSheetState extends State<_CleaningFormSheet> {
 
       if (selectedMatches.isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Produit introuvable à la ligne ${i + 1}.')),
+          SnackBar(content: Text(l10n.errProductNotFoundAtLine(i + 1))),
         );
         return;
       }
@@ -354,7 +356,7 @@ class _CleaningFormSheetState extends State<_CleaningFormSheet> {
 
       if (quantity == null || quantity <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Quantité invalide à la ligne ${i + 1}.')),
+          SnackBar(content: Text(l10n.invalidQuantityAtLine(i + 1))),
         );
         return;
       }
@@ -369,7 +371,7 @@ class _CleaningFormSheetState extends State<_CleaningFormSheet> {
 
     if (usedItems.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ajoute au moins un produit utilisé.')),
+        SnackBar(content: Text(l10n.errAddAtLeastOneProductUsed)),
       );
       return;
     }
@@ -388,11 +390,9 @@ class _CleaningFormSheetState extends State<_CleaningFormSheet> {
     if (success) {
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ménage enregistré pour la chambre $room.')),
+        SnackBar(content: Text(l10n.cleaningRecordedForRoom(room))),
       );
     } else {
-      final l10n = AppLocalizations.of(context);
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(controller.errorText(l10n) ?? l10n.errUnknown),
@@ -403,6 +403,7 @@ class _CleaningFormSheetState extends State<_CleaningFormSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final controller = context.watch<HygieneDailyController>();
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     final maxHeight = MediaQuery.of(context).size.height * 0.85;
@@ -456,33 +457,32 @@ class _CleaningFormSheetState extends State<_CleaningFormSheet> {
                     ),
                   ),
                   Text(
-                    'Déclarer le ménage',
+                    l10n.declareCleaningTitle,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _roomController,
-                    decoration: const InputDecoration(
-                      labelText: 'Numéro de chambre préparée',
+                    decoration: InputDecoration(
+                      labelText: l10n.labelPreparedRoomNumber,
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _noteController,
                     maxLines: 2,
-                    decoration: const InputDecoration(
-                      labelText: 'Note',
-                      hintText: 'Ex: draps changés, serviettes renouvelées',
+                    decoration: InputDecoration(
+                      labelText: l10n.labelNote,
+                      hintText: l10n.hintCleaningNotes,
                     ),
                   ),
                   const SizedBox(height: 14),
                   if (stocks.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                       child: Text(
-                        'Aucun produit dans le stock hôtel. '
-                        'Vous pouvez tout de même enregistrer sans article '
-                        '(sauf si un article est requis).',
+                        '${l10n.noProductInHotelStock} '
+                        '${l10n.canSaveWithoutItem}',
                       ),
                     )
                   else
@@ -498,7 +498,7 @@ class _CleaningFormSheetState extends State<_CleaningFormSheet> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      'Produit ${index + 1}',
+                                      l10n.labelProductIndex(index + 1),
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -519,8 +519,8 @@ class _CleaningFormSheetState extends State<_CleaningFormSheet> {
                               const SizedBox(height: 8),
                               DropdownButtonFormField<String>(
                                 initialValue: line.selectedStockId,
-                                decoration: const InputDecoration(
-                                  labelText: 'Produit utilisé',
+                                decoration: InputDecoration(
+                                  labelText: l10n.labelProductUsed,
                                 ),
                                 items: stocks.map((item) {
                                   final label =
@@ -543,8 +543,8 @@ class _CleaningFormSheetState extends State<_CleaningFormSheet> {
                                     const TextInputType.numberWithOptions(
                                       decimal: true,
                                     ),
-                                decoration: const InputDecoration(
-                                  labelText: 'Quantité utilisée',
+                                decoration: InputDecoration(
+                                  labelText: l10n.labelQuantityUsed,
                                 ),
                               ),
                             ],
@@ -560,7 +560,7 @@ class _CleaningFormSheetState extends State<_CleaningFormSheet> {
                         });
                       },
                       icon: const Icon(Icons.add),
-                      label: const Text('Ajouter un produit'),
+                      label: Text(l10n.actionAddProduct),
                     ),
                   const SizedBox(height: 12),
                   ElevatedButton.icon(
@@ -581,7 +581,7 @@ class _CleaningFormSheetState extends State<_CleaningFormSheet> {
                             ),
                           )
                         : const Icon(Icons.check_circle_outline),
-                    label: const Text('Enregistrer le ménage'),
+                    label: Text(l10n.actionSaveCleaning),
                   ),
                   const SizedBox(height: 8),
                 ],

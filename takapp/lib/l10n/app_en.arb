@@ -2716,5 +2716,102 @@
 
   "errNameEmailPasswordRequired": "Name, email and temporary password are required.",
 
-  "labelAction": "Action"
+  "labelAction": "Action",
+
+  "hygieneRoomsToPrepareTitle": "Housekeeping — rooms to prepare",
+  "noRoomSimple": "No room.",
+  "roomsToCleanHint": "{count} room(s) to clean. Tap a room to record the cleaning.",
+  "@roomsToCleanHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noRoomToCleanHint": "No room to clean right now. Tap a room to record a cleaning.",
+  "errSelectProductAtLine": "Select the product on line {line}.",
+  "@errSelectProductAtLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "errProductNotFoundAtLine": "Product not found on line {line}.",
+  "@errProductNotFoundAtLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "errAddAtLeastOneProductUsed": "Add at least one product used.",
+  "cleaningRecordedForRoom": "Cleaning recorded for room {room}.",
+  "@cleaningRecordedForRoom": {
+    "placeholders": {
+      "room": {
+        "type": "String"
+      }
+    }
+  },
+  "declareCleaningTitle": "Record the cleaning",
+  "labelPreparedRoomNumber": "Prepared room number",
+  "hintCleaningNotes": "E.g. sheets changed, towels replaced",
+  "noProductInHotelStock": "No product in the hotel stock.",
+  "canSaveWithoutItem": "You can still save without an item (unless an item is required).",
+  "labelProductUsed": "Product used",
+  "labelQuantityUsed": "Quantity used",
+  "actionAddProduct": "Add a product",
+  "actionSaveCleaning": "Save the cleaning",
+
+  "labelProductIndex": "Product {index}",
+  "@labelProductIndex": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+
+  "labelNote": "Note",
+
+  "disableClientTitle": "Disable this client?",
+  "disableClientBody": "The record for \u00ab {name} \u00bb will no longer be offered, but existing stays and invoices are not deleted.",
+  "@disableClientBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "actionAddClient": "Add a client",
+  "noClientRegistered": "No client registered.\nCreate your first client record.",
+  "actionViewHistory": "View history",
+  "clientUpdated": "Client updated.",
+  "editClientTitle": "Edit client",
+  "newClientTitle": "New client",
+  "labelNameOrCompany": "Name or company name",
+  "hintClientNameExample": "E.g. Kossi ADJOVI, SARL BENIN TRADE...",
+  "clientTypeIndividual": "Individual",
+  "clientTypeCompany": "Company",
+  "hintPhoneExample": "E.g. 97 00 00 00",
+  "labelIfuOptional": "TIN (optional)",
+  "hintIfuPurpose": "Tax identifier, mainly for companies",
+  "labelAddressOptional": "Address (optional)",
+  "labelEmailOptional": "Email (optional)",
+  "duplicateClientTitle": "Client already exists?",
+  "duplicateClientBody": "One or more clients look like the one you are creating:",
+  "nameDotPhone": "{name} \u00b7 {phone}",
+  "@nameDotPhone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "homonymsExistHint": "Namesakes do happen: you can still create it.",
+  "actionCreateAnyway": "Create anyway"
 }

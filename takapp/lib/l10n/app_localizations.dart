@@ -7048,6 +7048,252 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Action'**
   String get labelAction;
+
+  /// No description provided for @hygieneRoomsToPrepareTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Hygiène — chambres à préparer'**
+  String get hygieneRoomsToPrepareTitle;
+
+  /// No description provided for @noRoomSimple.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune chambre.'**
+  String get noRoomSimple;
+
+  /// No description provided for @roomsToCleanHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} chambre(s) à nettoyer. Touchez une chambre pour déclarer le ménage.'**
+  String roomsToCleanHint(int count);
+
+  /// No description provided for @noRoomToCleanHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune chambre à nettoyer pour le moment. Touchez une chambre pour déclarer un ménage.'**
+  String get noRoomToCleanHint;
+
+  /// No description provided for @errSelectProductAtLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionne le produit à la ligne {line}.'**
+  String errSelectProductAtLine(int line);
+
+  /// No description provided for @errProductNotFoundAtLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Produit introuvable à la ligne {line}.'**
+  String errProductNotFoundAtLine(int line);
+
+  /// No description provided for @errAddAtLeastOneProductUsed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoute au moins un produit utilisé.'**
+  String get errAddAtLeastOneProductUsed;
+
+  /// No description provided for @cleaningRecordedForRoom.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ménage enregistré pour la chambre {room}.'**
+  String cleaningRecordedForRoom(String room);
+
+  /// No description provided for @declareCleaningTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déclarer le ménage'**
+  String get declareCleaningTitle;
+
+  /// No description provided for @labelPreparedRoomNumber.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro de chambre préparée'**
+  String get labelPreparedRoomNumber;
+
+  /// No description provided for @hintCleaningNotes.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex: draps changés, serviettes renouvelées'**
+  String get hintCleaningNotes;
+
+  /// No description provided for @noProductInHotelStock.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun produit dans le stock hôtel.'**
+  String get noProductInHotelStock;
+
+  /// No description provided for @canSaveWithoutItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous pouvez tout de même enregistrer sans article (sauf si un article est requis).'**
+  String get canSaveWithoutItem;
+
+  /// No description provided for @labelProductUsed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Produit utilisé'**
+  String get labelProductUsed;
+
+  /// No description provided for @labelQuantityUsed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quantité utilisée'**
+  String get labelQuantityUsed;
+
+  /// No description provided for @actionAddProduct.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un produit'**
+  String get actionAddProduct;
+
+  /// No description provided for @actionSaveCleaning.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer le ménage'**
+  String get actionSaveCleaning;
+
+  /// No description provided for @labelProductIndex.
+  ///
+  /// In fr, this message translates to:
+  /// **'Produit {index}'**
+  String labelProductIndex(int index);
+
+  /// No description provided for @labelNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Note'**
+  String get labelNote;
+
+  /// No description provided for @disableClientTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Désactiver ce client ?'**
+  String get disableClientTitle;
+
+  /// No description provided for @disableClientBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'La fiche de « {name} » ne sera plus proposée, mais les séjours et factures existants ne sont pas supprimés.'**
+  String disableClientBody(String name);
+
+  /// No description provided for @actionAddClient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un client'**
+  String get actionAddClient;
+
+  /// No description provided for @noClientRegistered.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun client enregistré.\nCréez votre première fiche client.'**
+  String get noClientRegistered;
+
+  /// No description provided for @actionViewHistory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir l’historique'**
+  String get actionViewHistory;
+
+  /// No description provided for @clientUpdated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Client modifié.'**
+  String get clientUpdated;
+
+  /// No description provided for @editClientTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier le client'**
+  String get editClientTitle;
+
+  /// No description provided for @newClientTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveau client'**
+  String get newClientTitle;
+
+  /// No description provided for @labelNameOrCompany.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom ou raison sociale'**
+  String get labelNameOrCompany;
+
+  /// No description provided for @hintClientNameExample.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. Kossi ADJOVI, SARL BENIN TRADE...'**
+  String get hintClientNameExample;
+
+  /// No description provided for @clientTypeIndividual.
+  ///
+  /// In fr, this message translates to:
+  /// **'Particulier'**
+  String get clientTypeIndividual;
+
+  /// No description provided for @clientTypeCompany.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entreprise'**
+  String get clientTypeCompany;
+
+  /// No description provided for @hintPhoneExample.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. 97 00 00 00'**
+  String get hintPhoneExample;
+
+  /// No description provided for @labelIfuOptional.
+  ///
+  /// In fr, this message translates to:
+  /// **'IFU (optionnel)'**
+  String get labelIfuOptional;
+
+  /// No description provided for @hintIfuPurpose.
+  ///
+  /// In fr, this message translates to:
+  /// **'Identifiant fiscal, surtout pour les entreprises'**
+  String get hintIfuPurpose;
+
+  /// No description provided for @labelAddressOptional.
+  ///
+  /// In fr, this message translates to:
+  /// **'Adresse (optionnel)'**
+  String get labelAddressOptional;
+
+  /// No description provided for @labelEmailOptional.
+  ///
+  /// In fr, this message translates to:
+  /// **'Email (optionnel)'**
+  String get labelEmailOptional;
+
+  /// No description provided for @duplicateClientTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Client déjà existant ?'**
+  String get duplicateClientTitle;
+
+  /// No description provided for @duplicateClientBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un ou plusieurs clients ressemblent à celui que vous créez :'**
+  String get duplicateClientBody;
+
+  /// No description provided for @nameDotPhone.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} · {phone}'**
+  String nameDotPhone(String name, String phone);
+
+  /// No description provided for @homonymsExistHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les homonymes existent : vous pouvez créer quand même.'**
+  String get homonymsExistHint;
+
+  /// No description provided for @actionCreateAnyway.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer quand même'**
+  String get actionCreateAnyway;
 }
 
 class _AppLocalizationsDelegate

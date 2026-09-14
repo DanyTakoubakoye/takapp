@@ -2722,5 +2722,102 @@
 
   "errNameEmailPasswordRequired": "Nom, email et mot de passe temporaire obligatoires.",
 
-  "labelAction": "Action"
+  "labelAction": "Action",
+
+  "hygieneRoomsToPrepareTitle": "Hygiène — chambres à préparer",
+  "noRoomSimple": "Aucune chambre.",
+  "roomsToCleanHint": "{count} chambre(s) à nettoyer. Touchez une chambre pour déclarer le ménage.",
+  "@roomsToCleanHint": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noRoomToCleanHint": "Aucune chambre à nettoyer pour le moment. Touchez une chambre pour déclarer un ménage.",
+  "errSelectProductAtLine": "Sélectionne le produit à la ligne {line}.",
+  "@errSelectProductAtLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "errProductNotFoundAtLine": "Produit introuvable à la ligne {line}.",
+  "@errProductNotFoundAtLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "errAddAtLeastOneProductUsed": "Ajoute au moins un produit utilisé.",
+  "cleaningRecordedForRoom": "Ménage enregistré pour la chambre {room}.",
+  "@cleaningRecordedForRoom": {
+    "placeholders": {
+      "room": {
+        "type": "String"
+      }
+    }
+  },
+  "declareCleaningTitle": "Déclarer le ménage",
+  "labelPreparedRoomNumber": "Numéro de chambre préparée",
+  "hintCleaningNotes": "Ex: draps changés, serviettes renouvelées",
+  "noProductInHotelStock": "Aucun produit dans le stock hôtel.",
+  "canSaveWithoutItem": "Vous pouvez tout de même enregistrer sans article (sauf si un article est requis).",
+  "labelProductUsed": "Produit utilisé",
+  "labelQuantityUsed": "Quantité utilisée",
+  "actionAddProduct": "Ajouter un produit",
+  "actionSaveCleaning": "Enregistrer le ménage",
+
+  "labelProductIndex": "Produit {index}",
+  "@labelProductIndex": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+
+  "labelNote": "Note",
+
+  "disableClientTitle": "Désactiver ce client ?",
+  "disableClientBody": "La fiche de « {name} » ne sera plus proposée, mais les séjours et factures existants ne sont pas supprimés.",
+  "@disableClientBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "actionAddClient": "Ajouter un client",
+  "noClientRegistered": "Aucun client enregistré.\nCréez votre première fiche client.",
+  "actionViewHistory": "Voir l’historique",
+  "clientUpdated": "Client modifié.",
+  "editClientTitle": "Modifier le client",
+  "newClientTitle": "Nouveau client",
+  "labelNameOrCompany": "Nom ou raison sociale",
+  "hintClientNameExample": "Ex. Kossi ADJOVI, SARL BENIN TRADE...",
+  "clientTypeIndividual": "Particulier",
+  "clientTypeCompany": "Entreprise",
+  "hintPhoneExample": "Ex. 97 00 00 00",
+  "labelIfuOptional": "IFU (optionnel)",
+  "hintIfuPurpose": "Identifiant fiscal, surtout pour les entreprises",
+  "labelAddressOptional": "Adresse (optionnel)",
+  "labelEmailOptional": "Email (optionnel)",
+  "duplicateClientTitle": "Client déjà existant ?",
+  "duplicateClientBody": "Un ou plusieurs clients ressemblent à celui que vous créez :",
+  "nameDotPhone": "{name} · {phone}",
+  "@nameDotPhone": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "homonymsExistHint": "Les homonymes existent : vous pouvez créer quand même.",
+  "actionCreateAnyway": "Créer quand même"
 }

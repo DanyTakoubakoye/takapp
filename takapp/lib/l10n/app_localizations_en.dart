@@ -3997,4 +3997,146 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get labelAction => 'Action';
+
+  @override
+  String get hygieneRoomsToPrepareTitle => 'Housekeeping — rooms to prepare';
+
+  @override
+  String get noRoomSimple => 'No room.';
+
+  @override
+  String roomsToCleanHint(int count) {
+    return '$count room(s) to clean. Tap a room to record the cleaning.';
+  }
+
+  @override
+  String get noRoomToCleanHint =>
+      'No room to clean right now. Tap a room to record a cleaning.';
+
+  @override
+  String errSelectProductAtLine(int line) {
+    return 'Select the product on line $line.';
+  }
+
+  @override
+  String errProductNotFoundAtLine(int line) {
+    return 'Product not found on line $line.';
+  }
+
+  @override
+  String get errAddAtLeastOneProductUsed => 'Add at least one product used.';
+
+  @override
+  String cleaningRecordedForRoom(String room) {
+    return 'Cleaning recorded for room $room.';
+  }
+
+  @override
+  String get declareCleaningTitle => 'Record the cleaning';
+
+  @override
+  String get labelPreparedRoomNumber => 'Prepared room number';
+
+  @override
+  String get hintCleaningNotes => 'E.g. sheets changed, towels replaced';
+
+  @override
+  String get noProductInHotelStock => 'No product in the hotel stock.';
+
+  @override
+  String get canSaveWithoutItem =>
+      'You can still save without an item (unless an item is required).';
+
+  @override
+  String get labelProductUsed => 'Product used';
+
+  @override
+  String get labelQuantityUsed => 'Quantity used';
+
+  @override
+  String get actionAddProduct => 'Add a product';
+
+  @override
+  String get actionSaveCleaning => 'Save the cleaning';
+
+  @override
+  String labelProductIndex(int index) {
+    return 'Product $index';
+  }
+
+  @override
+  String get labelNote => 'Note';
+
+  @override
+  String get disableClientTitle => 'Disable this client?';
+
+  @override
+  String disableClientBody(String name) {
+    return 'The record for « $name » will no longer be offered, but existing stays and invoices are not deleted.';
+  }
+
+  @override
+  String get actionAddClient => 'Add a client';
+
+  @override
+  String get noClientRegistered =>
+      'No client registered.\nCreate your first client record.';
+
+  @override
+  String get actionViewHistory => 'View history';
+
+  @override
+  String get clientUpdated => 'Client updated.';
+
+  @override
+  String get editClientTitle => 'Edit client';
+
+  @override
+  String get newClientTitle => 'New client';
+
+  @override
+  String get labelNameOrCompany => 'Name or company name';
+
+  @override
+  String get hintClientNameExample => 'E.g. Kossi ADJOVI, SARL BENIN TRADE...';
+
+  @override
+  String get clientTypeIndividual => 'Individual';
+
+  @override
+  String get clientTypeCompany => 'Company';
+
+  @override
+  String get hintPhoneExample => 'E.g. 97 00 00 00';
+
+  @override
+  String get labelIfuOptional => 'TIN (optional)';
+
+  @override
+  String get hintIfuPurpose => 'Tax identifier, mainly for companies';
+
+  @override
+  String get labelAddressOptional => 'Address (optional)';
+
+  @override
+  String get labelEmailOptional => 'Email (optional)';
+
+  @override
+  String get duplicateClientTitle => 'Client already exists?';
+
+  @override
+  String get duplicateClientBody =>
+      'One or more clients look like the one you are creating:';
+
+  @override
+  String nameDotPhone(String name, String phone) {
+    return '$name · $phone';
+  }
+
+  @override
+  String get homonymsExistHint =>
+      'Namesakes do happen: you can still create it.';
+
+  @override
+  String get actionCreateAnyway => 'Create anyway';
 }

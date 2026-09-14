@@ -104,22 +104,20 @@ class _ClientsPageState extends State<ClientsPage> {
   }
 
   Future<void> _confirmDisable(ClientModel client) async {
+    final l10n = AppLocalizations.of(context);
     final confirm = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Désactiver ce client ?'),
-        content: Text(
-          'La fiche de "${client.name}" ne sera plus proposée, '
-          'mais les séjours et factures existants ne sont pas supprimés.',
-        ),
+        title: Text(l10n.disableClientTitle),
+        content: Text(l10n.disableClientBody(client.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Annuler'),
+            child: Text(l10n.commonCancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Désactiver'),
+            child: Text(l10n.actionDisable),
           ),
         ],
       ),
@@ -153,18 +151,20 @@ class _ClientsPageState extends State<ClientsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Clients')),
+      appBar: AppBar(title: Text(l10n.tileClientsTitle)),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openForm(),
         icon: const Icon(Icons.add),
-        label: const Text('Ajouter un client'),
+        label: Text(l10n.actionAddClient),
       ),
       body: Column(
         children: [
@@ -173,8 +173,8 @@ class _ClientsPageState extends State<ClientsPage> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                labelText: 'Rechercher',
-                hintText: 'Nom ou téléphone',
+                labelText: l10n.searchLabel,
+                hintText: l10n.searchNameOrPhoneHint,
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _query.isEmpty
                     ? null
@@ -208,12 +208,11 @@ class _ClientsPageState extends State<ClientsPage> {
                 final clients = snapshot.data ?? [];
 
                 if (clients.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Padding(
-                      padding: EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(24),
                       child: Text(
-                        'Aucun client enregistré.\n'
-                        'Créez votre première fiche client.',
+                        l10n.noClientRegistered,
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -223,11 +222,11 @@ class _ClientsPageState extends State<ClientsPage> {
                 final filtered = _filter(clients);
 
                 if (filtered.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Padding(
-                      padding: EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(24),
                       child: Text(
-                        'Aucun client ne correspond à cette recherche.',
+                        l10n.noClientMatchesSearch,
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -265,18 +264,18 @@ class _ClientsPageState extends State<ClientsPage> {
                               _openHistory(client);
                             }
                           },
-                          itemBuilder: (_) => const [
+                          itemBuilder: (_) => [
                             PopupMenuItem(
                               value: 'edit',
-                              child: Text('Modifier'),
+                              child: Text(l10n.actionEdit),
                             ),
                             PopupMenuItem(
                               value: 'disable',
-                              child: Text('Désactiver'),
+                              child: Text(l10n.actionDisable),
                             ),
                             PopupMenuItem(
                               value: 'history',
-                              child: Text('Voir l\'historique'),
+                              child: Text(l10n.actionViewHistory),
                             ),
                           ],
                         ),
@@ -360,6 +359,10 @@ class _ClientFormDialogState extends State<_ClientFormDialog> {
   }
 
   Future<void> _save() async {
+    // l10n lu en tete : apres le pop, le context n'est plus exploitable
+    // pour lire les localisations.
+    final l10n = AppLocalizations.of(context);
+
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isSaving = true);
@@ -387,7 +390,7 @@ class _ClientFormDialogState extends State<_ClientFormDialog> {
 
         if (!mounted) return;
         Navigator.of(context).pop();
-        widget.onDone('Client modifié.');
+        widget.onDone(l10n.clientUpdated);
         return;
       }
 
@@ -431,15 +434,10 @@ class _ClientFormDialogState extends State<_ClientFormDialog> {
 
       if (!mounted) return;
 
-      // l10n capturé AVANT le pop : après démontage, le context n'est
-      // plus exploitable pour lire les localisations.
-      final l10n = AppLocalizations.of(context);
-
       Navigator.of(context).pop();
       widget.onDone(l10n.clientAdded);
     } catch (e) {
       if (!mounted) return;
-      final l10n = AppLocalizations.of(context);
       widget.onDone(l10n.errorPrefixed(localizedError(l10n, e)));
     } finally {
       if (mounted) setState(() => _isSaving = false);
@@ -448,8 +446,10 @@ class _ClientFormDialogState extends State<_ClientFormDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return AlertDialog(
-      title: Text(_isEdit ? 'Modifier le client' : 'Nouveau client'),
+      title: Text(_isEdit ? l10n.editClientTitle : l10n.newClientTitle),
       content: SizedBox(
         width: 420,
         child: Form(
@@ -460,27 +460,27 @@ class _ClientFormDialogState extends State<_ClientFormDialog> {
               children: [
                 TextFormField(
                   controller: _nameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Nom ou raison sociale',
-                    hintText: 'Ex. Kossi ADJOVI, SARL BENIN TRADE...',
+                  decoration: InputDecoration(
+                    labelText: l10n.labelNameOrCompany,
+                    hintText: l10n.hintClientNameExample,
                   ),
                   validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Obligatoire' : null,
+                      (v == null || v.trim().isEmpty) ? l10n.fieldRequired : null,
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   initialValue: _clientType,
-                  decoration: const InputDecoration(
-                    labelText: 'Type de client',
+                  decoration: InputDecoration(
+                    labelText: l10n.clientTypeLabel,
                   ),
-                  items: const [
+                  items: [
                     DropdownMenuItem(
                       value: 'particulier',
-                      child: Text('Particulier'),
+                      child: Text(l10n.clientTypeIndividual),
                     ),
                     DropdownMenuItem(
                       value: 'entreprise',
-                      child: Text('Entreprise'),
+                      child: Text(l10n.clientTypeCompany),
                     ),
                   ],
                   onChanged: (value) {
@@ -492,40 +492,39 @@ class _ClientFormDialogState extends State<_ClientFormDialog> {
                 TextFormField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(
-                    labelText: 'Téléphone',
-                    hintText: 'Ex. 97 00 00 00',
+                  decoration: InputDecoration(
+                    labelText: l10n.labelPhone,
+                    hintText: l10n.hintPhoneExample,
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _ifuController,
-                  decoration: const InputDecoration(
-                    labelText: 'IFU (optionnel)',
-                    hintText:
-                        'Identifiant fiscal, surtout pour les entreprises',
+                  decoration: InputDecoration(
+                    labelText: l10n.labelIfuOptional,
+                    hintText: l10n.hintIfuPurpose,
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _addressController,
-                  decoration: const InputDecoration(
-                    labelText: 'Adresse (optionnel)',
+                  decoration: InputDecoration(
+                    labelText: l10n.labelAddressOptional,
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _emailController,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(
-                    labelText: 'Email (optionnel)',
+                  decoration: InputDecoration(
+                    labelText: l10n.labelEmailOptional,
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _noteController,
-                  decoration: const InputDecoration(
-                    labelText: 'Note (optionnel)',
+                  decoration: InputDecoration(
+                    labelText: l10n.noteOptionalLabel,
                   ),
                   maxLines: 2,
                 ),
@@ -562,8 +561,10 @@ class _DuplicateWarningDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return AlertDialog(
-      title: const Text('Client déjà existant ?'),
+      title: Text(l10n.duplicateClientTitle),
       content: SizedBox(
         width: 420,
         child: SingleChildScrollView(
@@ -571,9 +572,7 @@ class _DuplicateWarningDialog extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Un ou plusieurs clients ressemblent à celui que vous créez :',
-              ),
+              Text(l10n.duplicateClientBody),
               const SizedBox(height: 12),
               ...duplicates.map(
                 (client) => Padding(
@@ -586,7 +585,7 @@ class _DuplicateWarningDialog extends StatelessWidget {
                       Expanded(
                         child: Text(
                           client.phone.isNotEmpty
-                              ? '${client.name} · ${client.phone}'
+                              ? l10n.nameDotPhone(client.name, client.phone)
                               : client.name,
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
@@ -597,7 +596,7 @@ class _DuplicateWarningDialog extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'Les homonymes existent : vous pouvez créer quand même.',
+                l10n.homonymsExistHint,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -611,7 +610,7 @@ class _DuplicateWarningDialog extends StatelessWidget {
         ),
         ElevatedButton(
           onPressed: () => Navigator.of(context).pop(true),
-          child: const Text('Créer quand même'),
+          child: Text(l10n.actionCreateAnyway),
         ),
       ],
     );
