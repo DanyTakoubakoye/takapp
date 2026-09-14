@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:takapp/core/constants/catalog_labels.dart';
 import 'package:takapp/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:takapp/modeles/stock_movement_model.dart';
@@ -84,7 +85,7 @@ class StockMovementHistoryPage extends StatelessWidget {
                     '${l10n.storeNameLine(store)}\n'
                     '${l10n.typeLine(isIn ? l10n.labelEntry : l10n.labelExit)}\n'
                     '${l10n.quantityUnitLine(item.quantity.toStringAsFixed(item.quantity % 1 == 0 ? 0 : 2), item.unit)}\n'
-                    '${l10n.reasonLine(item.reason)}\n'
+                    '${l10n.reasonLine(CatalogLabels.stockReason(l10n, item.reason))}\n'
                     '${l10n.byLine(item.performedByName)}\n'
                     '${l10n.dateLine(item.createdAt == null ? "-" : DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt!))}',
                   ),

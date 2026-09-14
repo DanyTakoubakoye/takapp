@@ -1,3 +1,6 @@
+import 'package:takapp/core/constants/catalog_labels.dart';
+import 'package:takapp/l10n/app_localizations.dart';
+
 /// Catalogue des catégories de boissons du Bar.
 ///
 /// Certaines catégories sont des SOUS-CATÉGORIES rattachées à une catégorie
@@ -167,12 +170,18 @@ class BarCategories {
 
   /// Libellé complet d'une catégorie : « Cocktails › Sans alcool » pour une
   /// sous-catégorie, le libellé seul sinon.
-  static String displayLabel(String category) {
+  ///
+  /// Les libellés stockés en base restent français ; seul l'affichage suit
+  /// la langue de l'utilisateur.
+  static String displayLabel(AppLocalizations l10n, String category) {
     final label = canonical(category);
     final parent = parentOf(label);
 
-    if (parent == null) return label;
+    if (parent == null) return CatalogLabels.category(l10n, label);
 
-    return '$parent › $label';
+    return l10n.categorySubcategorySeparator(
+      CatalogLabels.category(l10n, parent),
+      CatalogLabels.category(l10n, label),
+    );
   }
 }

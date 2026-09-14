@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import 'package:takapp/core/constants/catalog_labels.dart';
 import 'package:takapp/l10n/app_localizations.dart';
 
 import 'package:takapp/core/constants/bar_categories.dart';
@@ -668,7 +669,12 @@ class _BarMenuItemIngredientsFormPageState
                                                     ),
                                                     const SizedBox(width: 4),
                                                   ],
-                                                  Text(cat),
+                                                  Text(
+                                                    CatalogLabels.category(
+                                                      l10n,
+                                                      cat,
+                                                    ),
+                                                  ),
                                                 ],
                                               ),
                                             );

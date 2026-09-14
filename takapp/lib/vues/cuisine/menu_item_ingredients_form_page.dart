@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:takapp/core/constants/catalog_labels.dart';
 import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/services/menu_ingredient_service.dart';
 
@@ -599,7 +600,9 @@ class _MenuItemIngredientsFormPageState
                                         items: _dishCategories.map((cat) {
                                           return DropdownMenuItem<String>(
                                             value: cat,
-                                            child: Text(cat),
+                                            child: Text(
+                                              CatalogLabels.category(l10n, cat),
+                                            ),
                                           );
                                         }).toList(),
                                         onChanged: isSaving

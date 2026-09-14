@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:takapp/core/constants/catalog_labels.dart';
+
 import 'package:takapp/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
@@ -735,7 +737,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                 items: _categories.map((category) {
                   return DropdownMenuItem<String>(
                     value: category,
-                    child: Text(category),
+                    child: Text(CatalogLabels.category(l10n, category)),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -969,7 +971,10 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                                             ),
                                           ),
                                           child: Text(
-                                            item.category,
+                                            CatalogLabels.category(
+                                              l10n,
+                                              item.category,
+                                            ),
                                             style: TextStyle(
                                               color: color,
                                               fontWeight: FontWeight.w600,

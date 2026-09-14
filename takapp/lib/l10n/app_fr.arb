@@ -2577,5 +2577,104 @@
 
   "labelTotalWord": "Total",
 
-  "managerHandoverAccountLabel": "Versement gérante"
+  "managerHandoverAccountLabel": "Versement gérante",
+
+  "catCereals": "Céréales",
+  "catDrinks": "Boissons",
+  "catCondiments": "Condiments",
+  "catMeats": "Viandes",
+  "catMeat": "viande",
+  "catVegetablesFruits": "Légumes et fruits",
+  "catDairy": "Produits laitiers",
+  "catCleaningProducts": "Produits d’entretien",
+  "catHotelConsumables": "Consommables hôtel",
+  "catFishPlural": "Poissons",
+  "catFish": "poisson",
+  "catSideDishes": "Accompagnements",
+  "catBread": "Pain",
+  "catBreads": "Pains",
+  "catCheese": "fromage",
+  "catBurger": "Hamberger",
+  "catPasta": "pate",
+  "catSauce": "sauce",
+  "catSauces": "Sauces",
+  "catEgg": "œuf",
+  "catBlanket": "couverture",
+  "catConsumable": "consommable",
+  "catReusable": "reutilisable",
+  "catMeatAndFish": "Viandes et poissons",
+  "catOther": "Autres",
+  "catMainDish": "plat",
+  "catPoultry": "Volailles",
+  "catPastaPlural": "Pates",
+  "catSeafood": "Fruits de mer",
+  "catAfricanSpecialties": "Spécialités africaines",
+  "catBurgersSandwiches": "Burger et Sandwichs",
+  "catLebaneseStarters": "Etrées libanaises",
+  "catColdStarters": "Entrées froides",
+  "catPizzas": "Pizzas",
+  "catFastFood": "Fast food",
+  "catDesserts": "Desserts",
+  "catBarDrink": "boisson",
+  "catCocktails": "Cocktails",
+  "catAlcoholicCocktails": "Cocktails alcoolisés",
+  "catNonAlcoholic": "Sans alcool",
+  "catShots": "Shots et shots composés",
+  "catBeers": "Bières",
+  "catSparkling": "Bulles",
+  "catWinesChampagnes": "Vins et Champagnes",
+  "catRedWines": "Vins rouges",
+  "catWhiteWines": "Vins blancs",
+  "catRoses": "Rosés",
+  "catChampagnes": "Champagnes",
+  "catSpirits": "Spiritueux",
+  "catCognacs": "Cognacs",
+  "catVodkas": "Vodkas",
+  "catBittersAnise": "Betters/Anisées",
+  "catRumGinTequila": "Rhum/Gin-Tequila",
+  "catCreamLiqueurs": "Liqueurs crèmes",
+  "catWhiskeys": "Whiskeys",
+  "catJuices": "Jus",
+  "catPlainJuices": "Jus natures",
+  "catSmoothies": "Smoothies",
+  "catSyrup": "Sirop",
+  "catHotDrinks": "Boissons chaudes",
+  "catSodas": "Sodas",
+  "catWaters": "Eaux",
+  "reasonSupplyValidated": "Approvisionnement validé",
+  "reasonRoomPreparation": "Préparation chambre {room}",
+  "@reasonRoomPreparation": {
+    "placeholders": {
+      "room": {
+        "type": "String"
+      }
+    }
+  },
+  "reasonAutoOrderConsumption": "Consommation automatique commande {order}",
+  "@reasonAutoOrderConsumption": {
+    "placeholders": {
+      "order": {
+        "type": "String"
+      }
+    }
+  },
+  "reasonAutoOrderRestock": "Restitution automatique annulation commande {order}",
+  "@reasonAutoOrderRestock": {
+    "placeholders": {
+      "order": {
+        "type": "String"
+      }
+    }
+  },
+  "categorySubcategorySeparator": "{parent} › {child}",
+  "@categorySubcategorySeparator": {
+    "placeholders": {
+      "parent": {
+        "type": "String"
+      },
+      "child": {
+        "type": "String"
+      }
+    }
+  }
 }

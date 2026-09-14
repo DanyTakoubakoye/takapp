@@ -2571,5 +2571,104 @@
 
   "labelTotalWord": "Total",
 
-  "managerHandoverAccountLabel": "Manager handover"
+  "managerHandoverAccountLabel": "Manager handover",
+
+  "catCereals": "Cereals",
+  "catDrinks": "Drinks",
+  "catCondiments": "Condiments",
+  "catMeats": "Meats",
+  "catMeat": "Meat",
+  "catVegetablesFruits": "Vegetables and fruits",
+  "catDairy": "Dairy products",
+  "catCleaningProducts": "Cleaning products",
+  "catHotelConsumables": "Hotel consumables",
+  "catFishPlural": "Fish",
+  "catFish": "Fish",
+  "catSideDishes": "Side dishes",
+  "catBread": "Bread",
+  "catBreads": "Breads",
+  "catCheese": "Cheese",
+  "catBurger": "Burger",
+  "catPasta": "Pasta",
+  "catSauce": "Sauce",
+  "catSauces": "Sauces",
+  "catEgg": "Egg",
+  "catBlanket": "Blanket",
+  "catConsumable": "Consumable",
+  "catReusable": "Reusable",
+  "catMeatAndFish": "Meat and fish",
+  "catOther": "Other",
+  "catMainDish": "Main dish",
+  "catPoultry": "Poultry",
+  "catPastaPlural": "Pasta",
+  "catSeafood": "Seafood",
+  "catAfricanSpecialties": "African specialties",
+  "catBurgersSandwiches": "Burgers and sandwiches",
+  "catLebaneseStarters": "Lebanese starters",
+  "catColdStarters": "Cold starters",
+  "catPizzas": "Pizzas",
+  "catFastFood": "Fast food",
+  "catDesserts": "Desserts",
+  "catBarDrink": "Drink",
+  "catCocktails": "Cocktails",
+  "catAlcoholicCocktails": "Alcoholic cocktails",
+  "catNonAlcoholic": "Non-alcoholic",
+  "catShots": "Shots and mixed shots",
+  "catBeers": "Beers",
+  "catSparkling": "Sparkling",
+  "catWinesChampagnes": "Wines and champagnes",
+  "catRedWines": "Red wines",
+  "catWhiteWines": "White wines",
+  "catRoses": "Rosés",
+  "catChampagnes": "Champagnes",
+  "catSpirits": "Spirits",
+  "catCognacs": "Cognacs",
+  "catVodkas": "Vodkas",
+  "catBittersAnise": "Bitters/Anise",
+  "catRumGinTequila": "Rum/Gin-Tequila",
+  "catCreamLiqueurs": "Cream liqueurs",
+  "catWhiskeys": "Whiskeys",
+  "catJuices": "Juices",
+  "catPlainJuices": "Plain juices",
+  "catSmoothies": "Smoothies",
+  "catSyrup": "Syrup",
+  "catHotDrinks": "Hot drinks",
+  "catSodas": "Sodas",
+  "catWaters": "Waters",
+  "reasonSupplyValidated": "Supply validated",
+  "reasonRoomPreparation": "Room {room} preparation",
+  "@reasonRoomPreparation": {
+    "placeholders": {
+      "room": {
+        "type": "String"
+      }
+    }
+  },
+  "reasonAutoOrderConsumption": "Automatic consumption for order {order}",
+  "@reasonAutoOrderConsumption": {
+    "placeholders": {
+      "order": {
+        "type": "String"
+      }
+    }
+  },
+  "reasonAutoOrderRestock": "Automatic restock after order {order} cancellation",
+  "@reasonAutoOrderRestock": {
+    "placeholders": {
+      "order": {
+        "type": "String"
+      }
+    }
+  },
+  "categorySubcategorySeparator": "{parent} \u203a {child}",
+  "@categorySubcategorySeparator": {
+    "placeholders": {
+      "parent": {
+        "type": "String"
+      },
+      "child": {
+        "type": "String"
+      }
+    }
+  }
 }

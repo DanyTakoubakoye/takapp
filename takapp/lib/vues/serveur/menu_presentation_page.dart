@@ -5,6 +5,7 @@ import 'package:takapp/controllers/order_controller.dart';
 import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/client_model.dart';
 import 'package:takapp/core/constants/bar_categories.dart';
+import 'package:takapp/core/constants/catalog_labels.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
 import 'package:takapp/services/client_service.dart';
 import 'package:takapp/services/menu_service.dart';
@@ -525,9 +526,11 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
                     border: Border.all(color: isActive ? _navy : _border),
                   ),
                   child: Text(
-                    // Seule la sentinelle est traduite : les autres valeurs
-                    // sont les catégories réelles saisies par l'établissement.
-                    category == _allCategories ? l10n.categoryAll : category,
+                    // Le libellé stocké reste français ; seul l'affichage
+                    // suit la langue de l'utilisateur.
+                    category == _allCategories
+                        ? l10n.categoryAll
+                        : CatalogLabels.category(l10n, category),
                     style: TextStyle(
                       color: isActive ? _bg : _textSecondary,
                       fontSize: 13,
@@ -556,6 +559,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
     List<MenuItemModel> items,
     List<MenuItemModel> kitchenAccompaniments,
   ) {
+    final l10n = AppLocalizations.of(context);
     final screenWidth = MediaQuery.of(context).size.width;
     // 2 cartes par ligne sur mobile ; davantage sur grand écran.
     final crossAxisCount = screenWidth < 600
@@ -569,7 +573,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
       children: [
         const SizedBox(height: 18),
         Text(
-          BarCategories.displayLabel(category).toUpperCase(),
+          BarCategories.displayLabel(l10n, category).toUpperCase(),
           style: const TextStyle(
             color: _gold,
             fontSize: 11,

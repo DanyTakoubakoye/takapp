@@ -6556,6 +6556,408 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Versement gérante'**
   String get managerHandoverAccountLabel;
+
+  /// No description provided for @catCereals.
+  ///
+  /// In fr, this message translates to:
+  /// **'Céréales'**
+  String get catCereals;
+
+  /// No description provided for @catDrinks.
+  ///
+  /// In fr, this message translates to:
+  /// **'Boissons'**
+  String get catDrinks;
+
+  /// No description provided for @catCondiments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Condiments'**
+  String get catCondiments;
+
+  /// No description provided for @catMeats.
+  ///
+  /// In fr, this message translates to:
+  /// **'Viandes'**
+  String get catMeats;
+
+  /// No description provided for @catMeat.
+  ///
+  /// In fr, this message translates to:
+  /// **'viande'**
+  String get catMeat;
+
+  /// No description provided for @catVegetablesFruits.
+  ///
+  /// In fr, this message translates to:
+  /// **'Légumes et fruits'**
+  String get catVegetablesFruits;
+
+  /// No description provided for @catDairy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Produits laitiers'**
+  String get catDairy;
+
+  /// No description provided for @catCleaningProducts.
+  ///
+  /// In fr, this message translates to:
+  /// **'Produits d’entretien'**
+  String get catCleaningProducts;
+
+  /// No description provided for @catHotelConsumables.
+  ///
+  /// In fr, this message translates to:
+  /// **'Consommables hôtel'**
+  String get catHotelConsumables;
+
+  /// No description provided for @catFishPlural.
+  ///
+  /// In fr, this message translates to:
+  /// **'Poissons'**
+  String get catFishPlural;
+
+  /// No description provided for @catFish.
+  ///
+  /// In fr, this message translates to:
+  /// **'poisson'**
+  String get catFish;
+
+  /// No description provided for @catSideDishes.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accompagnements'**
+  String get catSideDishes;
+
+  /// No description provided for @catBread.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pain'**
+  String get catBread;
+
+  /// No description provided for @catBreads.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pains'**
+  String get catBreads;
+
+  /// No description provided for @catCheese.
+  ///
+  /// In fr, this message translates to:
+  /// **'fromage'**
+  String get catCheese;
+
+  /// No description provided for @catBurger.
+  ///
+  /// In fr, this message translates to:
+  /// **'Hamberger'**
+  String get catBurger;
+
+  /// No description provided for @catPasta.
+  ///
+  /// In fr, this message translates to:
+  /// **'pate'**
+  String get catPasta;
+
+  /// No description provided for @catSauce.
+  ///
+  /// In fr, this message translates to:
+  /// **'sauce'**
+  String get catSauce;
+
+  /// No description provided for @catSauces.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sauces'**
+  String get catSauces;
+
+  /// No description provided for @catEgg.
+  ///
+  /// In fr, this message translates to:
+  /// **'œuf'**
+  String get catEgg;
+
+  /// No description provided for @catBlanket.
+  ///
+  /// In fr, this message translates to:
+  /// **'couverture'**
+  String get catBlanket;
+
+  /// No description provided for @catConsumable.
+  ///
+  /// In fr, this message translates to:
+  /// **'consommable'**
+  String get catConsumable;
+
+  /// No description provided for @catReusable.
+  ///
+  /// In fr, this message translates to:
+  /// **'reutilisable'**
+  String get catReusable;
+
+  /// No description provided for @catMeatAndFish.
+  ///
+  /// In fr, this message translates to:
+  /// **'Viandes et poissons'**
+  String get catMeatAndFish;
+
+  /// No description provided for @catOther.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autres'**
+  String get catOther;
+
+  /// No description provided for @catMainDish.
+  ///
+  /// In fr, this message translates to:
+  /// **'plat'**
+  String get catMainDish;
+
+  /// No description provided for @catPoultry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Volailles'**
+  String get catPoultry;
+
+  /// No description provided for @catPastaPlural.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pates'**
+  String get catPastaPlural;
+
+  /// No description provided for @catSeafood.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fruits de mer'**
+  String get catSeafood;
+
+  /// No description provided for @catAfricanSpecialties.
+  ///
+  /// In fr, this message translates to:
+  /// **'Spécialités africaines'**
+  String get catAfricanSpecialties;
+
+  /// No description provided for @catBurgersSandwiches.
+  ///
+  /// In fr, this message translates to:
+  /// **'Burger et Sandwichs'**
+  String get catBurgersSandwiches;
+
+  /// No description provided for @catLebaneseStarters.
+  ///
+  /// In fr, this message translates to:
+  /// **'Etrées libanaises'**
+  String get catLebaneseStarters;
+
+  /// No description provided for @catColdStarters.
+  ///
+  /// In fr, this message translates to:
+  /// **'Entrées froides'**
+  String get catColdStarters;
+
+  /// No description provided for @catPizzas.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pizzas'**
+  String get catPizzas;
+
+  /// No description provided for @catFastFood.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fast food'**
+  String get catFastFood;
+
+  /// No description provided for @catDesserts.
+  ///
+  /// In fr, this message translates to:
+  /// **'Desserts'**
+  String get catDesserts;
+
+  /// No description provided for @catBarDrink.
+  ///
+  /// In fr, this message translates to:
+  /// **'boisson'**
+  String get catBarDrink;
+
+  /// No description provided for @catCocktails.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cocktails'**
+  String get catCocktails;
+
+  /// No description provided for @catAlcoholicCocktails.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cocktails alcoolisés'**
+  String get catAlcoholicCocktails;
+
+  /// No description provided for @catNonAlcoholic.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sans alcool'**
+  String get catNonAlcoholic;
+
+  /// No description provided for @catShots.
+  ///
+  /// In fr, this message translates to:
+  /// **'Shots et shots composés'**
+  String get catShots;
+
+  /// No description provided for @catBeers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bières'**
+  String get catBeers;
+
+  /// No description provided for @catSparkling.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bulles'**
+  String get catSparkling;
+
+  /// No description provided for @catWinesChampagnes.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vins et Champagnes'**
+  String get catWinesChampagnes;
+
+  /// No description provided for @catRedWines.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vins rouges'**
+  String get catRedWines;
+
+  /// No description provided for @catWhiteWines.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vins blancs'**
+  String get catWhiteWines;
+
+  /// No description provided for @catRoses.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rosés'**
+  String get catRoses;
+
+  /// No description provided for @catChampagnes.
+  ///
+  /// In fr, this message translates to:
+  /// **'Champagnes'**
+  String get catChampagnes;
+
+  /// No description provided for @catSpirits.
+  ///
+  /// In fr, this message translates to:
+  /// **'Spiritueux'**
+  String get catSpirits;
+
+  /// No description provided for @catCognacs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cognacs'**
+  String get catCognacs;
+
+  /// No description provided for @catVodkas.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vodkas'**
+  String get catVodkas;
+
+  /// No description provided for @catBittersAnise.
+  ///
+  /// In fr, this message translates to:
+  /// **'Betters/Anisées'**
+  String get catBittersAnise;
+
+  /// No description provided for @catRumGinTequila.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rhum/Gin-Tequila'**
+  String get catRumGinTequila;
+
+  /// No description provided for @catCreamLiqueurs.
+  ///
+  /// In fr, this message translates to:
+  /// **'Liqueurs crèmes'**
+  String get catCreamLiqueurs;
+
+  /// No description provided for @catWhiskeys.
+  ///
+  /// In fr, this message translates to:
+  /// **'Whiskeys'**
+  String get catWhiskeys;
+
+  /// No description provided for @catJuices.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jus'**
+  String get catJuices;
+
+  /// No description provided for @catPlainJuices.
+  ///
+  /// In fr, this message translates to:
+  /// **'Jus natures'**
+  String get catPlainJuices;
+
+  /// No description provided for @catSmoothies.
+  ///
+  /// In fr, this message translates to:
+  /// **'Smoothies'**
+  String get catSmoothies;
+
+  /// No description provided for @catSyrup.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sirop'**
+  String get catSyrup;
+
+  /// No description provided for @catHotDrinks.
+  ///
+  /// In fr, this message translates to:
+  /// **'Boissons chaudes'**
+  String get catHotDrinks;
+
+  /// No description provided for @catSodas.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sodas'**
+  String get catSodas;
+
+  /// No description provided for @catWaters.
+  ///
+  /// In fr, this message translates to:
+  /// **'Eaux'**
+  String get catWaters;
+
+  /// No description provided for @reasonSupplyValidated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approvisionnement validé'**
+  String get reasonSupplyValidated;
+
+  /// No description provided for @reasonRoomPreparation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Préparation chambre {room}'**
+  String reasonRoomPreparation(String room);
+
+  /// No description provided for @reasonAutoOrderConsumption.
+  ///
+  /// In fr, this message translates to:
+  /// **'Consommation automatique commande {order}'**
+  String reasonAutoOrderConsumption(String order);
+
+  /// No description provided for @reasonAutoOrderRestock.
+  ///
+  /// In fr, this message translates to:
+  /// **'Restitution automatique annulation commande {order}'**
+  String reasonAutoOrderRestock(String order);
+
+  /// No description provided for @categorySubcategorySeparator.
+  ///
+  /// In fr, this message translates to:
+  /// **'{parent} › {child}'**
+  String categorySubcategorySeparator(String parent, String child);
 }
 
 class _AppLocalizationsDelegate

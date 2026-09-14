@@ -3773,4 +3773,213 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get managerHandoverAccountLabel => 'Versement gérante';
+
+  @override
+  String get catCereals => 'Céréales';
+
+  @override
+  String get catDrinks => 'Boissons';
+
+  @override
+  String get catCondiments => 'Condiments';
+
+  @override
+  String get catMeats => 'Viandes';
+
+  @override
+  String get catMeat => 'viande';
+
+  @override
+  String get catVegetablesFruits => 'Légumes et fruits';
+
+  @override
+  String get catDairy => 'Produits laitiers';
+
+  @override
+  String get catCleaningProducts => 'Produits d’entretien';
+
+  @override
+  String get catHotelConsumables => 'Consommables hôtel';
+
+  @override
+  String get catFishPlural => 'Poissons';
+
+  @override
+  String get catFish => 'poisson';
+
+  @override
+  String get catSideDishes => 'Accompagnements';
+
+  @override
+  String get catBread => 'Pain';
+
+  @override
+  String get catBreads => 'Pains';
+
+  @override
+  String get catCheese => 'fromage';
+
+  @override
+  String get catBurger => 'Hamberger';
+
+  @override
+  String get catPasta => 'pate';
+
+  @override
+  String get catSauce => 'sauce';
+
+  @override
+  String get catSauces => 'Sauces';
+
+  @override
+  String get catEgg => 'œuf';
+
+  @override
+  String get catBlanket => 'couverture';
+
+  @override
+  String get catConsumable => 'consommable';
+
+  @override
+  String get catReusable => 'reutilisable';
+
+  @override
+  String get catMeatAndFish => 'Viandes et poissons';
+
+  @override
+  String get catOther => 'Autres';
+
+  @override
+  String get catMainDish => 'plat';
+
+  @override
+  String get catPoultry => 'Volailles';
+
+  @override
+  String get catPastaPlural => 'Pates';
+
+  @override
+  String get catSeafood => 'Fruits de mer';
+
+  @override
+  String get catAfricanSpecialties => 'Spécialités africaines';
+
+  @override
+  String get catBurgersSandwiches => 'Burger et Sandwichs';
+
+  @override
+  String get catLebaneseStarters => 'Etrées libanaises';
+
+  @override
+  String get catColdStarters => 'Entrées froides';
+
+  @override
+  String get catPizzas => 'Pizzas';
+
+  @override
+  String get catFastFood => 'Fast food';
+
+  @override
+  String get catDesserts => 'Desserts';
+
+  @override
+  String get catBarDrink => 'boisson';
+
+  @override
+  String get catCocktails => 'Cocktails';
+
+  @override
+  String get catAlcoholicCocktails => 'Cocktails alcoolisés';
+
+  @override
+  String get catNonAlcoholic => 'Sans alcool';
+
+  @override
+  String get catShots => 'Shots et shots composés';
+
+  @override
+  String get catBeers => 'Bières';
+
+  @override
+  String get catSparkling => 'Bulles';
+
+  @override
+  String get catWinesChampagnes => 'Vins et Champagnes';
+
+  @override
+  String get catRedWines => 'Vins rouges';
+
+  @override
+  String get catWhiteWines => 'Vins blancs';
+
+  @override
+  String get catRoses => 'Rosés';
+
+  @override
+  String get catChampagnes => 'Champagnes';
+
+  @override
+  String get catSpirits => 'Spiritueux';
+
+  @override
+  String get catCognacs => 'Cognacs';
+
+  @override
+  String get catVodkas => 'Vodkas';
+
+  @override
+  String get catBittersAnise => 'Betters/Anisées';
+
+  @override
+  String get catRumGinTequila => 'Rhum/Gin-Tequila';
+
+  @override
+  String get catCreamLiqueurs => 'Liqueurs crèmes';
+
+  @override
+  String get catWhiskeys => 'Whiskeys';
+
+  @override
+  String get catJuices => 'Jus';
+
+  @override
+  String get catPlainJuices => 'Jus natures';
+
+  @override
+  String get catSmoothies => 'Smoothies';
+
+  @override
+  String get catSyrup => 'Sirop';
+
+  @override
+  String get catHotDrinks => 'Boissons chaudes';
+
+  @override
+  String get catSodas => 'Sodas';
+
+  @override
+  String get catWaters => 'Eaux';
+
+  @override
+  String get reasonSupplyValidated => 'Approvisionnement validé';
+
+  @override
+  String reasonRoomPreparation(String room) {
+    return 'Préparation chambre $room';
+  }
+
+  @override
+  String reasonAutoOrderConsumption(String order) {
+    return 'Consommation automatique commande $order';
+  }
+
+  @override
+  String reasonAutoOrderRestock(String order) {
+    return 'Restitution automatique annulation commande $order';
+  }
+
+  @override
+  String categorySubcategorySeparator(String parent, String child) {
+    return '$parent › $child';
+  }
 }
