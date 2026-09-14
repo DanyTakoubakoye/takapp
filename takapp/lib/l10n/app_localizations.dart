@@ -2651,6 +2651,96 @@ abstract class AppLocalizations {
   /// **'IFU {ifu}'**
   String ifuPrefix(String ifu);
 
+  /// No description provided for @serverPaymentsNotHandedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaissements serveurs non versés'**
+  String get serverPaymentsNotHandedTitle;
+
+  /// No description provided for @noPendingPayment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun encaissement en attente'**
+  String get noPendingPayment;
+
+  /// No description provided for @methodLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode : {method}'**
+  String methodLine(String method);
+
+  /// No description provided for @stockManagementTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gestion des stocks'**
+  String get stockManagementTitle;
+
+  /// No description provided for @supplyRequests.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demandes d’approvisionnement'**
+  String get supplyRequests;
+
+  /// No description provided for @storesOverview.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pilotage des magasins'**
+  String get storesOverview;
+
+  /// No description provided for @storesOverviewSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Consulte les stocks, traite les demandes et valide les approvisionnements.'**
+  String get storesOverviewSubtitle;
+
+  /// No description provided for @storeHotelTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Magasin Hôtel'**
+  String get storeHotelTitle;
+
+  /// No description provided for @storeHotelSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Produits d’hygiène, entretien, consommables chambre'**
+  String get storeHotelSubtitle;
+
+  /// No description provided for @storeRestaurantTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Magasin Restaurant'**
+  String get storeRestaurantTitle;
+
+  /// No description provided for @storeRestaurantSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Denrées, cuisine, matières premières'**
+  String get storeRestaurantSubtitle;
+
+  /// No description provided for @storeBarTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Magasin Bar'**
+  String get storeBarTitle;
+
+  /// No description provided for @storeBarSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Boissons, snacks, accessoires bar'**
+  String get storeBarSubtitle;
+
+  /// No description provided for @actionViewStock.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir stock'**
+  String get actionViewStock;
+
+  /// No description provided for @actionRequests.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demandes'**
+  String get actionRequests;
+
   /// No description provided for @clientDisabled.
   ///
   /// In fr, this message translates to:

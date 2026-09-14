@@ -1481,6 +1481,55 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get serverPaymentsNotHandedTitle => 'Waiter payments not handed over';
+
+  @override
+  String get noPendingPayment => 'No pending payment';
+
+  @override
+  String methodLine(String method) {
+    return 'Method: $method';
+  }
+
+  @override
+  String get stockManagementTitle => 'Stock management';
+
+  @override
+  String get supplyRequests => 'Supply requests';
+
+  @override
+  String get storesOverview => 'Stores overview';
+
+  @override
+  String get storesOverviewSubtitle =>
+      'Check stock, process requests and approve supplies.';
+
+  @override
+  String get storeHotelTitle => 'Hotel store';
+
+  @override
+  String get storeHotelSubtitle =>
+      'Hygiene products, maintenance, room consumables';
+
+  @override
+  String get storeRestaurantTitle => 'Restaurant store';
+
+  @override
+  String get storeRestaurantSubtitle => 'Food, kitchen, raw materials';
+
+  @override
+  String get storeBarTitle => 'Bar store';
+
+  @override
+  String get storeBarSubtitle => 'Drinks, snacks, bar accessories';
+
+  @override
+  String get actionViewStock => 'View stock';
+
+  @override
+  String get actionRequests => 'Requests';
+
+  @override
   String get clientDisabled => 'Client disabled.';
 
   @override

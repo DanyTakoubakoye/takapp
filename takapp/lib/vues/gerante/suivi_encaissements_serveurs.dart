@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:takapp/core/constants/app_payment_methods.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/services/gerante_handover_service.dart';
 
 class SuiviEncaissementsServeursPage extends StatelessWidget {
@@ -11,18 +13,19 @@ class SuiviEncaissementsServeursPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final safeEstablishmentId = establishmentId.trim();
 
     if (safeEstablishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     final service = GeranteHandoverService();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Encaissements serveurs non versés')),
+      appBar: AppBar(title: Text(l10n.serverPaymentsNotHandedTitle)),
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: service.streamServerPaymentsNonVerses(
           establishmentId: safeEstablishmentId,
@@ -34,13 +37,15 @@ class SuiviEncaissementsServeursPage extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Erreur : ${snapshot.error}'));
+            return Center(
+              child: Text(l10n.errorPrefixed('${snapshot.error}')),
+            );
           }
 
           final data = snapshot.data ?? [];
 
           if (data.isEmpty) {
-            return const Center(child: Text('Aucun encaissement en attente'));
+            return Center(child: Text(l10n.noPendingPayment));
           }
 
           return ListView.separated(
@@ -54,7 +59,16 @@ class SuiviEncaissementsServeursPage extends StatelessWidget {
                 title: Text(
                   '${item['receivedByName'] ?? ''} • ${item['orderNumber'] ?? ''}',
                 ),
-                subtitle: Text('Mode: ${item['method'] ?? ''}'),
+                // `method` est un code technique ('cash', 'mobile_money'…) :
+                // on le rend via le libellé localisé partagé.
+                subtitle: Text(
+                  l10n.methodLine(
+                    AppPaymentMethods.label(
+                      l10n,
+                      (item['method'] ?? '').toString(),
+                    ),
+                  ),
+                ),
                 trailing: Text(
                   '${amount.toStringAsFixed(0)} FCFA',
                   style: const TextStyle(fontWeight: FontWeight.bold),

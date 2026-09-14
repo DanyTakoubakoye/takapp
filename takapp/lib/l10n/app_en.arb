@@ -1028,6 +1028,30 @@
     }
   },
 
+  "serverPaymentsNotHandedTitle": "Waiter payments not handed over",
+  "noPendingPayment": "No pending payment",
+  "methodLine": "Method: {method}",
+  "@methodLine": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+
+  "stockManagementTitle": "Stock management",
+  "supplyRequests": "Supply requests",
+  "storesOverview": "Stores overview",
+  "storesOverviewSubtitle": "Check stock, process requests and approve supplies.",
+  "storeHotelTitle": "Hotel store",
+  "storeHotelSubtitle": "Hygiene products, maintenance, room consumables",
+  "storeRestaurantTitle": "Restaurant store",
+  "storeRestaurantSubtitle": "Food, kitchen, raw materials",
+  "storeBarTitle": "Bar store",
+  "storeBarSubtitle": "Drinks, snacks, bar accessories",
+  "actionViewStock": "View stock",
+  "actionRequests": "Requests",
+
   "clientDisabled": "Client disabled.",
   "clientAdded": "Client added.",
 

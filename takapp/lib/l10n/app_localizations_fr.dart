@@ -1494,6 +1494,56 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get serverPaymentsNotHandedTitle =>
+      'Encaissements serveurs non versés';
+
+  @override
+  String get noPendingPayment => 'Aucun encaissement en attente';
+
+  @override
+  String methodLine(String method) {
+    return 'Mode : $method';
+  }
+
+  @override
+  String get stockManagementTitle => 'Gestion des stocks';
+
+  @override
+  String get supplyRequests => 'Demandes d’approvisionnement';
+
+  @override
+  String get storesOverview => 'Pilotage des magasins';
+
+  @override
+  String get storesOverviewSubtitle =>
+      'Consulte les stocks, traite les demandes et valide les approvisionnements.';
+
+  @override
+  String get storeHotelTitle => 'Magasin Hôtel';
+
+  @override
+  String get storeHotelSubtitle =>
+      'Produits d’hygiène, entretien, consommables chambre';
+
+  @override
+  String get storeRestaurantTitle => 'Magasin Restaurant';
+
+  @override
+  String get storeRestaurantSubtitle => 'Denrées, cuisine, matières premières';
+
+  @override
+  String get storeBarTitle => 'Magasin Bar';
+
+  @override
+  String get storeBarSubtitle => 'Boissons, snacks, accessoires bar';
+
+  @override
+  String get actionViewStock => 'Voir stock';
+
+  @override
+  String get actionRequests => 'Demandes';
+
+  @override
   String get clientDisabled => 'Client désactivé.';
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/vues/commun/module_visibility.dart';
 import 'package:takapp/vues/gerante/stock_request_list_page.dart';
 import 'package:takapp/vues/shared/store_stock_page.dart';
@@ -12,12 +13,13 @@ class StockManagementPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isSmall = MediaQuery.of(context).size.width < 800;
     final safeEstablishmentId = establishmentId.trim();
 
     if (safeEstablishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -27,24 +29,27 @@ class StockManagementPage extends StatelessWidget {
     // Établissement abonné à tout ⇒ les trois magasins restent affichés.
     final stores =
         [
+          // `store` reste une valeur technique ('hotel', 'restaurant',
+          // 'bar') : elle sert à canSeeStore et est transmise à
+          // StoreStockPage. Seuls titre et sous-titre sont traduits.
           _StoreCardData(
             store: 'hotel',
-            title: 'Magasin Hôtel',
-            subtitle: 'Produits d’hygiène, entretien, consommables chambre',
+            title: l10n.storeHotelTitle,
+            subtitle: l10n.storeHotelSubtitle,
             icon: Icons.hotel,
             color: Colors.teal,
           ),
           _StoreCardData(
             store: 'restaurant',
-            title: 'Magasin Restaurant',
-            subtitle: 'Denrées, cuisine, matières premières',
+            title: l10n.storeRestaurantTitle,
+            subtitle: l10n.storeRestaurantSubtitle,
             icon: Icons.restaurant,
             color: Colors.deepOrange,
           ),
           _StoreCardData(
             store: 'bar',
-            title: 'Magasin Bar',
-            subtitle: 'Boissons, snacks, accessoires bar',
+            title: l10n.storeBarTitle,
+            subtitle: l10n.storeBarSubtitle,
             icon: Icons.local_bar,
             color: Colors.indigo,
           ),
@@ -52,10 +57,10 @@ class StockManagementPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gestion des stocks'),
+        title: Text(l10n.stockManagementTitle),
         actions: [
           IconButton(
-            tooltip: 'Demandes d’approvisionnement',
+            tooltip: l10n.supplyRequests,
             onPressed: () {
               Navigator.push(
                 context,
@@ -76,12 +81,12 @@ class StockManagementPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Pilotage des magasins',
+              l10n.storesOverview,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 6),
             Text(
-              'Consulte les stocks, traite les demandes et valide les approvisionnements.',
+              l10n.storesOverviewSubtitle,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
@@ -145,7 +150,7 @@ class StockManagementPage extends StatelessWidget {
                                   );
                                 },
                                 icon: const Icon(Icons.visibility_outlined),
-                                label: const Text('Voir stock'),
+                                label: Text(l10n.actionViewStock),
                               ),
                               OutlinedButton.icon(
                                 onPressed: () {
@@ -160,7 +165,7 @@ class StockManagementPage extends StatelessWidget {
                                   );
                                 },
                                 icon: const Icon(Icons.list_alt_outlined),
-                                label: const Text('Demandes'),
+                                label: Text(l10n.actionRequests),
                               ),
                             ],
                           ),

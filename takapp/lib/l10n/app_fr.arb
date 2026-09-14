@@ -1034,6 +1034,30 @@
     }
   },
 
+  "serverPaymentsNotHandedTitle": "Encaissements serveurs non versés",
+  "noPendingPayment": "Aucun encaissement en attente",
+  "methodLine": "Mode : {method}",
+  "@methodLine": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+
+  "stockManagementTitle": "Gestion des stocks",
+  "supplyRequests": "Demandes d’approvisionnement",
+  "storesOverview": "Pilotage des magasins",
+  "storesOverviewSubtitle": "Consulte les stocks, traite les demandes et valide les approvisionnements.",
+  "storeHotelTitle": "Magasin Hôtel",
+  "storeHotelSubtitle": "Produits d’hygiène, entretien, consommables chambre",
+  "storeRestaurantTitle": "Magasin Restaurant",
+  "storeRestaurantSubtitle": "Denrées, cuisine, matières premières",
+  "storeBarTitle": "Magasin Bar",
+  "storeBarSubtitle": "Boissons, snacks, accessoires bar",
+  "actionViewStock": "Voir stock",
+  "actionRequests": "Demandes",
+
   "clientDisabled": "Client désactivé.",
   "clientAdded": "Client ajouté.",
 
