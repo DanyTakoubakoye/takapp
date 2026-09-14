@@ -1110,11 +1110,11 @@ abstract class AppLocalizations {
   /// **'Revenir en préparation'**
   String get actionBackToPreparing;
 
-  /// No description provided for @actionBack.
+  /// No description provided for @actionRevert.
   ///
   /// In fr, this message translates to:
-  /// **'Retour'**
-  String get actionBack;
+  /// **'Revenir'**
+  String get actionRevert;
 
   /// No description provided for @actionPickedUp.
   ///
@@ -2387,6 +2387,12 @@ abstract class AppLocalizations {
   /// **'La réservation de {client} sera marquée annulée.'**
   String cancelReservationConfirmBody(String client);
 
+  /// No description provided for @actionBack.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retour'**
+  String get actionBack;
+
   /// No description provided for @actionCancelReservation.
   ///
   /// In fr, this message translates to:
@@ -2914,6 +2920,216 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Réceptionniste'**
   String get roleReceptionist;
+
+  /// No description provided for @labelReason.
+  ///
+  /// In fr, this message translates to:
+  /// **'Motif'**
+  String get labelReason;
+
+  /// No description provided for @labelItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Article'**
+  String get labelItem;
+
+  /// No description provided for @labelItemIndex.
+  ///
+  /// In fr, this message translates to:
+  /// **'Article {index}'**
+  String labelItemIndex(int index);
+
+  /// No description provided for @labelQuantitySupplied.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quantité approvisionnée'**
+  String get labelQuantitySupplied;
+
+  /// No description provided for @actionAddItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un article'**
+  String get actionAddItem;
+
+  /// No description provided for @actionValidateSupply.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valider l’approvisionnement'**
+  String get actionValidateSupply;
+
+  /// No description provided for @reasonDirectSupplyDefault.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approvisionnement direct gérante'**
+  String get reasonDirectSupplyDefault;
+
+  /// No description provided for @selectItemAtLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sélectionne l’article à la ligne {line}.'**
+  String selectItemAtLine(int line);
+
+  /// No description provided for @invalidQuantityAtLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quantité invalide à la ligne {line}.'**
+  String invalidQuantityAtLine(int line);
+
+  /// No description provided for @directSupplyRecorded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approvisionnement direct enregistré avec succès.'**
+  String get directSupplyRecorded;
+
+  /// No description provided for @registerServerTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer un serveur'**
+  String get registerServerTitle;
+
+  /// No description provided for @newServerTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveau serveur'**
+  String get newServerTitle;
+
+  /// No description provided for @labelFullName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom complet'**
+  String get labelFullName;
+
+  /// No description provided for @labelPhone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Téléphone'**
+  String get labelPhone;
+
+  /// No description provided for @labelEmail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Email'**
+  String get labelEmail;
+
+  /// No description provided for @errFullNameRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez renseigner le nom complet'**
+  String get errFullNameRequired;
+
+  /// No description provided for @errPhoneTooShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro trop court'**
+  String get errPhoneTooShort;
+
+  /// No description provided for @serverRegisteredSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Serveur enregistré avec succès.'**
+  String get serverRegisteredSuccess;
+
+  /// No description provided for @storeNameHotel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Hôtel'**
+  String get storeNameHotel;
+
+  /// No description provided for @storeNameRestaurant.
+  ///
+  /// In fr, this message translates to:
+  /// **'Restaurant'**
+  String get storeNameRestaurant;
+
+  /// No description provided for @storeNameBar.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bar'**
+  String get storeNameBar;
+
+  /// No description provided for @statusDelivered.
+  ///
+  /// In fr, this message translates to:
+  /// **'Livrée'**
+  String get statusDelivered;
+
+  /// No description provided for @statusReceived.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réceptionnée'**
+  String get statusReceived;
+
+  /// No description provided for @deliveryTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Livraison / Approvisionnement'**
+  String get deliveryTitle;
+
+  /// No description provided for @requestAlreadyProcessed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette demande a déjà été traitée.'**
+  String get requestAlreadyProcessed;
+
+  /// No description provided for @requestAlreadyProcessedShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demande déjà traitée'**
+  String get requestAlreadyProcessedShort;
+
+  /// No description provided for @invalidDeliveredQuantityAtLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quantité livrée invalide à la ligne {line}.'**
+  String invalidDeliveredQuantityAtLine(int line);
+
+  /// No description provided for @supplyValidatedSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approvisionnement validé avec succès.'**
+  String get supplyValidatedSuccess;
+
+  /// No description provided for @requestedByLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demandé par : {name}'**
+  String requestedByLine(String name);
+
+  /// No description provided for @roleLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rôle : {role}'**
+  String roleLine(String role);
+
+  /// No description provided for @statusLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Statut : {status}'**
+  String statusLine(String status);
+
+  /// No description provided for @quantitiesToDeliver.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quantités à livrer'**
+  String get quantitiesToDeliver;
+
+  /// No description provided for @requestedQuantityLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demandé : {quantity} {unit}'**
+  String requestedQuantityLine(String quantity, String unit);
+
+  /// No description provided for @labelQuantityDelivered.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quantité livrée'**
+  String get labelQuantityDelivered;
+
+  /// No description provided for @actionValidateDelivery.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valider la livraison'**
+  String get actionValidateDelivery;
 }
 
 class _AppLocalizationsDelegate

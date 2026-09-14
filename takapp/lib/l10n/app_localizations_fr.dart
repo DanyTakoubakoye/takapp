@@ -615,7 +615,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get actionBackToPreparing => 'Revenir en préparation';
 
   @override
-  String get actionBack => 'Retour';
+  String get actionRevert => 'Revenir';
 
   @override
   String get actionPickedUp => 'Récupéré';
@@ -1338,6 +1338,9 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get actionBack => 'Retour';
+
+  @override
   String get actionCancelReservation => 'Annuler la réservation';
 
   @override
@@ -1636,4 +1639,126 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get roleReceptionist => 'Réceptionniste';
+
+  @override
+  String get labelReason => 'Motif';
+
+  @override
+  String get labelItem => 'Article';
+
+  @override
+  String labelItemIndex(int index) {
+    return 'Article $index';
+  }
+
+  @override
+  String get labelQuantitySupplied => 'Quantité approvisionnée';
+
+  @override
+  String get actionAddItem => 'Ajouter un article';
+
+  @override
+  String get actionValidateSupply => 'Valider l’approvisionnement';
+
+  @override
+  String get reasonDirectSupplyDefault => 'Approvisionnement direct gérante';
+
+  @override
+  String selectItemAtLine(int line) {
+    return 'Sélectionne l’article à la ligne $line.';
+  }
+
+  @override
+  String invalidQuantityAtLine(int line) {
+    return 'Quantité invalide à la ligne $line.';
+  }
+
+  @override
+  String get directSupplyRecorded =>
+      'Approvisionnement direct enregistré avec succès.';
+
+  @override
+  String get registerServerTitle => 'Enregistrer un serveur';
+
+  @override
+  String get newServerTitle => 'Nouveau serveur';
+
+  @override
+  String get labelFullName => 'Nom complet';
+
+  @override
+  String get labelPhone => 'Téléphone';
+
+  @override
+  String get labelEmail => 'Email';
+
+  @override
+  String get errFullNameRequired => 'Veuillez renseigner le nom complet';
+
+  @override
+  String get errPhoneTooShort => 'Numéro trop court';
+
+  @override
+  String get serverRegisteredSuccess => 'Serveur enregistré avec succès.';
+
+  @override
+  String get storeNameHotel => 'Hôtel';
+
+  @override
+  String get storeNameRestaurant => 'Restaurant';
+
+  @override
+  String get storeNameBar => 'Bar';
+
+  @override
+  String get statusDelivered => 'Livrée';
+
+  @override
+  String get statusReceived => 'Réceptionnée';
+
+  @override
+  String get deliveryTitle => 'Livraison / Approvisionnement';
+
+  @override
+  String get requestAlreadyProcessed => 'Cette demande a déjà été traitée.';
+
+  @override
+  String get requestAlreadyProcessedShort => 'Demande déjà traitée';
+
+  @override
+  String invalidDeliveredQuantityAtLine(int line) {
+    return 'Quantité livrée invalide à la ligne $line.';
+  }
+
+  @override
+  String get supplyValidatedSuccess => 'Approvisionnement validé avec succès.';
+
+  @override
+  String requestedByLine(String name) {
+    return 'Demandé par : $name';
+  }
+
+  @override
+  String roleLine(String role) {
+    return 'Rôle : $role';
+  }
+
+  @override
+  String statusLine(String status) {
+    return 'Statut : $status';
+  }
+
+  @override
+  String get quantitiesToDeliver => 'Quantités à livrer';
+
+  @override
+  String requestedQuantityLine(String quantity, String unit) {
+    return 'Demandé : $quantity $unit';
+  }
+
+  @override
+  String get labelQuantityDelivered => 'Quantité livrée';
+
+  @override
+  String get actionValidateDelivery => 'Valider la livraison';
 }

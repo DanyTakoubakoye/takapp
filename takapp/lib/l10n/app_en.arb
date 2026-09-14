@@ -447,7 +447,7 @@
   "actionSetPreparing": "Start preparing",
   "actionMarkReady": "Mark as ready",
   "actionBackToPreparing": "Back to preparing",
-  "actionBack": "Back",
+  "actionRevert": "Revert",
   "actionPickedUp": "Picked up",
 
   "encaissementTitle": "Payment collection",
@@ -1096,5 +1096,102 @@
   "roleHousekeeping": "Housekeeping",
   "roleBartender": "Bartender",
   "roleButler": "Butler",
-  "roleReceptionist": "Receptionist"
+  "roleReceptionist": "Receptionist",
+
+  "labelReason": "Reason",
+  "labelItem": "Item",
+  "labelItemIndex": "Item {index}",
+  "@labelItemIndex": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "labelQuantitySupplied": "Quantity supplied",
+  "actionAddItem": "Add an item",
+  "actionValidateSupply": "Confirm the supply",
+  "reasonDirectSupplyDefault": "Direct supply by the manager",
+  "selectItemAtLine": "Select the item on line {line}.",
+  "@selectItemAtLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "invalidQuantityAtLine": "Invalid quantity on line {line}.",
+  "@invalidQuantityAtLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "directSupplyRecorded": "Direct supply recorded successfully.",
+
+  "registerServerTitle": "Register a waiter",
+  "newServerTitle": "New waiter",
+  "labelFullName": "Full name",
+  "labelPhone": "Phone",
+  "labelEmail": "Email",
+  "errFullNameRequired": "Please enter the full name",
+  "errPhoneTooShort": "Number too short",
+  "serverRegisteredSuccess": "Waiter registered successfully.",
+
+  "storeNameHotel": "Hotel",
+  "storeNameRestaurant": "Restaurant",
+  "storeNameBar": "Bar",
+  "statusDelivered": "Delivered",
+  "statusReceived": "Received",
+  "deliveryTitle": "Delivery / Supply",
+  "requestAlreadyProcessed": "This request has already been processed.",
+  "requestAlreadyProcessedShort": "Request already processed",
+  "invalidDeliveredQuantityAtLine": "Invalid delivered quantity on line {line}.",
+  "@invalidDeliveredQuantityAtLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "supplyValidatedSuccess": "Supply confirmed successfully.",
+  "requestedByLine": "Requested by: {name}",
+  "@requestedByLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roleLine": "Role: {role}",
+  "@roleLine": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "statusLine": "Status: {status}",
+  "@statusLine": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "quantitiesToDeliver": "Quantities to deliver",
+  "requestedQuantityLine": "Requested: {quantity} {unit}",
+  "@requestedQuantityLine": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "labelQuantityDelivered": "Quantity delivered",
+  "actionValidateDelivery": "Confirm the delivery"
 }

@@ -453,7 +453,7 @@
   "actionSetPreparing": "Passer en préparation",
   "actionMarkReady": "Marquer prête",
   "actionBackToPreparing": "Revenir en préparation",
-  "actionBack": "Revenir",
+  "actionRevert": "Revenir",
   "actionPickedUp": "Récupéré",
 
   "encaissementTitle": "Encaissement",
@@ -1102,5 +1102,102 @@
   "roleHousekeeping": "Service Hygiène",
   "roleBartender": "Barman",
   "roleButler": "Majordhomme",
-  "roleReceptionist": "Réceptionniste"
+  "roleReceptionist": "Réceptionniste",
+
+  "labelReason": "Motif",
+  "labelItem": "Article",
+  "labelItemIndex": "Article {index}",
+  "@labelItemIndex": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "labelQuantitySupplied": "Quantité approvisionnée",
+  "actionAddItem": "Ajouter un article",
+  "actionValidateSupply": "Valider l’approvisionnement",
+  "reasonDirectSupplyDefault": "Approvisionnement direct gérante",
+  "selectItemAtLine": "Sélectionne l’article à la ligne {line}.",
+  "@selectItemAtLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "invalidQuantityAtLine": "Quantité invalide à la ligne {line}.",
+  "@invalidQuantityAtLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "directSupplyRecorded": "Approvisionnement direct enregistré avec succès.",
+
+  "registerServerTitle": "Enregistrer un serveur",
+  "newServerTitle": "Nouveau serveur",
+  "labelFullName": "Nom complet",
+  "labelPhone": "Téléphone",
+  "labelEmail": "Email",
+  "errFullNameRequired": "Veuillez renseigner le nom complet",
+  "errPhoneTooShort": "Numéro trop court",
+  "serverRegisteredSuccess": "Serveur enregistré avec succès.",
+
+  "storeNameHotel": "Hôtel",
+  "storeNameRestaurant": "Restaurant",
+  "storeNameBar": "Bar",
+  "statusDelivered": "Livrée",
+  "statusReceived": "Réceptionnée",
+  "deliveryTitle": "Livraison / Approvisionnement",
+  "requestAlreadyProcessed": "Cette demande a déjà été traitée.",
+  "requestAlreadyProcessedShort": "Demande déjà traitée",
+  "invalidDeliveredQuantityAtLine": "Quantité livrée invalide à la ligne {line}.",
+  "@invalidDeliveredQuantityAtLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "supplyValidatedSuccess": "Approvisionnement validé avec succès.",
+  "requestedByLine": "Demandé par : {name}",
+  "@requestedByLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "roleLine": "Rôle : {role}",
+  "@roleLine": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "statusLine": "Statut : {status}",
+  "@statusLine": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "quantitiesToDeliver": "Quantités à livrer",
+  "requestedQuantityLine": "Demandé : {quantity} {unit}",
+  "@requestedQuantityLine": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "labelQuantityDelivered": "Quantité livrée",
+  "actionValidateDelivery": "Valider la livraison"
 }

@@ -35,6 +35,7 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
       return;
     }
 
+    final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthController>();
     final controller = context.read<ServeurController>();
 
@@ -43,16 +44,16 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
     if (user == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errUserNotFound)));
       return;
     }
 
     final establishmentId = user.establishmentId.trim();
 
     if (establishmentId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Établissement introuvable.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errEstablishmentNotFound)));
       return;
     }
 
@@ -66,17 +67,15 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
     if (!mounted) return;
 
     if (error != null) {
-      final l10n = AppLocalizations.of(context);
-
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(localizedError(l10n, error))));
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Serveur enregistré avec succès.")),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.serverRegisteredSuccess)));
 
     _nomController.clear();
     _telephoneController.clear();
@@ -85,18 +84,17 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
     final user = auth.currentUser;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     if (user.establishmentId.trim().isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -104,7 +102,7 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
       builder: (context, controller, child) {
         return Scaffold(
           appBar: AppBar(
-            title: const Text("Enregistrer un serveur"),
+            title: Text(l10n.registerServerTitle),
             centerTitle: true,
           ),
           body: Center(
@@ -124,9 +122,9 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Text(
-                            "Nouveau serveur",
-                            style: TextStyle(
+                          Text(
+                            l10n.newServerTitle,
+                            style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),
@@ -134,13 +132,13 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
                           const SizedBox(height: 20),
                           TextFormField(
                             controller: _nomController,
-                            decoration: const InputDecoration(
-                              labelText: "Nom complet",
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: l10n.labelFullName,
+                              border: const OutlineInputBorder(),
                             ),
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return "Veuillez renseigner le nom complet";
+                                return l10n.errFullNameRequired;
                               }
 
                               return null;
@@ -150,17 +148,17 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
                           TextFormField(
                             controller: _telephoneController,
                             keyboardType: TextInputType.phone,
-                            decoration: const InputDecoration(
-                              labelText: "Téléphone",
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: l10n.labelPhone,
+                              border: const OutlineInputBorder(),
                             ),
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return "Veuillez renseigner le téléphone";
+                                return l10n.errPhoneRequired;
                               }
 
                               if (value.trim().length < 8) {
-                                return "Numéro trop court";
+                                return l10n.errPhoneTooShort;
                               }
 
                               return null;
@@ -170,13 +168,13 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
                           TextFormField(
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
-                            decoration: const InputDecoration(
-                              labelText: "Email",
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: l10n.labelEmail,
+                              border: const OutlineInputBorder(),
                             ),
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return "Veuillez renseigner l'email";
+                                return l10n.errEmailRequired;
                               }
 
                               final emailRegex = RegExp(
@@ -184,7 +182,7 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
                               );
 
                               if (!emailRegex.hasMatch(value.trim())) {
-                                return "Email invalide";
+                                return l10n.errInvalidEmail;
                               }
 
                               return null;
@@ -203,7 +201,7 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
                                         strokeWidth: 2.5,
                                       ),
                                     )
-                                  : const Text("Enregistrer"),
+                                  : Text(l10n.actionSave),
                             ),
                           ),
                         ],

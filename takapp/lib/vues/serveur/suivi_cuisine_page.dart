@@ -522,7 +522,7 @@ class _CuisineColumn extends StatelessWidget {
                                                         'preparing',
                                                   );
                                             },
-                                            child: Text(l10n.actionBack),
+                                            child: Text(l10n.actionRevert),
                                           ),
                                         if (kitchenStatus == 'ready')
                                           ElevatedButton(

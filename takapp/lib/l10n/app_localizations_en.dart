@@ -611,7 +611,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionBackToPreparing => 'Back to preparing';
 
   @override
-  String get actionBack => 'Back';
+  String get actionRevert => 'Revert';
 
   @override
   String get actionPickedUp => 'Picked up';
@@ -1325,6 +1325,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get actionBack => 'Back';
+
+  @override
   String get actionCancelReservation => 'Cancel the reservation';
 
   @override
@@ -1620,4 +1623,126 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get roleReceptionist => 'Receptionist';
+
+  @override
+  String get labelReason => 'Reason';
+
+  @override
+  String get labelItem => 'Item';
+
+  @override
+  String labelItemIndex(int index) {
+    return 'Item $index';
+  }
+
+  @override
+  String get labelQuantitySupplied => 'Quantity supplied';
+
+  @override
+  String get actionAddItem => 'Add an item';
+
+  @override
+  String get actionValidateSupply => 'Confirm the supply';
+
+  @override
+  String get reasonDirectSupplyDefault => 'Direct supply by the manager';
+
+  @override
+  String selectItemAtLine(int line) {
+    return 'Select the item on line $line.';
+  }
+
+  @override
+  String invalidQuantityAtLine(int line) {
+    return 'Invalid quantity on line $line.';
+  }
+
+  @override
+  String get directSupplyRecorded => 'Direct supply recorded successfully.';
+
+  @override
+  String get registerServerTitle => 'Register a waiter';
+
+  @override
+  String get newServerTitle => 'New waiter';
+
+  @override
+  String get labelFullName => 'Full name';
+
+  @override
+  String get labelPhone => 'Phone';
+
+  @override
+  String get labelEmail => 'Email';
+
+  @override
+  String get errFullNameRequired => 'Please enter the full name';
+
+  @override
+  String get errPhoneTooShort => 'Number too short';
+
+  @override
+  String get serverRegisteredSuccess => 'Waiter registered successfully.';
+
+  @override
+  String get storeNameHotel => 'Hotel';
+
+  @override
+  String get storeNameRestaurant => 'Restaurant';
+
+  @override
+  String get storeNameBar => 'Bar';
+
+  @override
+  String get statusDelivered => 'Delivered';
+
+  @override
+  String get statusReceived => 'Received';
+
+  @override
+  String get deliveryTitle => 'Delivery / Supply';
+
+  @override
+  String get requestAlreadyProcessed =>
+      'This request has already been processed.';
+
+  @override
+  String get requestAlreadyProcessedShort => 'Request already processed';
+
+  @override
+  String invalidDeliveredQuantityAtLine(int line) {
+    return 'Invalid delivered quantity on line $line.';
+  }
+
+  @override
+  String get supplyValidatedSuccess => 'Supply confirmed successfully.';
+
+  @override
+  String requestedByLine(String name) {
+    return 'Requested by: $name';
+  }
+
+  @override
+  String roleLine(String role) {
+    return 'Role: $role';
+  }
+
+  @override
+  String statusLine(String status) {
+    return 'Status: $status';
+  }
+
+  @override
+  String get quantitiesToDeliver => 'Quantities to deliver';
+
+  @override
+  String requestedQuantityLine(String quantity, String unit) {
+    return 'Requested: $quantity $unit';
+  }
+
+  @override
+  String get labelQuantityDelivered => 'Quantity delivered';
+
+  @override
+  String get actionValidateDelivery => 'Confirm the delivery';
 }

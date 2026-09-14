@@ -25,9 +25,8 @@ class DirectStockSupplyPage extends StatefulWidget {
 final StockItemService _service = StockItemService();
 
 class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
-  final TextEditingController _reasonController = TextEditingController(
-    text: 'Approvisionnement direct gérante',
-  );
+  final TextEditingController _reasonController = TextEditingController();
+  bool _reasonInitialized = false;
   late final Stream<List<StockItemModel>> _itemsStream;
 
   final List<_SupplyLineInput> _lines = [_SupplyLineInput()];
@@ -48,6 +47,7 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
   }
 
   Future<void> _submit(List<StockItemModel> items) async {
+    final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthController>();
     final controller = context.read<StoreStockController>();
     final user = auth.currentUser;
@@ -55,14 +55,14 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
     if (user == null) {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Utilisateur introuvable.')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errUserNotFound)));
       return;
     }
 
     if (establishmentId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Établissement introuvable.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errEstablishmentNotFound)));
       return;
     }
 
@@ -81,15 +81,15 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
       }
 
       if (selected == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Sélectionne l’article à la ligne ${i + 1}.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.selectItemAtLine(i + 1))));
         return;
       }
 
       if (quantity == null || quantity <= 0) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Quantité invalide à la ligne ${i + 1}.')),
+          SnackBar(content: Text(l10n.invalidQuantityAtLine(i + 1))),
         );
         return;
       }
@@ -109,8 +109,6 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
       if (!mounted) return;
 
       if (!success) {
-        final l10n = AppLocalizations.of(context);
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(controller.errorText(l10n) ?? l10n.errUnknown),
@@ -124,11 +122,9 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
 
     Navigator.pop(context);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Approvisionnement direct enregistré avec succès.'),
-      ),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.directSupplyRecorded)));
   }
 
   @override
@@ -139,6 +135,21 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
       establishmentId: establishmentId,
       store: widget.store,
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Le motif par défaut est localisé : il ne peut donc pas être posé dans
+    // l'initialiseur du champ, où aucun `context` n'est encore disponible.
+    // Le texte affiché est aussi celui qui sera enregistré comme motif.
+    if (!_reasonInitialized) {
+      _reasonInitialized = true;
+      _reasonController.text = AppLocalizations.of(
+        context,
+      ).reasonDirectSupplyDefault;
+    }
   }
 
   @override
@@ -154,13 +165,14 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final controller = context.watch<StoreStockController>();
     final color = _storeColor();
     final isSmall = MediaQuery.of(context).size.width < 800;
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -174,13 +186,15 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Erreur : ${snapshot.error}'));
+            return Center(
+              child: Text(l10n.errorPrefixed('${snapshot.error}')),
+            );
           }
 
           final items = snapshot.data ?? [];
 
           if (items.isEmpty) {
-            return const Center(child: Text('Aucun article disponible.'));
+            return Center(child: Text(l10n.noItemAvailable));
           }
 
           return SingleChildScrollView(
@@ -193,7 +207,7 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
                     padding: const EdgeInsets.all(16),
                     child: TextField(
                       controller: _reasonController,
-                      decoration: const InputDecoration(labelText: 'Motif'),
+                      decoration: InputDecoration(labelText: l10n.labelReason),
                     ),
                   ),
                 ),
@@ -211,7 +225,7 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
                             children: [
                               Expanded(
                                 child: Text(
-                                  'Article ${index + 1}',
+                                  l10n.labelItemIndex(index + 1),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -239,8 +253,8 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
                                 )
                                 ? line.selectedItemId
                                 : null,
-                            decoration: const InputDecoration(
-                              labelText: 'Article',
+                            decoration: InputDecoration(
+                              labelText: l10n.labelItem,
                             ),
                             items: items.map((item) {
                               return DropdownMenuItem<String>(
@@ -263,8 +277,8 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
                             keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
                             ),
-                            decoration: const InputDecoration(
-                              labelText: 'Quantité approvisionnée',
+                            decoration: InputDecoration(
+                              labelText: l10n.labelQuantitySupplied,
                             ),
                           ),
                         ],
@@ -281,7 +295,7 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
                           });
                         },
                   icon: const Icon(Icons.add),
-                  label: const Text('Ajouter un article'),
+                  label: Text(l10n.actionAddItem),
                 ),
                 const SizedBox(height: 12),
                 SizedBox(
@@ -304,7 +318,7 @@ class _DirectStockSupplyPageState extends State<DirectStockSupplyPage> {
                             ),
                           )
                         : const Icon(Icons.add_business),
-                    label: const Text('Valider l’approvisionnement'),
+                    label: Text(l10n.actionValidateSupply),
                   ),
                 ),
               ],
