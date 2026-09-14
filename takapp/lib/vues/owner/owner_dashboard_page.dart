@@ -15,6 +15,7 @@ import 'package:takapp/services/printer_service.dart';
 import 'package:takapp/vues/clients/clients_page.dart';
 import 'package:takapp/vues/comptabilite/soldes_precedents_page.dart';
 import 'package:takapp/vues/reception/reception_dashboard_page.dart';
+import 'package:takapp/core/l10n/language_selector.dart';
 
 class OwnerDashboardPage extends StatefulWidget {
   final String establishmentId;
@@ -374,6 +375,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
               },
               icon: const Icon(Icons.people_outline),
             ),
+          const LanguageSelector(),
           IconButton(
             onPressed: () => context.read<AuthController>().logout(),
             icon: const Icon(Icons.logout),

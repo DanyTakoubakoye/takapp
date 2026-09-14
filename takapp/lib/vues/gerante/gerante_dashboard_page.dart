@@ -20,6 +20,7 @@ import 'package:takapp/vues/reception/rooms_board_page.dart';
 import 'package:takapp/vues/reception/rooms_page.dart';
 import 'package:takapp/vues/shared/low_stock_page.dart';
 import 'package:takapp/vues/shared/stock_item_registry_page.dart';
+import 'package:takapp/core/l10n/language_selector.dart';
 
 class GeranteDashboardPage extends StatelessWidget {
   final String establishmentId;
@@ -52,6 +53,7 @@ class GeranteDashboardPage extends StatelessWidget {
         // TAKHOTEL est la marque : seul le rôle est traduit.
         title: Text('TAKHOTEL - ${l10n.roleManager}'),
         actions: [
+          const LanguageSelector(),
           IconButton(
             onPressed: () => context.read<AuthController>().logout(),
             icon: const Icon(Icons.logout),

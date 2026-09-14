@@ -13,6 +13,7 @@ import 'package:takapp/vues/serveur/serveur_notifications_page.dart';
 import 'package:takapp/vues/serveur/suivi_bar_page.dart';
 import 'package:takapp/vues/serveur/suivi_cuisine_page.dart';
 import 'package:takapp/vues/serveur/versement_gerante_page.dart';
+import 'package:takapp/core/l10n/language_selector.dart';
 
 class ServeurHomePage extends StatefulWidget {
   final String establishmentId;
@@ -226,6 +227,7 @@ class _ServeurHomePageState extends State<ServeurHomePage> {
                   );
                 },
               ),
+              const LanguageSelector(),
               IconButton(
                 onPressed: () => context.read<AuthController>().logout(),
                 tooltip: l10n.commonLogout,

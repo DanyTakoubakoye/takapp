@@ -10,6 +10,7 @@ import 'package:takapp/vues/reception/rooms_page.dart';
 import 'package:takapp/vues/reception/rooms_board_page.dart';
 import 'package:takapp/vues/gerante/facturation_chambre_page.dart';
 import 'package:takapp/vues/gerante/liste_factures_page.dart';
+import 'package:takapp/core/l10n/language_selector.dart';
 
 class ReceptionDashboardPage extends StatelessWidget {
   final String establishmentId;
@@ -94,6 +95,7 @@ class ReceptionDashboardPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(l10n.receptionTitle),
         actions: [
+          const LanguageSelector(),
           IconButton(
             onPressed: () => context.read<AuthController>().logout(),
             tooltip: l10n.commonLogout,

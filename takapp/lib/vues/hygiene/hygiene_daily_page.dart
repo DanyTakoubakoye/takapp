@@ -8,6 +8,7 @@ import 'package:takapp/modeles/room_model.dart';
 import 'package:takapp/modeles/store_stock_model.dart';
 import 'package:takapp/services/room_service.dart';
 import 'package:takapp/services/store_stock_service.dart';
+import 'package:takapp/core/l10n/language_selector.dart';
 
 class HygieneDailyPage extends StatefulWidget {
   final String establishmentId;
@@ -119,6 +120,7 @@ class _HygieneDailyPageState extends State<HygieneDailyPage> {
             onPressed: () => _openCleaningForm(),
             icon: const Icon(Icons.edit_note),
           ),
+          const LanguageSelector(),
           IconButton(
             onPressed: () => context.read<AuthController>().logout(),
             icon: const Icon(Icons.logout),

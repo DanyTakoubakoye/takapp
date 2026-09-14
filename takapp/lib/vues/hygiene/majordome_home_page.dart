@@ -6,6 +6,7 @@ import 'package:takapp/vues/shared/create_stock_request_page.dart';
 import 'package:takapp/vues/shared/store_request_history_page.dart';
 import 'package:takapp/vues/hygiene/hygiene_daily_page.dart';
 import 'package:takapp/vues/hygiene/hotel_stock_item_form_page.dart';
+import 'package:takapp/core/l10n/language_selector.dart';
 
 class MajordomeHomePage extends StatelessWidget {
   const MajordomeHomePage({super.key});
@@ -33,6 +34,7 @@ class MajordomeHomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text(l10n.hygieneServiceTitle),
         actions: [
+          const LanguageSelector(),
           IconButton(
             onPressed: () => context.read<AuthController>().logout(),
             icon: const Icon(Icons.logout),

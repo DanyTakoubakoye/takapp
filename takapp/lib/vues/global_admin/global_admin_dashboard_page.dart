@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/l10n/app_localizations.dart';
+import 'package:takapp/core/l10n/language_selector.dart';
 
 class GlobalAdminDashboardPage extends StatefulWidget {
   const GlobalAdminDashboardPage({super.key});
@@ -240,6 +241,7 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
       appBar: AppBar(
         title: Text(l10n.saasAdministrationTitle),
         actions: [
+          const LanguageSelector(),
           IconButton(
             onPressed: () => context.read<AuthController>().logout(),
             icon: const Icon(Icons.logout),

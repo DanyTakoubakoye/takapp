@@ -14,6 +14,7 @@ import 'package:takapp/vues/shared/create_stock_request_page.dart';
 import 'package:takapp/vues/shared/stock_out_page.dart';
 import 'package:takapp/vues/shared/store_request_history_page.dart';
 import 'package:takapp/vues/shared/stock_movement_history_page.dart';
+import 'package:takapp/core/l10n/language_selector.dart';
 import 'package:takapp/services/notification_web_helper_stub.dart'
     if (dart.library.html) 'package:takapp/services/notification_web_helper.dart';
 
@@ -195,6 +196,7 @@ class _BarHomePageState extends State<BarHomePage> {
           },
         ),
         actions: [
+          const LanguageSelector(),
           IconButton(
             onPressed: () => context.read<AuthController>().logout(),
             icon: const Icon(Icons.logout),

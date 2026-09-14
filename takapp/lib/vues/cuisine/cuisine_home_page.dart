@@ -16,6 +16,7 @@ import 'package:takapp/vues/shared/store_request_history_page.dart';
 import 'package:takapp/vues/shared/stock_movement_history_page.dart';
 import 'package:takapp/vues/cuisine/stock_item_form_page.dart';
 import 'package:takapp/vues/cuisine/menu_item_ingredients_form_page.dart';
+import 'package:takapp/core/l10n/language_selector.dart';
 import 'package:takapp/services/notification_web_helper_stub.dart'
     if (dart.library.html) 'package:takapp/services/notification_web_helper.dart';
 
@@ -205,6 +206,7 @@ class _CuisineHomePageState extends State<CuisineHomePage> {
           },
         ),
         actions: [
+          const LanguageSelector(),
           IconButton(
             onPressed: () => context.read<AuthController>().logout(),
             icon: const Icon(Icons.logout),
