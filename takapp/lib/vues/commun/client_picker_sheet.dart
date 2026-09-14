@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:takapp/l10n/app_localizations.dart';
+
 import 'package:takapp/modeles/client_model.dart';
 import 'package:takapp/services/client_service.dart';
 
@@ -74,6 +76,8 @@ class _ClientPickerSheetState extends State<ClientPickerSheet> {
 
   @override
   Widget build(BuildContext sheetContext) {
+    final l10n = AppLocalizations.of(sheetContext);
+
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
@@ -84,7 +88,7 @@ class _ClientPickerSheetState extends State<ClientPickerSheet> {
           children: [
             const SizedBox(height: 14),
             Text(
-              'Choisir un client',
+              l10n.chooseClient,
               style: Theme.of(
                 sheetContext,
               ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -94,11 +98,11 @@ class _ClientPickerSheetState extends State<ClientPickerSheet> {
               child: TextField(
                 controller: _searchController,
                 autofocus: true,
-                decoration: const InputDecoration(
-                  labelText: 'Rechercher',
-                  hintText: 'Nom ou téléphone',
-                  prefixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.searchLabel,
+                  hintText: l10n.searchNameOrPhoneHint,
+                  prefixIcon: const Icon(Icons.search),
+                  border: const OutlineInputBorder(),
                 ),
                 onChanged: (value) => setState(() => _query = value),
               ),
@@ -113,19 +117,20 @@ class _ClientPickerSheetState extends State<ClientPickerSheet> {
 
                   if (snapshot.hasError) {
                     return Center(
-                      child: SelectableText('Erreur : ${snapshot.error}'),
+                      child: SelectableText(
+                        l10n.commonError('${snapshot.error}'),
+                      ),
                     );
                   }
 
                   final clients = snapshot.data ?? [];
 
                   if (clients.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: Padding(
-                        padding: EdgeInsets.all(24),
+                        padding: const EdgeInsets.all(24),
                         child: Text(
-                          'Aucune fiche client.\n'
-                          'La commande peut être envoyée sans client.',
+                          l10n.noClientRecordOrderless,
                           textAlign: TextAlign.center,
                         ),
                       ),
@@ -135,11 +140,11 @@ class _ClientPickerSheetState extends State<ClientPickerSheet> {
                   final filtered = _filter(clients);
 
                   if (filtered.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: Padding(
-                        padding: EdgeInsets.all(24),
+                        padding: const EdgeInsets.all(24),
                         child: Text(
-                          'Aucun client ne correspond à cette recherche.',
+                          l10n.noClientMatchesSearch,
                           textAlign: TextAlign.center,
                         ),
                       ),

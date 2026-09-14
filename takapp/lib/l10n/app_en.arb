@@ -2219,11 +2219,136 @@
   "registryImportExampleRows": "Rice | Cereals | bag | restaurant\nCoke | Drinks | bottle | Bar",
   "registryImportHint": "The category must exist in the list. The store: Hotel, Restaurant or Bar.",
   "hintItemNameExamples": "E.g. Rice, Oil, Sugar",
-  "errItemNameRequired": "Please enter the item name.",
   "labelStoreField": "Store",
   "hintUnitExamplesLong": "E.g. g, cl, bottle, sachet, piece",
   "errUnitRequired": "Please enter the unit.",
   "savedItemsTitle": "Saved items",
   "noItemRecordedYet": "No item recorded yet.",
-  "startCreatingItemsHint": "Start by creating items such as rice, oil, sugar, mineral water, detergent, etc."
+  "startCreatingItemsHint": "Start by creating items such as rice, oil, sugar, mineral water, detergent, etc.",
+
+  "noClientRecordOrderless": "No client record.\nThe order can be sent without a client.",
+  "noClientMatchesSearch": "No client matches this search.",
+  "accessDeniedTitle": "Access denied",
+  "unauthorizedMessage": "Your role is not recognized, your account is not linked to an establishment, or you do not have access to this module.",
+
+  "orderStatusSent": "Sent",
+  "orderStatusPartiallyCancelled": "Partially cancelled",
+  "orderStatusCancelled": "Cancelled",
+  "orderStatusStockError": "Stock error",
+  "datesNotProvided": "Dates not provided",
+  "departureOnDate": "Departure on {date}",
+  "@departureOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "arrivalOnDate": "Arrival on {date}",
+  "@arrivalOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "clientHistoryTitle": "History \u00b7 {name}",
+  "@clientHistoryTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "staysSectionTitle": "Stays",
+  "noStayForClient": "No stay recorded for this client.",
+  "noOrderForClient": "No order linked to this client.",
+  "stayWordSingular": "stay",
+  "stayWordPlural": "stays",
+  "totalSpentExcludingCancellations": "Total spent (excluding cancellations)",
+
+  "barRestaurantConsumptionsTitle": "Bar/restaurant consumptions",
+
+  "noEstablishmentAvailable": "No establishment available.",
+  "adminCreatedSuccess": "Administrator created successfully.",
+  "errAdminCreationFailed": "Administrator creation error: {error}",
+  "@errAdminCreationFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "createEstablishmentTitle": "Create an establishment",
+  "editEstablishmentTitle": "Edit establishment",
+  "establishmentCreatedSuccess": "Establishment created successfully.",
+  "errEstablishmentCreationFailed": "Establishment creation error: {error}",
+  "@errEstablishmentCreationFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "establishmentUpdatedSuccess": "Establishment updated successfully.",
+  "errEstablishmentUpdateFailed": "Establishment update error: {error}",
+  "@errEstablishmentUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "saasAdministrationTitle": "SaaS administration",
+  "actionCreateAdmin": "Create administrator",
+  "actionCreateEstablishment": "Create establishment",
+  "noEstablishmentRecorded": "No establishment recorded.",
+  "establishmentInformation": "Establishment information",
+  "labelEstablishmentName": "Establishment name",
+  "labelIfu": "IFU",
+  "labelCity": "City",
+  "labelCountry": "Country",
+  "labelEstablishmentType": "Establishment type",
+  "typeHotelBarRestaurant": "Hotel + Bar + Restaurant",
+  "labelPlan": "Plan",
+  "establishmentStatusActive": "Active",
+  "establishmentStatusSuspended": "Suspended",
+  "establishmentStatusTrial": "Trial",
+  "enabledModules": "Enabled modules",
+  "firstEstablishmentAdmin": "First establishment administrator",
+  "labelAdminName": "Administrator name",
+  "labelAdminEmail": "Administrator email",
+  "labelTemporaryPassword": "Temporary password",
+  "hintDefaultTemporaryPassword": "Temp@123456 by default",
+  "globalConsoleTitle": "Takapp SaaS global console",
+  "globalConsoleSubtitle": "Create establishments, enable modules, manage plans and initialize administrators.",
+  "unnamedEstablishment": "Unnamed establishment",
+  "idLine": "ID: {id}",
+  "@idLine": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "ifuLine": "IFU: {ifu}",
+  "@ifuLine": {
+    "placeholders": {
+      "ifu": {
+        "type": "String"
+      }
+    }
+  },
+  "planChipLabel": "Plan {plan}",
+  "@planChipLabel": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "createEstablishmentAdminTitle": "Create an establishment administrator",
+  "labelEstablishment": "Establishment",
+
+  "noStatus": "No status"
 }

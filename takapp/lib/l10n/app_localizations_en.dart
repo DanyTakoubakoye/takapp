@@ -3364,4 +3364,203 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get startCreatingItemsHint =>
       'Start by creating items such as rice, oil, sugar, mineral water, detergent, etc.';
+
+  @override
+  String get noClientRecordOrderless =>
+      'No client record.\nThe order can be sent without a client.';
+
+  @override
+  String get noClientMatchesSearch => 'No client matches this search.';
+
+  @override
+  String get accessDeniedTitle => 'Access denied';
+
+  @override
+  String get unauthorizedMessage =>
+      'Your role is not recognized, your account is not linked to an establishment, or you do not have access to this module.';
+
+  @override
+  String get orderStatusSent => 'Sent';
+
+  @override
+  String get orderStatusPartiallyCancelled => 'Partially cancelled';
+
+  @override
+  String get orderStatusCancelled => 'Cancelled';
+
+  @override
+  String get orderStatusStockError => 'Stock error';
+
+  @override
+  String get datesNotProvided => 'Dates not provided';
+
+  @override
+  String departureOnDate(String date) {
+    return 'Departure on $date';
+  }
+
+  @override
+  String arrivalOnDate(String date) {
+    return 'Arrival on $date';
+  }
+
+  @override
+  String clientHistoryTitle(String name) {
+    return 'History · $name';
+  }
+
+  @override
+  String get staysSectionTitle => 'Stays';
+
+  @override
+  String get noStayForClient => 'No stay recorded for this client.';
+
+  @override
+  String get noOrderForClient => 'No order linked to this client.';
+
+  @override
+  String get stayWordSingular => 'stay';
+
+  @override
+  String get stayWordPlural => 'stays';
+
+  @override
+  String get totalSpentExcludingCancellations =>
+      'Total spent (excluding cancellations)';
+
+  @override
+  String get barRestaurantConsumptionsTitle => 'Bar/restaurant consumptions';
+
+  @override
+  String get noEstablishmentAvailable => 'No establishment available.';
+
+  @override
+  String get adminCreatedSuccess => 'Administrator created successfully.';
+
+  @override
+  String errAdminCreationFailed(String error) {
+    return 'Administrator creation error: $error';
+  }
+
+  @override
+  String get createEstablishmentTitle => 'Create an establishment';
+
+  @override
+  String get editEstablishmentTitle => 'Edit establishment';
+
+  @override
+  String get establishmentCreatedSuccess =>
+      'Establishment created successfully.';
+
+  @override
+  String errEstablishmentCreationFailed(String error) {
+    return 'Establishment creation error: $error';
+  }
+
+  @override
+  String get establishmentUpdatedSuccess =>
+      'Establishment updated successfully.';
+
+  @override
+  String errEstablishmentUpdateFailed(String error) {
+    return 'Establishment update error: $error';
+  }
+
+  @override
+  String get saasAdministrationTitle => 'SaaS administration';
+
+  @override
+  String get actionCreateAdmin => 'Create administrator';
+
+  @override
+  String get actionCreateEstablishment => 'Create establishment';
+
+  @override
+  String get noEstablishmentRecorded => 'No establishment recorded.';
+
+  @override
+  String get establishmentInformation => 'Establishment information';
+
+  @override
+  String get labelEstablishmentName => 'Establishment name';
+
+  @override
+  String get labelIfu => 'IFU';
+
+  @override
+  String get labelCity => 'City';
+
+  @override
+  String get labelCountry => 'Country';
+
+  @override
+  String get labelEstablishmentType => 'Establishment type';
+
+  @override
+  String get typeHotelBarRestaurant => 'Hotel + Bar + Restaurant';
+
+  @override
+  String get labelPlan => 'Plan';
+
+  @override
+  String get establishmentStatusActive => 'Active';
+
+  @override
+  String get establishmentStatusSuspended => 'Suspended';
+
+  @override
+  String get establishmentStatusTrial => 'Trial';
+
+  @override
+  String get enabledModules => 'Enabled modules';
+
+  @override
+  String get firstEstablishmentAdmin => 'First establishment administrator';
+
+  @override
+  String get labelAdminName => 'Administrator name';
+
+  @override
+  String get labelAdminEmail => 'Administrator email';
+
+  @override
+  String get labelTemporaryPassword => 'Temporary password';
+
+  @override
+  String get hintDefaultTemporaryPassword => 'Temp@123456 by default';
+
+  @override
+  String get globalConsoleTitle => 'Takapp SaaS global console';
+
+  @override
+  String get globalConsoleSubtitle =>
+      'Create establishments, enable modules, manage plans and initialize administrators.';
+
+  @override
+  String get unnamedEstablishment => 'Unnamed establishment';
+
+  @override
+  String idLine(String id) {
+    return 'ID: $id';
+  }
+
+  @override
+  String ifuLine(String ifu) {
+    return 'IFU: $ifu';
+  }
+
+  @override
+  String planChipLabel(String plan) {
+    return 'Plan $plan';
+  }
+
+  @override
+  String get createEstablishmentAdminTitle =>
+      'Create an establishment administrator';
+
+  @override
+  String get labelEstablishment => 'Establishment';
+
+  @override
+  String get noStatus => 'No status';
 }

@@ -4298,7 +4298,7 @@ abstract class AppLocalizations {
   /// No description provided for @errItemNameRequired.
   ///
   /// In fr, this message translates to:
-  /// **'Veuillez saisir le nom de l’article.'**
+  /// **'Veuillez renseigner le nom de l’article.'**
   String get errItemNameRequired;
 
   /// No description provided for @errCategoryRequired.
@@ -5968,6 +5968,354 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Commence par créer des articles comme riz, huile, sucre, eau minérale, détergent, etc.'**
   String get startCreatingItemsHint;
+
+  /// No description provided for @noClientRecordOrderless.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune fiche client.\nLa commande peut être envoyée sans client.'**
+  String get noClientRecordOrderless;
+
+  /// No description provided for @noClientMatchesSearch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun client ne correspond à cette recherche.'**
+  String get noClientMatchesSearch;
+
+  /// No description provided for @accessDeniedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accès refusé'**
+  String get accessDeniedTitle;
+
+  /// No description provided for @unauthorizedMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Votre rôle n’est pas reconnu, votre compte n’est pas rattaché à un établissement, ou vous n’avez pas accès à ce module.'**
+  String get unauthorizedMessage;
+
+  /// No description provided for @orderStatusSent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Envoyée'**
+  String get orderStatusSent;
+
+  /// No description provided for @orderStatusPartiallyCancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Partiellement annulée'**
+  String get orderStatusPartiallyCancelled;
+
+  /// No description provided for @orderStatusCancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annulée'**
+  String get orderStatusCancelled;
+
+  /// No description provided for @orderStatusStockError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur stock'**
+  String get orderStatusStockError;
+
+  /// No description provided for @datesNotProvided.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dates non renseignées'**
+  String get datesNotProvided;
+
+  /// No description provided for @departureOnDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Départ le {date}'**
+  String departureOnDate(String date);
+
+  /// No description provided for @arrivalOnDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Arrivée le {date}'**
+  String arrivalOnDate(String date);
+
+  /// No description provided for @clientHistoryTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Historique · {name}'**
+  String clientHistoryTitle(String name);
+
+  /// No description provided for @staysSectionTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Séjours'**
+  String get staysSectionTitle;
+
+  /// No description provided for @noStayForClient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun séjour enregistré pour ce client.'**
+  String get noStayForClient;
+
+  /// No description provided for @noOrderForClient.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune commande rattachée à ce client.'**
+  String get noOrderForClient;
+
+  /// No description provided for @stayWordSingular.
+  ///
+  /// In fr, this message translates to:
+  /// **'séjour'**
+  String get stayWordSingular;
+
+  /// No description provided for @stayWordPlural.
+  ///
+  /// In fr, this message translates to:
+  /// **'séjours'**
+  String get stayWordPlural;
+
+  /// No description provided for @totalSpentExcludingCancellations.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total dépensé (hors annulations)'**
+  String get totalSpentExcludingCancellations;
+
+  /// No description provided for @barRestaurantConsumptionsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Consommations bar/restaurant'**
+  String get barRestaurantConsumptionsTitle;
+
+  /// No description provided for @noEstablishmentAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun établissement disponible.'**
+  String get noEstablishmentAvailable;
+
+  /// No description provided for @adminCreatedSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Administrateur créé avec succès.'**
+  String get adminCreatedSuccess;
+
+  /// No description provided for @errAdminCreationFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur création administrateur : {error}'**
+  String errAdminCreationFailed(String error);
+
+  /// No description provided for @createEstablishmentTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer un établissement'**
+  String get createEstablishmentTitle;
+
+  /// No description provided for @editEstablishmentTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier l’établissement'**
+  String get editEstablishmentTitle;
+
+  /// No description provided for @establishmentCreatedSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Établissement créé avec succès.'**
+  String get establishmentCreatedSuccess;
+
+  /// No description provided for @errEstablishmentCreationFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur création établissement : {error}'**
+  String errEstablishmentCreationFailed(String error);
+
+  /// No description provided for @establishmentUpdatedSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Établissement modifié avec succès.'**
+  String get establishmentUpdatedSuccess;
+
+  /// No description provided for @errEstablishmentUpdateFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur modification établissement : {error}'**
+  String errEstablishmentUpdateFailed(String error);
+
+  /// No description provided for @saasAdministrationTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Administration SaaS'**
+  String get saasAdministrationTitle;
+
+  /// No description provided for @actionCreateAdmin.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer administrateur'**
+  String get actionCreateAdmin;
+
+  /// No description provided for @actionCreateEstablishment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer établissement'**
+  String get actionCreateEstablishment;
+
+  /// No description provided for @noEstablishmentRecorded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun établissement enregistré.'**
+  String get noEstablishmentRecorded;
+
+  /// No description provided for @establishmentInformation.
+  ///
+  /// In fr, this message translates to:
+  /// **'Informations établissement'**
+  String get establishmentInformation;
+
+  /// No description provided for @labelEstablishmentName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom de l’établissement'**
+  String get labelEstablishmentName;
+
+  /// No description provided for @labelIfu.
+  ///
+  /// In fr, this message translates to:
+  /// **'IFU'**
+  String get labelIfu;
+
+  /// No description provided for @labelCity.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ville'**
+  String get labelCity;
+
+  /// No description provided for @labelCountry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pays'**
+  String get labelCountry;
+
+  /// No description provided for @labelEstablishmentType.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type d’établissement'**
+  String get labelEstablishmentType;
+
+  /// No description provided for @typeHotelBarRestaurant.
+  ///
+  /// In fr, this message translates to:
+  /// **'Hôtel + Bar + Restaurant'**
+  String get typeHotelBarRestaurant;
+
+  /// No description provided for @labelPlan.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plan'**
+  String get labelPlan;
+
+  /// No description provided for @establishmentStatusActive.
+  ///
+  /// In fr, this message translates to:
+  /// **'Actif'**
+  String get establishmentStatusActive;
+
+  /// No description provided for @establishmentStatusSuspended.
+  ///
+  /// In fr, this message translates to:
+  /// **'Suspendu'**
+  String get establishmentStatusSuspended;
+
+  /// No description provided for @establishmentStatusTrial.
+  ///
+  /// In fr, this message translates to:
+  /// **'Essai'**
+  String get establishmentStatusTrial;
+
+  /// No description provided for @enabledModules.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modules activés'**
+  String get enabledModules;
+
+  /// No description provided for @firstEstablishmentAdmin.
+  ///
+  /// In fr, this message translates to:
+  /// **'Premier administrateur établissement'**
+  String get firstEstablishmentAdmin;
+
+  /// No description provided for @labelAdminName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom administrateur'**
+  String get labelAdminName;
+
+  /// No description provided for @labelAdminEmail.
+  ///
+  /// In fr, this message translates to:
+  /// **'Email administrateur'**
+  String get labelAdminEmail;
+
+  /// No description provided for @labelTemporaryPassword.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mot de passe temporaire'**
+  String get labelTemporaryPassword;
+
+  /// No description provided for @hintDefaultTemporaryPassword.
+  ///
+  /// In fr, this message translates to:
+  /// **'Temp@123456 par défaut'**
+  String get hintDefaultTemporaryPassword;
+
+  /// No description provided for @globalConsoleTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Console globale Takapp SaaS'**
+  String get globalConsoleTitle;
+
+  /// No description provided for @globalConsoleSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer les établissements, activer les modules, gérer les plans et initialiser les administrateurs.'**
+  String get globalConsoleSubtitle;
+
+  /// No description provided for @unnamedEstablishment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Établissement sans nom'**
+  String get unnamedEstablishment;
+
+  /// No description provided for @idLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'ID : {id}'**
+  String idLine(String id);
+
+  /// No description provided for @ifuLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'IFU : {ifu}'**
+  String ifuLine(String ifu);
+
+  /// No description provided for @planChipLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Plan {plan}'**
+  String planChipLabel(String plan);
+
+  /// No description provided for @createEstablishmentAdminTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer un administrateur d’établissement'**
+  String get createEstablishmentAdminTitle;
+
+  /// No description provided for @labelEstablishment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Établissement'**
+  String get labelEstablishment;
+
+  /// No description provided for @noStatus.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sans statut'**
+  String get noStatus;
 }
 
 class _AppLocalizationsDelegate

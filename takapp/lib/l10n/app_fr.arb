@@ -2225,11 +2225,136 @@
   "registryImportExampleRows": "Riz | Céréales | sac | restaurant\nCoca | Boissons | bouteille | Bar",
   "registryImportHint": "La catégorie doit exister dans la liste. Le magasin : Hôtel, Restaurant ou Bar.",
   "hintItemNameExamples": "Ex : Riz, Huile, Sucre",
-  "errItemNameRequired": "Veuillez saisir le nom de l’article.",
   "labelStoreField": "Magasin",
   "hintUnitExamplesLong": "Ex : g, cl, bouteille, sachet, pièce",
   "errUnitRequired": "Veuillez saisir l’unité.",
   "savedItemsTitle": "Articles enregistrés",
   "noItemRecordedYet": "Aucun article enregistré pour le moment.",
-  "startCreatingItemsHint": "Commence par créer des articles comme riz, huile, sucre, eau minérale, détergent, etc."
+  "startCreatingItemsHint": "Commence par créer des articles comme riz, huile, sucre, eau minérale, détergent, etc.",
+
+  "noClientRecordOrderless": "Aucune fiche client.\nLa commande peut être envoyée sans client.",
+  "noClientMatchesSearch": "Aucun client ne correspond à cette recherche.",
+  "accessDeniedTitle": "Accès refusé",
+  "unauthorizedMessage": "Votre rôle n’est pas reconnu, votre compte n’est pas rattaché à un établissement, ou vous n’avez pas accès à ce module.",
+
+  "orderStatusSent": "Envoyée",
+  "orderStatusPartiallyCancelled": "Partiellement annulée",
+  "orderStatusCancelled": "Annulée",
+  "orderStatusStockError": "Erreur stock",
+  "datesNotProvided": "Dates non renseignées",
+  "departureOnDate": "Départ le {date}",
+  "@departureOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "arrivalOnDate": "Arrivée le {date}",
+  "@arrivalOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "clientHistoryTitle": "Historique · {name}",
+  "@clientHistoryTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "staysSectionTitle": "Séjours",
+  "noStayForClient": "Aucun séjour enregistré pour ce client.",
+  "noOrderForClient": "Aucune commande rattachée à ce client.",
+  "stayWordSingular": "séjour",
+  "stayWordPlural": "séjours",
+  "totalSpentExcludingCancellations": "Total dépensé (hors annulations)",
+
+  "barRestaurantConsumptionsTitle": "Consommations bar/restaurant",
+
+  "noEstablishmentAvailable": "Aucun établissement disponible.",
+  "adminCreatedSuccess": "Administrateur créé avec succès.",
+  "errAdminCreationFailed": "Erreur création administrateur : {error}",
+  "@errAdminCreationFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "createEstablishmentTitle": "Créer un établissement",
+  "editEstablishmentTitle": "Modifier l’établissement",
+  "establishmentCreatedSuccess": "Établissement créé avec succès.",
+  "errEstablishmentCreationFailed": "Erreur création établissement : {error}",
+  "@errEstablishmentCreationFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "establishmentUpdatedSuccess": "Établissement modifié avec succès.",
+  "errEstablishmentUpdateFailed": "Erreur modification établissement : {error}",
+  "@errEstablishmentUpdateFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "saasAdministrationTitle": "Administration SaaS",
+  "actionCreateAdmin": "Créer administrateur",
+  "actionCreateEstablishment": "Créer établissement",
+  "noEstablishmentRecorded": "Aucun établissement enregistré.",
+  "establishmentInformation": "Informations établissement",
+  "labelEstablishmentName": "Nom de l’établissement",
+  "labelIfu": "IFU",
+  "labelCity": "Ville",
+  "labelCountry": "Pays",
+  "labelEstablishmentType": "Type d’établissement",
+  "typeHotelBarRestaurant": "Hôtel + Bar + Restaurant",
+  "labelPlan": "Plan",
+  "establishmentStatusActive": "Actif",
+  "establishmentStatusSuspended": "Suspendu",
+  "establishmentStatusTrial": "Essai",
+  "enabledModules": "Modules activés",
+  "firstEstablishmentAdmin": "Premier administrateur établissement",
+  "labelAdminName": "Nom administrateur",
+  "labelAdminEmail": "Email administrateur",
+  "labelTemporaryPassword": "Mot de passe temporaire",
+  "hintDefaultTemporaryPassword": "Temp@123456 par défaut",
+  "globalConsoleTitle": "Console globale Takapp SaaS",
+  "globalConsoleSubtitle": "Créer les établissements, activer les modules, gérer les plans et initialiser les administrateurs.",
+  "unnamedEstablishment": "Établissement sans nom",
+  "idLine": "ID : {id}",
+  "@idLine": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "ifuLine": "IFU : {ifu}",
+  "@ifuLine": {
+    "placeholders": {
+      "ifu": {
+        "type": "String"
+      }
+    }
+  },
+  "planChipLabel": "Plan {plan}",
+  "@planChipLabel": {
+    "placeholders": {
+      "plan": {
+        "type": "String"
+      }
+    }
+  },
+  "createEstablishmentAdminTitle": "Créer un administrateur d’établissement",
+  "labelEstablishment": "Établissement",
+
+  "noStatus": "Sans statut"
 }

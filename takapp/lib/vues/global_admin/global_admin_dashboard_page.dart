@@ -3,6 +3,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 
 class GlobalAdminDashboardPage extends StatefulWidget {
   const GlobalAdminDashboardPage({super.key});
@@ -39,6 +40,7 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
     'fiscalisation',
   ];
   Future<void> _openCreateAdminDialog() async {
+    final l10n = AppLocalizations.of(context);
     final establishmentsSnapshot = await _firestore
         .collection('establishments')
         .get();
@@ -46,7 +48,7 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
     final establishments = establishmentsSnapshot.docs;
 
     if (establishments.isEmpty) {
-      _showSnack('Aucun établissement disponible.');
+      _showSnack(l10n.noEstablishmentAvailable);
       return;
     }
 
@@ -70,6 +72,8 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
     required String phone,
     required Map<String, dynamic> modules,
   }) async {
+    final l10n = AppLocalizations.of(context);
+
     try {
       await _functions.httpsCallable('createEstablishmentAdmin').call({
         'email': email,
@@ -84,9 +88,9 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
       if (!mounted) return;
 
       Navigator.pop(context);
-      _showSnack('Administrateur créé avec succès.');
+      _showSnack(l10n.adminCreatedSuccess);
     } catch (e) {
-      _showSnack('Erreur création administrateur : $e');
+      _showSnack(l10n.errAdminCreationFailed('$e'));
     }
   }
 
@@ -105,6 +109,7 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
   }
 
   Future<void> _openCreateDialog() async {
+    final l10n = AppLocalizations.of(context);
     final moduleKeys = await _loadModuleKeys();
 
     if (!mounted) return;
@@ -112,7 +117,7 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
     await showDialog<void>(
       context: context,
       builder: (_) => _EstablishmentFormDialog(
-        title: 'Créer un établissement',
+        title: l10n.createEstablishmentTitle,
         moduleKeys: moduleKeys,
         onSubmit: _createEstablishment,
       ),
@@ -123,6 +128,7 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
     required String establishmentId,
     required Map<String, dynamic> data,
   }) async {
+    final l10n = AppLocalizations.of(context);
     final moduleKeys = await _loadModuleKeys();
 
     if (!mounted) return;
@@ -130,7 +136,7 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
     await showDialog<void>(
       context: context,
       builder: (_) => _EstablishmentFormDialog(
-        title: 'Modifier l’établissement',
+        title: l10n.editEstablishmentTitle,
         moduleKeys: moduleKeys,
         initialData: data,
         onSubmit: (payload, adminPayload) async {
@@ -147,6 +153,8 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
     Map<String, dynamic> payload,
     Map<String, dynamic>? adminPayload,
   ) async {
+    final l10n = AppLocalizations.of(context);
+
     setState(() => isSaving = true);
 
     try {
@@ -172,9 +180,9 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
       if (!mounted) return;
 
       Navigator.pop(context);
-      _showSnack('Établissement créé avec succès.');
+      _showSnack(l10n.establishmentCreatedSuccess);
     } catch (e) {
-      _showSnack('Erreur création établissement : $e');
+      _showSnack(l10n.errEstablishmentCreationFailed('$e'));
     } finally {
       if (mounted) setState(() => isSaving = false);
     }
@@ -184,6 +192,8 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
     required String establishmentId,
     required Map<String, dynamic> payload,
   }) async {
+    final l10n = AppLocalizations.of(context);
+
     setState(() => isSaving = true);
 
     try {
@@ -195,9 +205,9 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
       if (!mounted) return;
 
       Navigator.pop(context);
-      _showSnack('Établissement modifié avec succès.');
+      _showSnack(l10n.establishmentUpdatedSuccess);
     } catch (e) {
-      _showSnack('Erreur modification établissement : $e');
+      _showSnack(l10n.errEstablishmentUpdateFailed('$e'));
     } finally {
       if (mounted) setState(() => isSaving = false);
     }
@@ -223,11 +233,12 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isSmall = MediaQuery.of(context).size.width < 900;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Administration SaaS'),
+        title: Text(l10n.saasAdministrationTitle),
         actions: [
           IconButton(
             onPressed: () => context.read<AuthController>().logout(),
@@ -243,14 +254,14 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
             heroTag: 'create_admin',
             onPressed: _openCreateAdminDialog,
             icon: const Icon(Icons.person_add_alt_1),
-            label: const Text('Créer administrateur'),
+            label: Text(l10n.actionCreateAdmin),
           ),
           const SizedBox(height: 12),
           FloatingActionButton.extended(
             heroTag: 'create_establishment',
             onPressed: _openCreateDialog,
             icon: const Icon(Icons.add_business),
-            label: const Text('Créer établissement'),
+            label: Text(l10n.actionCreateEstablishment),
           ),
         ],
       ),
@@ -270,7 +281,9 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text('Erreur : ${snapshot.error}'));
+                    return Center(
+                      child: Text(l10n.commonError('${snapshot.error}')),
+                    );
                   }
 
                   final docs = snapshot.data?.docs ?? [];
@@ -282,9 +295,7 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
                   });
 
                   if (docs.isEmpty) {
-                    return const Center(
-                      child: Text('Aucun établissement enregistré.'),
-                    );
+                    return Center(child: Text(l10n.noEstablishmentRecorded));
                   }
 
                   return GridView.builder(
@@ -460,6 +471,8 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return AlertDialog(
       insetPadding: const EdgeInsets.all(16),
       title: Text(widget.title),
@@ -468,17 +481,17 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              _sectionTitle('Informations établissement'),
+              _sectionTitle(l10n.establishmentInformation),
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nom de l’établissement',
+                decoration: InputDecoration(
+                  labelText: l10n.labelEstablishmentName,
                 ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: ifuController,
-                decoration: const InputDecoration(labelText: 'IFU'),
+                decoration: InputDecoration(labelText: l10n.labelIfu),
               ),
               const SizedBox(height: 12),
               Row(
@@ -486,14 +499,14 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
                   Expanded(
                     child: TextField(
                       controller: cityController,
-                      decoration: const InputDecoration(labelText: 'Ville'),
+                      decoration: InputDecoration(labelText: l10n.labelCity),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: TextField(
                       controller: countryController,
-                      decoration: const InputDecoration(labelText: 'Pays'),
+                      decoration: InputDecoration(labelText: l10n.labelCountry),
                     ),
                   ),
                 ],
@@ -501,20 +514,26 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 initialValue: selectedType,
-                decoration: const InputDecoration(
-                  labelText: 'Type d’établissement',
+                decoration: InputDecoration(
+                  labelText: l10n.labelEstablishmentType,
                 ),
-                items: const [
+                items: [
                   DropdownMenuItem(
                     value: 'hotel_bar_restaurant',
-                    child: Text('Hôtel + Bar + Restaurant'),
+                    child: Text(l10n.typeHotelBarRestaurant),
                   ),
-                  DropdownMenuItem(value: 'hotel', child: Text('Hôtel')),
+                  DropdownMenuItem(
+                    value: 'hotel',
+                    child: Text(l10n.storeNameHotel),
+                  ),
                   DropdownMenuItem(
                     value: 'restaurant',
-                    child: Text('Restaurant'),
+                    child: Text(l10n.storeNameRestaurant),
                   ),
-                  DropdownMenuItem(value: 'bar', child: Text('Bar')),
+                  DropdownMenuItem(
+                    value: 'bar',
+                    child: Text(l10n.storeNameBar),
+                  ),
                 ],
                 onChanged: (value) {
                   if (value == null) return;
@@ -524,8 +543,8 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 initialValue: selectedPlan,
-                decoration: const InputDecoration(labelText: 'Plan'),
-                items: const [
+                decoration: InputDecoration(labelText: l10n.labelPlan),
+                items: [
                   DropdownMenuItem(value: 'starter', child: Text('Starter')),
                   DropdownMenuItem(value: 'standard', child: Text('Standard')),
                   DropdownMenuItem(value: 'premium', child: Text('Premium')),
@@ -542,11 +561,20 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 initialValue: selectedStatus,
-                decoration: const InputDecoration(labelText: 'Statut'),
-                items: const [
-                  DropdownMenuItem(value: 'active', child: Text('Actif')),
-                  DropdownMenuItem(value: 'suspended', child: Text('Suspendu')),
-                  DropdownMenuItem(value: 'trial', child: Text('Essai')),
+                decoration: InputDecoration(labelText: l10n.labelStatus),
+                items: [
+                  DropdownMenuItem(
+                    value: 'active',
+                    child: Text(l10n.establishmentStatusActive),
+                  ),
+                  DropdownMenuItem(
+                    value: 'suspended',
+                    child: Text(l10n.establishmentStatusSuspended),
+                  ),
+                  DropdownMenuItem(
+                    value: 'trial',
+                    child: Text(l10n.establishmentStatusTrial),
+                  ),
                 ],
                 onChanged: (value) {
                   if (value == null) return;
@@ -554,7 +582,7 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
                 },
               ),
               const SizedBox(height: 18),
-              _sectionTitle('Modules activés'),
+              _sectionTitle(l10n.enabledModules),
               Wrap(
                 spacing: 10,
                 runSpacing: 8,
@@ -571,27 +599,27 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
               ),
               if (!isEdit) ...[
                 const SizedBox(height: 18),
-                _sectionTitle('Premier administrateur établissement'),
+                _sectionTitle(l10n.firstEstablishmentAdmin),
                 TextField(
                   controller: adminNameController,
-                  decoration: const InputDecoration(
-                    labelText: 'Nom administrateur',
+                  decoration: InputDecoration(
+                    labelText: l10n.labelAdminName,
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: adminEmailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email administrateur',
+                  decoration: InputDecoration(
+                    labelText: l10n.labelAdminEmail,
                   ),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: adminPasswordController,
                   obscureText: true,
-                  decoration: const InputDecoration(
-                    labelText: 'Mot de passe temporaire',
-                    hintText: 'Temp@123456 par défaut',
+                  decoration: InputDecoration(
+                    labelText: l10n.labelTemporaryPassword,
+                    hintText: l10n.hintDefaultTemporaryPassword,
                   ),
                 ),
               ],
@@ -602,7 +630,7 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
       actions: [
         TextButton(
           onPressed: isSaving ? null : () => Navigator.pop(context),
-          child: const Text('Annuler'),
+          child: Text(l10n.commonCancel),
         ),
         ElevatedButton.icon(
           onPressed: isSaving ? null : _submit,
@@ -613,7 +641,7 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : Icon(isEdit ? Icons.save : Icons.add_business),
-          label: Text(isEdit ? 'Enregistrer' : 'Créer'),
+          label: Text(isEdit ? l10n.actionSave : l10n.actionCreate),
         ),
       ],
     );
@@ -640,34 +668,36 @@ class _HeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       color: Colors.indigo,
       child: Padding(
         padding: EdgeInsets.all(isSmall ? 16 : 22),
-        child: const Row(
+        child: Row(
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               radius: 28,
               backgroundColor: Colors.white,
               child: Icon(Icons.admin_panel_settings, color: Colors.indigo),
             ),
-            SizedBox(width: 14),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Console globale Takapp SaaS',
-                    style: TextStyle(
+                    l10n.globalConsoleTitle,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    'Créer les établissements, activer les modules, gérer les plans et initialiser les administrateurs.',
-                    style: TextStyle(color: Colors.white70),
+                    l10n.globalConsoleSubtitle,
+                    style: const TextStyle(color: Colors.white70),
                   ),
                 ],
               ),
@@ -694,6 +724,7 @@ class _EstablishmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final name = (data['name'] ?? '').toString();
     final city = (data['city'] ?? '').toString();
     final country = (data['country'] ?? '').toString();
@@ -716,7 +747,7 @@ class _EstablishmentCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    name.isEmpty ? 'Établissement sans nom' : name,
+                    name.isEmpty ? l10n.unnamedEstablishment : name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -728,28 +759,28 @@ class _EstablishmentCard extends StatelessWidget {
                 IconButton(
                   onPressed: onEdit,
                   icon: const Icon(Icons.edit_outlined),
-                  tooltip: 'Modifier',
+                  tooltip: l10n.actionEdit,
                 ),
               ],
             ),
             const SizedBox(height: 6),
             Text('$city, $country'),
             const SizedBox(height: 6),
-            Text('ID : $establishmentId'),
-            Text('IFU : ${ifu.isEmpty ? "-" : ifu}'),
-            Text('Type : $type'),
+            Text(l10n.idLine(establishmentId)),
+            Text(l10n.ifuLine(ifu.isEmpty ? '-' : ifu)),
+            Text(l10n.typeLine(type)),
             const SizedBox(height: 8),
             Wrap(
               spacing: 6,
               runSpacing: 6,
               children: [
                 Chip(
-                  label: Text(status.isEmpty ? 'Sans statut' : status),
+                  label: Text(status.isEmpty ? l10n.noStatus : status),
                   backgroundColor: isActive
                       ? Colors.green.withValues(alpha: 0.12)
                       : Colors.red.withValues(alpha: 0.12),
                 ),
-                Chip(label: Text('Plan ${plan.isEmpty ? "-" : plan}')),
+                Chip(label: Text(l10n.planChipLabel(plan.isEmpty ? '-' : plan))),
                 ...modules.entries
                     .where((entry) => entry.value == true)
                     .map((entry) => Chip(label: Text(entry.key))),
@@ -865,8 +896,10 @@ class _CreateEstablishmentAdminDialogState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return AlertDialog(
-      title: const Text('Créer un administrateur d’établissement'),
+      title: Text(l10n.createEstablishmentAdminTitle),
       content: SizedBox(
         width: 600,
         child: SingleChildScrollView(
@@ -874,7 +907,9 @@ class _CreateEstablishmentAdminDialogState
             children: [
               DropdownButtonFormField<String>(
                 initialValue: selectedEstablishmentId,
-                decoration: const InputDecoration(labelText: 'Établissement'),
+                decoration: InputDecoration(
+                  labelText: l10n.labelEstablishment,
+                ),
                 items: widget.establishments.map((doc) {
                   final data = doc.data();
                   final name = (data['name'] ?? doc.id).toString();
@@ -893,27 +928,25 @@ class _CreateEstablishmentAdminDialogState
               const SizedBox(height: 12),
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nom administrateur',
-                ),
+                decoration: InputDecoration(labelText: l10n.labelAdminName),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: InputDecoration(labelText: l10n.labelEmail),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: phoneController,
-                decoration: const InputDecoration(labelText: 'Téléphone'),
+                decoration: InputDecoration(labelText: l10n.labelPhone),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: passwordController,
                 obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Mot de passe temporaire',
-                  hintText: 'Temp@123456 par défaut',
+                decoration: InputDecoration(
+                  labelText: l10n.labelTemporaryPassword,
+                  hintText: l10n.hintDefaultTemporaryPassword,
                 ),
               ),
             ],
@@ -923,7 +956,7 @@ class _CreateEstablishmentAdminDialogState
       actions: [
         TextButton(
           onPressed: isSaving ? null : () => Navigator.pop(context),
-          child: const Text('Annuler'),
+          child: Text(l10n.commonCancel),
         ),
         ElevatedButton.icon(
           onPressed: isSaving ? null : _submit,
@@ -934,7 +967,7 @@ class _CreateEstablishmentAdminDialogState
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.person_add_alt_1),
-          label: const Text('Créer'),
+          label: Text(l10n.actionCreate),
         ),
       ],
     );

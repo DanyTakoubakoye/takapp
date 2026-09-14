@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 
 import 'package:takapp/modeles/client_model.dart';
@@ -58,16 +60,16 @@ class _ClientHistoryPageState extends State<ClientHistoryPage> {
     );
   }
 
-  String _statusLabel(String status) {
+  String _statusLabel(String status, AppLocalizations l10n) {
     switch (status) {
       case 'confirmed':
-        return 'Confirmée';
+        return l10n.reservationStatusConfirmed;
       case 'checked_in':
-        return 'Arrivée';
+        return l10n.reservationStatusCheckedIn;
       case 'checked_out':
-        return 'Partie';
+        return l10n.reservationStatusCheckedOut;
       case 'cancelled':
-        return 'Annulée';
+        return l10n.reservationStatusCancelled;
       default:
         return status;
     }
@@ -88,31 +90,31 @@ class _ClientHistoryPageState extends State<ClientHistoryPage> {
     }
   }
 
-  String _orderTypeLabel(String clientType) {
+  String _orderTypeLabel(String clientType, AppLocalizations l10n) {
     switch (clientType) {
       case 'bar':
-        return 'Bar';
+        return l10n.storeNameBar;
       case 'restaurant':
-        return 'Restaurant';
+        return l10n.storeNameRestaurant;
       case 'hotel':
-        return 'Hôtel';
+        return l10n.storeNameHotel;
       default:
-        return clientType.isEmpty ? 'Commande' : clientType;
+        return clientType.isEmpty ? l10n.labelOrder : clientType;
     }
   }
 
-  String _orderStatusLabel(String status) {
+  String _orderStatusLabel(String status, AppLocalizations l10n) {
     switch (status) {
       case 'sent':
-        return 'Envoyée';
+        return l10n.orderStatusSent;
       case 'served':
-        return 'Servie';
+        return l10n.statusServed;
       case 'partially_cancelled':
-        return 'Partiellement annulée';
+        return l10n.orderStatusPartiallyCancelled;
       case 'cancelled':
-        return 'Annulée';
+        return l10n.orderStatusCancelled;
       case 'stock_error':
-        return 'Erreur stock';
+        return l10n.orderStatusStockError;
       default:
         return status;
     }
@@ -135,27 +137,29 @@ class _ClientHistoryPageState extends State<ClientHistoryPage> {
     }
   }
 
-  String _dates(ReservationModel resa) {
+  String _dates(ReservationModel resa, AppLocalizations l10n) {
     final checkIn = resa.checkInDate;
     final checkOut = resa.checkOutDate;
 
-    if (checkIn == null && checkOut == null) return 'Dates non renseignées';
-    if (checkIn == null) return 'Départ le ${_df.format(checkOut!)}';
-    if (checkOut == null) return 'Arrivée le ${_df.format(checkIn)}';
+    if (checkIn == null && checkOut == null) return l10n.datesNotProvided;
+    if (checkIn == null) return l10n.departureOnDate(_df.format(checkOut!));
+    if (checkOut == null) return l10n.arrivalOnDate(_df.format(checkIn));
 
     return '${_df.format(checkIn)} → ${_df.format(checkOut)}';
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('Historique · ${widget.client.name}')),
+      appBar: AppBar(title: Text(l10n.clientHistoryTitle(widget.client.name))),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 24),
         children: [_buildStaysSection(), _buildOrdersSection()],
@@ -168,6 +172,8 @@ class _ClientHistoryPageState extends State<ClientHistoryPage> {
   /// =========================
 
   Widget _buildStaysSection() {
+    final l10n = AppLocalizations.of(context);
+
     return FutureBuilder<List<ReservationModel>>(
       future: _future,
       builder: (context, snapshot) {
@@ -181,7 +187,9 @@ class _ClientHistoryPageState extends State<ClientHistoryPage> {
         if (snapshot.hasError) {
           return Padding(
             padding: const EdgeInsets.all(24),
-            child: Center(child: SelectableText('Erreur : ${snapshot.error}')),
+            child: Center(
+              child: SelectableText(l10n.commonError('${snapshot.error}')),
+            ),
           );
         }
 
@@ -198,11 +206,11 @@ class _ClientHistoryPageState extends State<ClientHistoryPage> {
               stayCount: reservations.length,
               totalSpent: totalSpent,
             ),
-            const _SectionTitle('Séjours'),
+            _SectionTitle(l10n.staysSectionTitle),
             if (reservations.isEmpty)
-              const Padding(
-                padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
-                child: Text('Aucun séjour enregistré pour ce client.'),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: Text(l10n.noStayForClient),
               )
             else
               ListView.separated(
@@ -225,7 +233,7 @@ class _ClientHistoryPageState extends State<ClientHistoryPage> {
                         vertical: 8,
                       ),
                       title: Text(
-                        _dates(resa),
+                        _dates(resa, l10n),
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: Text(
@@ -243,7 +251,7 @@ class _ClientHistoryPageState extends State<ClientHistoryPage> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
-                          _statusLabel(resa.status),
+                          _statusLabel(resa.status, l10n),
                           style: TextStyle(
                             color: color,
                             fontWeight: FontWeight.bold,
@@ -266,6 +274,8 @@ class _ClientHistoryPageState extends State<ClientHistoryPage> {
   /// =========================
 
   Widget _buildOrdersSection() {
+    final l10n = AppLocalizations.of(context);
+
     return FutureBuilder<List<OrderModel>>(
       future: _ordersFuture,
       builder: (context, snapshot) {
@@ -279,7 +289,9 @@ class _ClientHistoryPageState extends State<ClientHistoryPage> {
         if (snapshot.hasError) {
           return Padding(
             padding: const EdgeInsets.all(24),
-            child: Center(child: SelectableText('Erreur : ${snapshot.error}')),
+            child: Center(
+              child: SelectableText(l10n.commonError('${snapshot.error}')),
+            ),
           );
         }
 
@@ -293,11 +305,11 @@ class _ClientHistoryPageState extends State<ClientHistoryPage> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _SectionTitle('Consommations bar/restaurant'),
+            _SectionTitle(l10n.barRestaurantConsumptionsTitle),
             if (orders.isEmpty)
-              const Padding(
-                padding: EdgeInsets.fromLTRB(16, 0, 16, 8),
-                child: Text('Aucune commande rattachée à ce client.'),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: Text(l10n.noOrderForClient),
               )
             else ...[
               Padding(
@@ -332,7 +344,7 @@ class _ClientHistoryPageState extends State<ClientHistoryPage> {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       subtitle: Text(
-                        '${_orderTypeLabel(order.clientType)}'
+                        '${_orderTypeLabel(order.clientType, l10n)}'
                         '\n${order.total.toStringAsFixed(0)} FCFA',
                       ),
                       isThreeLine: true,
@@ -346,7 +358,7 @@ class _ClientHistoryPageState extends State<ClientHistoryPage> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
-                          _orderStatusLabel(order.status),
+                          _orderStatusLabel(order.status, l10n),
                           style: TextStyle(
                             color: color,
                             fontWeight: FontWeight.bold,
@@ -399,6 +411,8 @@ class _ClientHistorySummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
       child: Card(
@@ -419,7 +433,7 @@ class _ClientHistorySummary extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      stayCount > 1 ? 'séjours' : 'séjour',
+                      stayCount > 1 ? l10n.stayWordPlural : l10n.stayWordSingular,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
@@ -436,7 +450,7 @@ class _ClientHistorySummary extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Total dépensé (hors annulations)',
+                      l10n.totalSpentExcludingCancellations,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
