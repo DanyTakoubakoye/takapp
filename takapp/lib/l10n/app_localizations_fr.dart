@@ -3982,4 +3982,58 @@ class AppLocalizationsFr extends AppLocalizations {
   String categorySubcategorySeparator(String parent, String child) {
     return '$parent › $child';
   }
+
+  @override
+  String get userCreatedSuccess => 'Utilisateur créé avec succès.';
+
+  @override
+  String errUserCreationFailed(String error) {
+    return 'Erreur création utilisateur : $error';
+  }
+
+  @override
+  String get errAmountsNotEquivalent => 'Montants non équivalents.';
+
+  @override
+  String get quitusGenerated => 'Quitus généré.';
+
+  @override
+  String establishmentOwnerTitle(String name) {
+    return '$name - Propriétaire';
+  }
+
+  @override
+  String get actionCreateUser => 'Créer utilisateur';
+
+  @override
+  String get createUserTitle => 'Créer un utilisateur';
+
+  @override
+  String get labelPeriod => 'Période';
+
+  @override
+  String get labelAccount => 'Compte';
+
+  @override
+  String get labelRole => 'Rôle';
+
+  @override
+  String get physicalBalance => 'Solde physique';
+
+  @override
+  String theoreticalBalanceAmount(String amount) {
+    return 'Solde théorique : $amount FCFA';
+  }
+
+  @override
+  String totalTheoreticalBalanceAmount(String amount) {
+    return 'Solde théorique total : $amount FCFA';
+  }
+
+  @override
+  String get errNameEmailPasswordRequired =>
+      'Nom, email et mot de passe temporaire obligatoires.';
+
+  @override
+  String get labelAction => 'Action';
 }

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/core/constants/app_roles.dart';
 import 'package:takapp/core/errors/app_error.dart';
 import 'package:takapp/core/errors/error_localizer.dart';
 import 'package:takapp/l10n/app_localizations.dart';
@@ -113,12 +114,13 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
   }
 
   Future<void> _openCreateUserDialog() async {
+    final l10n = AppLocalizations.of(context);
     final auth = context.read<AuthController>();
     final user = auth.currentUser;
 
     if (user == null || user.establishmentId.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Établissement introuvable.')),
+        SnackBar(content: Text(l10n.errEstablishmentNotFound)),
       );
       return;
     }
@@ -136,6 +138,8 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     required String phone,
     required String role,
   }) async {
+    final l10n = AppLocalizations.of(context);
+
     try {
       await _functions.httpsCallable('createTenantUser').call({
         'name': name,
@@ -150,13 +154,13 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
       Navigator.pop(context);
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Utilisateur créé avec succès.')),
+        SnackBar(content: Text(l10n.userCreatedSuccess)),
       );
     } catch (e) {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur création utilisateur : $e')),
+        SnackBar(content: Text(l10n.errUserCreationFailed('$e'))),
       );
     }
   }
@@ -259,7 +263,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
 
     if (theoretical != physical) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Montants non équivalents.')),
+        SnackBar(content: Text(l10n.errAmountsNotEquivalent)),
       );
 
       return;
@@ -297,11 +301,12 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
 
     ScaffoldMessenger.of(
       context,
-    ).showSnackBar(const SnackBar(content: Text('Quitus généré.')));
+    ).showSnackBar(SnackBar(content: Text(l10n.quitusGenerated)));
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
 
     final formatter = DateFormat('dd/MM/yyyy');
@@ -320,7 +325,11 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
       return Scaffold(
         body: Center(
           child: Text(
-            '${user.establishmentName.isNotEmpty == true ? user.establishmentName : 'TAKHOTEL'} - Propriétaire',
+            l10n.establishmentOwnerTitle(
+              user.establishmentName.isNotEmpty == true
+                  ? user.establishmentName
+                  : 'TAKHOTEL',
+            ),
           ),
         ),
       );
@@ -329,14 +338,18 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '${user.establishmentName.isNotEmpty == true ? user.establishmentName : 'TAKHOTEL'} - Propriétaire',
+          l10n.establishmentOwnerTitle(
+            user.establishmentName.isNotEmpty == true
+                ? user.establishmentName
+                : 'TAKHOTEL',
+          ),
         ),
         actions: [
           // Réception & Clients relèvent du module hôtel : masqués si
           // l'établissement n'est pas abonné à l'hôtel.
           if (auth.canAccessHotel)
             IconButton(
-              tooltip: 'Réception',
+              tooltip: l10n.receptionTitle,
               onPressed: () {
                 Navigator.push(
                   context,
@@ -372,7 +385,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _openCreateUserDialog,
         icon: const Icon(Icons.person_add_alt_1),
-        label: const Text('Créer utilisateur'),
+        label: Text(l10n.actionCreateUser),
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {
@@ -425,6 +438,8 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
     DateFormat formatter, {
     required bool isMobile,
   }) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -451,7 +466,10 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Période : ${formatter.format(startDate)} - ${formatter.format(endDate)}',
+                              l10n.periodLine(
+                              formatter.format(startDate),
+                              formatter.format(endDate),
+                            ),
                             ),
                           ],
                         ),
@@ -478,7 +496,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                       OutlinedButton.icon(
                         onPressed: _pickCustomPeriod,
                         icon: const Icon(Icons.date_range_outlined),
-                        label: const Text('Période'),
+                        label: Text(l10n.labelPeriod),
                       ),
                       OutlinedButton.icon(
                         onPressed: () {
@@ -492,7 +510,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                           );
                         },
                         icon: const Icon(Icons.account_balance_wallet_outlined),
-                        label: const Text('Soldes précédents'),
+                        label: Text(l10n.previousBalancesTitle),
                       ),
                     ],
                   ),
@@ -515,7 +533,10 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Période : ${formatter.format(startDate)} - ${formatter.format(endDate)}',
+                          l10n.periodLine(
+                            formatter.format(startDate),
+                            formatter.format(endDate),
+                          ),
                         ),
                       ],
                     ),
@@ -538,7 +559,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                   OutlinedButton.icon(
                     onPressed: _pickCustomPeriod,
                     icon: const Icon(Icons.date_range_outlined),
-                    label: const Text('Période'),
+                    label: Text(l10n.labelPeriod),
                   ),
                   const SizedBox(width: 8),
                   OutlinedButton.icon(
@@ -553,7 +574,7 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                       );
                     },
                     icon: const Icon(Icons.account_balance_wallet_outlined),
-                    label: const Text('Soldes précédents'),
+                    label: Text(l10n.previousBalancesTitle),
                   ),
                 ],
               ),
@@ -562,33 +583,35 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
   }
 
   Widget _buildDesktopBalancesView() {
+    final l10n = AppLocalizations.of(context);
+
     return SingleChildScrollView(
       child: Column(
         children: [
           Row(
-            children: const [
+            children: [
               Expanded(
                 child: Text(
-                  'Compte',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  l10n.labelAccount,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
               Expanded(
                 child: Text(
-                  'Solde théorique',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  l10n.theoreticalBalance,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
               Expanded(
                 child: Text(
-                  'Solde physique',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  l10n.physicalBalance,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
               Expanded(
                 child: Text(
-                  'Action',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  l10n.labelAction,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -693,6 +716,8 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
   }
 
   Widget _buildMobileBalancesView() {
+    final l10n = AppLocalizations.of(context);
+
     return ListView(
       children: [
         ...balancesByType.entries.map(
@@ -716,7 +741,9 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Solde théorique : ${entry.value.toStringAsFixed(0)} FCFA',
+                  l10n.theoreticalBalanceAmount(
+                    entry.value.toStringAsFixed(0),
+                  ),
                 ),
                 const SizedBox(height: 10),
                 TextField(
@@ -767,7 +794,9 @@ class _OwnerDashboardPageState extends State<OwnerDashboardPage> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Solde théorique total : ${totalTheoretical.toStringAsFixed(0)} FCFA',
+                l10n.totalTheoreticalBalanceAmount(
+                  totalTheoretical.toStringAsFixed(0),
+                ),
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 10),
@@ -834,15 +863,17 @@ class _CreateTenantUserDialogState extends State<_CreateTenantUserDialog> {
 
   String selectedRole = 'serveur';
 
-  final List<Map<String, String>> roles = const [
-    {'value': 'gerante', 'label': 'Gérante'},
-    {'value': 'comptable', 'label': 'Comptable'},
-    {'value': 'serveur', 'label': 'Serveur'},
-    {'value': 'barman', 'label': 'Barman'},
-    {'value': 'chef_cuisine', 'label': 'Chef cuisine'},
-    {'value': 'service_hygiene', 'label': 'Service hygiène'},
-    {'value': 'majordhomme', 'label': 'Majordhomme'},
-    {'value': 'receptionniste', 'label': 'Réceptionniste'},
+  /// Rôles proposés : seule la valeur technique est stockée, le libellé
+  /// affiché vient de [AppRoles.label].
+  final List<String> roles = const [
+    AppRoles.gerante,
+    AppRoles.comptable,
+    AppRoles.serveur,
+    AppRoles.barman,
+    AppRoles.chefCuisine,
+    AppRoles.hygiene,
+    AppRoles.majordhomme,
+    AppRoles.receptionniste,
   ];
 
   @override
@@ -855,6 +886,8 @@ class _CreateTenantUserDialogState extends State<_CreateTenantUserDialog> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
+
     final name = nameController.text.trim();
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
@@ -862,9 +895,7 @@ class _CreateTenantUserDialogState extends State<_CreateTenantUserDialog> {
 
     if (name.isEmpty || email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Nom, email et mot de passe temporaire obligatoires.'),
-        ),
+        SnackBar(content: Text(l10n.errNameEmailPasswordRequired)),
       );
       return;
     }
@@ -886,8 +917,10 @@ class _CreateTenantUserDialogState extends State<_CreateTenantUserDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return AlertDialog(
-      title: const Text('Créer un utilisateur'),
+      title: Text(l10n.createUserTitle),
       insetPadding: const EdgeInsets.all(16),
       content: SizedBox(
         width: 560,
@@ -908,7 +941,7 @@ class _CreateTenantUserDialogState extends State<_CreateTenantUserDialog> {
               TextField(
                 controller: phoneController,
                 keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(labelText: 'Téléphone'),
+                decoration: InputDecoration(labelText: l10n.labelPhone),
               ),
               const SizedBox(height: 12),
               TextField(
@@ -921,11 +954,11 @@ class _CreateTenantUserDialogState extends State<_CreateTenantUserDialog> {
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 initialValue: selectedRole,
-                decoration: const InputDecoration(labelText: 'Rôle'),
+                decoration: InputDecoration(labelText: l10n.labelRole),
                 items: roles.map((role) {
                   return DropdownMenuItem<String>(
-                    value: role['value'],
-                    child: Text(role['label']!),
+                    value: role,
+                    child: Text(AppRoles.label(l10n, role)),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -943,7 +976,7 @@ class _CreateTenantUserDialogState extends State<_CreateTenantUserDialog> {
       actions: [
         TextButton(
           onPressed: isSaving ? null : () => Navigator.pop(context),
-          child: const Text('Annuler'),
+          child: Text(l10n.commonCancel),
         ),
         ElevatedButton.icon(
           onPressed: isSaving ? null : _submit,
@@ -954,7 +987,7 @@ class _CreateTenantUserDialogState extends State<_CreateTenantUserDialog> {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.person_add_alt_1),
-          label: const Text('Créer'),
+          label: Text(l10n.actionCreate),
         ),
       ],
     );

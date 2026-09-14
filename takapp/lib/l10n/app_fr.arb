@@ -2676,5 +2676,51 @@
         "type": "String"
       }
     }
-  }
+  },
+
+  "userCreatedSuccess": "Utilisateur créé avec succès.",
+  "errUserCreationFailed": "Erreur création utilisateur : {error}",
+  "@errUserCreationFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errAmountsNotEquivalent": "Montants non équivalents.",
+  "quitusGenerated": "Quitus généré.",
+  "establishmentOwnerTitle": "{name} - Propriétaire",
+  "@establishmentOwnerTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCreateUser": "Créer utilisateur",
+  "createUserTitle": "Créer un utilisateur",
+  "labelPeriod": "Période",
+  "labelAccount": "Compte",
+  "labelRole": "Rôle",
+  "physicalBalance": "Solde physique",
+  "theoreticalBalanceAmount": "Solde théorique : {amount} FCFA",
+  "@theoreticalBalanceAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "totalTheoreticalBalanceAmount": "Solde théorique total : {amount} FCFA",
+  "@totalTheoreticalBalanceAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errNameEmailPasswordRequired": "Nom, email et mot de passe temporaire obligatoires.",
+
+  "labelAction": "Action"
 }

@@ -2670,5 +2670,51 @@
         "type": "String"
       }
     }
-  }
+  },
+
+  "userCreatedSuccess": "User created successfully.",
+  "errUserCreationFailed": "User creation error: {error}",
+  "@errUserCreationFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errAmountsNotEquivalent": "Amounts are not equivalent.",
+  "quitusGenerated": "Validation receipt generated.",
+  "establishmentOwnerTitle": "{name} - Owner",
+  "@establishmentOwnerTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "actionCreateUser": "Create user",
+  "createUserTitle": "Create a user",
+  "labelPeriod": "Period",
+  "labelAccount": "Account",
+  "labelRole": "Role",
+  "physicalBalance": "Physical balance",
+  "theoreticalBalanceAmount": "Theoretical balance: {amount} FCFA",
+  "@theoreticalBalanceAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "totalTheoreticalBalanceAmount": "Total theoretical balance: {amount} FCFA",
+  "@totalTheoreticalBalanceAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errNameEmailPasswordRequired": "Name, email and temporary password are required.",
+
+  "labelAction": "Action"
 }

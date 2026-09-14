@@ -6958,6 +6958,96 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'{parent} › {child}'**
   String categorySubcategorySeparator(String parent, String child);
+
+  /// No description provided for @userCreatedSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Utilisateur créé avec succès.'**
+  String get userCreatedSuccess;
+
+  /// No description provided for @errUserCreationFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur création utilisateur : {error}'**
+  String errUserCreationFailed(String error);
+
+  /// No description provided for @errAmountsNotEquivalent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montants non équivalents.'**
+  String get errAmountsNotEquivalent;
+
+  /// No description provided for @quitusGenerated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quitus généré.'**
+  String get quitusGenerated;
+
+  /// No description provided for @establishmentOwnerTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} - Propriétaire'**
+  String establishmentOwnerTitle(String name);
+
+  /// No description provided for @actionCreateUser.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer utilisateur'**
+  String get actionCreateUser;
+
+  /// No description provided for @createUserTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer un utilisateur'**
+  String get createUserTitle;
+
+  /// No description provided for @labelPeriod.
+  ///
+  /// In fr, this message translates to:
+  /// **'Période'**
+  String get labelPeriod;
+
+  /// No description provided for @labelAccount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Compte'**
+  String get labelAccount;
+
+  /// No description provided for @labelRole.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rôle'**
+  String get labelRole;
+
+  /// No description provided for @physicalBalance.
+  ///
+  /// In fr, this message translates to:
+  /// **'Solde physique'**
+  String get physicalBalance;
+
+  /// No description provided for @theoreticalBalanceAmount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Solde théorique : {amount} FCFA'**
+  String theoreticalBalanceAmount(String amount);
+
+  /// No description provided for @totalTheoreticalBalanceAmount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Solde théorique total : {amount} FCFA'**
+  String totalTheoreticalBalanceAmount(String amount);
+
+  /// No description provided for @errNameEmailPasswordRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom, email et mot de passe temporaire obligatoires.'**
+  String get errNameEmailPasswordRequired;
+
+  /// No description provided for @labelAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Action'**
+  String get labelAction;
 }
 
 class _AppLocalizationsDelegate
