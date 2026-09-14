@@ -3460,6 +3460,462 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Aucune demande trouvée.'**
   String get noRequestFound;
+
+  /// No description provided for @labelQuantity.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quantité'**
+  String get labelQuantity;
+
+  /// No description provided for @periodLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Période : {start} → {end}'**
+  String periodLine(String start, String end);
+
+  /// No description provided for @actionMarkPaid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Marquer payée'**
+  String get actionMarkPaid;
+
+  /// No description provided for @actionPrintNormalized.
+  ///
+  /// In fr, this message translates to:
+  /// **'Imprimer normalisée'**
+  String get actionPrintNormalized;
+
+  /// No description provided for @filterAllInvoices.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tous'**
+  String get filterAllInvoices;
+
+  /// No description provided for @filterPaid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Payées'**
+  String get filterPaid;
+
+  /// No description provided for @filterUnpaid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Non payées'**
+  String get filterUnpaid;
+
+  /// No description provided for @noInvoiceFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune facture trouvée.'**
+  String get noInvoiceFound;
+
+  /// No description provided for @searchClientOrRoom.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recherche client / chambre'**
+  String get searchClientOrRoom;
+
+  /// No description provided for @roomInvoicesListTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Liste des factures chambres'**
+  String get roomInvoicesListTitle;
+
+  /// No description provided for @errInvoiceDatesInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les dates de la facture sont invalides.'**
+  String get errInvoiceDatesInvalid;
+
+  /// No description provided for @errInvoiceNotFiscalizedYet.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette facture n’est pas encore fiscalisée.'**
+  String get errInvoiceNotFiscalizedYet;
+
+  /// No description provided for @errSetIfuFirst.
+  ///
+  /// In fr, this message translates to:
+  /// **'Renseignez d’abord l’IFU de l’établissement (console admin).'**
+  String get errSetIfuFirst;
+
+  /// No description provided for @errInvoiceAlreadyFiscalized.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cette facture est déjà fiscalisée.'**
+  String get errInvoiceAlreadyFiscalized;
+
+  /// No description provided for @managerWorkspaceSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Espace de supervision et validation'**
+  String get managerWorkspaceSubtitle;
+
+  /// No description provided for @moduleStocksTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stocks & Approvisionnements'**
+  String get moduleStocksTitle;
+
+  /// No description provided for @moduleStocksSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stocks, demandes, seuils, articles et approvisionnements'**
+  String get moduleStocksSubtitle;
+
+  /// No description provided for @actionStockRequests.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demandes stock'**
+  String get actionStockRequests;
+
+  /// No description provided for @lowStockTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stocks faibles'**
+  String get lowStockTitle;
+
+  /// No description provided for @actionSupplyRestaurant.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approvisionner Restaurant'**
+  String get actionSupplyRestaurant;
+
+  /// No description provided for @actionSupplyBar.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approvisionner Bar'**
+  String get actionSupplyBar;
+
+  /// No description provided for @actionSupplyHotel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approvisionner Hôtel'**
+  String get actionSupplyHotel;
+
+  /// No description provided for @directSupplyRestaurantTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approvisionnement direct - Restaurant'**
+  String get directSupplyRestaurantTitle;
+
+  /// No description provided for @directSupplyBarTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approvisionnement direct - Bar'**
+  String get directSupplyBarTitle;
+
+  /// No description provided for @directSupplyHotelTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approvisionnement direct - Hôtel'**
+  String get directSupplyHotelTitle;
+
+  /// No description provided for @actionItemRegistry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Registre des articles'**
+  String get actionItemRegistry;
+
+  /// No description provided for @actionCreateStock.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créer un stock'**
+  String get actionCreateStock;
+
+  /// No description provided for @moduleServersTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Serveurs & Encaissements'**
+  String get moduleServersTitle;
+
+  /// No description provided for @moduleServersSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Serveurs, versements et encaissements'**
+  String get moduleServersSubtitle;
+
+  /// No description provided for @actionValidateHandovers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valider les versements'**
+  String get actionValidateHandovers;
+
+  /// No description provided for @actionServerCollections.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaissements serveurs'**
+  String get actionServerCollections;
+
+  /// No description provided for @moduleBillingRoomsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facturation & Chambres'**
+  String get moduleBillingRoomsTitle;
+
+  /// No description provided for @moduleBillingRoomsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Factures, chambres et versement comptable'**
+  String get moduleBillingRoomsSubtitle;
+
+  /// No description provided for @actionRoomBilling.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facturation chambres'**
+  String get actionRoomBilling;
+
+  /// No description provided for @actionInvoicesList.
+  ///
+  /// In fr, this message translates to:
+  /// **'Liste des factures'**
+  String get actionInvoicesList;
+
+  /// No description provided for @actionAccountingTransfer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Versement compta'**
+  String get actionAccountingTransfer;
+
+  /// No description provided for @moduleMenuTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Menu & Exploitation'**
+  String get moduleMenuTitle;
+
+  /// No description provided for @moduleMenuSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gestion du menu restaurant et bar'**
+  String get moduleMenuSubtitle;
+
+  /// No description provided for @actionManageMenu.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gérer le menu'**
+  String get actionManageMenu;
+
+  /// No description provided for @createStockPageTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Création stock gérante'**
+  String get createStockPageTitle;
+
+  /// No description provided for @createStockTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Création / import de stock'**
+  String get createStockTitle;
+
+  /// No description provided for @createStockSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisissez un article actif, saisissez la quantité, ou importez plusieurs lignes depuis un fichier.'**
+  String get createStockSubtitle;
+
+  /// No description provided for @manualEntry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Saisie manuelle'**
+  String get manualEntry;
+
+  /// No description provided for @noActiveItemFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun article actif trouvé dans stock_items.'**
+  String get noActiveItemFound;
+
+  /// No description provided for @labelStockItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Article de stock'**
+  String get labelStockItem;
+
+  /// No description provided for @hintQuantityExample.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. 25'**
+  String get hintQuantityExample;
+
+  /// No description provided for @errQuantityRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez saisir une quantité'**
+  String get errQuantityRequired;
+
+  /// No description provided for @errQuantityMustBeInteger.
+  ///
+  /// In fr, this message translates to:
+  /// **'La quantité doit être un entier.'**
+  String get errQuantityMustBeInteger;
+
+  /// No description provided for @errQuantityNegative.
+  ///
+  /// In fr, this message translates to:
+  /// **'La quantité ne peut pas être négative'**
+  String get errQuantityNegative;
+
+  /// No description provided for @errChooseAnItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez choisir un article'**
+  String get errChooseAnItem;
+
+  /// No description provided for @errSelectAnItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez sélectionner un article.'**
+  String get errSelectAnItem;
+
+  /// No description provided for @stockSavedSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stock enregistré avec succès.'**
+  String get stockSavedSuccess;
+
+  /// No description provided for @errLoadItemsFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur chargement articles : {error}'**
+  String errLoadItemsFailed(String error);
+
+  /// No description provided for @errSaveFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur lors de l’enregistrement : {error}'**
+  String errSaveFailed(String error);
+
+  /// No description provided for @errImportFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur import : {error}'**
+  String errImportFailed(String error);
+
+  /// No description provided for @importCancelled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Import annulé.'**
+  String get importCancelled;
+
+  /// No description provided for @errFileUnreadable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de lire le fichier sélectionné.'**
+  String get errFileUnreadable;
+
+  /// No description provided for @errUnsupportedFormat.
+  ///
+  /// In fr, this message translates to:
+  /// **'Format non supporté. Utilise CSV ou XLSX.'**
+  String get errUnsupportedFormat;
+
+  /// No description provided for @errNoUsableRow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune ligne exploitable trouvée.'**
+  String get errNoUsableRow;
+
+  /// No description provided for @errItemNameMissing.
+  ///
+  /// In fr, this message translates to:
+  /// **'nom d’article manquant'**
+  String get errItemNameMissing;
+
+  /// No description provided for @errQuantityInvalidShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'quantité invalide'**
+  String get errQuantityInvalidShort;
+
+  /// No description provided for @errItemNotInStockItems.
+  ///
+  /// In fr, this message translates to:
+  /// **'article « {name} » introuvable dans stock_items'**
+  String errItemNotInStockItems(String name);
+
+  /// No description provided for @lineErrorLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ligne {line}: {message}'**
+  String lineErrorLine(int line, String message);
+
+  /// No description provided for @importSuccessCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} stock(s) importé(s) avec succès.'**
+  String importSuccessCount(int count);
+
+  /// No description provided for @importPartialResult.
+  ///
+  /// In fr, this message translates to:
+  /// **'{success} import(s) réussi(s), {errors} erreur(s).'**
+  String importPartialResult(int success, int errors);
+
+  /// No description provided for @importedCountShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} stock(s) importé(s).'**
+  String importedCountShort(int count);
+
+  /// No description provided for @importingInProgress.
+  ///
+  /// In fr, this message translates to:
+  /// **'Import en cours...'**
+  String get importingInProgress;
+
+  /// No description provided for @actionImportCsvExcel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Importer CSV / Excel'**
+  String get actionImportCsvExcel;
+
+  /// No description provided for @importRecommendedFormat.
+  ///
+  /// In fr, this message translates to:
+  /// **'Format d’import recommandé'**
+  String get importRecommendedFormat;
+
+  /// No description provided for @expectedColumns.
+  ///
+  /// In fr, this message translates to:
+  /// **'Colonnes attendues :'**
+  String get expectedColumns;
+
+  /// No description provided for @exampleLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Exemple :'**
+  String get exampleLabel;
+
+  /// No description provided for @importExampleRow1.
+  ///
+  /// In fr, this message translates to:
+  /// **'Eau minérale | 48'**
+  String get importExampleRow1;
+
+  /// No description provided for @importExampleRow2.
+  ///
+  /// In fr, this message translates to:
+  /// **'Riz local | 120'**
+  String get importExampleRow2;
+
+  /// No description provided for @fieldsSavedInStoreStocks.
+  ///
+  /// In fr, this message translates to:
+  /// **'Champs enregistrés dans store_stocks'**
+  String get fieldsSavedInStoreStocks;
+
+  /// No description provided for @storeLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Store : {store}'**
+  String storeLine(String store);
+
+  /// No description provided for @unitLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Unité : {unit}'**
+  String unitLine(String unit);
 }
 
 class _AppLocalizationsDelegate

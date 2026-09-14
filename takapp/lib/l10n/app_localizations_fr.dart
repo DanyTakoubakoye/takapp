@@ -1952,4 +1952,264 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noRequestFound => 'Aucune demande trouvée.';
+
+  @override
+  String get labelQuantity => 'Quantité';
+
+  @override
+  String periodLine(String start, String end) {
+    return 'Période : $start → $end';
+  }
+
+  @override
+  String get actionMarkPaid => 'Marquer payée';
+
+  @override
+  String get actionPrintNormalized => 'Imprimer normalisée';
+
+  @override
+  String get filterAllInvoices => 'Tous';
+
+  @override
+  String get filterPaid => 'Payées';
+
+  @override
+  String get filterUnpaid => 'Non payées';
+
+  @override
+  String get noInvoiceFound => 'Aucune facture trouvée.';
+
+  @override
+  String get searchClientOrRoom => 'Recherche client / chambre';
+
+  @override
+  String get roomInvoicesListTitle => 'Liste des factures chambres';
+
+  @override
+  String get errInvoiceDatesInvalid =>
+      'Les dates de la facture sont invalides.';
+
+  @override
+  String get errInvoiceNotFiscalizedYet =>
+      'Cette facture n’est pas encore fiscalisée.';
+
+  @override
+  String get errSetIfuFirst =>
+      'Renseignez d’abord l’IFU de l’établissement (console admin).';
+
+  @override
+  String get errInvoiceAlreadyFiscalized =>
+      'Cette facture est déjà fiscalisée.';
+
+  @override
+  String get managerWorkspaceSubtitle => 'Espace de supervision et validation';
+
+  @override
+  String get moduleStocksTitle => 'Stocks & Approvisionnements';
+
+  @override
+  String get moduleStocksSubtitle =>
+      'Stocks, demandes, seuils, articles et approvisionnements';
+
+  @override
+  String get actionStockRequests => 'Demandes stock';
+
+  @override
+  String get lowStockTitle => 'Stocks faibles';
+
+  @override
+  String get actionSupplyRestaurant => 'Approvisionner Restaurant';
+
+  @override
+  String get actionSupplyBar => 'Approvisionner Bar';
+
+  @override
+  String get actionSupplyHotel => 'Approvisionner Hôtel';
+
+  @override
+  String get directSupplyRestaurantTitle =>
+      'Approvisionnement direct - Restaurant';
+
+  @override
+  String get directSupplyBarTitle => 'Approvisionnement direct - Bar';
+
+  @override
+  String get directSupplyHotelTitle => 'Approvisionnement direct - Hôtel';
+
+  @override
+  String get actionItemRegistry => 'Registre des articles';
+
+  @override
+  String get actionCreateStock => 'Créer un stock';
+
+  @override
+  String get moduleServersTitle => 'Serveurs & Encaissements';
+
+  @override
+  String get moduleServersSubtitle => 'Serveurs, versements et encaissements';
+
+  @override
+  String get actionValidateHandovers => 'Valider les versements';
+
+  @override
+  String get actionServerCollections => 'Encaissements serveurs';
+
+  @override
+  String get moduleBillingRoomsTitle => 'Facturation & Chambres';
+
+  @override
+  String get moduleBillingRoomsSubtitle =>
+      'Factures, chambres et versement comptable';
+
+  @override
+  String get actionRoomBilling => 'Facturation chambres';
+
+  @override
+  String get actionInvoicesList => 'Liste des factures';
+
+  @override
+  String get actionAccountingTransfer => 'Versement compta';
+
+  @override
+  String get moduleMenuTitle => 'Menu & Exploitation';
+
+  @override
+  String get moduleMenuSubtitle => 'Gestion du menu restaurant et bar';
+
+  @override
+  String get actionManageMenu => 'Gérer le menu';
+
+  @override
+  String get createStockPageTitle => 'Création stock gérante';
+
+  @override
+  String get createStockTitle => 'Création / import de stock';
+
+  @override
+  String get createStockSubtitle =>
+      'Choisissez un article actif, saisissez la quantité, ou importez plusieurs lignes depuis un fichier.';
+
+  @override
+  String get manualEntry => 'Saisie manuelle';
+
+  @override
+  String get noActiveItemFound =>
+      'Aucun article actif trouvé dans stock_items.';
+
+  @override
+  String get labelStockItem => 'Article de stock';
+
+  @override
+  String get hintQuantityExample => 'Ex. 25';
+
+  @override
+  String get errQuantityRequired => 'Veuillez saisir une quantité';
+
+  @override
+  String get errQuantityMustBeInteger => 'La quantité doit être un entier.';
+
+  @override
+  String get errQuantityNegative => 'La quantité ne peut pas être négative';
+
+  @override
+  String get errChooseAnItem => 'Veuillez choisir un article';
+
+  @override
+  String get errSelectAnItem => 'Veuillez sélectionner un article.';
+
+  @override
+  String get stockSavedSuccess => 'Stock enregistré avec succès.';
+
+  @override
+  String errLoadItemsFailed(String error) {
+    return 'Erreur chargement articles : $error';
+  }
+
+  @override
+  String errSaveFailed(String error) {
+    return 'Erreur lors de l’enregistrement : $error';
+  }
+
+  @override
+  String errImportFailed(String error) {
+    return 'Erreur import : $error';
+  }
+
+  @override
+  String get importCancelled => 'Import annulé.';
+
+  @override
+  String get errFileUnreadable => 'Impossible de lire le fichier sélectionné.';
+
+  @override
+  String get errUnsupportedFormat =>
+      'Format non supporté. Utilise CSV ou XLSX.';
+
+  @override
+  String get errNoUsableRow => 'Aucune ligne exploitable trouvée.';
+
+  @override
+  String get errItemNameMissing => 'nom d’article manquant';
+
+  @override
+  String get errQuantityInvalidShort => 'quantité invalide';
+
+  @override
+  String errItemNotInStockItems(String name) {
+    return 'article « $name » introuvable dans stock_items';
+  }
+
+  @override
+  String lineErrorLine(int line, String message) {
+    return 'Ligne $line: $message';
+  }
+
+  @override
+  String importSuccessCount(int count) {
+    return '$count stock(s) importé(s) avec succès.';
+  }
+
+  @override
+  String importPartialResult(int success, int errors) {
+    return '$success import(s) réussi(s), $errors erreur(s).';
+  }
+
+  @override
+  String importedCountShort(int count) {
+    return '$count stock(s) importé(s).';
+  }
+
+  @override
+  String get importingInProgress => 'Import en cours...';
+
+  @override
+  String get actionImportCsvExcel => 'Importer CSV / Excel';
+
+  @override
+  String get importRecommendedFormat => 'Format d’import recommandé';
+
+  @override
+  String get expectedColumns => 'Colonnes attendues :';
+
+  @override
+  String get exampleLabel => 'Exemple :';
+
+  @override
+  String get importExampleRow1 => 'Eau minérale | 48';
+
+  @override
+  String get importExampleRow2 => 'Riz local | 120';
+
+  @override
+  String get fieldsSavedInStoreStocks => 'Champs enregistrés dans store_stocks';
+
+  @override
+  String storeLine(String store) {
+    return 'Store : $store';
+  }
+
+  @override
+  String unitLine(String unit) {
+    return 'Unité : $unit';
+  }
 }

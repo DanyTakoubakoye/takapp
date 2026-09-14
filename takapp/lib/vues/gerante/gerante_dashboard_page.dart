@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/vues/clients/clients_page.dart';
 import 'package:takapp/vues/gerante/enregistrer_serveur_page.dart';
 import 'package:takapp/vues/gerante/facturation_chambre_page.dart';
@@ -26,21 +27,20 @@ class GeranteDashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
     final user = auth.currentUser;
     final width = MediaQuery.of(context).size.width;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     final establishmentId = user.establishmentId.trim();
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
@@ -49,7 +49,8 @@ class GeranteDashboardPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TAKHOTEL - Gérante'),
+        // TAKHOTEL est la marque : seul le rôle est traduit.
+        title: Text('TAKHOTEL - ${l10n.roleManager}'),
         actions: [
           IconButton(
             onPressed: () => context.read<AuthController>().logout(),
@@ -85,6 +86,8 @@ class _GeranteWelcomeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -102,14 +105,14 @@ class _GeranteWelcomeCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Bienvenue $userName',
+                    l10n.welcomeName(userName),
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Espace de supervision et validation',
+                    l10n.managerWorkspaceSubtitle,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ],
@@ -135,6 +138,7 @@ class _GeranteModulesGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
     final canRestaurant = auth.canAccessRestaurant;
     final canBar = auth.canAccessBar;
@@ -142,6 +146,7 @@ class _GeranteModulesGrid extends StatelessWidget {
 
     // Magasins visibles dans l'écran « Stocks faibles » : seuls les modules
     // souscrits. Établissement abonné à tout ⇒ les trois magasins.
+    // Valeurs techniques : elles ne sont pas traduites.
     final lowStockStores = <String>[
       if (canHotel) 'hotel',
       if (canRestaurant) 'restaurant',
@@ -150,70 +155,70 @@ class _GeranteModulesGrid extends StatelessWidget {
 
     final modules = [
       _GeranteModule(
-        title: 'Stocks & Approvisionnements',
-        subtitle: 'Stocks, demandes, seuils, articles et approvisionnements',
+        title: l10n.moduleStocksTitle,
+        subtitle: l10n.moduleStocksSubtitle,
         icon: Icons.inventory_2_outlined,
         color: Colors.blueGrey,
         actions: [
           _GeranteAction(
-            title: 'Gestion des stocks',
+            title: l10n.stockManagementTitle,
             icon: Icons.inventory_2,
             pageBuilder: (_) =>
                 StockManagementPage(establishmentId: establishmentId),
           ),
           _GeranteAction(
-            title: 'Demandes stock',
+            title: l10n.actionStockRequests,
             icon: Icons.assignment_outlined,
             pageBuilder: (_) =>
                 StockRequestListPage(establishmentId: establishmentId),
           ),
           _GeranteAction(
-            title: 'Stocks faibles',
+            title: l10n.lowStockTitle,
             icon: Icons.warning_amber_rounded,
             pageBuilder: (_) => LowStockPage(
               establishmentId: establishmentId,
               stores: lowStockStores,
-              title: 'Stocks faibles',
+              title: l10n.lowStockTitle,
             ),
           ),
           _GeranteAction(
-            title: 'Approvisionner Restaurant',
+            title: l10n.actionSupplyRestaurant,
             icon: Icons.restaurant,
             visible: canRestaurant,
             pageBuilder: (_) => DirectStockSupplyPage(
               establishmentId: establishmentId,
               store: 'restaurant',
-              title: 'Approvisionnement direct - Restaurant',
+              title: l10n.directSupplyRestaurantTitle,
             ),
           ),
           _GeranteAction(
-            title: 'Approvisionner Bar',
+            title: l10n.actionSupplyBar,
             icon: Icons.local_bar,
             visible: canBar,
             pageBuilder: (_) => DirectStockSupplyPage(
               establishmentId: establishmentId,
               store: 'bar',
-              title: 'Approvisionnement direct - Bar',
+              title: l10n.directSupplyBarTitle,
             ),
           ),
           _GeranteAction(
-            title: 'Approvisionner Hôtel',
+            title: l10n.actionSupplyHotel,
             icon: Icons.hotel,
             visible: canHotel,
             pageBuilder: (_) => DirectStockSupplyPage(
               establishmentId: establishmentId,
               store: 'hotel',
-              title: 'Approvisionnement direct - Hôtel',
+              title: l10n.directSupplyHotelTitle,
             ),
           ),
           _GeranteAction(
-            title: 'Registre des articles',
+            title: l10n.actionItemRegistry,
             icon: Icons.inventory_2_outlined,
             pageBuilder: (_) =>
                 StockItemRegistryPage(establishmentId: establishmentId),
           ),
           _GeranteAction(
-            title: 'Créer un stock',
+            title: l10n.actionCreateStock,
             icon: Icons.add_business_outlined,
             pageBuilder: (_) =>
                 CreateStoreStockPage(establishmentId: establishmentId),
@@ -221,24 +226,24 @@ class _GeranteModulesGrid extends StatelessWidget {
         ],
       ),
       _GeranteModule(
-        title: 'Serveurs & Encaissements',
-        subtitle: 'Serveurs, versements et encaissements',
+        title: l10n.moduleServersTitle,
+        subtitle: l10n.moduleServersSubtitle,
         icon: Icons.people_alt_outlined,
         color: Colors.blue,
         actions: [
           _GeranteAction(
-            title: 'Enregistrer un serveur',
+            title: l10n.registerServerTitle,
             icon: Icons.person_add,
             pageBuilder: (_) => const EnregistrerServeurPage(),
           ),
           _GeranteAction(
-            title: 'Valider les versements',
+            title: l10n.actionValidateHandovers,
             icon: Icons.fact_check_outlined,
             pageBuilder: (_) =>
                 VersementsServeursPage(establishmentId: establishmentId),
           ),
           _GeranteAction(
-            title: 'Encaissements serveurs',
+            title: l10n.actionServerCollections,
             icon: Icons.visibility,
             pageBuilder: (_) => SuiviEncaissementsServeursPage(
               establishmentId: establishmentId,
@@ -248,53 +253,53 @@ class _GeranteModulesGrid extends StatelessWidget {
       ),
 
       _GeranteModule(
-        title: 'Facturation & Chambres',
-        subtitle: 'Factures, chambres et versement comptable',
+        title: l10n.moduleBillingRoomsTitle,
+        subtitle: l10n.moduleBillingRoomsSubtitle,
         icon: Icons.hotel_outlined,
         color: Colors.indigo,
         visible: canHotel,
         actions: [
           _GeranteAction(
-            title: 'Réservations',
+            title: l10n.tileReservationsTitle,
             icon: Icons.event_available_outlined,
             pageBuilder: (_) =>
                 ReservationsPage(establishmentId: establishmentId),
           ),
           _GeranteAction(
-            title: 'Clients',
+            title: l10n.tileClientsTitle,
             icon: Icons.people_outline,
             pageBuilder: (_) => ClientsPage(establishmentId: establishmentId),
           ),
           _GeranteAction(
-            title: 'Types de chambres',
+            title: l10n.roomTypesTitle,
             icon: Icons.category_outlined,
             pageBuilder: (_) => RoomTypesPage(establishmentId: establishmentId),
           ),
           _GeranteAction(
-            title: 'Chambres',
+            title: l10n.roomsTitle,
             icon: Icons.meeting_room_outlined,
             pageBuilder: (_) => RoomsPage(establishmentId: establishmentId),
           ),
           _GeranteAction(
-            title: 'Plan des chambres',
+            title: l10n.tileRoomsBoardTitle,
             icon: Icons.grid_view_outlined,
             pageBuilder: (_) =>
                 RoomsBoardPage(establishmentId: establishmentId),
           ),
           _GeranteAction(
-            title: 'Facturation chambres',
+            title: l10n.actionRoomBilling,
             icon: Icons.hotel,
             pageBuilder: (_) =>
                 FacturationChambrePage(establishmentId: establishmentId),
           ),
           _GeranteAction(
-            title: 'Liste des factures',
+            title: l10n.actionInvoicesList,
             icon: Icons.receipt_long_outlined,
             pageBuilder: (_) =>
                 ListeFacturesPage(establishmentId: establishmentId),
           ),
           _GeranteAction(
-            title: 'Versement compta',
+            title: l10n.actionAccountingTransfer,
             icon: Icons.account_balance_outlined,
             pageBuilder: (_) =>
                 VersementComptaPage(establishmentId: establishmentId),
@@ -302,14 +307,14 @@ class _GeranteModulesGrid extends StatelessWidget {
         ],
       ),
       _GeranteModule(
-        title: 'Menu & Exploitation',
-        subtitle: 'Gestion du menu restaurant et bar',
+        title: l10n.moduleMenuTitle,
+        subtitle: l10n.moduleMenuSubtitle,
         icon: Icons.restaurant_menu,
         color: Colors.green,
         visible: canRestaurant || canBar,
         actions: [
           _GeranteAction(
-            title: 'Gérer le menu',
+            title: l10n.actionManageMenu,
             icon: Icons.restaurant_menu,
             pageBuilder: (_) =>
                 GestionMenuPage(establishmentId: establishmentId),

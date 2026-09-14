@@ -6,6 +6,7 @@ import 'package:csv/csv.dart';
 import 'package:excel/excel.dart' as xlsx;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 
 class CreateStoreStockPage extends StatefulWidget {
   final String establishmentId;
@@ -47,6 +48,11 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
         .collection('store_stocks');
   }
 
+  /// Les erreurs de ligne d'import sont levées déjà localisées puis
+  /// recomposées dans le rapport : on retire seulement le préfixe technique.
+  String _plain(Object error) =>
+      error.toString().replaceFirst('Exception: ', '');
+
   @override
   void initState() {
     super.initState();
@@ -61,6 +67,8 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
 
   Future<void> _loadStockItems() async {
     if (establishmentId.isEmpty) return;
+
+    final l10n = AppLocalizations.of(context);
 
     setState(() {
       _isLoadingItems = true;
@@ -93,9 +101,9 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur chargement articles : $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errLoadItemsFailed('$e'))));
     } finally {
       if (mounted) {
         setState(() {
@@ -106,28 +114,30 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
   }
 
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Établissement introuvable.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errEstablishmentNotFound)));
       return;
     }
 
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedItem == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez sélectionner un article.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errSelectAnItem)));
       return;
     }
 
     final quantity = int.tryParse(_quantityController.text.trim());
 
     if (quantity == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('La quantité doit être un entier.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errQuantityMustBeInteger)));
       return;
     }
 
@@ -140,17 +150,17 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Stock enregistré avec succès.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.stockSavedSuccess)));
 
       _quantityController.clear();
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de l’enregistrement : $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errSaveFailed('$e'))));
     } finally {
       if (mounted) {
         setState(() {
@@ -169,6 +179,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
     final stockItemData = stockItemDoc.data();
 
     if (stockItemData == null) {
+      // Invariant interne : ce message n'est pas destiné à l'utilisateur.
       throw Exception('Article introuvable dans stock_items');
     }
 
@@ -211,10 +222,12 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
   }
 
   Future<void> _importFile() async {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Établissement introuvable.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errEstablishmentNotFound)));
       return;
     }
 
@@ -232,7 +245,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
 
       if (result == null || result.files.isEmpty) {
         setState(() {
-          _importMessage = 'Import annulé.';
+          _importMessage = l10n.importCancelled;
         });
         return;
       }
@@ -242,7 +255,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
       final bytes = file.bytes;
 
       if (bytes == null || bytes.isEmpty) {
-        throw Exception('Impossible de lire le fichier sélectionné.');
+        throw Exception(l10n.errFileUnreadable);
       }
 
       List<Map<String, String>> rows;
@@ -252,11 +265,11 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
       } else if (fileName.endsWith('.xlsx')) {
         rows = _readXlsxRows(bytes);
       } else {
-        throw Exception('Format non supporté. Utilise CSV ou XLSX.');
+        throw Exception(l10n.errUnsupportedFormat);
       }
 
       if (rows.isEmpty) {
-        throw Exception('Aucune ligne exploitable trouvée.');
+        throw Exception(l10n.errNoUsableRow);
       }
 
       int successCount = 0;
@@ -267,18 +280,19 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
         final row = rows[i];
 
         try {
+          // Les en-têtes acceptés sont des clés techniques normalisées.
           final itemName = _pick(row, ['itemname', 'name', 'article', 'nom']);
 
           final quantityText = _pick(row, ['quantity', 'quantite', 'qty']);
 
           if (itemName.isEmpty) {
-            throw Exception('nom d’article manquant');
+            throw Exception(l10n.errItemNameMissing);
           }
 
           final quantity = int.tryParse(quantityText);
 
           if (quantity == null) {
-            throw Exception('quantité invalide');
+            throw Exception(l10n.errQuantityInvalidShort);
           }
 
           final stockItemQuery = await _stockItemsCol
@@ -287,7 +301,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
               .get();
 
           if (stockItemQuery.docs.isEmpty) {
-            throw Exception('article "$itemName" introuvable dans stock_items');
+            throw Exception(l10n.errItemNotInStockItems(itemName));
           }
 
           final itemId = stockItemQuery.docs.first.id;
@@ -296,34 +310,35 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
 
           successCount++;
         } catch (e) {
-          errors.add('Ligne ${i + 2}: $e');
+          errors.add(l10n.lineErrorLine(i + 2, _plain(e)));
         }
       }
 
       setState(() {
         if (errors.isEmpty) {
-          _importMessage = '$successCount stock(s) importé(s) avec succès.';
+          _importMessage = l10n.importSuccessCount(successCount);
         } else {
           _importMessage =
-              '$successCount import(s) réussi(s), ${errors.length} erreur(s).\n${errors.join('\n')}';
+              '${l10n.importPartialResult(successCount, errors.length)}\n'
+              '${errors.join('\n')}';
         }
       });
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$successCount stock(s) importé(s).')),
+        SnackBar(content: Text(l10n.importedCountShort(successCount))),
       );
     } catch (e) {
       setState(() {
-        _importMessage = 'Erreur import : $e';
+        _importMessage = l10n.errImportFailed(_plain(e));
       });
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erreur import : $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.errImportFailed(_plain(e)))),
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -412,6 +427,8 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
     return output;
   }
 
+  // Normalisation des en-têtes du fichier importé : c'est de la
+  // classification de données, pas de l'affichage. Ne pas traduire.
   String _normalizeHeader(String value) {
     return value
         .trim()
@@ -440,6 +457,8 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -457,12 +476,12 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Création / import de stock',
+                    l10n.createStockTitle,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Choisissez un article actif, saisissez la quantité, ou importez plusieurs lignes depuis un fichier.',
+                    l10n.createStockSubtitle,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ],
@@ -475,6 +494,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
   }
 
   Widget _buildForm(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isSmallScreen = MediaQuery.of(context).size.width < 700;
 
     return Card(
@@ -488,7 +508,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                'Saisie manuelle',
+                l10n.manualEntry,
                 style: Theme.of(
                   context,
                 ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
@@ -500,16 +520,16 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
                   child: Center(child: CircularProgressIndicator()),
                 )
               else if (_items.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12),
-                  child: Text('Aucun article actif trouvé dans stock_items.'),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Text(l10n.noActiveItemFound),
                 )
               else ...[
                 DropdownButtonFormField<_StockItemOption>(
                   initialValue: _selectedItem,
                   isExpanded: true,
                   decoration: InputDecoration(
-                    labelText: 'Article de stock',
+                    labelText: l10n.labelStockItem,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -527,7 +547,7 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
                   },
                   validator: (value) {
                     if (value == null) {
-                      return 'Veuillez choisir un article';
+                      return l10n.errChooseAnItem;
                     }
 
                     return null;
@@ -538,8 +558,8 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
                   controller: _quantityController,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: 'Quantité',
-                    hintText: 'Ex. 25',
+                    labelText: l10n.labelQuantity,
+                    hintText: l10n.hintQuantityExample,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -548,17 +568,17 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
                     final text = value?.trim() ?? '';
 
                     if (text.isEmpty) {
-                      return 'Veuillez saisir une quantité';
+                      return l10n.errQuantityRequired;
                     }
 
                     final parsed = int.tryParse(text);
 
                     if (parsed == null) {
-                      return 'La quantité doit être un entier';
+                      return l10n.errQuantityMustBeInteger;
                     }
 
                     if (parsed < 0) {
-                      return 'La quantité ne peut pas être négative';
+                      return l10n.errQuantityNegative;
                     }
 
                     return null;
@@ -573,13 +593,15 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: Colors.grey.shade300),
                     ),
+                    // `MinimumQuantity` et `isLowStock` sont des noms de
+                    // champs Firestore : ils restent tels quels.
                     child: isSmallScreen
                         ? Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Store : ${_selectedItem!.store}'),
+                              Text(l10n.storeLine(_selectedItem!.store)),
                               const SizedBox(height: 6),
-                              Text('Unité : ${_selectedItem!.unit}'),
+                              Text(l10n.unitLine(_selectedItem!.unit)),
                               const SizedBox(height: 6),
                               const Text('MinimumQuantity : 0'),
                               const SizedBox(height: 6),
@@ -589,10 +611,14 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
                         : Row(
                             children: [
                               Expanded(
-                                child: Text('Store : ${_selectedItem!.store}'),
+                                child: Text(
+                                  l10n.storeLine(_selectedItem!.store),
+                                ),
                               ),
                               Expanded(
-                                child: Text('Unité : ${_selectedItem!.unit}'),
+                                child: Text(
+                                  l10n.unitLine(_selectedItem!.unit),
+                                ),
                               ),
                               const Expanded(
                                 child: Text('MinimumQuantity : 0'),
@@ -618,8 +644,8 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
                           : const Icon(Icons.upload_file),
                       label: Text(
                         _isImporting
-                            ? 'Import en cours...'
-                            : 'Importer CSV / Excel',
+                            ? l10n.importingInProgress
+                            : l10n.actionImportCsvExcel,
                       ),
                     ),
                     ElevatedButton.icon(
@@ -632,7 +658,9 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
                             )
                           : const Icon(Icons.save),
                       label: Text(
-                        _isSubmitting ? 'Enregistrement...' : 'Valider',
+                        _isSubmitting
+                            ? l10n.savingInProgress
+                            : l10n.commonValidate,
                       ),
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
@@ -655,26 +683,29 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
   }
 
   Widget _buildImportInfoCard() {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 1,
-      child: const Padding(
-        padding: EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Format d’import recommandé',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              l10n.importRecommendedFormat,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
-            Text('Colonnes attendues :'),
-            SizedBox(height: 4),
-            Text('itemName | quantity'),
-            SizedBox(height: 8),
-            Text('Exemple :'),
-            SizedBox(height: 4),
-            Text('Eau minérale | 48'),
-            Text('Riz local | 120'),
+            const SizedBox(height: 8),
+            Text(l10n.expectedColumns),
+            const SizedBox(height: 4),
+            // En-têtes techniques attendus dans le fichier.
+            const Text('itemName | quantity'),
+            const SizedBox(height: 8),
+            Text(l10n.exampleLabel),
+            const SizedBox(height: 4),
+            Text(l10n.importExampleRow1),
+            Text(l10n.importExampleRow2),
           ],
         ),
       ),
@@ -682,28 +713,31 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
   }
 
   Widget _buildInfoCard() {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 1,
-      child: const Padding(
-        padding: EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Champs enregistrés dans store_stocks',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              l10n.fieldsSavedInStoreStocks,
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 8),
-            Text('• itemId'),
-            Text('• itemName'),
-            Text('• quantity'),
-            Text('• minimumQuantity = 0'),
-            Text('• isLowStock = false'),
-            Text('• createdAt'),
-            Text('• updatedAt'),
-            Text('• store'),
-            Text('• unit'),
-            Text('• establishmentId'),
+            const SizedBox(height: 8),
+            // Noms de champs Firestore : jamais traduits.
+            const Text('• itemId'),
+            const Text('• itemName'),
+            const Text('• quantity'),
+            const Text('• minimumQuantity = 0'),
+            const Text('• isLowStock = false'),
+            const Text('• createdAt'),
+            const Text('• updatedAt'),
+            const Text('• store'),
+            const Text('• unit'),
+            const Text('• establishmentId'),
           ],
         ),
       ),
@@ -712,14 +746,16 @@ class _CreateStoreStockPageState extends State<CreateStoreStockPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Création stock gérante')),
+      appBar: AppBar(title: Text(l10n.createStockPageTitle)),
       body: RefreshIndicator(
         onRefresh: _loadStockItems,
         child: ListView(

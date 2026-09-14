@@ -28,6 +28,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
   final RoomInvoiceService _service = RoomInvoiceService();
   final TextEditingController searchController = TextEditingController();
 
+  // Valeur technique : comparée au `status` tel qu'il est stocké.
   String statusFilter = 'all';
 
   String get establishmentId => widget.establishmentId.trim();
@@ -110,15 +111,17 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
   }
 
   Future<void> _printFiscalizedInvoice(RoomInvoiceModel item) async {
+    final l10n = AppLocalizations.of(context);
+
     if (item.startDate == null || item.endDate == null) {
-      _showSnack('Les dates de la facture sont invalides.');
+      _showSnack(l10n.errInvoiceDatesInvalid);
       return;
     }
 
     if (!item.isFiscalized ||
         item.fiscalMecefCode.trim().isEmpty ||
         item.fiscalQrCode.trim().isEmpty) {
-      _showSnack('Cette facture n’est pas encore fiscalisée.');
+      _showSnack(l10n.errInvoiceNotFiscalizedYet);
       return;
     }
 
@@ -156,6 +159,8 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
     await printer.printPdf(Uint8List.fromList(bytes));
   }
 
+  // Les valeurs envoyées à CertiLink sont des codes de l'API fiscale :
+  // elles ne sont jamais traduites.
   EmcfInvoiceRequestModel _buildEmcfRequestForItem(
     RoomInvoiceModel item,
     String sellerName,
@@ -241,20 +246,20 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
   }
 
   Future<void> _fiscalizeExistingInvoice(RoomInvoiceModel item) async {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      _showSnack('Établissement introuvable.');
+      _showSnack(l10n.errEstablishmentNotFound);
       return;
     }
 
     if (_sellerIfu.isEmpty) {
-      _showSnack(
-        "Renseignez d'abord l'IFU de l'établissement (console admin).",
-      );
+      _showSnack(l10n.errSetIfuFirst);
       return;
     }
 
     if (item.isFiscalized) {
-      _showSnack('Cette facture est déjà fiscalisée.');
+      _showSnack(l10n.errInvoiceAlreadyFiscalized);
       return;
     }
 
@@ -262,10 +267,11 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
     final user = auth.currentUser;
 
     if (user == null) {
-      _showSnack('Utilisateur introuvable.');
+      _showSnack(l10n.errUserNotFound);
       return;
     }
 
+    // Valeur transmise à CertiLink en cas de nom manquant : non traduite.
     final sellerName = user.name.isNotEmpty ? user.name : 'Operateur';
     final operatorId = user.uid;
 
@@ -284,18 +290,19 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
     if (fiscalController.confirmResult != null &&
         !fiscalController.confirmResult!.hasError) {
       _showSnack(
-        'Facture fiscalisée. Code MECeF : ${fiscalController.confirmResult!.codeMECeFDGI}',
+        l10n.invoiceFiscalizedWithCode(
+          fiscalController.confirmResult!.codeMECeFDGI,
+        ),
       );
     } else {
-      final l10n = AppLocalizations.of(context);
-
       _showSnack(
         fiscalController.errorText(l10n) ?? l10n.errFiscalizationFailed,
       );
     }
   }
 
-  Widget _buildStatusChip(RoomInvoiceModel item) {
+  Widget _buildStatusChip(AppLocalizations l10n, RoomInvoiceModel item) {
+    // `status` reste la valeur technique stockée : seul le rendu est localisé.
     final isPaid = item.status == 'paid';
 
     return Container(
@@ -307,7 +314,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        isPaid ? 'Payée' : 'Non payée',
+        isPaid ? l10n.statusPaidShort : l10n.statusUnpaidShort,
         style: TextStyle(
           color: isPaid ? Colors.green : Colors.orange,
           fontWeight: FontWeight.w700,
@@ -316,7 +323,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
     );
   }
 
-  Widget _buildFiscalChip(RoomInvoiceModel item) {
+  Widget _buildFiscalChip(AppLocalizations l10n, RoomInvoiceModel item) {
     final bool ok = item.isFiscalized && item.fiscalStatus == 'success';
 
     return Container(
@@ -328,7 +335,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        ok ? 'Fiscalisée' : 'Non fiscalisée',
+        ok ? l10n.statusFiscalized : l10n.statusNotFiscalized,
         style: TextStyle(
           color: ok ? Colors.blue : Colors.red,
           fontWeight: FontWeight.w700,
@@ -337,7 +344,16 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
     );
   }
 
-  Widget _buildFilters(bool isSmall) {
+  /// Les `value` des options restent techniques : seul le libellé est traduit.
+  List<DropdownMenuItem<String>> _statusFilterItems(AppLocalizations l10n) {
+    return [
+      DropdownMenuItem(value: 'all', child: Text(l10n.filterAllInvoices)),
+      DropdownMenuItem(value: 'paid', child: Text(l10n.filterPaid)),
+      DropdownMenuItem(value: 'unpaid', child: Text(l10n.filterUnpaid)),
+    ];
+  }
+
+  Widget _buildFilters(AppLocalizations l10n, bool isSmall) {
     if (isSmall) {
       return Card(
         child: Padding(
@@ -346,21 +362,17 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
             children: [
               TextField(
                 controller: searchController,
-                decoration: const InputDecoration(
-                  labelText: 'Recherche client / chambre',
-                  prefixIcon: Icon(Icons.search),
+                decoration: InputDecoration(
+                  labelText: l10n.searchClientOrRoom,
+                  prefixIcon: const Icon(Icons.search),
                 ),
                 onChanged: (_) => setState(() {}),
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 initialValue: statusFilter,
-                decoration: const InputDecoration(labelText: 'Statut'),
-                items: const [
-                  DropdownMenuItem(value: 'all', child: Text('Tous')),
-                  DropdownMenuItem(value: 'paid', child: Text('Payées')),
-                  DropdownMenuItem(value: 'unpaid', child: Text('Non payées')),
-                ],
+                decoration: InputDecoration(labelText: l10n.labelStatus),
+                items: _statusFilterItems(l10n),
                 onChanged: (value) {
                   if (value == null) return;
                   setState(() {
@@ -382,9 +394,9 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
             Expanded(
               child: TextField(
                 controller: searchController,
-                decoration: const InputDecoration(
-                  labelText: 'Recherche client / chambre',
-                  prefixIcon: Icon(Icons.search),
+                decoration: InputDecoration(
+                  labelText: l10n.searchClientOrRoom,
+                  prefixIcon: const Icon(Icons.search),
                 ),
                 onChanged: (_) => setState(() {}),
               ),
@@ -394,12 +406,8 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
               width: 180,
               child: DropdownButtonFormField<String>(
                 initialValue: statusFilter,
-                decoration: const InputDecoration(labelText: 'Statut'),
-                items: const [
-                  DropdownMenuItem(value: 'all', child: Text('Tous')),
-                  DropdownMenuItem(value: 'paid', child: Text('Payées')),
-                  DropdownMenuItem(value: 'unpaid', child: Text('Non payées')),
-                ],
+                decoration: InputDecoration(labelText: l10n.labelStatus),
+                items: _statusFilterItems(l10n),
                 onChanged: (value) {
                   if (value == null) return;
                   setState(() {
@@ -416,6 +424,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
 
   Widget _buildInvoiceCard(
     BuildContext context,
+    AppLocalizations l10n,
     RoomInvoiceModel item,
     DateFormat dateFormat,
     bool isSmall,
@@ -431,30 +440,35 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 6),
-            Text('Chambre : ${item.roomNumber}'),
+            Text(l10n.roomLine(item.roomNumber)),
             Text(
-              'Période : '
-              '${item.startDate == null ? "-" : dateFormat.format(item.startDate!)}'
-              ' → '
-              '${item.endDate == null ? "-" : dateFormat.format(item.endDate!)}',
+              l10n.periodLine(
+                item.startDate == null
+                    ? '-'
+                    : dateFormat.format(item.startDate!),
+                item.endDate == null ? '-' : dateFormat.format(item.endDate!),
+              ),
             ),
-            Text('Total : ${item.total.toStringAsFixed(0)} FCFA'),
+            Text(l10n.totalLine(item.total.toStringAsFixed(0))),
             const SizedBox(height: 8),
             if (isSmall) ...[
-              _buildStatusChip(item),
+              _buildStatusChip(l10n, item),
               const SizedBox(height: 8),
-              _buildFiscalChip(item),
+              _buildFiscalChip(l10n, item),
             ] else
               Wrap(
                 spacing: 10,
                 runSpacing: 8,
-                children: [_buildStatusChip(item), _buildFiscalChip(item)],
+                children: [
+                  _buildStatusChip(l10n, item),
+                  _buildFiscalChip(l10n, item),
+                ],
               ),
             const SizedBox(height: 12),
             if (item.isFiscalized &&
                 item.fiscalMecefCode.trim().isNotEmpty) ...[
               Text(
-                'Code MECeF : ${item.fiscalMecefCode}',
+                l10n.mecefCodeLine(item.fiscalMecefCode),
                 style: const TextStyle(fontSize: 12),
               ),
               const SizedBox(height: 4),
@@ -474,7 +488,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
                         );
                       },
                       icon: const Icon(Icons.check_circle_outline),
-                      label: const Text('Marquer payée'),
+                      label: Text(l10n.actionMarkPaid),
                     ),
                   if (!item.isFiscalized)
                     Consumer<FiscalizationController>(
@@ -492,7 +506,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
                                   ),
                                 )
                               : const Icon(Icons.verified),
-                          label: const Text('Fiscaliser'),
+                          label: Text(l10n.actionFiscalize),
                         );
                       },
                     ),
@@ -500,12 +514,12 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
                     OutlinedButton.icon(
                       onPressed: () => _printFiscalizedInvoice(item),
                       icon: const Icon(Icons.verified_outlined),
-                      label: const Text('Imprimer normalisée'),
+                      label: Text(l10n.actionPrintNormalized),
                     ),
                   OutlinedButton.icon(
                     onPressed: () => _printInvoice(item),
                     icon: const Icon(Icons.print_outlined),
-                    label: const Text('Imprimer'),
+                    label: Text(l10n.actionPrint),
                   ),
                 ],
               ),
@@ -518,30 +532,29 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
     final user = auth.currentUser;
     final dateFormat = DateFormat('dd/MM/yyyy');
     final isSmall = _isSmallScreen(context);
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Liste des factures chambres')),
+      appBar: AppBar(title: Text(l10n.roomInvoicesListTitle)),
       body: Padding(
         padding: EdgeInsets.all(isSmall ? 12 : 16),
         child: Column(
           children: [
-            _buildFilters(isSmall),
+            _buildFilters(l10n, isSmall),
             const SizedBox(height: 12),
             Expanded(
               child: StreamBuilder<List<RoomInvoiceModel>>(
@@ -552,7 +565,9 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
                   }
 
                   if (snapshot.hasError) {
-                    return Center(child: Text('Erreur: ${snapshot.error}'));
+                    return Center(
+                      child: Text(l10n.errorPrefixed('${snapshot.error}')),
+                    );
                   }
 
                   final allItems = snapshot.data ?? [];
@@ -571,7 +586,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
                   }).toList();
 
                   if (items.isEmpty) {
-                    return const Center(child: Text('Aucune facture trouvée.'));
+                    return Center(child: Text(l10n.noInvoiceFound));
                   }
 
                   return ListView.separated(
@@ -582,6 +597,7 @@ class _ListeFacturesPageState extends State<ListeFacturesPage> {
 
                       return _buildInvoiceCard(
                         context,
+                        l10n,
                         item,
                         dateFormat,
                         isSmall,

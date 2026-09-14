@@ -1346,5 +1346,170 @@
   "filterRequests": "Filtrer les demandes",
   "filterDelivered": "Livrées",
   "filterReceived": "Réceptionnées",
-  "noRequestFound": "Aucune demande trouvée."
+  "noRequestFound": "Aucune demande trouvée.",
+
+  "labelQuantity": "Quantité",
+  "periodLine": "Période : {start} → {end}",
+  "@periodLine": {
+    "placeholders": {
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "actionMarkPaid": "Marquer payée",
+  "actionPrintNormalized": "Imprimer normalisée",
+  "filterAllInvoices": "Tous",
+  "filterPaid": "Payées",
+  "filterUnpaid": "Non payées",
+  "noInvoiceFound": "Aucune facture trouvée.",
+  "searchClientOrRoom": "Recherche client / chambre",
+  "roomInvoicesListTitle": "Liste des factures chambres",
+  "errInvoiceDatesInvalid": "Les dates de la facture sont invalides.",
+  "errInvoiceNotFiscalizedYet": "Cette facture n’est pas encore fiscalisée.",
+  "errSetIfuFirst": "Renseignez d’abord l’IFU de l’établissement (console admin).",
+  "errInvoiceAlreadyFiscalized": "Cette facture est déjà fiscalisée.",
+
+  "managerWorkspaceSubtitle": "Espace de supervision et validation",
+  "moduleStocksTitle": "Stocks & Approvisionnements",
+  "moduleStocksSubtitle": "Stocks, demandes, seuils, articles et approvisionnements",
+  "actionStockRequests": "Demandes stock",
+  "lowStockTitle": "Stocks faibles",
+  "actionSupplyRestaurant": "Approvisionner Restaurant",
+  "actionSupplyBar": "Approvisionner Bar",
+  "actionSupplyHotel": "Approvisionner Hôtel",
+  "directSupplyRestaurantTitle": "Approvisionnement direct - Restaurant",
+  "directSupplyBarTitle": "Approvisionnement direct - Bar",
+  "directSupplyHotelTitle": "Approvisionnement direct - Hôtel",
+  "actionItemRegistry": "Registre des articles",
+  "actionCreateStock": "Créer un stock",
+  "moduleServersTitle": "Serveurs & Encaissements",
+  "moduleServersSubtitle": "Serveurs, versements et encaissements",
+  "actionValidateHandovers": "Valider les versements",
+  "actionServerCollections": "Encaissements serveurs",
+  "moduleBillingRoomsTitle": "Facturation & Chambres",
+  "moduleBillingRoomsSubtitle": "Factures, chambres et versement comptable",
+  "actionRoomBilling": "Facturation chambres",
+  "actionInvoicesList": "Liste des factures",
+  "actionAccountingTransfer": "Versement compta",
+  "moduleMenuTitle": "Menu & Exploitation",
+  "moduleMenuSubtitle": "Gestion du menu restaurant et bar",
+  "actionManageMenu": "Gérer le menu",
+
+  "createStockPageTitle": "Création stock gérante",
+  "createStockTitle": "Création / import de stock",
+  "createStockSubtitle": "Choisissez un article actif, saisissez la quantité, ou importez plusieurs lignes depuis un fichier.",
+  "manualEntry": "Saisie manuelle",
+  "noActiveItemFound": "Aucun article actif trouvé dans stock_items.",
+  "labelStockItem": "Article de stock",
+  "hintQuantityExample": "Ex. 25",
+  "errQuantityRequired": "Veuillez saisir une quantité",
+  "errQuantityMustBeInteger": "La quantité doit être un entier.",
+  "errQuantityNegative": "La quantité ne peut pas être négative",
+  "errChooseAnItem": "Veuillez choisir un article",
+  "errSelectAnItem": "Veuillez sélectionner un article.",
+  "stockSavedSuccess": "Stock enregistré avec succès.",
+  "errLoadItemsFailed": "Erreur chargement articles : {error}",
+  "@errLoadItemsFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errSaveFailed": "Erreur lors de l’enregistrement : {error}",
+  "@errSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errImportFailed": "Erreur import : {error}",
+  "@errImportFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "importCancelled": "Import annulé.",
+  "errFileUnreadable": "Impossible de lire le fichier sélectionné.",
+  "errUnsupportedFormat": "Format non supporté. Utilise CSV ou XLSX.",
+  "errNoUsableRow": "Aucune ligne exploitable trouvée.",
+  "errItemNameMissing": "nom d’article manquant",
+  "errQuantityInvalidShort": "quantité invalide",
+  "errItemNotInStockItems": "article « {name} » introuvable dans stock_items",
+  "@errItemNotInStockItems": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "lineErrorLine": "Ligne {line}: {message}",
+  "@lineErrorLine": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "importSuccessCount": "{count} stock(s) importé(s) avec succès.",
+  "@importSuccessCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importPartialResult": "{success} import(s) réussi(s), {errors} erreur(s).",
+  "@importPartialResult": {
+    "placeholders": {
+      "success": {
+        "type": "int"
+      },
+      "errors": {
+        "type": "int"
+      }
+    }
+  },
+  "importedCountShort": "{count} stock(s) importé(s).",
+  "@importedCountShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importingInProgress": "Import en cours...",
+  "actionImportCsvExcel": "Importer CSV / Excel",
+  "importRecommendedFormat": "Format d’import recommandé",
+  "expectedColumns": "Colonnes attendues :",
+  "exampleLabel": "Exemple :",
+  "importExampleRow1": "Eau minérale | 48",
+  "importExampleRow2": "Riz local | 120",
+  "fieldsSavedInStoreStocks": "Champs enregistrés dans store_stocks",
+  "storeLine": "Store : {store}",
+  "@storeLine": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      }
+    }
+  },
+  "unitLine": "Unité : {unit}",
+  "@unitLine": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  }
 }

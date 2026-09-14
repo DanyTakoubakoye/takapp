@@ -1935,4 +1935,260 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get noRequestFound => 'No request found.';
+
+  @override
+  String get labelQuantity => 'Quantity';
+
+  @override
+  String periodLine(String start, String end) {
+    return 'Period: $start → $end';
+  }
+
+  @override
+  String get actionMarkPaid => 'Mark as paid';
+
+  @override
+  String get actionPrintNormalized => 'Print normalized';
+
+  @override
+  String get filterAllInvoices => 'All';
+
+  @override
+  String get filterPaid => 'Paid';
+
+  @override
+  String get filterUnpaid => 'Unpaid';
+
+  @override
+  String get noInvoiceFound => 'No invoice found.';
+
+  @override
+  String get searchClientOrRoom => 'Search client / room';
+
+  @override
+  String get roomInvoicesListTitle => 'Room invoices list';
+
+  @override
+  String get errInvoiceDatesInvalid => 'The invoice dates are invalid.';
+
+  @override
+  String get errInvoiceNotFiscalizedYet =>
+      'This invoice is not fiscalized yet.';
+
+  @override
+  String get errSetIfuFirst =>
+      'Set the establishment\'s IFU first (admin console).';
+
+  @override
+  String get errInvoiceAlreadyFiscalized =>
+      'This invoice is already fiscalized.';
+
+  @override
+  String get managerWorkspaceSubtitle => 'Supervision and validation workspace';
+
+  @override
+  String get moduleStocksTitle => 'Stock & Supply';
+
+  @override
+  String get moduleStocksSubtitle =>
+      'Stock, requests, thresholds, items and supplies';
+
+  @override
+  String get actionStockRequests => 'Stock requests';
+
+  @override
+  String get lowStockTitle => 'Low stock';
+
+  @override
+  String get actionSupplyRestaurant => 'Supply Restaurant';
+
+  @override
+  String get actionSupplyBar => 'Supply Bar';
+
+  @override
+  String get actionSupplyHotel => 'Supply Hotel';
+
+  @override
+  String get directSupplyRestaurantTitle => 'Direct supply - Restaurant';
+
+  @override
+  String get directSupplyBarTitle => 'Direct supply - Bar';
+
+  @override
+  String get directSupplyHotelTitle => 'Direct supply - Hotel';
+
+  @override
+  String get actionItemRegistry => 'Item registry';
+
+  @override
+  String get actionCreateStock => 'Create a stock';
+
+  @override
+  String get moduleServersTitle => 'Waiters & Collections';
+
+  @override
+  String get moduleServersSubtitle => 'Waiters, handovers and collections';
+
+  @override
+  String get actionValidateHandovers => 'Validate handovers';
+
+  @override
+  String get actionServerCollections => 'Waiter collections';
+
+  @override
+  String get moduleBillingRoomsTitle => 'Billing & Rooms';
+
+  @override
+  String get moduleBillingRoomsSubtitle =>
+      'Invoices, rooms and accounting transfer';
+
+  @override
+  String get actionRoomBilling => 'Room billing';
+
+  @override
+  String get actionInvoicesList => 'Invoice list';
+
+  @override
+  String get actionAccountingTransfer => 'Accounting transfer';
+
+  @override
+  String get moduleMenuTitle => 'Menu & Operations';
+
+  @override
+  String get moduleMenuSubtitle => 'Restaurant and bar menu management';
+
+  @override
+  String get actionManageMenu => 'Manage the menu';
+
+  @override
+  String get createStockPageTitle => 'Manager stock creation';
+
+  @override
+  String get createStockTitle => 'Stock creation / import';
+
+  @override
+  String get createStockSubtitle =>
+      'Pick an active item and enter the quantity, or import several rows from a file.';
+
+  @override
+  String get manualEntry => 'Manual entry';
+
+  @override
+  String get noActiveItemFound => 'No active item found in stock_items.';
+
+  @override
+  String get labelStockItem => 'Stock item';
+
+  @override
+  String get hintQuantityExample => 'E.g. 25';
+
+  @override
+  String get errQuantityRequired => 'Please enter a quantity';
+
+  @override
+  String get errQuantityMustBeInteger => 'The quantity must be a whole number.';
+
+  @override
+  String get errQuantityNegative => 'The quantity cannot be negative';
+
+  @override
+  String get errChooseAnItem => 'Please choose an item';
+
+  @override
+  String get errSelectAnItem => 'Please select an item.';
+
+  @override
+  String get stockSavedSuccess => 'Stock saved successfully.';
+
+  @override
+  String errLoadItemsFailed(String error) {
+    return 'Error loading items: $error';
+  }
+
+  @override
+  String errSaveFailed(String error) {
+    return 'Error while saving: $error';
+  }
+
+  @override
+  String errImportFailed(String error) {
+    return 'Import error: $error';
+  }
+
+  @override
+  String get importCancelled => 'Import cancelled.';
+
+  @override
+  String get errFileUnreadable => 'Unable to read the selected file.';
+
+  @override
+  String get errUnsupportedFormat => 'Unsupported format. Use CSV or XLSX.';
+
+  @override
+  String get errNoUsableRow => 'No usable row found.';
+
+  @override
+  String get errItemNameMissing => 'missing item name';
+
+  @override
+  String get errQuantityInvalidShort => 'invalid quantity';
+
+  @override
+  String errItemNotInStockItems(String name) {
+    return 'item “$name” not found in stock_items';
+  }
+
+  @override
+  String lineErrorLine(int line, String message) {
+    return 'Row $line: $message';
+  }
+
+  @override
+  String importSuccessCount(int count) {
+    return '$count stock(s) imported successfully.';
+  }
+
+  @override
+  String importPartialResult(int success, int errors) {
+    return '$success successful import(s), $errors error(s).';
+  }
+
+  @override
+  String importedCountShort(int count) {
+    return '$count stock(s) imported.';
+  }
+
+  @override
+  String get importingInProgress => 'Importing...';
+
+  @override
+  String get actionImportCsvExcel => 'Import CSV / Excel';
+
+  @override
+  String get importRecommendedFormat => 'Recommended import format';
+
+  @override
+  String get expectedColumns => 'Expected columns:';
+
+  @override
+  String get exampleLabel => 'Example:';
+
+  @override
+  String get importExampleRow1 => 'Mineral water | 48';
+
+  @override
+  String get importExampleRow2 => 'Local rice | 120';
+
+  @override
+  String get fieldsSavedInStoreStocks => 'Fields saved in store_stocks';
+
+  @override
+  String storeLine(String store) {
+    return 'Store: $store';
+  }
+
+  @override
+  String unitLine(String unit) {
+    return 'Unit: $unit';
+  }
 }
