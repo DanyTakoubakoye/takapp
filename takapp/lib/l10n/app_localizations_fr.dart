@@ -2420,7 +2420,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get menuManagementTitle => 'Gestion du menu';
 
   @override
-  String get errItemNameRequired => 'Veuillez renseigner le nom de l’article.';
+  String get errItemNameRequired => 'Veuillez saisir le nom de l’article.';
 
   @override
   String get errCategoryRequired => 'Veuillez renseigner la catégorie.';
@@ -3221,4 +3221,186 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get errPickCocktailOrBarItem =>
       'Veuillez choisir un cocktail ou article du bar.';
+
+  @override
+  String get hygieneServiceTitle => 'Service Hygiène';
+
+  @override
+  String get butlerHygieneLeadTitle => 'Majordome / Chef service hygiène';
+
+  @override
+  String get butlerHygieneLeadSubtitle =>
+      'Pilote la préparation des chambres, l’utilisation des produits et les demandes de réapprovisionnement.';
+
+  @override
+  String get actionDailyHygiene => 'Hygiène journalière';
+
+  @override
+  String get actionAddHotelItem => 'Ajouter article hôtel';
+
+  @override
+  String get supplyRequestHotelTitle => 'Demande approvisionnement - Hôtel';
+
+  @override
+  String get actionRequestSupplyShort => 'Demander approvisionnement';
+
+  @override
+  String get receptionsToConfirmHotelTitle => 'Réceptions à confirmer - Hôtel';
+
+  @override
+  String get actionValidateReception => 'Valider réception';
+
+  @override
+  String get hotelStockItemsTitle => 'Articles de stock - Hôtel';
+
+  @override
+  String get newHotelItemTitle => 'Nouvel article hôtel';
+
+  @override
+  String get storeAutoSetToHotel =>
+      'Le store est automatiquement défini sur : hotel';
+
+  @override
+  String get hotelItemSavedSuccess => 'Article hôtel enregistré avec succès.';
+
+  @override
+  String get hintHotelItemNameExample => 'Ex. Serviette blanche';
+
+  @override
+  String get hintHotelCategoryExample => 'Ex. Linge, Hygiène, Chambre';
+
+  @override
+  String get hintHotelUnitExamples => 'Ex. pièce, carton, litre';
+
+  @override
+  String storeNameLine(String store) {
+    return 'Magasin : $store';
+  }
+
+  @override
+  String typeLine(String type) {
+    return 'Type : $type';
+  }
+
+  @override
+  String quantityUnitLine(String quantity, String unit) {
+    return 'Quantité : $quantity $unit';
+  }
+
+  @override
+  String reasonLine(String reason) {
+    return 'Motif : $reason';
+  }
+
+  @override
+  String byLine(String name) {
+    return 'Par : $name';
+  }
+
+  @override
+  String updatedAtLine(String date) {
+    return 'Mis à jour : $date';
+  }
+
+  @override
+  String get noMovementRecorded => 'Aucun mouvement enregistré.';
+
+  @override
+  String get noStockForStore => 'Aucun stock enregistré pour ce magasin.';
+
+  @override
+  String get labelStoreWord => 'Magasin';
+
+  @override
+  String get labelLastUpdate => 'Dernière mise à jour';
+
+  @override
+  String get actionTakePhoto => 'Prendre une photo';
+
+  @override
+  String get actionChooseFromGallery => 'Choisir dans la galerie';
+
+  @override
+  String errPhotoFailed(String error) {
+    return 'Erreur photo : $error';
+  }
+
+  @override
+  String get errSaveDishFirst =>
+      'Enregistrez d’abord le plat, puis ajoutez sa photo.';
+
+  @override
+  String get errNoDataRowShort => 'Aucune ligne de données.';
+
+  @override
+  String rejectedRowMissingNameUnit(int line) {
+    return 'Ligne $line : nom ou unité manquant.';
+  }
+
+  @override
+  String rejectedRowUnknownCategory(int line, String name, String category) {
+    return 'Ligne $line ($name) : catégorie inconnue « $category ».';
+  }
+
+  @override
+  String rejectedRowUnknownStore(int line, String name, String store) {
+    return 'Ligne $line ($name) : magasin inconnu « $store ».';
+  }
+
+  @override
+  String createdItemsCount(int count) {
+    return '$count article(s) créé(s)';
+  }
+
+  @override
+  String ignoredEmptyRowsCount(int count) {
+    return '$count ligne(s) vide(s) ignorée(s).';
+  }
+
+  @override
+  String get existingItemsIgnored => 'Articles déjà existants (ignorés) :';
+
+  @override
+  String get rejectedRowsTitle => 'Lignes rejetées :';
+
+  @override
+  String get validCategoriesAndStoresHint =>
+      'Catégories valides : voir la liste du formulaire. Magasins valides : Hôtel, Restaurant, Bar.';
+
+  @override
+  String get itemRegistryTitle => 'Registre des articles';
+
+  @override
+  String get itemRegistrySubtitle =>
+      'Crée et organise les articles de stock avant approvisionnement.';
+
+  @override
+  String get registryImportExampleRows =>
+      'Riz | Céréales | sac | restaurant\nCoca | Boissons | bouteille | Bar';
+
+  @override
+  String get registryImportHint =>
+      'La catégorie doit exister dans la liste. Le magasin : Hôtel, Restaurant ou Bar.';
+
+  @override
+  String get hintItemNameExamples => 'Ex : Riz, Huile, Sucre';
+
+  @override
+  String get labelStoreField => 'Magasin';
+
+  @override
+  String get hintUnitExamplesLong => 'Ex : g, cl, bouteille, sachet, pièce';
+
+  @override
+  String get errUnitRequired => 'Veuillez saisir l’unité.';
+
+  @override
+  String get savedItemsTitle => 'Articles enregistrés';
+
+  @override
+  String get noItemRecordedYet => 'Aucun article enregistré pour le moment.';
+
+  @override
+  String get startCreatingItemsHint =>
+      'Commence par créer des articles comme riz, huile, sucre, eau minérale, détergent, etc.';
 }

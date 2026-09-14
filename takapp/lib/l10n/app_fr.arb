@@ -2077,5 +2077,159 @@
   "defineCocktailIngredientsTitle": "Définir les ingrédients des cocktails",
 
   "cocktailPhotoTitle": "Photo du cocktail",
-  "errPickCocktailOrBarItem": "Veuillez choisir un cocktail ou article du bar."
+  "errPickCocktailOrBarItem": "Veuillez choisir un cocktail ou article du bar.",
+
+  "hygieneServiceTitle": "Service Hygiène",
+  "butlerHygieneLeadTitle": "Majordome / Chef service hygiène",
+  "butlerHygieneLeadSubtitle": "Pilote la préparation des chambres, l’utilisation des produits et les demandes de réapprovisionnement.",
+  "actionDailyHygiene": "Hygiène journalière",
+  "actionAddHotelItem": "Ajouter article hôtel",
+  "supplyRequestHotelTitle": "Demande approvisionnement - Hôtel",
+  "actionRequestSupplyShort": "Demander approvisionnement",
+  "receptionsToConfirmHotelTitle": "Réceptions à confirmer - Hôtel",
+  "actionValidateReception": "Valider réception",
+  "hotelStockItemsTitle": "Articles de stock - Hôtel",
+  "newHotelItemTitle": "Nouvel article hôtel",
+  "storeAutoSetToHotel": "Le store est automatiquement défini sur : hotel",
+  "hotelItemSavedSuccess": "Article hôtel enregistré avec succès.",
+  "hintHotelItemNameExample": "Ex. Serviette blanche",
+  "hintHotelCategoryExample": "Ex. Linge, Hygiène, Chambre",
+  "hintHotelUnitExamples": "Ex. pièce, carton, litre",
+
+  "storeNameLine": "Magasin : {store}",
+  "@storeNameLine": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      }
+    }
+  },
+  "typeLine": "Type : {type}",
+  "@typeLine": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "quantityUnitLine": "Quantité : {quantity} {unit}",
+  "@quantityUnitLine": {
+    "placeholders": {
+      "quantity": {
+        "type": "String"
+      },
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "reasonLine": "Motif : {reason}",
+  "@reasonLine": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "byLine": "Par : {name}",
+  "@byLine": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "updatedAtLine": "Mis à jour : {date}",
+  "@updatedAtLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "noMovementRecorded": "Aucun mouvement enregistré.",
+  "noStockForStore": "Aucun stock enregistré pour ce magasin.",
+  "labelStoreWord": "Magasin",
+  "labelLastUpdate": "Dernière mise à jour",
+  "actionTakePhoto": "Prendre une photo",
+  "actionChooseFromGallery": "Choisir dans la galerie",
+  "errPhotoFailed": "Erreur photo : {error}",
+  "@errPhotoFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+
+  "errSaveDishFirst": "Enregistrez d’abord le plat, puis ajoutez sa photo.",
+
+  "errNoDataRowShort": "Aucune ligne de données.",
+  "rejectedRowMissingNameUnit": "Ligne {line} : nom ou unité manquant.",
+  "@rejectedRowMissingNameUnit": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      }
+    }
+  },
+  "rejectedRowUnknownCategory": "Ligne {line} ({name}) : catégorie inconnue « {category} ».",
+  "@rejectedRowUnknownCategory": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      },
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "rejectedRowUnknownStore": "Ligne {line} ({name}) : magasin inconnu « {store} ».",
+  "@rejectedRowUnknownStore": {
+    "placeholders": {
+      "line": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      },
+      "store": {
+        "type": "String"
+      }
+    }
+  },
+  "createdItemsCount": "{count} article(s) créé(s)",
+  "@createdItemsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ignoredEmptyRowsCount": "{count} ligne(s) vide(s) ignorée(s).",
+  "@ignoredEmptyRowsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "existingItemsIgnored": "Articles déjà existants (ignorés) :",
+  "rejectedRowsTitle": "Lignes rejetées :",
+  "validCategoriesAndStoresHint": "Catégories valides : voir la liste du formulaire. Magasins valides : Hôtel, Restaurant, Bar.",
+  "itemRegistryTitle": "Registre des articles",
+  "itemRegistrySubtitle": "Crée et organise les articles de stock avant approvisionnement.",
+  "registryImportExampleRows": "Riz | Céréales | sac | restaurant\nCoca | Boissons | bouteille | Bar",
+  "registryImportHint": "La catégorie doit exister dans la liste. Le magasin : Hôtel, Restaurant ou Bar.",
+  "hintItemNameExamples": "Ex : Riz, Huile, Sucre",
+  "errItemNameRequired": "Veuillez saisir le nom de l’article.",
+  "labelStoreField": "Magasin",
+  "hintUnitExamplesLong": "Ex : g, cl, bouteille, sachet, pièce",
+  "errUnitRequired": "Veuillez saisir l’unité.",
+  "savedItemsTitle": "Articles enregistrés",
+  "noItemRecordedYet": "Aucun article enregistré pour le moment.",
+  "startCreatingItemsHint": "Commence par créer des articles comme riz, huile, sucre, eau minérale, détergent, etc."
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:takapp/services/menu_image_service.dart';
 
@@ -31,8 +33,10 @@ class _MenuPhotoPickerState extends State<MenuPhotoPicker> {
   String? get _displayUrl => _localUrl ?? widget.currentImageUrl;
 
   Future<void> _choose(ImageSource source) async {
+    final l10n = AppLocalizations.of(context);
+
     if (widget.menuItemId.trim().isEmpty) {
-      _msg('Enregistrez d\'abord le plat, puis ajoutez sa photo.');
+      _msg(l10n.errSaveDishFirst);
       return;
     }
     try {
@@ -52,15 +56,17 @@ class _MenuPhotoPickerState extends State<MenuPhotoPicker> {
         _uploading = false;
       });
       widget.onUploaded(url);
-      _msg('Photo enregistrée.');
+      _msg(l10n.photoSaved);
     } catch (e) {
       if (!mounted) return;
       setState(() => _uploading = false);
-      _msg('Erreur photo : $e');
+      _msg(l10n.errPhotoFailed('$e'));
     }
   }
 
   void _openSourceSheet() {
+    final l10n = AppLocalizations.of(context);
+
     showModalBottomSheet<void>(
       context: context,
       builder: (sheetContext) => SafeArea(
@@ -69,7 +75,7 @@ class _MenuPhotoPickerState extends State<MenuPhotoPicker> {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt_outlined),
-              title: const Text('Prendre une photo'),
+              title: Text(l10n.actionTakePhoto),
               onTap: () {
                 Navigator.pop(sheetContext);
                 _choose(ImageSource.camera);
@@ -77,7 +83,7 @@ class _MenuPhotoPickerState extends State<MenuPhotoPicker> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('Choisir dans la galerie'),
+              title: Text(l10n.actionChooseFromGallery),
               onTap: () {
                 Navigator.pop(sheetContext);
                 _choose(ImageSource.gallery);

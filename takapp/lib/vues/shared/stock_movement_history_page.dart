@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:takapp/modeles/stock_movement_model.dart';
 import 'package:takapp/services/store_stock_service.dart';
@@ -30,6 +32,7 @@ class StockMovementHistoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final service = StoreStockService();
     final isSmall = MediaQuery.of(context).size.width < 800;
 
@@ -46,13 +49,13 @@ class StockMovementHistoryPage extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Erreur : ${snapshot.error}'));
+            return Center(child: Text(l10n.commonError('${snapshot.error}')));
           }
 
           final items = snapshot.data ?? [];
 
           if (items.isEmpty) {
-            return const Center(child: Text('Aucun mouvement enregistré.'));
+            return Center(child: Text(l10n.noMovementRecorded));
           }
 
           return ListView.separated(
@@ -78,12 +81,12 @@ class StockMovementHistoryPage extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(
-                    'Magasin : $store\n'
-                    'Type : ${isIn ? "Entrée" : "Sortie"}\n'
-                    'Quantité : ${item.quantity.toStringAsFixed(item.quantity % 1 == 0 ? 0 : 2)} ${item.unit}\n'
-                    'Motif : ${item.reason}\n'
-                    'Par : ${item.performedByName}\n'
-                    'Date : ${item.createdAt == null ? "-" : DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt!)}',
+                    '${l10n.storeNameLine(store)}\n'
+                    '${l10n.typeLine(isIn ? l10n.labelEntry : l10n.labelExit)}\n'
+                    '${l10n.quantityUnitLine(item.quantity.toStringAsFixed(item.quantity % 1 == 0 ? 0 : 2), item.unit)}\n'
+                    '${l10n.reasonLine(item.reason)}\n'
+                    '${l10n.byLine(item.performedByName)}\n'
+                    '${l10n.dateLine(item.createdAt == null ? "-" : DateFormat('dd/MM/yyyy HH:mm').format(item.createdAt!))}',
                   ),
                   trailing: Text(
                     '${isIn ? "+" : "-"}${item.quantity.toStringAsFixed(item.quantity % 1 == 0 ? 0 : 2)}',

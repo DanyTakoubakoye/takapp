@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/vues/shared/create_stock_request_page.dart';
 import 'package:takapp/vues/shared/store_request_history_page.dart';
 import 'package:takapp/vues/hygiene/hygiene_daily_page.dart';
@@ -11,27 +12,26 @@ class MajordomeHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final auth = context.watch<AuthController>();
     final user = auth.currentUser;
     final isSmall = MediaQuery.of(context).size.width < 800;
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: Text('Utilisateur introuvable.')),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errUserNotFound)));
     }
 
     final establishmentId = user.establishmentId.trim();
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Service Hygiène'),
+        title: Text(l10n.hygieneServiceTitle),
         actions: [
           IconButton(
             onPressed: () => context.read<AuthController>().logout(),
@@ -45,12 +45,12 @@ class MajordomeHomePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Majordome / Chef service hygiène',
+              l10n.butlerHygieneLeadTitle,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 6),
             Text(
-              'Pilote la préparation des chambres, l’utilisation des produits et les demandes de réapprovisionnement.',
+              l10n.butlerHygieneLeadSubtitle,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 16),
@@ -88,7 +88,7 @@ class MajordomeHomePage extends StatelessWidget {
                         );
                       },
                       icon: const Icon(Icons.cleaning_services),
-                      label: const Text('Hygiène journalière'),
+                      label: Text(l10n.actionDailyHygiene),
                     ),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
@@ -114,7 +114,7 @@ class MajordomeHomePage extends StatelessWidget {
                         );
                       },
                       icon: const Icon(Icons.add_business_outlined),
-                      label: const Text('Ajouter article hôtel'),
+                      label: Text(l10n.actionAddHotelItem),
                     ),
                     OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
@@ -134,13 +134,13 @@ class MajordomeHomePage extends StatelessWidget {
                               establishmentId: establishmentId,
                               store: 'hotel',
                               requestedByRole: 'majordhomme',
-                              title: 'Demande approvisionnement - Hôtel',
+                              title: l10n.supplyRequestHotelTitle,
                             ),
                           ),
                         );
                       },
                       icon: const Icon(Icons.playlist_add_circle_outlined),
-                      label: const Text('Demander approvisionnement'),
+                      label: Text(l10n.actionRequestSupplyShort),
                     ),
                     OutlinedButton.icon(
                       style: OutlinedButton.styleFrom(
@@ -159,13 +159,13 @@ class MajordomeHomePage extends StatelessWidget {
                             builder: (_) => StoreRequestHistoryPage(
                               establishmentId: establishmentId,
                               store: 'hotel',
-                              title: 'Réceptions à confirmer - Hôtel',
+                              title: l10n.receptionsToConfirmHotelTitle,
                             ),
                           ),
                         );
                       },
                       icon: const Icon(Icons.check_circle_outline),
-                      label: const Text('Valider réception'),
+                      label: Text(l10n.actionValidateReception),
                     ),
                   ],
                 ),

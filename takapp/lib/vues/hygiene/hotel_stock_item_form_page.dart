@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import 'package:takapp/l10n/app_localizations.dart';
+
 class HotelStockItemFormPage extends StatefulWidget {
   final String establishmentId;
 
@@ -40,8 +42,10 @@ class _HotelStockItemFormPageState extends State<HotelStockItemFormPage> {
   }
 
   Future<void> _saveHotelItem() async {
+    final l10n = AppLocalizations.of(context);
+
     if (establishmentId.isEmpty) {
-      _showMessage('Établissement introuvable.');
+      _showMessage(l10n.errEstablishmentNotFound);
       return;
     }
 
@@ -67,11 +71,11 @@ class _HotelStockItemFormPageState extends State<HotelStockItemFormPage> {
 
       if (!mounted) return;
 
-      _showMessage('Article hôtel enregistré avec succès.');
+      _showMessage(l10n.hotelItemSavedSuccess);
     } catch (e) {
       if (!mounted) return;
 
-      _showMessage('Erreur lors de l’enregistrement : $e');
+      _showMessage(l10n.errSaveFailed('$e'));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -97,7 +101,7 @@ class _HotelStockItemFormPageState extends State<HotelStockItemFormPage> {
       ),
       validator: (value) {
         if (value == null || value.trim().isEmpty) {
-          return 'Champ obligatoire';
+          return AppLocalizations.of(context).errRequiredField;
         }
         return null;
       },
@@ -106,16 +110,17 @@ class _HotelStockItemFormPageState extends State<HotelStockItemFormPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isSmall = MediaQuery.of(context).size.width < 700;
 
     if (establishmentId.isEmpty) {
-      return const Scaffold(
-        body: Center(child: Text('Établissement introuvable.')),
+      return Scaffold(
+        body: Center(child: Text(l10n.errEstablishmentNotFound)),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Articles de stock - Hôtel')),
+      appBar: AppBar(title: Text(l10n.hotelStockItemsTitle)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Center(
@@ -134,32 +139,32 @@ class _HotelStockItemFormPageState extends State<HotelStockItemFormPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Nouvel article hôtel',
+                        l10n.newHotelItemTitle,
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
                       const SizedBox(height: 8),
-                      const Text(
-                        'Le store est automatiquement défini sur : hotel',
-                        style: TextStyle(fontWeight: FontWeight.w500),
+                      Text(
+                        l10n.storeAutoSetToHotel,
+                        style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                       const SizedBox(height: 20),
                       if (isSmall) ...[
                         _buildField(
                           controller: _nameController,
-                          label: 'Nom',
-                          hint: 'Ex. Serviette blanche',
+                          label: l10n.labelName,
+                          hint: l10n.hintHotelItemNameExample,
                         ),
                         const SizedBox(height: 12),
                         _buildField(
                           controller: _categoryController,
-                          label: 'Catégorie',
-                          hint: 'Ex. Linge, Hygiène, Chambre',
+                          label: l10n.labelCategory,
+                          hint: l10n.hintHotelCategoryExample,
                         ),
                         const SizedBox(height: 12),
                         _buildField(
                           controller: _unitController,
-                          label: 'Unité',
-                          hint: 'Ex. pièce, carton, litre',
+                          label: l10n.labelUnit,
+                          hint: l10n.hintHotelUnitExamples,
                         ),
                       ] else ...[
                         Row(
@@ -167,24 +172,24 @@ class _HotelStockItemFormPageState extends State<HotelStockItemFormPage> {
                             Expanded(
                               child: _buildField(
                                 controller: _nameController,
-                                label: 'Nom',
-                                hint: 'Ex. Serviette blanche',
+                                label: l10n.labelName,
+                                hint: l10n.hintHotelItemNameExample,
                               ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: _buildField(
                                 controller: _categoryController,
-                                label: 'Catégorie',
-                                hint: 'Ex. Linge, Hygiène, Chambre',
+                                label: l10n.labelCategory,
+                                hint: l10n.hintHotelCategoryExample,
                               ),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
                               child: _buildField(
                                 controller: _unitController,
-                                label: 'Unité',
-                                hint: 'Ex. pièce, carton, litre',
+                                label: l10n.labelUnit,
+                                hint: l10n.hintHotelUnitExamples,
                               ),
                             ),
                           ],
@@ -193,7 +198,7 @@ class _HotelStockItemFormPageState extends State<HotelStockItemFormPage> {
                       const SizedBox(height: 12),
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text('Article actif'),
+                        title: Text(l10n.labelActiveItem),
                         value: _isActive,
                         onChanged: _isSaving
                             ? null
@@ -218,7 +223,7 @@ class _HotelStockItemFormPageState extends State<HotelStockItemFormPage> {
                           label: Text(
                             _isSaving
                                 ? 'Enregistrement...'
-                                : 'Enregistrer l’article',
+                                : l10n.actionSaveItem,
                           ),
                         ),
                       ),

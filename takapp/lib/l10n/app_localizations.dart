@@ -4298,7 +4298,7 @@ abstract class AppLocalizations {
   /// No description provided for @errItemNameRequired.
   ///
   /// In fr, this message translates to:
-  /// **'Veuillez renseigner le nom de l’article.'**
+  /// **'Veuillez saisir le nom de l’article.'**
   String get errItemNameRequired;
 
   /// No description provided for @errCategoryRequired.
@@ -5668,6 +5668,306 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Veuillez choisir un cocktail ou article du bar.'**
   String get errPickCocktailOrBarItem;
+
+  /// No description provided for @hygieneServiceTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Service Hygiène'**
+  String get hygieneServiceTitle;
+
+  /// No description provided for @butlerHygieneLeadTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Majordome / Chef service hygiène'**
+  String get butlerHygieneLeadTitle;
+
+  /// No description provided for @butlerHygieneLeadSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pilote la préparation des chambres, l’utilisation des produits et les demandes de réapprovisionnement.'**
+  String get butlerHygieneLeadSubtitle;
+
+  /// No description provided for @actionDailyHygiene.
+  ///
+  /// In fr, this message translates to:
+  /// **'Hygiène journalière'**
+  String get actionDailyHygiene;
+
+  /// No description provided for @actionAddHotelItem.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter article hôtel'**
+  String get actionAddHotelItem;
+
+  /// No description provided for @supplyRequestHotelTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demande approvisionnement - Hôtel'**
+  String get supplyRequestHotelTitle;
+
+  /// No description provided for @actionRequestSupplyShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demander approvisionnement'**
+  String get actionRequestSupplyShort;
+
+  /// No description provided for @receptionsToConfirmHotelTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réceptions à confirmer - Hôtel'**
+  String get receptionsToConfirmHotelTitle;
+
+  /// No description provided for @actionValidateReception.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valider réception'**
+  String get actionValidateReception;
+
+  /// No description provided for @hotelStockItemsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Articles de stock - Hôtel'**
+  String get hotelStockItemsTitle;
+
+  /// No description provided for @newHotelItemTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouvel article hôtel'**
+  String get newHotelItemTitle;
+
+  /// No description provided for @storeAutoSetToHotel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le store est automatiquement défini sur : hotel'**
+  String get storeAutoSetToHotel;
+
+  /// No description provided for @hotelItemSavedSuccess.
+  ///
+  /// In fr, this message translates to:
+  /// **'Article hôtel enregistré avec succès.'**
+  String get hotelItemSavedSuccess;
+
+  /// No description provided for @hintHotelItemNameExample.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. Serviette blanche'**
+  String get hintHotelItemNameExample;
+
+  /// No description provided for @hintHotelCategoryExample.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. Linge, Hygiène, Chambre'**
+  String get hintHotelCategoryExample;
+
+  /// No description provided for @hintHotelUnitExamples.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. pièce, carton, litre'**
+  String get hintHotelUnitExamples;
+
+  /// No description provided for @storeNameLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Magasin : {store}'**
+  String storeNameLine(String store);
+
+  /// No description provided for @typeLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Type : {type}'**
+  String typeLine(String type);
+
+  /// No description provided for @quantityUnitLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quantité : {quantity} {unit}'**
+  String quantityUnitLine(String quantity, String unit);
+
+  /// No description provided for @reasonLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Motif : {reason}'**
+  String reasonLine(String reason);
+
+  /// No description provided for @byLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Par : {name}'**
+  String byLine(String name);
+
+  /// No description provided for @updatedAtLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mis à jour : {date}'**
+  String updatedAtLine(String date);
+
+  /// No description provided for @noMovementRecorded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun mouvement enregistré.'**
+  String get noMovementRecorded;
+
+  /// No description provided for @noStockForStore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun stock enregistré pour ce magasin.'**
+  String get noStockForStore;
+
+  /// No description provided for @labelStoreWord.
+  ///
+  /// In fr, this message translates to:
+  /// **'Magasin'**
+  String get labelStoreWord;
+
+  /// No description provided for @labelLastUpdate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dernière mise à jour'**
+  String get labelLastUpdate;
+
+  /// No description provided for @actionTakePhoto.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prendre une photo'**
+  String get actionTakePhoto;
+
+  /// No description provided for @actionChooseFromGallery.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir dans la galerie'**
+  String get actionChooseFromGallery;
+
+  /// No description provided for @errPhotoFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Erreur photo : {error}'**
+  String errPhotoFailed(String error);
+
+  /// No description provided for @errSaveDishFirst.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrez d’abord le plat, puis ajoutez sa photo.'**
+  String get errSaveDishFirst;
+
+  /// No description provided for @errNoDataRowShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune ligne de données.'**
+  String get errNoDataRowShort;
+
+  /// No description provided for @rejectedRowMissingNameUnit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ligne {line} : nom ou unité manquant.'**
+  String rejectedRowMissingNameUnit(int line);
+
+  /// No description provided for @rejectedRowUnknownCategory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ligne {line} ({name}) : catégorie inconnue « {category} ».'**
+  String rejectedRowUnknownCategory(int line, String name, String category);
+
+  /// No description provided for @rejectedRowUnknownStore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ligne {line} ({name}) : magasin inconnu « {store} ».'**
+  String rejectedRowUnknownStore(int line, String name, String store);
+
+  /// No description provided for @createdItemsCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} article(s) créé(s)'**
+  String createdItemsCount(int count);
+
+  /// No description provided for @ignoredEmptyRowsCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} ligne(s) vide(s) ignorée(s).'**
+  String ignoredEmptyRowsCount(int count);
+
+  /// No description provided for @existingItemsIgnored.
+  ///
+  /// In fr, this message translates to:
+  /// **'Articles déjà existants (ignorés) :'**
+  String get existingItemsIgnored;
+
+  /// No description provided for @rejectedRowsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lignes rejetées :'**
+  String get rejectedRowsTitle;
+
+  /// No description provided for @validCategoriesAndStoresHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Catégories valides : voir la liste du formulaire. Magasins valides : Hôtel, Restaurant, Bar.'**
+  String get validCategoriesAndStoresHint;
+
+  /// No description provided for @itemRegistryTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Registre des articles'**
+  String get itemRegistryTitle;
+
+  /// No description provided for @itemRegistrySubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Crée et organise les articles de stock avant approvisionnement.'**
+  String get itemRegistrySubtitle;
+
+  /// No description provided for @registryImportExampleRows.
+  ///
+  /// In fr, this message translates to:
+  /// **'Riz | Céréales | sac | restaurant\nCoca | Boissons | bouteille | Bar'**
+  String get registryImportExampleRows;
+
+  /// No description provided for @registryImportHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'La catégorie doit exister dans la liste. Le magasin : Hôtel, Restaurant ou Bar.'**
+  String get registryImportHint;
+
+  /// No description provided for @hintItemNameExamples.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex : Riz, Huile, Sucre'**
+  String get hintItemNameExamples;
+
+  /// No description provided for @labelStoreField.
+  ///
+  /// In fr, this message translates to:
+  /// **'Magasin'**
+  String get labelStoreField;
+
+  /// No description provided for @hintUnitExamplesLong.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex : g, cl, bouteille, sachet, pièce'**
+  String get hintUnitExamplesLong;
+
+  /// No description provided for @errUnitRequired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Veuillez saisir l’unité.'**
+  String get errUnitRequired;
+
+  /// No description provided for @savedItemsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Articles enregistrés'**
+  String get savedItemsTitle;
+
+  /// No description provided for @noItemRecordedYet.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun article enregistré pour le moment.'**
+  String get noItemRecordedYet;
+
+  /// No description provided for @startCreatingItemsHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commence par créer des articles comme riz, huile, sucre, eau minérale, détergent, etc.'**
+  String get startCreatingItemsHint;
 }
 
 class _AppLocalizationsDelegate

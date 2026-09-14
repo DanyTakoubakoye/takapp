@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/modeles/stock_item_model.dart';
@@ -71,6 +73,8 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
   bool _isSaving = false;
 
   Future<void> _saveItem() async {
+    final l10n = AppLocalizations.of(context);
+
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isSaving = true);
@@ -94,15 +98,15 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
 
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Article enregistré avec succès.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.menuItemSavedSuccess)));
     } catch (e) {
       if (!mounted) return;
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erreur lors de l’enregistrement : $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errSaveFailed('$e'))));
     } finally {
       if (mounted) {
         setState(() => _isSaving = false);
@@ -139,10 +143,12 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
   }
 
   Future<void> _importFromExcel() async {
+    final l10n = AppLocalizations.of(context);
+
     if (widget.establishmentId.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Établissement introuvable.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errEstablishmentNotFound)));
       return;
     }
 
@@ -156,9 +162,9 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
     final bytes = result.files.first.bytes;
     if (bytes == null) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Impossible de lire le fichier.')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.errFileUnreadable)));
       return;
     }
 
@@ -170,16 +176,16 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
         if (!mounted) return;
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('Fichier Excel vide.')));
+        ).showSnackBar(SnackBar(content: Text(l10n.errEmptyExcelFile)));
         return;
       }
       final sheet = excel.tables.values.first;
       final rows = sheet.rows;
       if (rows.length < 2) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Aucune ligne de données.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(l10n.errNoDataRowShort)));
         return;
       }
 
@@ -219,14 +225,14 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
         }
 
         if (name.isEmpty || unit.isEmpty) {
-          lignesRejetees.add('Ligne ${i + 1} : nom ou unité manquant.');
+          lignesRejetees.add(l10n.rejectedRowMissingNameUnit(i + 1));
           continue;
         }
 
         final category = _resolveCategory(categoryRaw);
         if (category == null) {
           lignesRejetees.add(
-            'Ligne ${i + 1} ($name) : catégorie inconnue « $categoryRaw ».',
+            l10n.rejectedRowUnknownCategory(i + 1, name, categoryRaw),
           );
           continue;
         }
@@ -234,7 +240,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
         final store = _resolveStore(storeRaw);
         if (store == null) {
           lignesRejetees.add(
-            'Ligne ${i + 1} ($name) : magasin inconnu « $storeRaw ».',
+            l10n.rejectedRowUnknownStore(i + 1, name, storeRaw),
           );
           continue;
         }
@@ -244,7 +250,9 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
         // dans ce même fichier. On saute sans arrêter l'import.
         final cle = '${_norm(name)}|${_norm(category)}|${_norm(store)}';
         if (clesExistantes.contains(cle)) {
-          doublonsIgnores.add('$name ($category, ${_storeLabel(store)})');
+          doublonsIgnores.add(
+            '$name ($category, ${_storeLabel(store, l10n)})',
+          );
           continue;
         }
         clesExistantes.add(cle);
@@ -271,7 +279,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Erreur lors de l\'import : $e')));
+      ).showSnackBar(SnackBar(content: Text(l10n.errImportFailed('$e'))));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -283,10 +291,12 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
     required List<String> doublonsIgnores,
     required int lignesIgnorees,
   }) async {
+    final l10n = AppLocalizations.of(context);
+
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Rapport d\'import'),
+        title: Text(l10n.importReportTitle),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -297,20 +307,20 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                   const Icon(Icons.check_circle, color: Colors.green, size: 20),
                   const SizedBox(width: 8),
                   Text(
-                    '$importes article(s) créé(s)',
+                    l10n.createdItemsCount(importes),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
               if (lignesIgnorees > 0) ...[
                 const SizedBox(height: 8),
-                Text('$lignesIgnorees ligne(s) vide(s) ignorée(s).'),
+                Text(l10n.ignoredEmptyRowsCount(lignesIgnorees)),
               ],
               if (doublonsIgnores.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                const Text(
-                  'Articles déjà existants (ignorés) :',
-                  style: TextStyle(
+                Text(
+                  l10n.existingItemsIgnored,
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.orange,
                   ),
@@ -320,9 +330,9 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
               ],
               if (lignesRejetees.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                const Text(
-                  'Lignes rejetées :',
-                  style: TextStyle(
+                Text(
+                  l10n.rejectedRowsTitle,
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.orange,
                   ),
@@ -330,10 +340,12 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                 const SizedBox(height: 4),
                 ...lignesRejetees.map((l) => Text('• $l')),
                 const SizedBox(height: 12),
-                const Text(
-                  'Catégories valides : voir la liste du formulaire. '
-                  'Magasins valides : Hôtel, Restaurant, Bar.',
-                  style: TextStyle(fontStyle: FontStyle.italic, fontSize: 12),
+                Text(
+                  l10n.validCategoriesAndStoresHint,
+                  style: const TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ],
@@ -395,14 +407,14 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
     }
   }
 
-  String _storeLabel(String store) {
+  String _storeLabel(String store, AppLocalizations l10n) {
     switch (store.toLowerCase()) {
       case 'hotel':
-        return 'Hôtel';
+        return l10n.storeNameHotel;
       case 'restaurant':
-        return 'Restaurant';
+        return l10n.storeNameRestaurant;
       case 'bar':
-        return 'Bar';
+        return l10n.storeNameBar;
       default:
         return store;
     }
@@ -451,6 +463,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isSmall = MediaQuery.of(context).size.width < 800;
     final user = context.watch<AuthController>().currentUser;
 
@@ -466,7 +479,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Registre des articles'),
+        title: Text(l10n.itemRegistryTitle),
         centerTitle: true,
       ),
       body: Container(
@@ -533,6 +546,8 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
   }
 
   Widget _buildHeaderCard(int totalItems) {
+    final l10n = AppLocalizations.of(context);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(18),
@@ -570,9 +585,9 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Registre des articles',
-                  style: TextStyle(
+                Text(
+                  l10n.itemRegistryTitle,
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
@@ -580,7 +595,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Crée et organise les articles de stock avant approvisionnement.',
+                  l10n.itemRegistrySubtitle,
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.92),
                     fontSize: 13.5,
@@ -619,6 +634,8 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
   }
 
   Widget _buildFormCard(List<String> stores) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 2,
       shadowColor: Colors.black12,
@@ -644,7 +661,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
               OutlinedButton.icon(
                 onPressed: _isSaving ? null : _importFromExcel,
                 icon: const Icon(Icons.upload_file),
-                label: const Text('Importer depuis Excel'),
+                label: Text(l10n.actionImportFromExcel),
               ),
               const SizedBox(height: 8),
               Container(
@@ -654,33 +671,31 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
                 ),
-                child: const Column(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Format Excel attendu',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      l10n.excelExpectedFormat,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 8),
-                    Text('Colonnes :'),
-                    SizedBox(height: 4),
-                    Text(
+                    const SizedBox(height: 8),
+                    Text(l10n.columnsLabel),
+                    const SizedBox(height: 4),
+                    const Text(
                       'name | category | unit | store',
                       style: TextStyle(fontFamily: 'monospace'),
                     ),
-                    SizedBox(height: 8),
-                    Text('Exemple :'),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 8),
+                    Text(l10n.exampleLabel),
+                    const SizedBox(height: 4),
                     Text(
-                      'Riz | Céréales | sac | restaurant\n'
-                      'Coca | Boissons | bouteille | Bar',
-                      style: TextStyle(fontFamily: 'monospace'),
+                      l10n.registryImportExampleRows,
+                      style: const TextStyle(fontFamily: 'monospace'),
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
-                      'La catégorie doit exister dans la liste. '
-                      'Le magasin : Hôtel, Restaurant ou Bar.',
-                      style: TextStyle(
+                      l10n.registryImportHint,
+                      style: const TextStyle(
                         fontStyle: FontStyle.italic,
                         fontSize: 12,
                       ),
@@ -693,8 +708,8 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                 controller: _nameController,
                 textCapitalization: TextCapitalization.words,
                 decoration: InputDecoration(
-                  labelText: 'Nom de l’article',
-                  hintText: 'Ex : Riz, Huile, Sucre',
+                  labelText: l10n.labelItemName,
+                  hintText: l10n.hintItemNameExamples,
                   prefixIcon: const Icon(Icons.inventory),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -702,7 +717,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Veuillez saisir le nom de l’article.';
+                    return l10n.errItemNameRequired;
                   }
                   return null;
                 },
@@ -711,7 +726,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
               DropdownButtonFormField<String>(
                 initialValue: _selectedCategory,
                 decoration: InputDecoration(
-                  labelText: 'Catégorie',
+                  labelText: l10n.labelCategory,
                   prefixIcon: const Icon(Icons.category_outlined),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -734,7 +749,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
               DropdownButtonFormField<String>(
                 initialValue: _selectedStore,
                 decoration: InputDecoration(
-                  labelText: 'Magasin',
+                  labelText: l10n.labelStoreField,
                   prefixIcon: const Icon(Icons.store),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -743,7 +758,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                 items: stores.map((store) {
                   return DropdownMenuItem<String>(
                     value: store,
-                    child: Text(_storeLabel(store)),
+                    child: Text(_storeLabel(store, l10n)),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -758,8 +773,8 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                 controller: _unitController,
                 textCapitalization: TextCapitalization.words,
                 decoration: InputDecoration(
-                  labelText: 'Unité',
-                  hintText: 'Ex : g, cl, bouteille, sachet, pièce',
+                  labelText: l10n.labelUnit,
+                  hintText: l10n.hintUnitExamplesLong,
                   prefixIcon: const Icon(Icons.straighten),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
@@ -767,7 +782,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                 ),
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Veuillez saisir l’unité.';
+                    return l10n.errUnitRequired;
                   }
                   return null;
                 },
@@ -796,7 +811,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                         )
                       : const Icon(Icons.save_alt),
                   label: Text(
-                    _isSaving ? 'Enregistrement...' : 'Enregistrer l’article',
+                    _isSaving ? l10n.savingInProgress : l10n.actionSaveItem,
                   ),
                 ),
               ),
@@ -811,6 +826,8 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
     AsyncSnapshot<List<StockItemModel>> snapshot,
     List<StockItemModel> items,
   ) {
+    final l10n = AppLocalizations.of(context);
+
     return Card(
       elevation: 2,
       shadowColor: Colors.black12,
@@ -822,13 +839,16 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.list_alt, color: Colors.green),
-                  SizedBox(width: 8),
+                  const Icon(Icons.list_alt, color: Colors.green),
+                  const SizedBox(width: 8),
                   Text(
-                    'Articles enregistrés',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                    l10n.savedItemsTitle,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ],
               ),
@@ -845,7 +865,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                   child: Padding(
                     padding: const EdgeInsets.all(20),
                     child: Text(
-                      'Erreur : ${snapshot.error}',
+                      l10n.commonError('${snapshot.error}'),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -859,27 +879,27 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: Colors.grey.shade300),
                   ),
-                  child: const Column(
+                  child: Column(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.inventory_2_outlined,
                         size: 42,
                         color: Colors.grey,
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       Text(
-                        'Aucun article enregistré pour le moment.',
-                        style: TextStyle(
+                        l10n.noItemRecordedYet,
+                        style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           color: Colors.black87,
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 6),
+                      const SizedBox(height: 6),
                       Text(
-                        'Commence par créer des articles comme riz, huile, sucre, eau minérale, détergent, etc.',
+                        l10n.startCreatingItemsHint,
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.black54),
+                        style: const TextStyle(color: Colors.black54),
                       ),
                     ],
                   ),
@@ -971,7 +991,7 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                                             ),
                                           ),
                                           child: Text(
-                                            'Unité : ${item.unit}',
+                                            l10n.unitLine(item.unit),
                                             style: const TextStyle(
                                               color: Colors.black87,
                                               fontWeight: FontWeight.w600,
@@ -1002,7 +1022,10 @@ class _StockItemRegistryPageState extends State<StockItemRegistryPage> {
                                               ),
                                               const SizedBox(width: 4),
                                               Text(
-                                                _storeLabel(item.store),
+                                                _storeLabel(
+                                                  item.store,
+                                                  l10n,
+                                                ),
                                                 style: TextStyle(
                                                   color: storeColor,
                                                   fontWeight: FontWeight.w600,

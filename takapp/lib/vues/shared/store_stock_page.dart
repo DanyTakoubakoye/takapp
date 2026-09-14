@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+
+import 'package:takapp/l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:takapp/modeles/store_stock_model.dart';
 import 'package:takapp/services/store_stock_service.dart';
@@ -43,6 +45,7 @@ class StoreStockPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final service = StoreStockService();
     final isSmall = MediaQuery.of(context).size.width < 800;
     final color = _storeColor();
@@ -60,7 +63,7 @@ class StoreStockPage extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Erreur : ${snapshot.error}'));
+            return Center(child: Text(l10n.commonError('${snapshot.error}')));
           }
 
           final stocks = snapshot.data ?? [];
@@ -73,7 +76,7 @@ class StoreStockPage extends StatelessWidget {
                   Icon(_storeIcon(), size: 60, color: color.withValues(alpha: 0.7)),
                   const SizedBox(height: 12),
                   Text(
-                    'Aucun stock enregistré pour ce magasin.',
+                    l10n.noStockForStore,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ],
@@ -100,9 +103,9 @@ class StoreStockPage extends StatelessWidget {
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     subtitle: Text(
-                      'Magasin : ${item.store}\n'
-                      'Unité : ${item.unit}\n'
-                      'Mis à jour : ${item.updatedAt == null ? "-" : DateFormat('dd/MM/yyyy HH:mm').format(item.updatedAt!)}',
+                      '${l10n.storeNameLine(item.store)}\n'
+                      '${l10n.unitLine(item.unit)}\n'
+                      '${l10n.updatedAtLine(item.updatedAt == null ? "-" : DateFormat('dd/MM/yyyy HH:mm').format(item.updatedAt!))}',
                     ),
                     trailing: Text(
                       item.quantity.toStringAsFixed(
@@ -128,12 +131,12 @@ class StoreStockPage extends StatelessWidget {
                 padding: const EdgeInsets.all(12),
                 child: DataTable(
                   columnSpacing: 20,
-                  columns: const [
-                    DataColumn(label: Text('Article')),
-                    DataColumn(label: Text('Magasin')),
-                    DataColumn(label: Text('Unité')),
-                    DataColumn(label: Text('Quantité')),
-                    DataColumn(label: Text('Dernière mise à jour')),
+                  columns: [
+                    DataColumn(label: Text(l10n.labelItem)),
+                    DataColumn(label: Text(l10n.labelStoreWord)),
+                    DataColumn(label: Text(l10n.labelUnit)),
+                    DataColumn(label: Text(l10n.labelQuantity)),
+                    DataColumn(label: Text(l10n.labelLastUpdate)),
                   ],
                   rows: stocks.map((item) {
                     return DataRow(
