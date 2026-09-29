@@ -3,6 +3,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
+import 'package:takapp/core/constants/app_roles.dart';
 import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/core/l10n/language_selector.dart';
 import 'package:takapp/modeles/establishment_plan.dart';
@@ -381,13 +382,19 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
   late String selectedStatus;
   late String selectedPlan;
 
-  /// Valeurs `type` / `status` / `plan` lues dans Firestore, telles quelles
+  /// Valeurs `type` / `status` / `plan` / `stockMode` lues dans Firestore, telles quelles
   /// (absentes en création).
   final Map<String, String> _storedValues = {};
 
   /// Champs que l'admin a explicitement choisis dans leur liste.
   final Set<String> _changedByUser = {};
+
   late StockMode selectedStockMode;
+
+  /// Seul le rôle plateforme peut changer le contrôle du stock (voir
+  /// [AppRoles.canEditStockMode] et firestore.rules).
+  late final bool _canEditStockMode;
+
   late Map<String, bool> selectedModules;
 
   bool isSaving = false;
@@ -422,7 +429,7 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
     // Normalisées : une ancienne valeur (« Hotel », « Active », libellé…) ne
     // doit jamais être passée brute à un menu déroulant, qui exige une valeur
     // présente dans ses items.
-    for (final field in const ['type', 'status', 'plan']) {
+    for (final field in const ['type', 'status', 'plan', 'stockMode']) {
       final raw = data[field];
       if (raw != null) _storedValues[field] = raw.toString();
     }
@@ -430,6 +437,9 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
     selectedStatus = EstablishmentStatus.normalize(data['status']);
     selectedPlan = EstablishmentPlan.normalize(data['plan']);
     selectedStockMode = StockMode.fromValue(data['stockMode']);
+    _canEditStockMode = AppRoles.canEditStockMode(
+      context.read<AuthController>().currentUser?.role ?? '',
+    );
 
     selectedModules = {
       for (final key in widget.moduleKeys) key: modules[key] == true,
@@ -478,7 +488,10 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
       'type': valueToSave('type', selectedType),
       'status': valueToSave('status', selectedStatus),
       'plan': valueToSave('plan', selectedPlan),
-      'stockMode': selectedStockMode.value,
+      // Absent du payload si l'utilisateur n'a pas le droit : merge => la
+      // valeur existante est conservée.
+      if (_canEditStockMode)
+        'stockMode': valueToSave('stockMode', selectedStockMode.value),
       'modules': selectedModules,
     };
 
@@ -635,19 +648,35 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
                 },
               ),
               const SizedBox(height: 12),
-              DropdownButtonFormField<StockMode>(
-                initialValue: selectedStockMode,
-                decoration: InputDecoration(labelText: l10n.stockModeLabel),
-                items: StockMode.values.map((mode) {
-                  return DropdownMenuItem(
-                    value: mode,
-                    child: Text(_stockModeLabel(mode, l10n)),
-                  );
-                }).toList(),
+              _sectionTitle(l10n.stockModeLabel),
+              if (!_canEditStockMode)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    l10n.stockModeGlobalAdminOnly,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ),
+              RadioGroup<StockMode>(
+                groupValue: selectedStockMode,
                 onChanged: (value) {
-                  if (value == null) return;
-                  setState(() => selectedStockMode = value);
+                  if (value == null || !_canEditStockMode) return;
+                  setState(() {
+                    selectedStockMode = value;
+                    _changedByUser.add('stockMode');
+                  });
                 },
+                child: Column(
+                  children: StockMode.values.map((mode) {
+                    return RadioListTile<StockMode>(
+                      value: mode,
+                      enabled: _canEditStockMode,
+                      contentPadding: EdgeInsets.zero,
+                      title: Text(_stockModeLabel(mode, l10n)),
+                      subtitle: Text(_stockModeDescription(mode, l10n)),
+                    );
+                  }).toList(),
+                ),
               ),
               const SizedBox(height: 18),
               _sectionTitle(l10n.enabledModules),
@@ -722,14 +751,6 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
         ),
       ),
     );
-  }
-
-  String _stockModeLabel(StockMode mode, AppLocalizations l10n) {
-    return switch (mode) {
-      StockMode.disabled => l10n.stockModeDisabled,
-      StockMode.warningOnly => l10n.stockModeWarningOnly,
-      StockMode.strict => l10n.stockModeStrict,
-    };
   }
 }
 
@@ -854,6 +875,18 @@ class _EstablishmentCard extends StatelessWidget {
                 ),
                 Chip(
                   label: Text(l10n.planChipLabel(plan.isEmpty ? '-' : plan)),
+                ),
+                // Mode EFFECTIF (absent / inconnu => strict), identique à
+                // celui qu'applique le moteur de commande.
+                Chip(
+                  label: Text(
+                    l10n.stockModeChipLabel(
+                      _stockModeLabel(
+                        StockMode.fromValue(data['stockMode']),
+                        l10n,
+                      ),
+                    ),
+                  ),
                 ),
                 ...modules.entries
                     .where((entry) => entry.value == true)
@@ -1044,4 +1077,22 @@ class _CreateEstablishmentAdminDialogState
       ],
     );
   }
+}
+
+/// Libellés du contrôle du stock : la valeur technique reste le [StockMode],
+/// seul le texte est traduit.
+String _stockModeLabel(StockMode mode, AppLocalizations l10n) {
+  return switch (mode) {
+    StockMode.disabled => l10n.stockModeDisabled,
+    StockMode.warningOnly => l10n.stockModeWarningOnly,
+    StockMode.strict => l10n.stockModeStrict,
+  };
+}
+
+String _stockModeDescription(StockMode mode, AppLocalizations l10n) {
+  return switch (mode) {
+    StockMode.disabled => l10n.stockModeDisabledDescription,
+    StockMode.warningOnly => l10n.stockModeWarningOnlyDescription,
+    StockMode.strict => l10n.stockModeStrictDescription,
+  };
 }

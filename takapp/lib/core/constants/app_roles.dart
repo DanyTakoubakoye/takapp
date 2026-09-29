@@ -170,4 +170,16 @@ class AppRoles {
         normalized == hygiene ||
         normalized == majordhomme;
   }
+
+  /// Réglage `stockMode` d'un établissement : réservé à l'administration
+  /// plateforme. Miroir de `isSuperAdmin()` dans firestore.rules, qui est
+  /// l'autorité réelle ; ce helper ne sert qu'à l'affichage.
+  ///
+  /// Propriétaire et gérante sont volontairement exclus : le mode strict est
+  /// un contrôle anti-perte, celui qui gère le stock ne doit pas pouvoir le
+  /// désactiver lui-même.
+  static bool canEditStockMode(String role) {
+    final normalized = normalizeRole(role);
+    return normalized == globalAdmin || normalized == superAdmin;
+  }
 }

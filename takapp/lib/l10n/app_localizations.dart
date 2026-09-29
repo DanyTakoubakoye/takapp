@@ -7676,7 +7676,7 @@ abstract class AppLocalizations {
   /// No description provided for @stockModeLabel.
   ///
   /// In fr, this message translates to:
-  /// **'Mode de gestion du stock'**
+  /// **'Contrôle du stock lors des commandes'**
   String get stockModeLabel;
 
   /// No description provided for @stockModeDisabled.
@@ -7688,7 +7688,7 @@ abstract class AppLocalizations {
   /// No description provided for @stockModeWarningOnly.
   ///
   /// In fr, this message translates to:
-  /// **'Avertissement uniquement'**
+  /// **'Avertissement'**
   String get stockModeWarningOnly;
 
   /// No description provided for @stockModeStrict.
@@ -7696,6 +7696,36 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Strict'**
   String get stockModeStrict;
+
+  /// No description provided for @stockModeDisabledDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les commandes sont acceptées sans contrôle obligatoire des ingrédients et sans déduction automatique du stock.'**
+  String get stockModeDisabledDescription;
+
+  /// No description provided for @stockModeWarningOnlyDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'TAKAPP vérifie le stock et avertit en cas d\'insuffisance, mais permet de poursuivre la commande.'**
+  String get stockModeWarningOnlyDescription;
+
+  /// No description provided for @stockModeStrictDescription.
+  ///
+  /// In fr, this message translates to:
+  /// **'TAKAPP bloque la commande lorsque la recette ou le stock nécessaire est insuffisant.'**
+  String get stockModeStrictDescription;
+
+  /// No description provided for @stockModeGlobalAdminOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réglage réservé à l\'administration TAKAPP.'**
+  String get stockModeGlobalAdminOnly;
+
+  /// No description provided for @stockModeChipLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Stock : {mode}'**
+  String stockModeChipLabel(String mode);
 
   /// No description provided for @currentStockLine.
   ///

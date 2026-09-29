@@ -99,6 +99,10 @@ service cloud.firestore {
         (store == 'hotel' && isServiceHygiene())
       );
     }
+    // Champs du document établissement modifiables par propriétaire / gérante.
+    function establishmentProfileFields() {
+      return ['name', 'city', 'country', 'updatedAt'];
+    }
     function canManageHotel() {
       return isSignedIn() && (
         isGerante() ||
@@ -163,8 +167,20 @@ service cloud.firestore {
     match /establishments/{establishmentId} {
       allow read: if sameEstablishment(establishmentId);
       allow create: if isSuperAdmin();
+      // Paramètres plateforme (abonnement, contrôle, identité légale) :
+      // stockMode, modules, plan, status, type, ownerUid, ifu, createdAt…
+      // => administration plateforme uniquement.
+      //
+      // Propriétaire / gérante : LISTE BLANCHE de la fiche descriptive. Tout
+      // autre champ, y compris un champ nouveau ou inconnu, est refusé : une
+      // gérante ne peut ni s'ouvrir un module, ni changer de plan, ni
+      // réactiver un établissement suspendu.
       allow update: if sameEstablishment(establishmentId) && (
-        isSuperAdmin() || isAdminOrOwner() || isGerante()
+        isSuperAdmin() || (
+          (isAdminOrOwner() || isGerante()) &&
+          request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(establishmentProfileFields())
+        )
       );
       allow delete: if isSuperAdmin();
 

@@ -317,3 +317,160 @@ test('🔒 un serveur ne peut pas modifier arbitrairement un paiement', async ()
   await assertFails(updateDoc(paymentRef, { amount: 1 }));
   await assertFails(updateDoc(paymentRef, { status: 'cancelled' }));
 });
+// ─────────── STOCK MODE (contrôle du stock des commandes) ───────────
+
+async function seedEstablishmentWithStockMode(stockMode) {
+  await testEnv.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    await setDoc(doc(db, 'establishments', ESTAB_A), {
+      name: 'Estab A', stockMode, plan: 'standard',
+    });
+    await setDoc(doc(db, 'users', 'barmanA'), { role: 'barman', establishmentId: ESTAB_A });
+  });
+}
+
+test('✅ global_admin peut modifier stockMode', async () => {
+  await seedEstablishmentWithStockMode('strict');
+  const ref = doc(asUser(GLOBAL_ADMIN), 'establishments', ESTAB_A);
+  await assertSucceeds(updateDoc(ref, { stockMode: 'warningOnly' }));
+});
+
+test('🔒 serveur et barman ne peuvent PAS modifier stockMode', async () => {
+  await seedEstablishmentWithStockMode('strict');
+  for (const uid of [SERVEUR_A, 'barmanA']) {
+    const ref = doc(asUser(uid), 'establishments', ESTAB_A);
+    await assertFails(updateDoc(ref, { stockMode: 'disabled' }));
+  }
+});
+
+test('🔒 propriétaire et gérante ne peuvent PAS modifier stockMode', async () => {
+  await seedEstablishmentWithStockMode('strict');
+  for (const uid of [PROPRIETAIRE_A, GERANTE_A]) {
+    const ref = doc(asUser(uid), 'establishments', ESTAB_A);
+    await assertFails(updateDoc(ref, { stockMode: 'disabled' }));
+    // Ajouter le champ sur un établissement ancien est aussi un changement.
+    await assertFails(setDoc(ref, { stockMode: 'disabled' }, { merge: true }));
+  }
+});
+
+test('✅ propriétaire et gérante gardent la mise à jour des autres champs', async () => {
+  await seedEstablishmentWithStockMode('strict');
+  for (const uid of [PROPRIETAIRE_A, GERANTE_A]) {
+    const ref = doc(asUser(uid), 'establishments', ESTAB_A);
+    await assertSucceeds(updateDoc(ref, { name: `Renamed by ${uid}` }));
+  }
+});
+
+// ─────────── PARAMÈTRES D'ÉTABLISSEMENT (4C) ───────────
+
+const PLATFORM_FIELDS = {
+  stockMode: 'disabled',
+  modules: { restaurant: true, bar: true, hotel: true, stock: true, fiscalization: true },
+  plan: 'enterprise',
+  status: 'active',
+  type: 'hotel',
+  ownerUid: 'intrus',
+  ifu: '9999999999999',
+  createdAt: new Date(0),
+};
+
+async function seedFullEstablishments() {
+  await testEnv.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    const base = {
+      name: 'Estab', city: 'Cotonou', country: 'Benin', ifu: '1234567890123',
+      ownerUid: PROPRIETAIRE_A, type: 'restaurant', plan: 'starter',
+      status: 'suspended', stockMode: 'strict',
+      modules: { restaurant: true, bar: false, hotel: false, stock: false },
+      createdAt: new Date(1000),
+    };
+    await setDoc(doc(db, 'establishments', ESTAB_A), base);
+    await setDoc(doc(db, 'establishments', ESTAB_B), base);
+    await setDoc(doc(db, 'users', 'barmanA'), { role: 'barman', establishmentId: ESTAB_A });
+    await setDoc(doc(db, 'users', 'superAdmin'), { role: 'super_admin', establishmentId: ESTAB_A });
+  });
+}
+
+for (const [label, uid] of [['gérante', GERANTE_A], ['propriétaire', PROPRIETAIRE_A]]) {
+  for (const [field, value] of Object.entries(PLATFORM_FIELDS)) {
+    test(`🔒 ${label} ne peut PAS modifier ${field}`, async () => {
+      await seedFullEstablishments();
+      const ref = doc(asUser(uid), 'establishments', ESTAB_A);
+      await assertFails(updateDoc(ref, { [field]: value }));
+    });
+  }
+
+  test(`🔒 ${label} ne peut PAS s'activer un seul module (chemin imbriqué)`, async () => {
+    await seedFullEstablishments();
+    const ref = doc(asUser(uid), 'establishments', ESTAB_A);
+    await assertFails(updateDoc(ref, { 'modules.stock': true }));
+  });
+
+  test(`🔒 ${label} ne peut PAS supprimer un champ plateforme par remplacement complet`, async () => {
+    await seedFullEstablishments();
+    const ref = doc(asUser(uid), 'establishments', ESTAB_A);
+    // set() sans merge : modules, plan, status… disparaîtraient.
+    await assertFails(setDoc(ref, { name: 'X', city: 'Y', country: 'Z' }));
+  });
+
+  test(`🔒 ${label} ne peut PAS ajouter un champ inconnu`, async () => {
+    await seedFullEstablishments();
+    const ref = doc(asUser(uid), 'establishments', ESTAB_A);
+    await assertFails(updateDoc(ref, { billingOverride: true }));
+  });
+
+  test(`🔒 ${label} ne peut PAS glisser un champ interdit avec un champ autorisé`, async () => {
+    await seedFullEstablishments();
+    const ref = doc(asUser(uid), 'establishments', ESTAB_A);
+    await assertFails(updateDoc(ref, { name: 'Nouveau nom', status: 'active' }));
+  });
+
+  test(`✅ ${label} peut modifier la fiche (name, city, country, updatedAt)`, async () => {
+    await seedFullEstablishments();
+    const ref = doc(asUser(uid), 'establishments', ESTAB_A);
+    await assertSucceeds(updateDoc(ref, {
+      name: 'Nouveau nom', city: 'Porto-Novo', country: 'Bénin', updatedAt: new Date(),
+    }));
+  });
+
+  test(`🔒 ${label} ne peut PAS modifier la fiche d'un autre établissement`, async () => {
+    await seedFullEstablishments();
+    const ref = doc(asUser(uid), 'establishments', ESTAB_B);
+    await assertFails(updateDoc(ref, { name: 'Piraté' }));
+  });
+}
+
+test('🔒 serveur et barman ne peuvent modifier AUCUN champ de l’établissement', async () => {
+  await seedFullEstablishments();
+  for (const uid of [SERVEUR_A, 'barmanA']) {
+    const ref = doc(asUser(uid), 'establishments', ESTAB_A);
+    await assertFails(updateDoc(ref, { name: 'X' }));
+    await assertFails(updateDoc(ref, { status: 'active' }));
+    await assertFails(updateDoc(ref, { 'modules.stock': true }));
+  }
+});
+
+test('✅ global_admin peut modifier tous les paramètres plateforme', async () => {
+  await seedFullEstablishments();
+  const ref = doc(asUser(GLOBAL_ADMIN), 'establishments', ESTAB_A);
+  await assertSucceeds(updateDoc(ref, { ...PLATFORM_FIELDS, updatedAt: new Date() }));
+  await assertSucceeds(updateDoc(ref, { 'modules.hotel': false }));
+});
+
+test('✅ global_admin peut enregistrer le formulaire complet (set merge)', async () => {
+  await seedFullEstablishments();
+  const ref = doc(asUser(GLOBAL_ADMIN), 'establishments', ESTAB_A);
+  await assertSucceeds(setDoc(ref, {
+    name: 'Estab', city: 'Cotonou', country: 'Benin', ifu: '1234567890123',
+    ownerUid: PROPRIETAIRE_A, type: 'hotel_bar_restaurant', status: 'active',
+    plan: 'premium', stockMode: 'warningOnly',
+    modules: { restaurant: true, bar: true, hotel: true, stock: true },
+    updatedAt: new Date(),
+  }, { merge: true }));
+});
+
+test('ℹ️ super_admin (comportement actuel conservé) garde les droits plateforme', async () => {
+  await seedFullEstablishments();
+  const ref = doc(asUser('superAdmin'), 'establishments', ESTAB_B);
+  await assertSucceeds(updateDoc(ref, { plan: 'premium' }));
+});

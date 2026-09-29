@@ -22,6 +22,10 @@ class _FakeEstablishmentConfigService implements EstablishmentConfigService {
     _streams[establishmentId]?.add(mode);
   }
 
+  void emitError(String establishmentId) {
+    _streams[establishmentId]?.addError(StateError('permission-denied'));
+  }
+
   Future<void> close() async {
     for (final stream in _streams.values) {
       await stream.close();
@@ -71,4 +75,41 @@ void main() {
     controller.dispose();
     await service.close();
   });
+
+  test('a Global Admin change is reflected live, without re-login', () async {
+    final service = _FakeEstablishmentConfigService();
+    final controller = EstablishmentConfigController(service);
+    var notifications = 0;
+    controller.addListener(() => notifications++);
+
+    controller.setEstablishmentId('establishment-a');
+    service.emit('establishment-a', StockMode.strict);
+    service.emit('establishment-a', StockMode.warningOnly);
+    expect(controller.currentStockMode, StockMode.warningOnly);
+
+    service.emit('establishment-a', StockMode.disabled);
+    expect(controller.currentStockMode, StockMode.disabled);
+    expect(notifications, 2);
+
+    controller.dispose();
+    await service.close();
+  });
+
+  test(
+    'a stream failure never keeps a relaxed mode: falls back to strict',
+    () async {
+      final service = _FakeEstablishmentConfigService();
+      final controller = EstablishmentConfigController(service);
+
+      controller.setEstablishmentId('establishment-a');
+      service.emit('establishment-a', StockMode.disabled);
+      expect(controller.currentStockMode, StockMode.disabled);
+
+      service.emitError('establishment-a');
+      expect(controller.currentStockMode, StockMode.strict);
+
+      controller.dispose();
+      await service.close();
+    },
+  );
 }

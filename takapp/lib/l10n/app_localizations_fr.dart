@@ -4406,16 +4406,37 @@ class AppLocalizationsFr extends AppLocalizations {
   String get actionClear => 'Effacer';
 
   @override
-  String get stockModeLabel => 'Mode de gestion du stock';
+  String get stockModeLabel => 'Contrôle du stock lors des commandes';
 
   @override
   String get stockModeDisabled => 'Désactivé';
 
   @override
-  String get stockModeWarningOnly => 'Avertissement uniquement';
+  String get stockModeWarningOnly => 'Avertissement';
 
   @override
   String get stockModeStrict => 'Strict';
+
+  @override
+  String get stockModeDisabledDescription =>
+      'Les commandes sont acceptées sans contrôle obligatoire des ingrédients et sans déduction automatique du stock.';
+
+  @override
+  String get stockModeWarningOnlyDescription =>
+      'TAKAPP vérifie le stock et avertit en cas d\'insuffisance, mais permet de poursuivre la commande.';
+
+  @override
+  String get stockModeStrictDescription =>
+      'TAKAPP bloque la commande lorsque la recette ou le stock nécessaire est insuffisant.';
+
+  @override
+  String get stockModeGlobalAdminOnly =>
+      'Réglage réservé à l\'administration TAKAPP.';
+
+  @override
+  String stockModeChipLabel(String mode) {
+    return 'Stock : $mode';
+  }
 
   @override
   String currentStockLine(String quantity, String unit) {

@@ -2948,10 +2948,22 @@
   "directSupplyTitle": "Direct supply",
   "errInvalidThreshold": "Invalid threshold.",
   "actionClear": "Clear",
-  "stockModeLabel": "Stock management mode",
+  "stockModeLabel": "Stock control on orders",
   "stockModeDisabled": "Disabled",
-  "stockModeWarningOnly": "Warning only",
+  "stockModeWarningOnly": "Warning",
   "stockModeStrict": "Strict",
+  "stockModeDisabledDescription": "Orders are accepted without mandatory ingredient checks and without automatic stock deduction.",
+  "stockModeWarningOnlyDescription": "TAKAPP checks the stock and warns when it is insufficient, but lets the order go through.",
+  "stockModeStrictDescription": "TAKAPP blocks the order when the recipe or the required stock is insufficient.",
+  "stockModeGlobalAdminOnly": "Setting reserved to TAKAPP administration.",
+  "stockModeChipLabel": "Stock: {mode}",
+  "@stockModeChipLabel": {
+    "placeholders": {
+      "mode": {
+        "type": "String"
+      }
+    }
+  },
 
   "currentStockLine": "Current stock: {quantity} {unit}",
   "@currentStockLine": {
