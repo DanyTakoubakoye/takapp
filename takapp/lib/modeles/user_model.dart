@@ -37,7 +37,7 @@ class UserModel {
   });
 
   static String _normalizeRole(dynamic value) {
-    return (value ?? '').toString().trim().toLowerCase();
+    return AppRoles.normalizeRole((value ?? '').toString());
   }
 
   static bool _moduleValue(

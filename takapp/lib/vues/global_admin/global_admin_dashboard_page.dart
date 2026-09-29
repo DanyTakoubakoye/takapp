@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/core/l10n/language_selector.dart';
+import 'package:takapp/modeles/stock_mode.dart';
 
 class GlobalAdminDashboardPage extends StatefulWidget {
   const GlobalAdminDashboardPage({super.key});
@@ -372,6 +373,7 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
   late String selectedType;
   late String selectedStatus;
   late String selectedPlan;
+  late StockMode selectedStockMode;
   late Map<String, bool> selectedModules;
 
   bool isSaving = false;
@@ -406,6 +408,7 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
     selectedType = (data['type'] ?? 'hotel_bar_restaurant').toString();
     selectedStatus = (data['status'] ?? 'active').toString();
     selectedPlan = (data['plan'] ?? 'standard').toString();
+    selectedStockMode = StockMode.fromValue(data['stockMode']);
 
     selectedModules = {
       for (final key in widget.moduleKeys) key: modules[key] == true,
@@ -446,6 +449,7 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
       'type': selectedType,
       'status': selectedStatus,
       'plan': selectedPlan,
+      'stockMode': selectedStockMode.value,
       'modules': selectedModules,
     };
 
@@ -583,6 +587,21 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
                   setState(() => selectedStatus = value);
                 },
               ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<StockMode>(
+                initialValue: selectedStockMode,
+                decoration: InputDecoration(labelText: l10n.stockModeLabel),
+                items: StockMode.values.map((mode) {
+                  return DropdownMenuItem(
+                    value: mode,
+                    child: Text(_stockModeLabel(mode, l10n)),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value == null) return;
+                  setState(() => selectedStockMode = value);
+                },
+              ),
               const SizedBox(height: 18),
               _sectionTitle(l10n.enabledModules),
               Wrap(
@@ -604,16 +623,12 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
                 _sectionTitle(l10n.firstEstablishmentAdmin),
                 TextField(
                   controller: adminNameController,
-                  decoration: InputDecoration(
-                    labelText: l10n.labelAdminName,
-                  ),
+                  decoration: InputDecoration(labelText: l10n.labelAdminName),
                 ),
                 const SizedBox(height: 12),
                 TextField(
                   controller: adminEmailController,
-                  decoration: InputDecoration(
-                    labelText: l10n.labelAdminEmail,
-                  ),
+                  decoration: InputDecoration(labelText: l10n.labelAdminEmail),
                 ),
                 const SizedBox(height: 12),
                 TextField(
@@ -660,6 +675,14 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
         ),
       ),
     );
+  }
+
+  String _stockModeLabel(StockMode mode, AppLocalizations l10n) {
+    return switch (mode) {
+      StockMode.disabled => l10n.stockModeDisabled,
+      StockMode.warningOnly => l10n.stockModeWarningOnly,
+      StockMode.strict => l10n.stockModeStrict,
+    };
   }
 }
 
@@ -782,7 +805,9 @@ class _EstablishmentCard extends StatelessWidget {
                       ? Colors.green.withValues(alpha: 0.12)
                       : Colors.red.withValues(alpha: 0.12),
                 ),
-                Chip(label: Text(l10n.planChipLabel(plan.isEmpty ? '-' : plan))),
+                Chip(
+                  label: Text(l10n.planChipLabel(plan.isEmpty ? '-' : plan)),
+                ),
                 ...modules.entries
                     .where((entry) => entry.value == true)
                     .map((entry) => Chip(label: Text(entry.key))),
@@ -909,9 +934,7 @@ class _CreateEstablishmentAdminDialogState
             children: [
               DropdownButtonFormField<String>(
                 initialValue: selectedEstablishmentId,
-                decoration: InputDecoration(
-                  labelText: l10n.labelEstablishment,
-                ),
+                decoration: InputDecoration(labelText: l10n.labelEstablishment),
                 items: widget.establishments.map((doc) {
                   final data = doc.data();
                   final name = (data['name'] ?? doc.id).toString();

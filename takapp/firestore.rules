@@ -21,6 +21,15 @@ service cloud.firestore {
     function hasAnyRole(roles) {
       return isSignedIn() && userRole() in roles;
     }
+    function canChangeProfileRole(roles) {
+      return request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['role', 'updatedAt']) &&
+        (
+          !request.resource.data.diff(resource.data).affectedKeys()
+            .hasAny(['role']) ||
+          request.resource.data.role in roles
+        );
+    }
     function isSuperAdmin() {
       return userRole() == 'super_admin' || userRole() == 'global_admin';
     }
@@ -53,6 +62,19 @@ service cloud.firestore {
         isSuperAdmin() ||
         userEstablishmentId() == establishmentId
       );
+    }
+    function handoverAfterContainsPayment(establishmentId, handoverId, paymentId) {
+      let handoverPath = /databases/$(database)/documents/establishments/$(establishmentId)/serverHandovers/$(handoverId);
+      return handoverId is string &&
+        existsAfter(handoverPath) &&
+        getAfter(handoverPath).data.paymentIds is list &&
+        getAfter(handoverPath).data.paymentIds.hasAny([paymentId]);
+    }
+    function handoverAfterContainsPaymentInList(establishmentId, handoverId, paymentId, listField) {
+      let handoverPath = /databases/$(database)/documents/establishments/$(establishmentId)/serverHandovers/$(handoverId);
+      return handoverAfterContainsPayment(establishmentId, handoverId, paymentId) &&
+        getAfter(handoverPath).data[listField] is list &&
+        getAfter(handoverPath).data[listField].hasAny([paymentId]);
     }
     function validStore(store) {
       return store in ['restaurant', 'hotel', 'bar', 'divers'];
@@ -96,24 +118,33 @@ service cloud.firestore {
           resource.data.establishmentId == userEstablishmentId()
         )
       );
-      allow create: if isSignedIn() && (
-        isSuperAdmin() ||
-        (
-          (isAdminOrOwner() || isGerante()) &&
-          request.resource.data.establishmentId == userEstablishmentId()
-        )
-      );
+      // Root profiles are created by the authenticated Admin SDK callables.
+      allow create: if false;
       allow update: if isSignedIn() && (
         (
           request.auth.uid == userId &&
           request.resource.data.diff(resource.data).affectedKeys()
             .hasOnly(['fcmToken', 'lastTokenUpdate'])
         ) ||
-        isSuperAdmin() ||
         (
+          isSuperAdmin() &&
+          request.auth.uid != userId &&
+          canChangeProfileRole([
+            'global_admin', 'super_admin', 'proprietaire', 'gerante',
+            'comptable', 'chef_cuisine', 'serveur', 'service_hygiene',
+            'hygiene', 'barman', 'majordhomme', 'receptionniste'
+          ])
+        ) ||
+        (
+          request.auth.uid != userId &&
           (isAdminOrOwner() || isGerante()) &&
           resource.data.establishmentId == userEstablishmentId() &&
-          request.resource.data.establishmentId == resource.data.establishmentId
+          request.resource.data.establishmentId == resource.data.establishmentId &&
+          canChangeProfileRole([
+            'gerante', 'comptable', 'chef_cuisine', 'serveur',
+            'service_hygiene', 'hygiene', 'barman', 'majordhomme',
+            'receptionniste'
+          ])
         )
       );
       allow delete: if isSuperAdmin() || (
@@ -257,10 +288,52 @@ service cloud.firestore {
           isServeur() || isGerante() || isAdminOrOwner()
         );
         allow update: if sameEstablishment(establishmentId) && (
-          isServeur() || isGerante() || isAdminOrOwner() ||
+          (
+            isServeur() &&
+            resource.data.receivedBy == request.auth.uid &&
+            resource.data.handoverStatus == 'pending' &&
+            request.resource.data.handoverStatus == 'declared' &&
+            handoverAfterContainsPayment(establishmentId, request.resource.data.handoverId, paymentId) &&
+            getAfter(/databases/$(database)/documents/establishments/$(establishmentId)/serverHandovers/$(request.resource.data.handoverId)).data.serveurId == request.auth.uid &&
+            request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly([
+                'handoverStatus', 'handoverId', 'updatedAt',
+                'pendingSync', 'syncError'
+              ]) &&
+            request.resource.data.pendingSync == false &&
+            request.resource.data.syncError == false
+          ) ||
+          (
+            (isGerante() || isAdminOrOwner()) &&
+            resource.data.handoverStatus == 'declared' &&
+            resource.data.handoverId is string &&
+            (
+              (
+                request.resource.data.handoverStatus == 'validated' &&
+                request.resource.data.handoverId == resource.data.handoverId &&
+                handoverAfterContainsPaymentInList(establishmentId, resource.data.handoverId, paymentId, 'validatedPaymentIds')
+              ) ||
+              (
+                request.resource.data.handoverStatus == 'pending' &&
+                request.resource.data.handoverId == null &&
+                handoverAfterContainsPaymentInList(establishmentId, resource.data.handoverId, paymentId, 'rejectedPaymentIds')
+              )
+            ) &&
+            request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly([
+                'handoverStatus', 'handoverId', 'updatedAt',
+                'pendingSync', 'syncError'
+              ]) &&
+            request.resource.data.pendingSync == false &&
+            request.resource.data.syncError == false
+          ) ||
           (
             isAccounting() &&
             request.resource.data.handoverStatus == 'validated' &&
+            resource.data.handoverId is string &&
+            request.resource.data.handoverId == resource.data.handoverId &&
+            getAfter(/databases/$(database)/documents/establishments/$(establishmentId)/serverHandovers/$(resource.data.handoverId)).data.accountingTransferStatus == 'received' &&
+            handoverAfterContainsPayment(establishmentId, resource.data.handoverId, paymentId) &&
             request.resource.data.diff(resource.data).affectedKeys()
               .hasOnly(['handoverStatus', 'updatedAt'])
           )

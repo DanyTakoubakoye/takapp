@@ -35,6 +35,7 @@ class ServeurController extends ChangeNotifier {
     required String nomComplet,
     required String telephone,
     required String email,
+    required String password,
   }) async {
     if (establishmentId.trim().isEmpty) {
       _error = const AppError(AppErrorCode.establishmentNotFound);
@@ -60,6 +61,12 @@ class ServeurController extends ChangeNotifier {
       return _error;
     }
 
+    if (password.trim().isEmpty) {
+      _error = const AppError(AppErrorCode.serverRegistrationFailed);
+      notifyListeners();
+      return _error;
+    }
+
     try {
       _isLoading = true;
       _error = null;
@@ -71,6 +78,7 @@ class ServeurController extends ChangeNotifier {
         nomComplet: nomComplet.trim(),
         telephone: telephone.trim(),
         email: email.trim(),
+        password: password.trim(),
       );
 
       return null;

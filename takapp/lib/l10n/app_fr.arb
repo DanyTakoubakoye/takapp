@@ -2946,6 +2946,10 @@
   "directSupplyTitle": "Approvisionnement direct",
   "errInvalidThreshold": "Seuil invalide.",
   "actionClear": "Effacer",
+  "stockModeLabel": "Mode de gestion du stock",
+  "stockModeDisabled": "Désactivé",
+  "stockModeWarningOnly": "Avertissement uniquement",
+  "stockModeStrict": "Strict",
 
   "currentStockLine": "Stock actuel : {quantity} {unit}",
   "@currentStockLine": {

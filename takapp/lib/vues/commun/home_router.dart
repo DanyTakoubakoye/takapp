@@ -84,7 +84,6 @@ class HomeRouter extends StatelessWidget {
         return const UnauthorizedPage();
 
       case AppRoles.hygiene:
-      case AppRoles.legacyHygiene:
         if (user.canAccessHotel) {
           return HygieneDailyPage(establishmentId: user.establishmentId);
         }

@@ -2940,6 +2940,10 @@
   "directSupplyTitle": "Direct supply",
   "errInvalidThreshold": "Invalid threshold.",
   "actionClear": "Clear",
+  "stockModeLabel": "Stock management mode",
+  "stockModeDisabled": "Disabled",
+  "stockModeWarningOnly": "Warning only",
+  "stockModeStrict": "Strict",
 
   "currentStockLine": "Current stock: {quantity} {unit}",
   "@currentStockLine": {

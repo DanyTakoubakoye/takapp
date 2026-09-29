@@ -7667,6 +7667,30 @@ abstract class AppLocalizations {
   /// **'Effacer'**
   String get actionClear;
 
+  /// No description provided for @stockModeLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mode de gestion du stock'**
+  String get stockModeLabel;
+
+  /// No description provided for @stockModeDisabled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Désactivé'**
+  String get stockModeDisabled;
+
+  /// No description provided for @stockModeWarningOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Avertissement uniquement'**
+  String get stockModeWarningOnly;
+
+  /// No description provided for @stockModeStrict.
+  ///
+  /// In fr, this message translates to:
+  /// **'Strict'**
+  String get stockModeStrict;
+
   /// No description provided for @currentStockLine.
   ///
   /// In fr, this message translates to:

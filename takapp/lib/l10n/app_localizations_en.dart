@@ -4355,6 +4355,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get actionClear => 'Clear';
 
   @override
+  String get stockModeLabel => 'Stock management mode';
+
+  @override
+  String get stockModeDisabled => 'Disabled';
+
+  @override
+  String get stockModeWarningOnly => 'Warning only';
+
+  @override
+  String get stockModeStrict => 'Strict';
+
+  @override
   String currentStockLine(String quantity, String unit) {
     return 'Current stock: $quantity $unit';
   }

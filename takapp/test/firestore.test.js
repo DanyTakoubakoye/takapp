@@ -7,7 +7,7 @@ import {
   assertSucceeds,
 } from '@firebase/rules-unit-testing';
 import {
-  doc, getDoc, setDoc, updateDoc, deleteDoc,
+  doc, getDoc, setDoc, updateDoc, deleteDoc, writeBatch,
 } from 'firebase/firestore';
 
 let testEnv;
@@ -62,7 +62,15 @@ beforeEach(async () => {
     // Une clôture de caisse dans A (pour tester le raffinement par rôle)
     await setDoc(doc(db, 'establishments', ESTAB_A, 'accountClosures', 'clo1'), { validated: true });
     await setDoc(doc(db, 'establishments', ESTAB_A, 'payments', 'payment1'), {
-      amount: 1000, handoverStatus: 'pending',
+      amount: 1000, handoverStatus: 'declared', handoverId: 'handover1',
+      receivedBy: SERVEUR_A,
+    });
+    await setDoc(doc(db, 'establishments', ESTAB_A, 'serverHandovers', 'handover1'), {
+      serveurId: SERVEUR_A,
+      paymentIds: ['payment1'],
+      validatedPaymentIds: [],
+      rejectedPaymentIds: [],
+      accountingTransferStatus: 'pending',
     });
 
     // Une notification pour SERVEUR_A
@@ -179,12 +187,48 @@ test('✅ serveur A peut actualiser uniquement son token FCM', async () => {
   }));
 });
 
+test('🔒 une gérante ne peut pas créer directement un profil utilisateur racine', async () => {
+  await assertFails(setDoc(doc(asUser(GERANTE_A), 'users', 'newUser'), {
+    uid: 'newUser', role: 'serveur', establishmentId: ESTAB_A,
+  }));
+});
+
 test('✅ une gérante peut modifier le rôle d’un membre de son établissement', async () => {
   await assertSucceeds(updateDoc(doc(asUser(GERANTE_A), 'users', SERVEUR_A), { role: 'comptable' }));
 });
 
-test('✅ le comptable valide la réception liée à un paiement', async () => {
-  await assertSucceeds(updateDoc(
+test('🔒 une gérante ne peut pas attribuer un rôle propriétaire', async () => {
+  await assertFails(updateDoc(doc(asUser(GERANTE_A), 'users', SERVEUR_A), { role: 'proprietaire' }));
+});
+
+test('🔒 une gérante ne peut pas modifier son propre rôle', async () => {
+  await assertFails(updateDoc(doc(asUser(GERANTE_A), 'users', GERANTE_A), { role: 'serveur' }));
+});
+
+test('🔒 un administrateur global ne peut pas modifier son propre rôle', async () => {
+  await assertFails(updateDoc(doc(asUser(GLOBAL_ADMIN), 'users', GLOBAL_ADMIN), { role: 'super_admin' }));
+});
+
+test('🔒 une gérante ne peut pas modifier un rôle et des champs hors périmètre', async () => {
+  await assertFails(updateDoc(doc(asUser(GERANTE_A), 'users', SERVEUR_A), {
+    role: 'comptable', email: 'changed@example.com',
+  }));
+});
+
+test('✅ le comptable valide la réception liée à une remise reçue', async () => {
+  const db = asUser(COMPTABLE_A);
+  const batch = writeBatch(db);
+  batch.update(doc(db, 'establishments', ESTAB_A, 'serverHandovers', 'handover1'), {
+    accountingTransferStatus: 'received', updatedAt: new Date(),
+  });
+  batch.update(doc(db, 'establishments', ESTAB_A, 'payments', 'payment1'), {
+    handoverStatus: 'validated', updatedAt: new Date(),
+  });
+  await assertSucceeds(batch.commit());
+});
+
+test('🔒 le comptable ne peut pas valider un paiement hors réception comptable', async () => {
+  await assertFails(updateDoc(
     doc(asUser(COMPTABLE_A), 'establishments', ESTAB_A, 'payments', 'payment1'),
     { handoverStatus: 'validated', updatedAt: new Date() },
   ));
@@ -209,4 +253,67 @@ test('✅ global_admin peut créer un établissement', async () => {
     doc(asUser(GLOBAL_ADMIN), 'establishments', 'estabC'),
     { name: 'Tenant C', establishmentId: 'estabC' },
   ));
+});
+
+test('✅ un serveur peut déclarer uniquement la remise de son paiement', async () => {
+  await testEnv.withSecurityRulesDisabled(async (ctx) => {
+    await updateDoc(doc(ctx.firestore(), 'establishments', ESTAB_A, 'payments', 'payment1'), {
+      handoverStatus: 'pending', handoverId: null,
+    });
+  });
+  const db = asUser(SERVEUR_A);
+  const batch = writeBatch(db);
+  batch.set(doc(db, 'establishments', ESTAB_A, 'serverHandovers', 'handover2'), {
+    serveurId: SERVEUR_A, paymentIds: ['payment1'],
+  });
+  batch.update(doc(db, 'establishments', ESTAB_A, 'payments', 'payment1'), {
+    handoverStatus: 'declared', handoverId: 'handover2',
+    updatedAt: new Date(), pendingSync: false, syncError: false,
+  });
+  await assertSucceeds(batch.commit());
+});
+
+test('✅ une gérante peut valider la remise d’un paiement', async () => {
+  const db = asUser(GERANTE_A);
+  const batch = writeBatch(db);
+  batch.update(doc(db, 'establishments', ESTAB_A, 'serverHandovers', 'handover1'), {
+    status: 'validated', validatedPaymentIds: ['payment1'],
+  });
+  batch.update(doc(db, 'establishments', ESTAB_A, 'payments', 'payment1'), {
+    handoverStatus: 'validated', updatedAt: new Date(),
+    pendingSync: false, syncError: false,
+  });
+  await assertSucceeds(batch.commit());
+});
+
+test('✅ un propriétaire conserve la validation liée d’une remise', async () => {
+  const db = asUser(PROPRIETAIRE_A);
+  const batch = writeBatch(db);
+  batch.update(doc(db, 'establishments', ESTAB_A, 'serverHandovers', 'handover1'), {
+    status: 'validated', validatedPaymentIds: ['payment1'],
+  });
+  batch.update(doc(db, 'establishments', ESTAB_A, 'payments', 'payment1'), {
+    handoverStatus: 'validated', updatedAt: new Date(),
+    pendingSync: false, syncError: false,
+  });
+  await assertSucceeds(batch.commit());
+});
+
+test('✅ une gérante peut rejeter un paiement de remise', async () => {
+  const db = asUser(GERANTE_A);
+  const batch = writeBatch(db);
+  batch.update(doc(db, 'establishments', ESTAB_A, 'serverHandovers', 'handover1'), {
+    status: 'validated', rejectedPaymentIds: ['payment1'],
+  });
+  batch.update(doc(db, 'establishments', ESTAB_A, 'payments', 'payment1'), {
+    handoverStatus: 'pending', handoverId: null, updatedAt: new Date(),
+    pendingSync: false, syncError: false,
+  });
+  await assertSucceeds(batch.commit());
+});
+
+test('🔒 un serveur ne peut pas modifier arbitrairement un paiement', async () => {
+  const paymentRef = doc(asUser(SERVEUR_A), 'establishments', ESTAB_A, 'payments', 'payment1');
+  await assertFails(updateDoc(paymentRef, { amount: 1 }));
+  await assertFails(updateDoc(paymentRef, { status: 'cancelled' }));
 });

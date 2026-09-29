@@ -22,11 +22,14 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
 
   final TextEditingController _emailController = TextEditingController();
 
+  final TextEditingController _passwordController = TextEditingController();
+
   @override
   void dispose() {
     _nomController.dispose();
     _telephoneController.dispose();
     _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -62,6 +65,7 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
       nomComplet: _nomController.text.trim(),
       telephone: _telephoneController.text.trim(),
       email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
     );
 
     if (!mounted) return;
@@ -80,6 +84,7 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
     _nomController.clear();
     _telephoneController.clear();
     _emailController.clear();
+    _passwordController.clear();
   }
 
   @override
@@ -93,9 +98,7 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
     }
 
     if (user.establishmentId.trim().isEmpty) {
-      return Scaffold(
-        body: Center(child: Text(l10n.errEstablishmentNotFound)),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errEstablishmentNotFound)));
     }
 
     return Consumer<ServeurController>(
@@ -183,6 +186,22 @@ class _EnregistrerServeurPageState extends State<EnregistrerServeurPage> {
 
                               if (!emailRegex.hasMatch(value.trim())) {
                                 return l10n.errInvalidEmail;
+                              }
+
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 24),
+                          TextFormField(
+                            controller: _passwordController,
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              labelText: l10n.labelTemporaryPasswordRequired,
+                              border: const OutlineInputBorder(),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return l10n.errNameEmailPasswordRequired;
                               }
 
                               return null;

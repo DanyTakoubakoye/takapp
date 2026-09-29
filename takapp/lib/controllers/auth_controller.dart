@@ -67,7 +67,6 @@ class AuthController extends ChangeNotifier {
 
   bool get isServiceHygiene {
     return currentUserRole == AppRoles.hygiene ||
-        currentUserRole == AppRoles.legacyHygiene ||
         currentUserRole == AppRoles.majordhomme;
   }
 

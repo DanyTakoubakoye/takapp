@@ -17,6 +17,11 @@ class AppRoles {
   static const majordhomme = 'majordhomme';
   static const receptionniste = 'receptionniste';
 
+  static String normalizeRole(String role) {
+    final normalized = role.trim().toLowerCase();
+    return normalized == legacyHygiene ? hygiene : normalized;
+  }
+
   /// =========================
   /// LISTE COMPLETE
   /// =========================
@@ -29,7 +34,6 @@ class AppRoles {
     chefCuisine,
     serveur,
     hygiene,
-    legacyHygiene,
     barman,
     majordhomme,
     receptionniste,
@@ -50,7 +54,6 @@ class AppRoles {
     chefCuisine: 'Chef Cuisine',
     serveur: 'Serveur',
     hygiene: 'Service Hygiène',
-    legacyHygiene: 'Service Hygiène',
     barman: 'Barman',
     majordhomme: 'Majordhomme',
     receptionniste: 'Réceptionniste',
@@ -79,7 +82,6 @@ class AppRoles {
     chefCuisine: ['restaurant', 'stock'],
     serveur: ['restaurant', 'bar', 'hotel', 'fiscalization'],
     hygiene: ['hotel', 'stock'],
-    legacyHygiene: ['hotel', 'stock'],
     barman: ['bar', 'stock'],
     majordhomme: ['hotel', 'stock'],
     receptionniste: ['hotel', 'fiscalization'],
@@ -89,7 +91,8 @@ class AppRoles {
   /// LABEL ROLE (REPLI)
   /// =========================
   static String getLabel(String role) {
-    return labels[role] ?? role;
+    final normalized = normalizeRole(role);
+    return labels[normalized] ?? normalized;
   }
 
   /// =========================
@@ -99,7 +102,7 @@ class AppRoles {
   /// Le rôle reste une valeur technique ('gerante', 'chef_cuisine'…)
   /// stockée en base et comparée partout : seul son rendu est localisé.
   static String label(AppLocalizations l10n, String role) {
-    switch (role) {
+    switch (normalizeRole(role)) {
       case globalAdmin:
         return l10n.roleGlobalAdmin;
       case superAdmin:
@@ -115,7 +118,6 @@ class AppRoles {
       case serveur:
         return l10n.roleWaiter;
       case hygiene:
-      case legacyHygiene:
         return l10n.roleHousekeeping;
       case barman:
         return l10n.roleBartender;
@@ -139,14 +141,14 @@ class AppRoles {
   /// MODULES D'UN ROLE
   /// =========================
   static List<String> getModules(String role) {
-    return modules[role] ?? [];
+    return modules[normalizeRole(role)] ?? [];
   }
 
   /// =========================
   /// ROLE A ACCES MODULE ?
   /// =========================
   static bool canAccessModule({required String role, required String module}) {
-    final roleModules = modules[role] ?? [];
+    final roleModules = modules[normalizeRole(role)] ?? [];
     return roleModules.contains(module);
   }
 
@@ -154,15 +156,18 @@ class AppRoles {
   /// HELPERS
   /// =========================
   static bool isAdmin(String role) {
-    return role == superAdmin || role == proprietaire || role == gerante;
+    final normalized = normalizeRole(role);
+    return normalized == superAdmin ||
+        normalized == proprietaire ||
+        normalized == gerante;
   }
 
   static bool isStockManager(String role) {
-    return role == gerante ||
-        role == chefCuisine ||
-        role == barman ||
-        role == hygiene ||
-        role == legacyHygiene ||
-        role == majordhomme;
+    final normalized = normalizeRole(role);
+    return normalized == gerante ||
+        normalized == chefCuisine ||
+        normalized == barman ||
+        normalized == hygiene ||
+        normalized == majordhomme;
   }
 }
