@@ -1,3 +1,5 @@
+import 'package:takapp/core/constants/app_roles.dart';
+
 class UserModel {
   final String uid;
 
@@ -50,54 +52,8 @@ class UserModel {
     return fallback;
   }
 
-  static bool _canAccessRestaurantByRole(String role) {
-    return role == 'serveur' ||
-        role == 'chef_cuisine' ||
-        role == 'gerante' ||
-        role == 'comptable' ||
-        role == 'proprietaire' ||
-        role == 'super_admin';
-  }
-
-  static bool _canAccessBarByRole(String role) {
-    return role == 'serveur' ||
-        role == 'barman' ||
-        role == 'gerante' ||
-        role == 'comptable' ||
-        role == 'proprietaire' ||
-        role == 'super_admin';
-  }
-
-  static bool _canAccessHotelByRole(String role) {
-    return role == 'serveur' ||
-        role == 'service_hygiene' ||
-        role == 'hygiene' ||
-        role == 'majordhomme' ||
-        role == 'receptionniste' ||
-        role == 'gerante' ||
-        role == 'comptable' ||
-        role == 'proprietaire' ||
-        role == 'super_admin';
-  }
-
-  static bool _canAccessStockByRole(String role) {
-    return role == 'chef_cuisine' ||
-        role == 'barman' ||
-        role == 'service_hygiene' ||
-        role == 'hygiene' ||
-        role == 'majordhomme' ||
-        role == 'gerante' ||
-        role == 'proprietaire' ||
-        role == 'super_admin';
-  }
-
-  static bool _canAccessFiscalizationByRole(String role) {
-    return role == 'serveur' ||
-        role == 'gerante' ||
-        role == 'comptable' ||
-        role == 'receptionniste' ||
-        role == 'proprietaire' ||
-        role == 'super_admin';
+  static bool _canAccessModuleByRole(String role, String module) {
+    return AppRoles.canAccessModule(role: role, module: module);
   }
 
   /// [establishmentModules] : le champ `modules` du document
@@ -125,8 +81,8 @@ class UserModel {
     final bool applySubscription =
         establishmentModules != null &&
         establishmentModules.isNotEmpty &&
-        role != 'super_admin' &&
-        role != 'global_admin';
+        role != AppRoles.superAdmin &&
+        role != AppRoles.globalAdmin;
 
     bool effectiveAccess(String key, bool byRole) {
       final fromRole = _moduleValue(modules, key, byRole);
@@ -147,14 +103,20 @@ class UserModel {
       isActive: map['isActive'] != false,
       canAccessRestaurant: effectiveAccess(
         'restaurant',
-        _canAccessRestaurantByRole(role),
+        _canAccessModuleByRole(role, 'restaurant'),
       ),
-      canAccessBar: effectiveAccess('bar', _canAccessBarByRole(role)),
-      canAccessHotel: effectiveAccess('hotel', _canAccessHotelByRole(role)),
-      canAccessStock: effectiveAccess('stock', _canAccessStockByRole(role)),
+      canAccessBar: effectiveAccess('bar', _canAccessModuleByRole(role, 'bar')),
+      canAccessHotel: effectiveAccess(
+        'hotel',
+        _canAccessModuleByRole(role, 'hotel'),
+      ),
+      canAccessStock: effectiveAccess(
+        'stock',
+        _canAccessModuleByRole(role, 'stock'),
+      ),
       canAccessFiscalization: effectiveAccess(
         'fiscalization',
-        _canAccessFiscalizationByRole(role),
+        _canAccessModuleByRole(role, 'fiscalization'),
       ),
     );
   }

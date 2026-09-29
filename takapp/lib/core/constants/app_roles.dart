@@ -12,6 +12,7 @@ class AppRoles {
   static const chefCuisine = 'chef_cuisine';
   static const serveur = 'serveur';
   static const hygiene = 'service_hygiene';
+  static const legacyHygiene = 'hygiene';
   static const barman = 'barman';
   static const majordhomme = 'majordhomme';
   static const receptionniste = 'receptionniste';
@@ -28,6 +29,7 @@ class AppRoles {
     chefCuisine,
     serveur,
     hygiene,
+    legacyHygiene,
     barman,
     majordhomme,
     receptionniste,
@@ -48,6 +50,7 @@ class AppRoles {
     chefCuisine: 'Chef Cuisine',
     serveur: 'Serveur',
     hygiene: 'Service Hygiène',
+    legacyHygiene: 'Service Hygiène',
     barman: 'Barman',
     majordhomme: 'Majordhomme',
     receptionniste: 'Réceptionniste',
@@ -70,19 +73,13 @@ class AppRoles {
       'analytics',
       'settings',
     ],
-    proprietaire: [
-      'restaurant',
-      'bar',
-      'hotel',
-      'stock',
-      'analytics',
-      'settings',
-    ],
+    proprietaire: ['restaurant', 'bar', 'hotel', 'analytics', 'settings'],
     gerante: ['restaurant', 'bar', 'hotel', 'stock', 'analytics'],
     comptable: ['restaurant', 'bar', 'hotel', 'analytics', 'fiscalization'],
     chefCuisine: ['restaurant', 'stock'],
-    serveur: ['restaurant'],
+    serveur: ['restaurant', 'bar', 'hotel', 'fiscalization'],
     hygiene: ['hotel', 'stock'],
+    legacyHygiene: ['hotel', 'stock'],
     barman: ['bar', 'stock'],
     majordhomme: ['hotel', 'stock'],
     receptionniste: ['hotel', 'fiscalization'],
@@ -118,6 +115,7 @@ class AppRoles {
       case serveur:
         return l10n.roleWaiter;
       case hygiene:
+      case legacyHygiene:
         return l10n.roleHousekeeping;
       case barman:
         return l10n.roleBartender;
@@ -164,6 +162,7 @@ class AppRoles {
         role == chefCuisine ||
         role == barman ||
         role == hygiene ||
+        role == legacyHygiene ||
         role == majordhomme;
   }
 }

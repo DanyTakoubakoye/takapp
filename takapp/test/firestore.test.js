@@ -7,7 +7,7 @@ import {
   assertSucceeds,
 } from '@firebase/rules-unit-testing';
 import {
-  doc, getDoc, setDoc, deleteDoc,
+  doc, getDoc, setDoc, updateDoc, deleteDoc,
 } from 'firebase/firestore';
 
 let testEnv;
@@ -20,6 +20,8 @@ const ESTAB_B = 'estabB';
 const SERVEUR_A = 'serveurA';
 const SERVEUR_B = 'serveurB';
 const GERANTE_A = 'geranteA';
+const COMPTABLE_A = 'comptableA';
+const PROPRIETAIRE_A = 'proprietaireA';
 const GLOBAL_ADMIN = 'globalAdmin';
 
 before(async () => {
@@ -49,6 +51,8 @@ beforeEach(async () => {
     await setDoc(doc(db, 'users', SERVEUR_A), { role: 'serveur', establishmentId: ESTAB_A });
     await setDoc(doc(db, 'users', SERVEUR_B), { role: 'serveur', establishmentId: ESTAB_B });
     await setDoc(doc(db, 'users', GERANTE_A), { role: 'gerante', establishmentId: ESTAB_A });
+    await setDoc(doc(db, 'users', COMPTABLE_A), { role: 'comptable', establishmentId: ESTAB_A });
+    await setDoc(doc(db, 'users', PROPRIETAIRE_A), { role: 'proprietaire', establishmentId: ESTAB_A });
     await setDoc(doc(db, 'users', GLOBAL_ADMIN), { role: 'global_admin', establishmentId: '' });
 
     // Une commande dans chaque établissement
@@ -57,6 +61,9 @@ beforeEach(async () => {
 
     // Une clôture de caisse dans A (pour tester le raffinement par rôle)
     await setDoc(doc(db, 'establishments', ESTAB_A, 'accountClosures', 'clo1'), { validated: true });
+    await setDoc(doc(db, 'establishments', ESTAB_A, 'payments', 'payment1'), {
+      amount: 1000, handoverStatus: 'pending',
+    });
 
     // Une notification pour SERVEUR_A
     await setDoc(doc(db, 'establishments', ESTAB_A, 'serverNotifications', 'notif1'), {
@@ -142,4 +149,64 @@ test('✅ un utilisateur connecté lit le catalogue modules racine', async () =>
   });
   const db = asUser(SERVEUR_A);
   await assertSucceeds(getDoc(doc(db, 'modules', 'restaurant')));
+});
+
+test('🔒 serveur A ne peut PAS lire le profil du serveur B', async () => {
+  await assertFails(getDoc(doc(asUser(SERVEUR_A), 'users', SERVEUR_B)));
+});
+
+test('🔒 serveur A ne peut PAS modifier son rôle', async () => {
+  await assertFails(updateDoc(doc(asUser(SERVEUR_A), 'users', SERVEUR_A), { role: 'proprietaire' }));
+});
+
+test('🔒 serveur A ne peut PAS changer son établissement', async () => {
+  await assertFails(updateDoc(doc(asUser(SERVEUR_A), 'users', SERVEUR_A), { establishmentId: ESTAB_B }));
+});
+
+test('🔒 serveur A ne peut PAS s’attribuer des modules ou permissions', async () => {
+  const userRef = doc(asUser(SERVEUR_A), 'users', SERVEUR_A);
+  await assertFails(updateDoc(userRef, { modules: { hotel: true } }));
+  await assertFails(updateDoc(userRef, { permissions: { manageUsers: true } }));
+});
+
+test('🔒 serveur A ne peut PAS réactiver ou désactiver son profil', async () => {
+  await assertFails(updateDoc(doc(asUser(SERVEUR_A), 'users', SERVEUR_A), { isActive: false }));
+});
+
+test('✅ serveur A peut actualiser uniquement son token FCM', async () => {
+  await assertSucceeds(updateDoc(doc(asUser(SERVEUR_A), 'users', SERVEUR_A), {
+    fcmToken: 'new-token', lastTokenUpdate: new Date(),
+  }));
+});
+
+test('✅ une gérante peut modifier le rôle d’un membre de son établissement', async () => {
+  await assertSucceeds(updateDoc(doc(asUser(GERANTE_A), 'users', SERVEUR_A), { role: 'comptable' }));
+});
+
+test('✅ le comptable valide la réception liée à un paiement', async () => {
+  await assertSucceeds(updateDoc(
+    doc(asUser(COMPTABLE_A), 'establishments', ESTAB_A, 'payments', 'payment1'),
+    { handoverStatus: 'validated', updatedAt: new Date() },
+  ));
+});
+
+test('🔒 le comptable ne peut PAS modifier le montant d’un paiement', async () => {
+  await assertFails(updateDoc(
+    doc(asUser(COMPTABLE_A), 'establishments', ESTAB_A, 'payments', 'payment1'),
+    { amount: 1 },
+  ));
+});
+
+test('🔒 propriétaire A ne peut PAS créer un établissement B', async () => {
+  await assertFails(setDoc(
+    doc(asUser(PROPRIETAIRE_A), 'establishments', ESTAB_B),
+    { name: 'Tenant B', establishmentId: ESTAB_B },
+  ));
+});
+
+test('✅ global_admin peut créer un établissement', async () => {
+  await assertSucceeds(setDoc(
+    doc(asUser(GLOBAL_ADMIN), 'establishments', 'estabC'),
+    { name: 'Tenant C', establishmentId: 'estabC' },
+  ));
 });

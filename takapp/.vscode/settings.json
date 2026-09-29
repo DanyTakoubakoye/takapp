@@ -1,4 +1,7 @@
 {
     "java.configuration.updateBuildConfiguration": "interactive",
-    "cmake.sourceDirectory": "C:/src/Applications/Takhotel/takapp/linux"
+    "cmake.sourceDirectory": "C:/src/Applications/Takhotel/takapp/linux",
+    "chat.tools.terminal.autoApprove": {
+        "dart": true
+    }
 }

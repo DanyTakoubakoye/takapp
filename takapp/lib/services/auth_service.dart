@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:takapp/core/constants/app_roles.dart';
 import 'package:takapp/core/errors/app_error.dart';
 import 'package:takapp/modeles/user_model.dart';
 import 'package:takapp/services/notification_service.dart';
@@ -139,7 +140,7 @@ class AuthService {
 
   bool _isGlobalAdmin(UserModel user) {
     final role = user.role.trim();
-    return role == 'global_admin' || role == 'super_admin';
+    return role == AppRoles.globalAdmin || role == AppRoles.superAdmin;
   }
 
   bool _hasValidSaasAccess(UserModel user) {

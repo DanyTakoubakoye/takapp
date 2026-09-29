@@ -44,7 +44,7 @@ class HomeRouter extends StatelessWidget {
 
     final role = user.role.trim();
 
-    if (role == 'global_admin') {
+    if (role == AppRoles.globalAdmin) {
       return const GlobalAdminDashboardPage();
     }
 
@@ -84,6 +84,7 @@ class HomeRouter extends StatelessWidget {
         return const UnauthorizedPage();
 
       case AppRoles.hygiene:
+      case AppRoles.legacyHygiene:
         if (user.canAccessHotel) {
           return HygieneDailyPage(establishmentId: user.establishmentId);
         }

@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:takapp/core/constants/app_roles.dart';
 import 'package:takapp/core/errors/app_error.dart';
 import 'package:takapp/core/errors/error_localizer.dart';
 import 'package:takapp/l10n/app_localizations.dart';
@@ -46,27 +47,28 @@ class AuthController extends ChangeNotifier {
     return establishmentId.trim().isNotEmpty;
   }
 
-  bool get isGlobalAdmin => currentUserRole == 'global_admin';
+  bool get isGlobalAdmin => currentUserRole == AppRoles.globalAdmin;
 
-  bool get isSuperAdmin => currentUserRole == 'super_admin';
+  bool get isSuperAdmin => currentUserRole == AppRoles.superAdmin;
 
   bool get isPlatformAdmin => isGlobalAdmin || isSuperAdmin;
 
-  bool get isProprietaire => currentUserRole == 'proprietaire';
+  bool get isProprietaire => currentUserRole == AppRoles.proprietaire;
 
-  bool get isGerante => currentUserRole == 'gerante';
+  bool get isGerante => currentUserRole == AppRoles.gerante;
 
-  bool get isComptable => currentUserRole == 'comptable';
+  bool get isComptable => currentUserRole == AppRoles.comptable;
 
-  bool get isServeur => currentUserRole == 'serveur';
+  bool get isServeur => currentUserRole == AppRoles.serveur;
 
-  bool get isChefCuisine => currentUserRole == 'chef_cuisine';
+  bool get isChefCuisine => currentUserRole == AppRoles.chefCuisine;
 
-  bool get isBarman => currentUserRole == 'barman';
+  bool get isBarman => currentUserRole == AppRoles.barman;
 
   bool get isServiceHygiene {
-    return currentUserRole == 'service_hygiene' ||
-        currentUserRole == 'majordhomme';
+    return currentUserRole == AppRoles.hygiene ||
+        currentUserRole == AppRoles.legacyHygiene ||
+        currentUserRole == AppRoles.majordhomme;
   }
 
   bool get canAccessRestaurant {
@@ -149,7 +151,8 @@ class AuthController extends ChangeNotifier {
       await _authService.sendPasswordReset(email: email);
       return true;
     } on FirebaseAuthException catch (e) {
-      _error = _mapFirebaseAuthCode(e.code) ??
+      _error =
+          _mapFirebaseAuthCode(e.code) ??
           const AppError(AppErrorCode.resetEmailFailed);
       return false;
     } catch (e) {

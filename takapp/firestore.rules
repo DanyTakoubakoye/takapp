@@ -40,7 +40,7 @@ service cloud.firestore {
       return userRole() == 'barman';
     }
     function isServiceHygiene() {
-      return hasAnyRole(['service_hygiene', 'majordhomme']);
+      return hasAnyRole(['service_hygiene', 'hygiene', 'majordhomme']);
     }
     function isAccounting() {
       return userRole() == 'comptable';
@@ -104,7 +104,11 @@ service cloud.firestore {
         )
       );
       allow update: if isSignedIn() && (
-        request.auth.uid == userId ||
+        (
+          request.auth.uid == userId &&
+          request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['fcmToken', 'lastTokenUpdate'])
+        ) ||
         isSuperAdmin() ||
         (
           (isAdminOrOwner() || isGerante()) &&
@@ -127,7 +131,7 @@ service cloud.firestore {
     // ─────────────── establishments + sous-collections ───────────────
     match /establishments/{establishmentId} {
       allow read: if sameEstablishment(establishmentId);
-      allow create: if isSuperAdmin() || isAdminOrOwner();
+      allow create: if isSuperAdmin();
       allow update: if sameEstablishment(establishmentId) && (
         isSuperAdmin() || isAdminOrOwner() || isGerante()
       );
@@ -249,8 +253,17 @@ service cloud.firestore {
 
       match /payments/{paymentId} {
         allow read: if sameEstablishment(establishmentId);
-        allow create, update: if sameEstablishment(establishmentId) && (
+        allow create: if sameEstablishment(establishmentId) && (
           isServeur() || isGerante() || isAdminOrOwner()
+        );
+        allow update: if sameEstablishment(establishmentId) && (
+          isServeur() || isGerante() || isAdminOrOwner() ||
+          (
+            isAccounting() &&
+            request.resource.data.handoverStatus == 'validated' &&
+            request.resource.data.diff(resource.data).affectedKeys()
+              .hasOnly(['handoverStatus', 'updatedAt'])
+          )
         );
         allow delete: if sameEstablishment(establishmentId) &&
           (isAdminOrOwner() || isGerante());
