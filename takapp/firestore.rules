@@ -57,6 +57,18 @@ service cloud.firestore {
     function isReceptionniste() {
       return userRole() == 'receptionniste';
     }
+    function isFloorManager() {
+      return userRole() == 'floor_manager';
+    }
+    // Lecture « tout membre du tenant » des sous-collections.
+    //
+    // floor_manager en est exclu : rôle introduit sans fonction métier, il ne
+    // lit que son profil et le document établissement. Chaque accès futur
+    // (services, serveurs, commandes…) devra être ouvert par une règle
+    // explicite, jamais hérité de ce filet.
+    function tenantReader(establishmentId) {
+      return sameEstablishment(establishmentId) && !isFloorManager();
+    }
     function sameEstablishment(establishmentId) {
       return isSignedIn() && (
         isSuperAdmin() ||
@@ -185,14 +197,14 @@ service cloud.firestore {
       allow delete: if isSuperAdmin();
 
       match /certilink_config/{docId} {
-        allow read: if sameEstablishment(establishmentId);
+        allow read: if tenantReader(establishmentId);
         allow write: if sameEstablishment(establishmentId) &&
           (isAdminOrOwner() || isGerante());
       }
 
       // Base clients partagée (hôtel, bar/restaurant, facturation)
       match /clients/{clientId} {
-        allow read: if sameEstablishment(establishmentId);
+        allow read: if tenantReader(establishmentId);
         allow create, update, delete: if sameEstablishment(establishmentId) && (
           canManageHotel() || isServeur() || isAccounting()
         );
@@ -200,19 +212,19 @@ service cloud.firestore {
 
       // ─────────────── MODULE HÔTEL ───────────────
       match /roomTypes/{typeId} {
-        allow read: if sameEstablishment(establishmentId);
+        allow read: if tenantReader(establishmentId);
         allow create, update, delete: if sameEstablishment(establishmentId)
           && canManageHotel();
       }
 
       match /rooms/{roomId} {
-        allow read: if sameEstablishment(establishmentId);
+        allow read: if tenantReader(establishmentId);
         allow create, update, delete: if sameEstablishment(establishmentId)
           && canManageHotel();
       }
 
       match /reservations/{reservationId} {
-        allow read: if sameEstablishment(establishmentId);
+        allow read: if tenantReader(establishmentId);
         allow create, update, delete: if sameEstablishment(establishmentId)
           && canManageHotel();
       }
@@ -234,7 +246,7 @@ service cloud.firestore {
       }
 
     match /menuItems/{itemId} {
-          allow read: if sameEstablishment(establishmentId);
+          allow read: if tenantReader(establishmentId);
 
           // Création : gérante/admin sans restriction.
           // Le chef peut créer un plat CUISINE uniquement, sans prix (0).
@@ -276,7 +288,7 @@ service cloud.firestore {
           );
         }
       match /orders/{orderId} {
-        allow read: if sameEstablishment(establishmentId);
+        allow read: if tenantReader(establishmentId);
         allow create: if sameEstablishment(establishmentId) && (
           isServeur() || isGerante() || isAdminOrOwner()
         );
@@ -286,7 +298,7 @@ service cloud.firestore {
         allow delete: if sameEstablishment(establishmentId) &&
           (isAdminOrOwner() || isGerante());
         match /items/{itemId} {
-          allow read: if sameEstablishment(establishmentId);
+          allow read: if tenantReader(establishmentId);
           allow create: if sameEstablishment(establishmentId) && (
             isServeur() || isGerante() || isAdminOrOwner()
           );
@@ -299,7 +311,7 @@ service cloud.firestore {
       }
 
       match /payments/{paymentId} {
-        allow read: if sameEstablishment(establishmentId);
+        allow read: if tenantReader(establishmentId);
         allow create: if sameEstablishment(establishmentId) && (
           isServeur() || isGerante() || isAdminOrOwner()
         );
@@ -359,7 +371,7 @@ service cloud.firestore {
       }
 
       match /serverHandovers/{handoverId} {
-        allow read: if sameEstablishment(establishmentId);
+        allow read: if tenantReader(establishmentId);
         allow create: if sameEstablishment(establishmentId) && (
           isServeur() || isGerante() || isAdminOrOwner()
         );
@@ -371,7 +383,10 @@ service cloud.firestore {
       }
 
       match /managerToAccountingTransfers/{transferId} {
-        allow read: if sameEstablishment(establishmentId);
+        // Remises gérante → comptabilité : mêmes rôles qu'en écriture.
+        allow read: if sameEstablishment(establishmentId) && (
+          isGerante() || isAccounting() || isAdminOrOwner()
+        );
         allow create, update: if sameEstablishment(establishmentId) && (
           isGerante() || isAccounting() || isAdminOrOwner()
         );
@@ -379,7 +394,7 @@ service cloud.firestore {
       }
 
       match /stock_items/{itemId} {
-        allow read: if sameEstablishment(establishmentId);
+        allow read: if tenantReader(establishmentId);
         allow create: if sameEstablishment(establishmentId)
           && validStore(request.resource.data.store)
           && canManageStore(request.resource.data.store);
@@ -427,7 +442,7 @@ service cloud.firestore {
         allow delete: if sameEstablishment(establishmentId) &&
           (isAdminOrOwner() || isGerante());
         match /items/{itemId} {
-          allow read: if sameEstablishment(establishmentId);
+          allow read: if tenantReader(establishmentId);
           allow create, update: if sameEstablishment(establishmentId) && (
             isGerante() || isAdminOrOwner() ||
             canManageStore(
@@ -464,6 +479,12 @@ service cloud.firestore {
           isChefCuisine() ||
           (
             isServeur() &&
+            resource.data.serveurId == request.auth.uid
+          ) ||
+          // Tout membre lit SES notifications : AuthService écoute
+          // `serveurId == uid` à la connexion, quel que soit le rôle.
+          (
+            tenantReader(establishmentId) &&
             resource.data.serveurId == request.auth.uid
           )
         );
@@ -506,11 +527,10 @@ service cloud.firestore {
         allow delete: if sameEstablishment(establishmentId) && isAdminOrOwner();
       }
 
-      // Filet interne : lecture seule pour les membres du tenant.
-      // Toute ÉCRITURE doit passer par une règle explicite ci-dessus.
-      match /{document=**} {
-        allow read: if sameEstablishment(establishmentId);
-      }
+      // PAS de filet de lecture « tout le tenant » ici : les règles Firestore
+      // s'additionnent (OU), un tel filet annulerait les restrictions de
+      // lecture ci-dessus (comptabilité, hygiène…). Toute sous-collection
+      // doit avoir sa propre règle ; sinon le filet final refuse.
     }
 
     // ─────────────── FILET FINAL : tout le reste refusé ───────────────

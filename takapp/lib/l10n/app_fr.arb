@@ -1111,6 +1111,9 @@
   "roleBartender": "Barman",
   "roleButler": "Majordhomme",
   "roleReceptionist": "Réceptionniste",
+  "roleFloorManager": "Floor Manager",
+  "floorManagerHomeTitle": "Floor Manager",
+  "floorManagerHomeBody": "Espace Floor Manager",
 
   "labelReason": "Motif",
   "labelItem": "Article",

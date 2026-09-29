@@ -17,6 +17,11 @@ class AppRoles {
   static const majordhomme = 'majordhomme';
   static const receptionniste = 'receptionniste';
 
+  /// Responsable de salle : entre la gérante et les serveurs, SANS hériter
+  /// des droits de la gérante. Valeur technique unique, indépendante de la
+  /// langue (jamais « floorManager », « Floor Manager »…).
+  static const floorManager = 'floor_manager';
+
   static String normalizeRole(String role) {
     final normalized = role.trim().toLowerCase();
     return normalized == legacyHygiene ? hygiene : normalized;
@@ -37,6 +42,7 @@ class AppRoles {
     barman,
     majordhomme,
     receptionniste,
+    floorManager,
   ];
 
   /// =========================
@@ -57,6 +63,7 @@ class AppRoles {
     barman: 'Barman',
     majordhomme: 'Majordhomme',
     receptionniste: 'Réceptionniste',
+    floorManager: 'Floor Manager',
   };
 
   /// =========================
@@ -85,6 +92,9 @@ class AppRoles {
     barman: ['bar', 'stock'],
     majordhomme: ['hotel', 'stock'],
     receptionniste: ['hotel', 'fiscalization'],
+    // Moindre privilège : aucun module tant que ses fonctions (services,
+    // affectations, encaissements délégués…) ne sont pas implémentées.
+    floorManager: <String>[],
   };
 
   /// =========================
@@ -125,6 +135,8 @@ class AppRoles {
         return l10n.roleButler;
       case receptionniste:
         return l10n.roleReceptionist;
+      case floorManager:
+        return l10n.roleFloorManager;
       default:
         return role;
     }

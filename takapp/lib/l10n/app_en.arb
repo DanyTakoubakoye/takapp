@@ -1105,6 +1105,9 @@
   "roleBartender": "Bartender",
   "roleButler": "Butler",
   "roleReceptionist": "Receptionist",
+  "roleFloorManager": "Floor Manager",
+  "floorManagerHomeTitle": "Floor Manager",
+  "floorManagerHomeBody": "Floor Manager area",
 
   "labelReason": "Reason",
   "labelItem": "Item",

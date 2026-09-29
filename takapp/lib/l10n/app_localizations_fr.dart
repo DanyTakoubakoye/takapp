@@ -1646,6 +1646,15 @@ class AppLocalizationsFr extends AppLocalizations {
   String get roleReceptionist => 'Réceptionniste';
 
   @override
+  String get roleFloorManager => 'Floor Manager';
+
+  @override
+  String get floorManagerHomeTitle => 'Floor Manager';
+
+  @override
+  String get floorManagerHomeBody => 'Espace Floor Manager';
+
+  @override
   String get labelReason => 'Motif';
 
   @override

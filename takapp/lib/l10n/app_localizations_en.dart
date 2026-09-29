@@ -1630,6 +1630,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roleReceptionist => 'Receptionist';
 
   @override
+  String get roleFloorManager => 'Floor Manager';
+
+  @override
+  String get floorManagerHomeTitle => 'Floor Manager';
+
+  @override
+  String get floorManagerHomeBody => 'Floor Manager area';
+
+  @override
   String get labelReason => 'Reason';
 
   @override

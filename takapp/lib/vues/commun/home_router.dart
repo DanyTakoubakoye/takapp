@@ -9,6 +9,7 @@ import 'package:takapp/vues/commun/unauthorized_page.dart';
 
 import 'package:takapp/vues/comptabilite/comptable_dashboard_page.dart';
 import 'package:takapp/vues/cuisine/cuisine_home_page.dart';
+import 'package:takapp/vues/floor_manager/floor_manager_home_page.dart';
 import 'package:takapp/vues/gerante/gerante_dashboard_page.dart';
 import 'package:takapp/vues/global_admin/global_admin_dashboard_page.dart';
 import 'package:takapp/vues/hygiene/hygiene_daily_page.dart';
@@ -100,6 +101,11 @@ class HomeRouter extends StatelessWidget {
           return ReceptionDashboardPage(establishmentId: user.establishmentId);
         }
         return const UnauthorizedPage();
+
+      // Pas de condition de module : l'accueil temporaire n'expose aucune
+      // donnée. L'établissement reste obligatoire (garde ci-dessus).
+      case AppRoles.floorManager:
+        return const FloorManagerHomePage();
 
       default:
         return const UnauthorizedPage();

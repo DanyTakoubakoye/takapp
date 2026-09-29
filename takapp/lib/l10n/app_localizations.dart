@@ -2927,6 +2927,24 @@ abstract class AppLocalizations {
   /// **'Réceptionniste'**
   String get roleReceptionist;
 
+  /// No description provided for @roleFloorManager.
+  ///
+  /// In fr, this message translates to:
+  /// **'Floor Manager'**
+  String get roleFloorManager;
+
+  /// No description provided for @floorManagerHomeTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Floor Manager'**
+  String get floorManagerHomeTitle;
+
+  /// No description provided for @floorManagerHomeBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Espace Floor Manager'**
+  String get floorManagerHomeBody;
+
   /// No description provided for @labelReason.
   ///
   /// In fr, this message translates to:

@@ -874,6 +874,7 @@ class _CreateTenantUserDialogState extends State<_CreateTenantUserDialog> {
     AppRoles.hygiene,
     AppRoles.majordhomme,
     AppRoles.receptionniste,
+    AppRoles.floorManager,
   ];
 
   @override
