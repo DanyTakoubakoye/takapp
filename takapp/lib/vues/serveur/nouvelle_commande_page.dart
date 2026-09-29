@@ -12,7 +12,18 @@ import 'package:takapp/vues/commun/client_picker_sheet.dart';
 import 'package:takapp/vues/commun/module_visibility.dart';
 
 class NouvelleCommandePage extends StatefulWidget {
-  const NouvelleCommandePage({super.key});
+  final String initialClientType;
+  final String? initialTableNumber;
+  final String? initialRoomNumber;
+  final bool returnAfterSubmit;
+
+  const NouvelleCommandePage({
+    super.key,
+    this.initialClientType = 'restaurant',
+    this.initialTableNumber,
+    this.initialRoomNumber,
+    this.returnAfterSubmit = false,
+  });
 
   @override
   State<NouvelleCommandePage> createState() => _NouvelleCommandePageState();
@@ -39,6 +50,14 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
   // menu en chargement.
   String? _menuStreamEstablishmentId;
   Stream<List<MenuItemModel>>? _menuItemsStream;
+
+  @override
+  void initState() {
+    super.initState();
+    clientType = widget.initialClientType;
+    tableController.text = widget.initialTableNumber ?? '';
+    roomController.text = widget.initialRoomNumber ?? '';
+  }
 
   Stream<List<MenuItemModel>> _menuStreamFor(String establishmentId) {
     if (_menuStreamEstablishmentId != establishmentId ||
@@ -170,6 +189,11 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.orderSentSuccess)));
 
+      if (widget.returnAfterSubmit) {
+        Navigator.of(context).pop();
+        return;
+      }
+
       tableController.clear();
       roomController.clear();
 
@@ -200,9 +224,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
     final establishmentId = user.establishmentId.trim();
 
     if (establishmentId.isEmpty) {
-      return Scaffold(
-        body: Center(child: Text(l10n.errEstablishmentNotFound)),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errEstablishmentNotFound)));
     }
 
     final orderController = context.watch<OrderController>();
@@ -308,8 +330,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
               ),
               items: clientTypeOptions
                   .map(
-                    (e) =>
-                        DropdownMenuItem(value: e.key, child: Text(e.value)),
+                    (e) => DropdownMenuItem(value: e.key, child: Text(e.value)),
                   )
                   .toList(),
               onChanged: (value) {
@@ -353,12 +374,11 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
                   }
 
                   final items =
-                      user.visibleMenuItems(snapshot.data ?? []).toList()
-                        ..sort(
-                          (a, b) => a.name.toLowerCase().compareTo(
-                            b.name.toLowerCase(),
-                          ),
-                        );
+                      user.visibleMenuItems(snapshot.data ?? []).toList()..sort(
+                        (a, b) => a.name.toLowerCase().compareTo(
+                          b.name.toLowerCase(),
+                        ),
+                      );
 
                   if (items.isEmpty) {
                     return Center(child: Text(l10n.noItemAvailable));

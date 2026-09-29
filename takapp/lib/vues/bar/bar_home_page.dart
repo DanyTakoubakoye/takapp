@@ -8,6 +8,7 @@ import 'package:takapp/services/bar_service.dart';
 import 'package:takapp/services/notification_service_mobile.dart';
 import 'package:takapp/vues/bar/bar_stock_item_form_page.dart';
 import 'package:takapp/vues/bar/bar_menu_item_ingredients_form_page.dart';
+import 'package:takapp/vues/commun/unpaid_tickets_page.dart';
 
 import 'package:takapp/vues/shared/store_stock_page.dart';
 import 'package:takapp/vues/shared/create_stock_request_page.dart';
@@ -37,7 +38,8 @@ class _BarHomePageState extends State<BarHomePage> {
   // Créés une seule fois : recréés dans build(), ils relanceraient
   // l'abonnement / la lecture à chaque rebuild et feraient clignoter l'écran.
   late final Stream<QuerySnapshot<Map<String, dynamic>>> _barOrdersStream;
-  late final Future<DocumentSnapshot<Map<String, dynamic>>> _establishmentFuture;
+  late final Future<DocumentSnapshot<Map<String, dynamic>>>
+  _establishmentFuture;
 
   @override
   void initState() {
@@ -250,6 +252,10 @@ class _BarHomePageState extends State<BarHomePage> {
                         children: [
                           _WelcomeCard(userName: user.name),
                           const SizedBox(height: 12),
+                          _UnpaidTicketsActionCard(
+                            establishmentId: establishmentId,
+                          ),
+                          const SizedBox(height: 12),
                           _BarStockActionsCard(
                             establishmentId: establishmentId,
                           ),
@@ -294,6 +300,10 @@ class _BarHomePageState extends State<BarHomePage> {
                   return Column(
                     children: [
                       _WelcomeCard(userName: user.name),
+                      const SizedBox(height: 12),
+                      _UnpaidTicketsActionCard(
+                        establishmentId: establishmentId,
+                      ),
                       const SizedBox(height: 12),
                       _BarStockActionsCard(establishmentId: establishmentId),
                       const SizedBox(height: 12),
@@ -519,6 +529,43 @@ class _BarStockActionsCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _UnpaidTicketsActionCard extends StatelessWidget {
+  final String establishmentId;
+
+  const _UnpaidTicketsActionCard({required this.establishmentId});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    return Card(
+      color: Colors.deepOrange.shade50,
+      child: ListTile(
+        leading: const CircleAvatar(
+          backgroundColor: Colors.deepOrange,
+          foregroundColor: Colors.white,
+          child: Icon(Icons.receipt_long),
+        ),
+        title: Text(
+          l10n.encaissementTitle,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text(l10n.actionCollectSubtitle),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  UnpaidTicketsPage(establishmentId: establishmentId),
+            ),
+          );
+        },
       ),
     );
   }

@@ -362,22 +362,17 @@ class _LoginPageState extends State<LoginPage> {
                         alignment: Alignment.centerRight,
                         child: LanguageSelector(),
                       ),
-                      Container(
+                      SizedBox(
                         height: size.width < 500 ? 72 : 84,
                         width: size.width < 500 ? 72 : 84,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary,
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Icon(
-                          Icons.hotel,
-                          color: Colors.white,
-                          size: 40,
+                        child: Image.asset(
+                          'assets/images/logo.png',
+                          fit: BoxFit.contain,
                         ),
                       ),
                       const SizedBox(height: 18),
                       Text(
-                        'TAKHOTEL',
+                        'TAKAPP',
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
                       const SizedBox(height: 8),

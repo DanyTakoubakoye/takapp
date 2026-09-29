@@ -174,7 +174,7 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             navigatorKey: appNavigatorKey,
             debugShowCheckedModeBanner: false,
-            title: 'TAKHOTEL',
+            title: 'TAKAPP',
             theme: AppTheme.lightTheme,
             localizationsDelegates: const [
               AppLocalizations.delegate,

@@ -21,6 +21,7 @@ import 'package:takapp/vues/reception/rooms_page.dart';
 import 'package:takapp/vues/shared/low_stock_page.dart';
 import 'package:takapp/vues/shared/stock_item_registry_page.dart';
 import 'package:takapp/core/l10n/language_selector.dart';
+import 'package:takapp/vues/commun/unpaid_tickets_page.dart';
 
 class GeranteDashboardPage extends StatelessWidget {
   final String establishmentId;
@@ -40,9 +41,7 @@ class GeranteDashboardPage extends StatelessWidget {
     final establishmentId = user.establishmentId.trim();
 
     if (establishmentId.isEmpty) {
-      return Scaffold(
-        body: Center(child: Text(l10n.errEstablishmentNotFound)),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errEstablishmentNotFound)));
     }
 
     final isMobile = width < 700;
@@ -251,6 +250,12 @@ class _GeranteModulesGrid extends StatelessWidget {
               establishmentId: establishmentId,
             ),
           ),
+          _GeranteAction(
+            title: l10n.encaissementTitle,
+            icon: Icons.receipt_long,
+            pageBuilder: (_) =>
+                UnpaidTicketsPage(establishmentId: establishmentId),
+          ),
         ],
       ),
 
@@ -331,8 +336,9 @@ class _GeranteModulesGrid extends StatelessWidget {
     for (final module in modules) {
       if (!module.visible) continue;
 
-      final visibleActions =
-          module.actions.where((action) => action.visible).toList();
+      final visibleActions = module.actions
+          .where((action) => action.visible)
+          .toList();
       if (visibleActions.isEmpty) continue;
 
       visibleModules.add(

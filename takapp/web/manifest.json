@@ -1,6 +1,6 @@
 {
-    "name": "takapp",
-    "short_name": "takapp",
+    "name": "TAKAPP",
+    "short_name": "TAKAPP",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

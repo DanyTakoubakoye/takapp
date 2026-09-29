@@ -65,6 +65,31 @@ class PaymentService {
         });
   }
 
+  /// Toutes les commandes non encaissées de l'établissement.
+  ///
+  /// Les commandes annulées sont filtrées après lecture afin de conserver une
+  /// requête Firestore simple et sans index composite supplémentaire.
+  Stream<List<OrderModel>> streamUnpaidOrdersForEstablishment({
+    required String establishmentId,
+  }) {
+    _validateEstablishmentId(establishmentId);
+
+    return _ordersRef(establishmentId: establishmentId)
+        .where('paymentStatus', isEqualTo: 'unpaid')
+        .snapshots()
+        .map((snapshot) {
+          final orders = snapshot.docs
+              .where((doc) {
+                return (doc.data()['status'] ?? '').toString() != 'cancelled';
+              })
+              .map((doc) => OrderModel.fromMap(doc.data(), doc.id))
+              .toList();
+
+          orders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+          return orders;
+        });
+  }
+
   /// =========================
   /// STREAM ALL ORDERS FOR SERVER (par jour)
   /// =========================

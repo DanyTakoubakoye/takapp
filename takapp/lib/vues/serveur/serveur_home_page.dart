@@ -13,6 +13,7 @@ import 'package:takapp/vues/serveur/serveur_notifications_page.dart';
 import 'package:takapp/vues/serveur/suivi_bar_page.dart';
 import 'package:takapp/vues/serveur/suivi_cuisine_page.dart';
 import 'package:takapp/vues/serveur/versement_gerante_page.dart';
+import 'package:takapp/vues/commun/unpaid_tickets_page.dart';
 import 'package:takapp/core/l10n/language_selector.dart';
 
 class ServeurHomePage extends StatefulWidget {
@@ -150,9 +151,7 @@ class _ServeurHomePageState extends State<ServeurHomePage> {
     final establishmentId = user.establishmentId.trim();
 
     if (establishmentId.isEmpty) {
-      return Scaffold(
-        body: Center(child: Text(l10n.errEstablishmentNotFound)),
-      );
+      return Scaffold(body: Center(child: Text(l10n.errEstablishmentNotFound)));
     }
 
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
@@ -366,6 +365,15 @@ class _ServeurModulesGrid extends StatelessWidget {
             page: const EncaissementPage(),
           ),
           _ServeurAction(
+            title: l10n.encaissementTitle,
+            subtitle: l10n.actionCollectSubtitle,
+            icon: Icons.receipt_long_outlined,
+            page: UnpaidTicketsPage(
+              establishmentId: establishmentId,
+              serveurId: auth.currentUser?.uid,
+            ),
+          ),
+          _ServeurAction(
             title: l10n.myInvoicesTitle,
             subtitle: l10n.actionMyInvoicesSubtitle,
             icon: Icons.receipt_long_outlined,
@@ -407,8 +415,9 @@ class _ServeurModulesGrid extends StatelessWidget {
     // qui n'ont plus aucune action.
     final visibleModules = <_ServeurModule>[];
     for (final module in modules) {
-      final visibleActions =
-          module.actions.where((action) => action.visible).toList();
+      final visibleActions = module.actions
+          .where((action) => action.visible)
+          .toList();
       if (visibleActions.isEmpty) continue;
 
       visibleModules.add(
