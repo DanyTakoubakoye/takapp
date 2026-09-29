@@ -47,5 +47,18 @@ void main() {
     test('unknown status is never shown as active', () {
       expect(EstablishmentStatus.normalize('archived'), 'suspended');
     });
+
+    test('isActive tolerates legacy casings, not missing values', () {
+      expect(EstablishmentStatus.isActive('active'), isTrue);
+      expect(EstablishmentStatus.isActive('Active'), isTrue);
+      expect(EstablishmentStatus.isActive(' Actif '), isTrue);
+
+      expect(EstablishmentStatus.isActive('suspended'), isFalse);
+      expect(EstablishmentStatus.isActive('Suspendu'), isFalse);
+      expect(EstablishmentStatus.isActive('trial'), isFalse);
+      expect(EstablishmentStatus.isActive('archived'), isFalse);
+      expect(EstablishmentStatus.isActive(null), isFalse);
+      expect(EstablishmentStatus.isActive(''), isFalse);
+    });
   });
 }

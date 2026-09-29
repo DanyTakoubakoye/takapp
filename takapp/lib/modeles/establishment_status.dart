@@ -36,4 +36,12 @@ class EstablishmentStatus {
 
     return _aliases[text] ?? unknownFallback;
   }
+
+  /// Vrai si le statut stocké désigne un établissement actif (`active`,
+  /// `Active`, `Actif`…). Un statut absent n'est PAS considéré comme actif
+  /// ici : la carte d'établissement l'a toujours affiché comme inactif.
+  static bool isActive(Object? raw) {
+    final text = (raw ?? '').toString().trim();
+    return text.isNotEmpty && normalize(text) == active;
+  }
 }

@@ -222,7 +222,11 @@ class _GlobalAdminDashboardPageState extends State<GlobalAdminDashboardPage> {
     required String establishmentId,
     required String currentStatus,
   }) async {
-    final nextStatus = currentStatus == 'active' ? 'suspended' : 'active';
+    // Même règle que l'affichage de la carte : « Active » / « Actif » est
+    // bien actif, le clic suspend donc au lieu de réactiver.
+    final nextStatus = EstablishmentStatus.isActive(currentStatus)
+        ? EstablishmentStatus.suspended
+        : EstablishmentStatus.active;
 
     await _firestore.collection('establishments').doc(establishmentId).update({
       'status': nextStatus,
@@ -801,7 +805,7 @@ class _EstablishmentCard extends StatelessWidget {
     final plan = (data['plan'] ?? '').toString();
     final type = (data['type'] ?? '').toString();
     final modules = Map<String, dynamic>.from(data['modules'] ?? {});
-    final isActive = status == 'active';
+    final isActive = EstablishmentStatus.isActive(status);
 
     return Card(
       elevation: 2,
