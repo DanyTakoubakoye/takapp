@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/comptabilite_controller.dart';
+import 'package:takapp/controllers/establishment_config_controller.dart';
 import 'package:takapp/controllers/fiscalization_controller.dart';
 import 'package:takapp/controllers/gerante_handover_controller.dart';
 import 'package:takapp/controllers/handover_controller.dart';
@@ -23,6 +24,7 @@ import 'package:takapp/firebase_options.dart';
 
 import 'package:takapp/services/auth_service.dart';
 import 'package:takapp/services/comptabilite_service.dart';
+import 'package:takapp/services/establishment_config_service.dart';
 import 'package:takapp/services/cuisine_service.dart';
 import 'package:takapp/services/gerante_handover_service.dart';
 import 'package:takapp/services/handover_service.dart';
@@ -100,6 +102,26 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<LocaleController>.value(value: localeController),
 
         Provider<NotificationService>.value(value: notificationService),
+        Provider<EstablishmentConfigService>(
+          create: (_) => EstablishmentConfigService(),
+        ),
+        ChangeNotifierProxyProvider<
+          AuthController,
+          EstablishmentConfigController
+        >(
+          create: (context) => EstablishmentConfigController(
+            context.read<EstablishmentConfigService>(),
+          ),
+          update: (context, auth, previous) {
+            final controller =
+                previous ??
+                EstablishmentConfigController(
+                  context.read<EstablishmentConfigService>(),
+                );
+            controller.setEstablishmentId(auth.establishmentId);
+            return controller;
+          },
+        ),
         Provider<OrderService>(create: (_) => OrderService()),
         Provider<CuisineService>(create: (_) => CuisineService()),
         Provider<PaymentService>(create: (_) => PaymentService()),

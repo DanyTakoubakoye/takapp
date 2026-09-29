@@ -3,6 +3,7 @@ import 'package:takapp/core/errors/app_error.dart';
 
 import '../modeles/store_stock_model.dart';
 import '../modeles/stock_movement_model.dart';
+import 'order_stock_policy.dart';
 
 class StoreStockService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -101,229 +102,101 @@ class StoreStockService {
   }
 
   /// =========================
-  /// REMOVE STOCK FOR ORDER
+  /// STOCK DES COMMANDES (TRANSACTIONNEL)
   /// =========================
+  ///
+  /// La création d'une commande et la déduction de son stock se font dans
+  /// UNE SEULE transaction (voir `OrderService.createOrder`) : soit tout est
+  /// écrit, soit rien. La décision (accepter / refuser / avertir) est prise
+  /// par `OrderStockPolicy` ; ce service ne fait que lire et écrire.
 
-  Future<void> removeStockForOrder({
+  /// Document de stock d'un article dans un magasin, ou `null` s'il n'existe
+  /// pas. Les requêtes étant interdites dans une transaction client, les
+  /// références sont résolues AVANT, puis relues DANS la transaction.
+  Future<DocumentReference<Map<String, dynamic>>?> findStockRef({
+    required String establishmentId,
+    required String store,
+    required String itemId,
+  }) async {
+    final query = await _stockCol(establishmentId: establishmentId)
+        .where('store', isEqualTo: store)
+        .where('itemId', isEqualTo: itemId)
+        .limit(1)
+        .get();
+
+    return query.docs.isEmpty ? null : query.docs.first.reference;
+  }
+
+  /// Niveau de stock lu dans la transaction, ou `null` si le document a
+  /// disparu entre-temps.
+  Future<StockLevel?> readStockLevel(
+    Transaction transaction,
+    DocumentReference<Map<String, dynamic>> ref,
+  ) async {
+    final snap = await transaction.get(ref);
+    final data = snap.data();
+
+    if (!snap.exists || data == null) return null;
+
+    double toDouble(dynamic value) {
+      if (value is num) return value.toDouble();
+      return double.tryParse(value?.toString() ?? '') ?? 0;
+    }
+
+    return StockLevel(
+      quantity: toDouble(data['quantity']),
+      minimumQuantity: toDouble(data['minimumQuantity']),
+      unit: data['unit']?.toString() ?? '',
+    );
+  }
+
+  /// Écrit, dans la transaction de création de commande, les déductions
+  /// validées et leurs mouvements de sortie.
+  void writeOrderDeductions(
+    Transaction transaction, {
     required String establishmentId,
     required String orderId,
     required String orderNumber,
     required String performedBy,
     required String performedByName,
-    required List<Map<String, dynamic>> deductions,
-  }) async {
-    double toDouble(dynamic value) {
-      if (value == null) return 0;
-
-      if (value is num) {
-        return value.toDouble();
-      }
-
-      return double.tryParse(value.toString()) ?? 0;
-    }
-
-    // Affiche un nombre sans ".0" superflu (3.0 -> "3", 2.5 -> "2.5")
-    String fmt(double v) =>
-        v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toString();
-
-    final List<
-      ({
-        DocumentReference<Map<String, dynamic>> ref,
-        Map<String, dynamic> deduction,
-      })
-    >
-    stockRefs = [];
-
+    required List<StockDeduction> deductions,
+    required Map<String, DocumentReference<Map<String, dynamic>>> stockRefs,
+  }) {
     for (final deduction in deductions) {
-      final store = deduction['store']?.toString() ?? '';
+      final requirement = deduction.requirement;
+      final ref = stockRefs[requirement.key];
 
-      final itemId = deduction['itemId']?.toString() ?? '';
+      // Impossible si la politique a validé la ligne : garde-fou.
+      if (ref == null) continue;
 
-      final itemName = deduction['itemName']?.toString() ?? '';
+      transaction.update(ref, {
+        'quantity': deduction.newQuantity,
+        'isLowStock': deduction.isLowStock,
+        'updatedAt': FieldValue.serverTimestamp(),
+        'pendingSync': false,
+        'syncError': false,
+      });
 
-      final unit = deduction['unit']?.toString() ?? '';
-
-      final quantity = toDouble(deduction['quantity']);
-
-      if (store.isEmpty) {
-        throw AppError(AppErrorCode.invalidIngredientStore, name: itemName);
-      }
-
-      if (itemId.isEmpty) {
-        throw AppError(AppErrorCode.invalidIngredientItemId, name: itemName);
-      }
-
-      if (unit.isEmpty) {
-        throw AppError(AppErrorCode.invalidIngredientUnit, name: itemName);
-      }
-
-      if (quantity <= 0) {
-        throw AppError(AppErrorCode.invalidIngredientQuantity, name: itemName);
-      }
-
-      final query = await _stockCol(establishmentId: establishmentId)
-          .where('store', isEqualTo: store)
-          .where('itemId', isEqualTo: itemId)
-          .limit(1)
-          .get();
-
-      if (query.docs.isEmpty) {
-        throw AppError(AppErrorCode.itemNotFoundInStockFor, name: itemName);
-      }
-
-      stockRefs.add((ref: query.docs.first.reference, deduction: deduction));
-    }
-
-    // On capture la raison d'échec dans une variable au lieu de la lancer
-    // depuis l'intérieur de la transaction : sur Flutter web, un `throw` dans
-    // runTransaction est "boxé" (message perdu -> "Dart exception thrown from
-    // converted Future"). On relance l'erreur APRÈS la transaction, en
-    // nommant l'ingrédient concerné.
-    AppError? stockError;
-
-    await _firestore.runTransaction((transaction) async {
-      stockError = null; // reset : la transaction peut être rejouée
-      final List<Map<String, dynamic>> preparedWrites = [];
-
-      for (final entry in stockRefs) {
-        final deduction = entry.deduction;
-
-        final itemName = deduction['itemName']?.toString() ?? '';
-
-        final unit = deduction['unit']?.toString() ?? '';
-
-        final quantity = toDouble(deduction['quantity']);
-
-        final docSnap = await transaction.get(entry.ref);
-
-        if (!docSnap.exists || docSnap.data() == null) {
-          stockError = AppError(
-            AppErrorCode.stockNotFoundFor,
-            name: itemName,
-          );
-          return;
-        }
-
-        final data = Map<String, dynamic>.from(docSnap.data()!);
-
-        final current = toDouble(data['quantity']);
-
-        final minimumQuantity = toDouble(data['minimumQuantity']);
-
-        final stockUnit = data['unit']?.toString() ?? '';
-
-        if (stockUnit != unit) {
-          stockError = AppError(
-            AppErrorCode.inconsistentUnit,
-            name: itemName,
-            params: {'stockUnit': stockUnit, 'recipeUnit': unit},
-          );
-          return;
-        }
-
-        if (current < quantity) {
-          stockError = AppError(
-            AppErrorCode.insufficientStockDetailed,
-            name: itemName,
-            params: {
-              'available': '${fmt(current)} $stockUnit',
-              'required': '${fmt(quantity)} $unit',
-            },
-          );
-          return;
-        }
-
-        final newQuantity = current - quantity;
-
-        preparedWrites.add({
-          'ref': entry.ref,
-          'deduction': deduction,
-          'itemName': itemName,
-          'unit': unit,
-          'quantity': quantity,
-          'newQuantity': newQuantity,
-          'minimumQuantity': minimumQuantity,
-        });
-      }
-
-      for (final prepared in preparedWrites) {
-        final ref = prepared['ref'] as DocumentReference<Map<String, dynamic>>;
-
-        final deduction = prepared['deduction'] as Map<String, dynamic>;
-
-        final itemName = prepared['itemName']?.toString() ?? '';
-
-        final unit = prepared['unit']?.toString() ?? '';
-
-        final quantity = toDouble(prepared['quantity']);
-
-        final newQuantity = toDouble(prepared['newQuantity']);
-
-        final minimumQuantity = toDouble(prepared['minimumQuantity']);
-
-        transaction.update(ref, {
-          'quantity': newQuantity,
-
-          'isLowStock': newQuantity <= minimumQuantity,
-
-          'updatedAt': FieldValue.serverTimestamp(),
-
-          'pendingSync': false,
-
-          'syncError': false,
-        });
-
-        final movementDoc = _movementCol(
-          establishmentId: establishmentId,
-        ).doc();
-
-        transaction.set(movementDoc, {
-          'establishmentId': establishmentId,
-
-          'store': deduction['store'],
-
-          'itemId': deduction['itemId'],
-
-          'itemName': itemName,
-
-          'unit': unit,
-
-          'quantity': quantity,
-
-          'movementType': 'out',
-
-          'reason': 'Consommation automatique commande $orderNumber',
-
-          'performedBy': performedBy,
-
-          'performedByName': performedByName,
-
-          'validatedBy': '',
-
-          'validatedByName': '',
-
-          'sourceRequestId': orderId,
-
-          'orderId': orderId,
-
-          'orderNumber': orderNumber,
-
-          'createdAt': FieldValue.serverTimestamp(),
-
-          'pendingSync': false,
-
-          'syncError': false,
-        });
-      }
-    });
-
-    // La transaction a été volontairement abandonnée (aucune déduction faite).
-    // On relance ici, hors transaction, pour que le message survive au web.
-    if (stockError != null) {
-      // `stockError!` est nécessaire : la variable est capturée et modifiée
-      // dans la closure de la transaction, ce qui empêche Dart de promouvoir
-      // son type malgré le test de nullité juste au-dessus.
-      throw stockError!;
+      transaction.set(_movementCol(establishmentId: establishmentId).doc(), {
+        'establishmentId': establishmentId,
+        'store': requirement.store,
+        'itemId': requirement.itemId,
+        'itemName': requirement.itemName,
+        'unit': requirement.unit,
+        'quantity': requirement.quantity,
+        'movementType': 'out',
+        'reason': 'Consommation automatique commande $orderNumber',
+        'performedBy': performedBy,
+        'performedByName': performedByName,
+        'validatedBy': '',
+        'validatedByName': '',
+        'sourceRequestId': orderId,
+        'orderId': orderId,
+        'orderNumber': orderNumber,
+        'createdAt': FieldValue.serverTimestamp(),
+        'pendingSync': false,
+        'syncError': false,
+      });
     }
   }
 

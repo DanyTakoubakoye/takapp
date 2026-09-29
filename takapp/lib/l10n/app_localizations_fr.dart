@@ -754,6 +754,11 @@ class AppLocalizationsFr extends AppLocalizations {
   String get orderSentSuccess => 'Commande envoyée avec succès.';
 
   @override
+  String orderSentWithStockWarning(String details) {
+    return 'Commande envoyée, mais avec des anomalies de stock (non bloquantes) :\n$details\nLes ingrédients concernés n\'ont pas été déduits du stock.';
+  }
+
+  @override
   String get newOrderTitle => 'Nouvelle commande';
 
   @override

@@ -11,6 +11,7 @@ import 'package:takapp/services/client_service.dart';
 import 'package:takapp/services/menu_service.dart';
 import 'package:takapp/vues/commun/client_picker_sheet.dart';
 import 'package:takapp/vues/commun/module_visibility.dart';
+import 'package:takapp/vues/serveur/order_submitted_feedback.dart';
 
 class MenuPresentationPage extends StatefulWidget {
   const MenuPresentationPage({super.key});
@@ -1324,9 +1325,7 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
 
     if (!mounted) return;
     if (success) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.orderSentSuccess)));
+      showOrderSubmittedFeedback(context, orderController);
       Navigator.pop(context, true);
     } else if (orderController.hasError) {
       ScaffoldMessenger.of(

@@ -3,7 +3,28 @@ import 'package:takapp/core/errors/app_error.dart';
 import 'package:takapp/modeles/order_item_model.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
 import 'package:takapp/modeles/order_model.dart';
+import 'package:takapp/modeles/stock_mode.dart';
+import 'package:takapp/services/order_stock_policy.dart';
 import 'package:takapp/services/store_stock_service.dart';
+
+/// Commande réellement acceptée et écrite.
+class OrderCreationResult {
+  final String orderId;
+  final String orderNumber;
+  final StockMode stockMode;
+
+  /// Anomalies acceptées en warningOnly (vide sinon) : l'UI doit les montrer.
+  final List<StockAnomaly> stockWarnings;
+
+  const OrderCreationResult({
+    required this.orderId,
+    required this.orderNumber,
+    required this.stockMode,
+    this.stockWarnings = const [],
+  });
+
+  bool get hasStockWarnings => stockWarnings.isNotEmpty;
+}
 
 /// Résultat du rattachement d'une commande à une addition.
 class _TicketResolution {
@@ -166,7 +187,45 @@ class OrderService {
     );
   }
 
-  Future<void> createOrder({
+  Future<StockMode> _fetchStockMode(String establishmentId) async {
+    final snapshot = await _firestore
+        .collection('establishments')
+        .doc(establishmentId)
+        .get();
+
+    return StockMode.fromValue(snapshot.data()?['stockMode']);
+  }
+
+  /// =========================
+  /// CRÉATION DE COMMANDE
+  /// =========================
+  ///
+  /// Moteur unique de création de commande. Le `stockMode` de l'établissement
+  /// est lu ici (couche métier) et appliqué par [OrderStockPolicy] ; aucun
+  /// widget n'a à le connaître.
+  ///
+  /// Garanties côté client :
+  /// - la commande, ses lignes, les déductions et les mouvements de stock
+  ///   sont écrits dans UNE transaction : plus de commande `stock_error`
+  ///   créée puis laissée en plan ;
+  /// - un refus (strict) n'écrit RIEN : aucune commande n'existe, donc la
+  ///   Cloud Function `notifyDepartmentsNewOrder` (onDocumentCreated) ne
+  ///   notifie ni la cuisine ni le bar ;
+  /// - le stock est relu dans la transaction : deux commandes concurrentes ne
+  ///   peuvent pas consommer deux fois la même quantité.
+  ///
+  /// Limites connues (client, pas de backend autoritaire) :
+  /// - `stockMode`, les recettes et les références de stock sont lus juste
+  ///   AVANT la transaction (les requêtes y sont interdites côté client) ;
+  ///   un changement de mode ou de recette pendant ces quelques ms n'est pas
+  ///   détecté ;
+  /// - les règles Firestore ne vérifient pas la cohérence commande / stock.
+  ///
+  /// TODO(cloud-functions): déplacer ce flux dans `createOrderAndDeductStock`
+  /// (callable, Admin SDK) : lecture de `stockMode` et des recettes côté
+  /// serveur, transaction unique, puis interdire `create` sur `orders` et
+  /// `update` sur `store_stocks` depuis le client pour les serveurs.
+  Future<OrderCreationResult> createOrder({
     required String establishmentId,
     required String clientType,
     required String? tableNumber,
@@ -188,57 +247,36 @@ class OrderService {
 
     final docRef = _ordersRef(establishmentId).doc();
 
-    final ticket = await _resolveTicket(
-      establishmentId: establishmentId,
-      clientType: clientType,
-      tableNumber: tableNumber,
-      roomNumber: roomNumber,
-      fallbackId: docRef.id,
-    );
-
-    final batch = _firestore.batch();
-
     bool isForKitchen = false;
     bool isForBar = false;
 
-    final Map<String, Map<String, dynamic>> aggregatedDeductions = {};
+    // 1. Lignes de commande + recettes en vigueur.
+    final List<OrderLineRecipe> lines = [];
 
     for (final item in items) {
-      final itemMap = item.toMap();
+      final targetDepartment = item.targetDepartment.toLowerCase();
 
-      final targetDepartment = (itemMap['targetDepartment'] ?? '')
-          .toString()
-          .toLowerCase();
+      if (targetDepartment == 'kitchen' || targetDepartment == 'cuisine') {
+        isForKitchen = true;
+      }
 
-      final isItemForKitchen =
-          targetDepartment == 'kitchen' || targetDepartment == 'cuisine';
+      if (targetDepartment == 'bar') isForBar = true;
 
-      final isItemForBar = targetDepartment == 'bar';
-
-      if (isItemForKitchen) isForKitchen = true;
-      if (isItemForBar) isForBar = true;
-
-      final menuItemId = (itemMap['menuItemId'] ?? '').toString();
-
-      if (menuItemId.isEmpty) {
+      if (item.menuItemId.isEmpty) {
         throw const AppError(AppErrorCode.menuItemIdRequired);
       }
 
       final menuSnap = await _menuItemsRef(
         establishmentId,
-      ).doc(menuItemId).get();
+      ).doc(item.menuItemId).get();
 
       if (!menuSnap.exists || menuSnap.data() == null) {
-        throw AppError(AppErrorCode.menuItemNotFound, name: menuItemId);
+        throw AppError(AppErrorCode.menuItemNotFound, name: item.menuItemId);
       }
 
       final menuItem = MenuItemModel.fromMap(menuSnap.data()!, menuSnap.id);
 
-      if (menuItem.ingredients.isEmpty) {
-        throw AppError(AppErrorCode.noRecipeDefined, name: menuItem.name);
-      }
-
-      final orderedQuantity = (itemMap['quantity'] as num?)?.toDouble() ?? 0;
+      final orderedQuantity = item.quantity.toDouble();
 
       if (orderedQuantity <= 0) {
         throw AppError(
@@ -247,95 +285,235 @@ class OrderService {
         );
       }
 
-      for (final ingredient in menuItem.ingredients) {
-        final key =
-            '${ingredient.store}_${ingredient.itemId}_${ingredient.unit}';
+      lines.add(
+        OrderLineRecipe(
+          menuItemName: menuItem.name,
+          orderedQuantity: orderedQuantity,
+          ingredients: menuItem.ingredients,
+        ),
+      );
+    }
 
-        if (!aggregatedDeductions.containsKey(key)) {
-          aggregatedDeductions[key] = {
+    // 2. Besoins en stock selon le mode (aucun en mode désactivé).
+    final stockMode = await _fetchStockMode(establishmentId);
+
+    final requirements = stockMode == StockMode.disabled
+        ? const StockRequirements(requirements: [], recipeAnomalies: [])
+        : OrderStockPolicy.computeRequirements(lines);
+
+    final Map<String, DocumentReference<Map<String, dynamic>>> stockRefs = {};
+
+    for (final requirement in requirements.requirements) {
+      final ref = await _storeStockService.findStockRef(
+        establishmentId: establishmentId,
+        store: requirement.store,
+        itemId: requirement.itemId,
+      );
+
+      if (ref != null) stockRefs[requirement.key] = ref;
+    }
+
+    final ticket = await _resolveTicket(
+      establishmentId: establishmentId,
+      clientType: clientType,
+      tableNumber: tableNumber,
+      roomNumber: roomNumber,
+      fallbackId: docRef.id,
+    );
+
+    // 3. Décision + écritures, atomiquement.
+    //
+    // Sur Flutter web, un `throw` dans runTransaction est "boxé" (message
+    // perdu) : on capture le plan et on lève le refus APRÈS la transaction.
+    OrderStockPlan? decidedPlan;
+
+    await _firestore.runTransaction((transaction) async {
+      final Map<String, StockLevel?> levels = {};
+
+      for (final entry in stockRefs.entries) {
+        levels[entry.key] = await _storeStockService.readStockLevel(
+          transaction,
+          entry.value,
+        );
+      }
+
+      final plan = OrderStockPolicy.evaluate(
+        mode: stockMode,
+        requirements: requirements,
+        levels: levels,
+      );
+
+      decidedPlan = plan;
+
+      // Refus : rien n'est écrit, aucune commande n'existe.
+      if (!plan.isAccepted) return;
+
+      final stockDeducted = plan.deductions.isNotEmpty;
+
+      transaction.set(docRef, {
+        'establishmentId': establishmentId,
+        'orderNumber': orderNumber,
+        'ticketId': ticket.ticketId,
+        'clientType': clientType,
+        'tableNumber': tableNumber,
+        'roomNumber': roomNumber,
+        'clientId': clientId.trim(),
+        'createdBy': createdBy,
+        'createdByName': createdByName,
+        'status': 'sent',
+        'subtotal': subtotal,
+        'tax': tax,
+        'total': total,
+        'paymentStatus': 'unpaid',
+        'createdAt': FieldValue.serverTimestamp(),
+        'isForKitchen': isForKitchen,
+        'kitchenStatus': isForKitchen ? 'pending' : 'ready',
+        'isForBar': isForBar,
+        'barStatus': isForBar ? 'pending' : 'ready',
+        'stockMode': stockMode.value,
+        'stockStatus': plan.stockStatus,
+        'stockDeducted': stockDeducted,
+        if (stockDeducted) 'stockDeductedAt': FieldValue.serverTimestamp(),
+        'stockDeductedKeys': plan.deductedKeys,
+        'stockAnomalies': plan.anomalies.map((a) => a.toMap()).toList(),
+        'hasStockAnomaly': plan.anomalies.isNotEmpty,
+        'stockRestored': false,
+        'hasCancelledItems': false,
+        'pendingSync': false,
+        'syncError': false,
+      });
+
+      for (final item in items) {
+        transaction.set(
+          docRef.collection('items').doc(item.id),
+          item.copyWith(establishmentId: establishmentId).toMap(),
+        );
+      }
+
+      for (final orphanOrderId in ticket.orphanOrderIds) {
+        transaction.update(_ordersRef(establishmentId).doc(orphanOrderId), {
+          'ticketId': ticket.ticketId,
+        });
+      }
+
+      _storeStockService.writeOrderDeductions(
+        transaction,
+        establishmentId: establishmentId,
+        orderId: docRef.id,
+        orderNumber: orderNumber,
+        performedBy: createdBy,
+        performedByName: createdByName,
+        deductions: plan.deductions,
+        stockRefs: stockRefs,
+      );
+    });
+
+    final plan = decidedPlan;
+
+    if (plan == null) throw const AppError(AppErrorCode.unknown);
+
+    final refusal = plan.refusal;
+
+    if (refusal != null) throw refusal;
+
+    return OrderCreationResult(
+      orderId: docRef.id,
+      orderNumber: orderNumber,
+      stockMode: stockMode,
+      stockWarnings: plan.anomalies,
+    );
+  }
+
+  /// =========================
+  /// RESTITUTION A L'ANNULATION
+  /// =========================
+  ///
+  /// Quantités à remettre en stock pour des lignes annulées :
+  /// - commande sans déduction (mode désactivé, ancienne `stock_error`,
+  ///   warningOnly sans rien de déductible) : rien, et la recette n'est même
+  ///   pas relue — une recette absente ne bloque donc pas l'annulation ;
+  /// - commande récente : seules les clés de `stockDeductedKeys` sont
+  ///   restituées (en warningOnly, un ingrédient manquant n'a jamais été
+  ///   retiré, il ne doit pas être « rendu ») ;
+  /// - ancienne commande (champ absent) : comportement historique, toute la
+  ///   recette est restituée.
+  ///
+  /// La recette relue est celle du moment de l'annulation (limite
+  /// historique). TODO(cloud-functions): restituer à partir des mouvements
+  /// `stock_movements` liés à `orderId` plutôt que de la recette courante.
+  Future<List<Map<String, dynamic>>> _restitutionsFor({
+    required String establishmentId,
+    required Map<String, dynamic> orderData,
+    required List<OrderItemModel> items,
+  }) async {
+    if (orderData['stockDeducted'] != true) return const [];
+
+    final rawKeys = orderData['stockDeductedKeys'];
+
+    final Set<String>? deductedKeys = rawKeys is List
+        ? rawKeys.map((key) => key.toString()).toSet()
+        : null;
+
+    final Map<String, Map<String, dynamic>> aggregated = {};
+
+    for (final item in items) {
+      if (item.menuItemId.isEmpty) {
+        throw const AppError(AppErrorCode.menuItemIdMissingForCancel);
+      }
+
+      final menuSnap = await _menuItemsRef(
+        establishmentId,
+      ).doc(item.menuItemId).get();
+
+      if (!menuSnap.exists || menuSnap.data() == null) {
+        throw AppError(AppErrorCode.menuItemNotFound, name: item.menuItemId);
+      }
+
+      final menuItem = MenuItemModel.fromMap(menuSnap.data()!, menuSnap.id);
+
+      if (menuItem.ingredients.isEmpty) {
+        // Commande récente : plat accepté sans recette en warningOnly.
+        if (deductedKeys != null) continue;
+        throw AppError(AppErrorCode.noRecipeDefined, name: menuItem.name);
+      }
+
+      final orderedQuantity = item.quantity.toDouble();
+
+      if (orderedQuantity <= 0) {
+        throw AppError(
+          AppErrorCode.invalidQuantityInOrder,
+          name: menuItem.name,
+        );
+      }
+
+      for (final ingredient in menuItem.ingredients) {
+        final key = OrderStockPolicy.ingredientKey(
+          store: ingredient.store,
+          itemId: ingredient.itemId,
+          unit: ingredient.unit,
+        );
+
+        if (deductedKeys != null && !deductedKeys.contains(key)) continue;
+
+        final entry = aggregated.putIfAbsent(
+          key,
+          () => {
             'establishmentId': establishmentId,
             'store': ingredient.store,
             'itemId': ingredient.itemId,
             'itemName': ingredient.itemName,
             'unit': ingredient.unit,
             'quantity': 0.0,
-          };
-        }
+          },
+        );
 
-        aggregatedDeductions[key]!['quantity'] =
-            ((aggregatedDeductions[key]!['quantity'] as num).toDouble()) +
+        entry['quantity'] =
+            (entry['quantity'] as double) +
             (ingredient.quantity * orderedQuantity);
       }
     }
 
-    batch.set(docRef, {
-      'establishmentId': establishmentId,
-      'orderNumber': orderNumber,
-      'ticketId': ticket.ticketId,
-      'clientType': clientType,
-      'tableNumber': tableNumber,
-      'roomNumber': roomNumber,
-      'clientId': clientId.trim(),
-      'createdBy': createdBy,
-      'createdByName': createdByName,
-      'status': 'sent',
-      'subtotal': subtotal,
-      'tax': tax,
-      'total': total,
-      'paymentStatus': 'unpaid',
-      'createdAt': FieldValue.serverTimestamp(),
-      'isForKitchen': isForKitchen,
-      'kitchenStatus': isForKitchen ? 'pending' : 'ready',
-      'isForBar': isForBar,
-      'barStatus': isForBar ? 'pending' : 'ready',
-      'stockDeducted': false,
-      'stockRestored': false,
-      'hasCancelledItems': false,
-      'pendingSync': false,
-      'syncError': false,
-    });
-
-    for (final item in items) {
-      final itemRef = docRef.collection('items').doc(item.id);
-      batch.set(
-        itemRef,
-        item.copyWith(establishmentId: establishmentId).toMap(),
-      );
-    }
-
-    for (final orphanOrderId in ticket.orphanOrderIds) {
-      batch.update(_ordersRef(establishmentId).doc(orphanOrderId), {
-        'ticketId': ticket.ticketId,
-      });
-    }
-
-    await batch.commit();
-
-    try {
-      await _storeStockService.removeStockForOrder(
-        establishmentId: establishmentId,
-        orderId: docRef.id,
-        orderNumber: orderNumber,
-        performedBy: createdBy,
-        performedByName: createdByName,
-        deductions: aggregatedDeductions.values.toList(),
-      );
-
-      await docRef.update({
-        'stockDeducted': true,
-        'stockDeductedAt': FieldValue.serverTimestamp(),
-      });
-    } catch (e, stack) {
-      await docRef.update({
-        'status': 'stock_error',
-        'stockDeducted': false,
-        'stockError': e.toString(),
-        'stockErrorStack': stack.toString(),
-        'syncError': true,
-      });
-
-      rethrow;
-    }
+    return aggregated.values.toList();
   }
 
   Future<void> cancelOrderItems({
@@ -346,12 +524,6 @@ class OrderService {
     required String cancelledByName,
     String cancellationReason = '',
   }) async {
-    double toDouble(dynamic value) {
-      if (value == null) return 0;
-      if (value is num) return value.toDouble();
-      return double.tryParse(value.toString()) ?? 0;
-    }
-
     final orderRef = _ordersRef(establishmentId).doc(orderId);
     final orderSnap = await orderRef.get();
 
@@ -390,8 +562,6 @@ class OrderService {
     final kitchenStatus = (orderData['kitchenStatus'] ?? '').toString();
     final barStatus = (orderData['barStatus'] ?? '').toString();
 
-    final Map<String, Map<String, dynamic>> aggregatedRestitutions = {};
-
     for (final item in selectedItems) {
       if (item.isCancelled) {
         throw AppError(AppErrorCode.itemAlreadyCancelled, name: item.name);
@@ -411,62 +581,26 @@ class OrderService {
       }
 
       if (isBarItem && (barStatus == 'ready' || barStatus == 'served')) {
-        throw AppError(
-          AppErrorCode.cannotCancelItemBarReady,
-          name: item.name,
-        );
-      }
-
-      final menuSnap = await _menuItemsRef(
-        establishmentId,
-      ).doc(item.menuItemId).get();
-
-      if (!menuSnap.exists || menuSnap.data() == null) {
-        throw AppError(
-          AppErrorCode.menuItemNotFound,
-          name: item.menuItemId,
-        );
-      }
-
-      final menuItem = MenuItemModel.fromMap(menuSnap.data()!, menuSnap.id);
-
-      if (menuItem.ingredients.isEmpty) {
-        throw AppError(AppErrorCode.noRecipeDefined, name: menuItem.name);
-      }
-
-      final orderedQuantity = item.quantity.toDouble();
-
-      for (final ingredient in menuItem.ingredients) {
-        final key =
-            '${ingredient.store}_${ingredient.itemId}_${ingredient.unit}';
-
-        if (!aggregatedRestitutions.containsKey(key)) {
-          aggregatedRestitutions[key] = {
-            'establishmentId': establishmentId,
-            'store': ingredient.store,
-            'itemId': ingredient.itemId,
-            'itemName': ingredient.itemName,
-            'unit': ingredient.unit,
-            'quantity': 0.0,
-          };
-        }
-
-        aggregatedRestitutions[key]!['quantity'] =
-            toDouble(aggregatedRestitutions[key]!['quantity']) +
-            (ingredient.quantity * orderedQuantity);
+        throw AppError(AppErrorCode.cannotCancelItemBarReady, name: item.name);
       }
     }
 
     final stockDeducted = orderData['stockDeducted'] == true;
 
-    if (stockDeducted) {
+    final restitutions = await _restitutionsFor(
+      establishmentId: establishmentId,
+      orderData: orderData,
+      items: selectedItems,
+    );
+
+    if (restitutions.isNotEmpty) {
       await _storeStockService.restoreStockForCancelledOrder(
         establishmentId: establishmentId,
         orderId: orderId,
         orderNumber: (orderData['orderNumber'] ?? '').toString(),
         performedBy: cancelledBy,
         performedByName: cancelledByName,
-        restitutions: aggregatedRestitutions.values.toList(),
+        restitutions: restitutions,
       );
     }
 
@@ -530,7 +664,10 @@ class OrderService {
       'total': newTotal,
       'status': newStatus,
       'hasCancelledItems': refreshedItems.any((item) => item.isCancelled),
-      'stockRestored': refreshedItems.any((item) => item.isCancelled),
+      // Sans déduction initiale, rien n'a été restitué : ne pas bloquer une
+      // annulation complète ultérieure avec « stock déjà restitué ».
+      'stockRestored':
+          stockDeducted && refreshedItems.any((item) => item.isCancelled),
       'isForKitchen': activeKitchenItems.isNotEmpty,
       'isForBar': activeBarItems.isNotEmpty,
       'updatedAt': FieldValue.serverTimestamp(),
@@ -554,12 +691,6 @@ class OrderService {
     required String cancelledByName,
     String cancellationReason = '',
   }) async {
-    double toDouble(dynamic value) {
-      if (value == null) return 0;
-      if (value is num) return value.toDouble();
-      return double.tryParse(value.toString()) ?? 0;
-    }
-
     final orderRef = _ordersRef(establishmentId).doc(orderId);
     final orderSnap = await orderRef.get();
 
@@ -613,67 +744,20 @@ class OrderService {
         .map((doc) => OrderItemModel.fromMap(doc.data(), id: doc.id))
         .toList();
 
-    final Map<String, Map<String, dynamic>> aggregatedRestitutions = {};
+    final restitutions = await _restitutionsFor(
+      establishmentId: establishmentId,
+      orderData: orderData,
+      items: items,
+    );
 
-    for (final item in items) {
-      final menuItemId = item.menuItemId;
-
-      if (menuItemId.isEmpty) {
-        throw const AppError(AppErrorCode.menuItemIdMissingForCancel);
-      }
-
-      final menuSnap = await _menuItemsRef(
-        establishmentId,
-      ).doc(menuItemId).get();
-
-      if (!menuSnap.exists || menuSnap.data() == null) {
-        throw AppError(AppErrorCode.menuItemNotFound, name: menuItemId);
-      }
-
-      final menuItem = MenuItemModel.fromMap(menuSnap.data()!, menuSnap.id);
-
-      if (menuItem.ingredients.isEmpty) {
-        throw AppError(AppErrorCode.noRecipeDefined, name: menuItem.name);
-      }
-
-      final orderedQuantity = toDouble(item.quantity);
-
-      if (orderedQuantity <= 0) {
-        throw AppError(
-          AppErrorCode.invalidQuantityInOrder,
-          name: menuItem.name,
-        );
-      }
-
-      for (final ingredient in menuItem.ingredients) {
-        final key =
-            '${ingredient.store}_${ingredient.itemId}_${ingredient.unit}';
-
-        if (!aggregatedRestitutions.containsKey(key)) {
-          aggregatedRestitutions[key] = {
-            'establishmentId': establishmentId,
-            'store': ingredient.store,
-            'itemId': ingredient.itemId,
-            'itemName': ingredient.itemName,
-            'unit': ingredient.unit,
-            'quantity': 0.0,
-          };
-        }
-
-        aggregatedRestitutions[key]!['quantity'] =
-            toDouble(aggregatedRestitutions[key]!['quantity']) +
-            (ingredient.quantity * orderedQuantity);
-      }
-    }
-
-    if (stockDeducted) {
+    if (restitutions.isNotEmpty) {
       await _storeStockService.restoreStockForCancelledOrder(
         establishmentId: establishmentId,
         orderId: orderId,
         orderNumber: orderNumber,
         performedBy: cancelledBy,
         performedByName: cancelledByName,
-        restitutions: aggregatedRestitutions.values.toList(),
+        restitutions: restitutions,
       );
     }
 

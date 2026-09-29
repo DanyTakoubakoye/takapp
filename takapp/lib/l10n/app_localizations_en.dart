@@ -749,6 +749,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get orderSentSuccess => 'Order sent successfully.';
 
   @override
+  String orderSentWithStockWarning(String details) {
+    return 'Order sent, but with stock anomalies (non-blocking):\n$details\nThe affected ingredients were not deducted from stock.';
+  }
+
+  @override
   String get newOrderTitle => 'New order';
 
   @override

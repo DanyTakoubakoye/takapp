@@ -5,6 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/core/l10n/language_selector.dart';
+import 'package:takapp/modeles/establishment_plan.dart';
+import 'package:takapp/modeles/establishment_status.dart';
+import 'package:takapp/modeles/establishment_type.dart';
 import 'package:takapp/modeles/stock_mode.dart';
 
 class GlobalAdminDashboardPage extends StatefulWidget {
@@ -373,6 +376,13 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
   late String selectedType;
   late String selectedStatus;
   late String selectedPlan;
+
+  /// Valeurs `type` / `status` / `plan` lues dans Firestore, telles quelles
+  /// (absentes en création).
+  final Map<String, String> _storedValues = {};
+
+  /// Champs que l'admin a explicitement choisis dans leur liste.
+  final Set<String> _changedByUser = {};
   late StockMode selectedStockMode;
   late Map<String, bool> selectedModules;
 
@@ -405,9 +415,16 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
     adminEmailController = TextEditingController();
     adminPasswordController = TextEditingController();
 
-    selectedType = (data['type'] ?? 'hotel_bar_restaurant').toString();
-    selectedStatus = (data['status'] ?? 'active').toString();
-    selectedPlan = (data['plan'] ?? 'standard').toString();
+    // Normalisées : une ancienne valeur (« Hotel », « Active », libellé…) ne
+    // doit jamais être passée brute à un menu déroulant, qui exige une valeur
+    // présente dans ses items.
+    for (final field in const ['type', 'status', 'plan']) {
+      final raw = data[field];
+      if (raw != null) _storedValues[field] = raw.toString();
+    }
+    selectedType = EstablishmentType.normalize(data['type']);
+    selectedStatus = EstablishmentStatus.normalize(data['status']);
+    selectedPlan = EstablishmentPlan.normalize(data['plan']);
     selectedStockMode = StockMode.fromValue(data['stockMode']);
 
     selectedModules = {
@@ -440,15 +457,23 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
     if (city.isEmpty) return;
     if (selectedModules.values.every((v) => v == false)) return;
 
+    // Champ non touché par l'admin : on réécrit la valeur d'origine telle
+    // quelle, pour ne jamais remplacer silencieusement une ancienne valeur
+    // par sa forme normalisée ou par le fallback.
+    String valueToSave(String field, String selected) {
+      if (_changedByUser.contains(field)) return selected;
+      return _storedValues[field] ?? selected;
+    }
+
     final payload = {
       'name': name,
       'ifu': ifuController.text.trim(),
       'city': city,
       'country': countryController.text.trim(),
       'ownerUid': ownerUidController.text.trim(),
-      'type': selectedType,
-      'status': selectedStatus,
-      'plan': selectedPlan,
+      'type': valueToSave('type', selectedType),
+      'status': valueToSave('status', selectedStatus),
+      'plan': valueToSave('plan', selectedPlan),
       'stockMode': selectedStockMode.value,
       'modules': selectedModules,
     };
@@ -525,25 +550,28 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
                 ),
                 items: [
                   DropdownMenuItem(
-                    value: 'hotel_bar_restaurant',
+                    value: EstablishmentType.hotelBarRestaurant,
                     child: Text(l10n.typeHotelBarRestaurant),
                   ),
                   DropdownMenuItem(
-                    value: 'hotel',
+                    value: EstablishmentType.hotel,
                     child: Text(l10n.storeNameHotel),
                   ),
                   DropdownMenuItem(
-                    value: 'restaurant',
+                    value: EstablishmentType.restaurant,
                     child: Text(l10n.storeNameRestaurant),
                   ),
                   DropdownMenuItem(
-                    value: 'bar',
+                    value: EstablishmentType.bar,
                     child: Text(l10n.storeNameBar),
                   ),
                 ],
                 onChanged: (value) {
                   if (value == null) return;
-                  setState(() => selectedType = value);
+                  setState(() {
+                    selectedType = value;
+                    _changedByUser.add('type');
+                  });
                 },
               ),
               const SizedBox(height: 12),
@@ -551,17 +579,29 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
                 initialValue: selectedPlan,
                 decoration: InputDecoration(labelText: l10n.labelPlan),
                 items: [
-                  DropdownMenuItem(value: 'starter', child: Text('Starter')),
-                  DropdownMenuItem(value: 'standard', child: Text('Standard')),
-                  DropdownMenuItem(value: 'premium', child: Text('Premium')),
                   DropdownMenuItem(
-                    value: 'enterprise',
+                    value: EstablishmentPlan.starter,
+                    child: Text('Starter'),
+                  ),
+                  DropdownMenuItem(
+                    value: EstablishmentPlan.standard,
+                    child: Text('Standard'),
+                  ),
+                  DropdownMenuItem(
+                    value: EstablishmentPlan.premium,
+                    child: Text('Premium'),
+                  ),
+                  DropdownMenuItem(
+                    value: EstablishmentPlan.enterprise,
                     child: Text('Enterprise'),
                   ),
                 ],
                 onChanged: (value) {
                   if (value == null) return;
-                  setState(() => selectedPlan = value);
+                  setState(() {
+                    selectedPlan = value;
+                    _changedByUser.add('plan');
+                  });
                 },
               ),
               const SizedBox(height: 12),
@@ -570,21 +610,24 @@ class _EstablishmentFormDialogState extends State<_EstablishmentFormDialog> {
                 decoration: InputDecoration(labelText: l10n.labelStatus),
                 items: [
                   DropdownMenuItem(
-                    value: 'active',
+                    value: EstablishmentStatus.active,
                     child: Text(l10n.establishmentStatusActive),
                   ),
                   DropdownMenuItem(
-                    value: 'suspended',
+                    value: EstablishmentStatus.suspended,
                     child: Text(l10n.establishmentStatusSuspended),
                   ),
                   DropdownMenuItem(
-                    value: 'trial',
+                    value: EstablishmentStatus.trial,
                     child: Text(l10n.establishmentStatusTrial),
                   ),
                 ],
                 onChanged: (value) {
                   if (value == null) return;
-                  setState(() => selectedStatus = value);
+                  setState(() {
+                    selectedStatus = value;
+                    _changedByUser.add('status');
+                  });
                 },
               ),
               const SizedBox(height: 12),

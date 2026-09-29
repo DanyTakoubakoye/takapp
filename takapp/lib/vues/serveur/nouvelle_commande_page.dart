@@ -10,6 +10,7 @@ import 'package:takapp/services/client_service.dart';
 import 'package:takapp/services/menu_service.dart';
 import 'package:takapp/vues/commun/client_picker_sheet.dart';
 import 'package:takapp/vues/commun/module_visibility.dart';
+import 'package:takapp/vues/serveur/order_submitted_feedback.dart';
 
 class NouvelleCommandePage extends StatefulWidget {
   final String initialClientType;
@@ -185,9 +186,7 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
     if (!mounted) return;
 
     if (success) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.orderSentSuccess)));
+      showOrderSubmittedFeedback(context, orderController);
 
       if (widget.returnAfterSubmit) {
         Navigator.of(context).pop();

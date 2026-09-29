@@ -5,6 +5,7 @@ import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
 import 'package:takapp/modeles/order_item_model.dart';
 import 'package:takapp/services/order_service.dart';
+import 'package:takapp/services/order_stock_policy.dart';
 import 'package:uuid/uuid.dart';
 
 class OrderController extends ChangeNotifier {
@@ -20,10 +21,30 @@ class OrderController extends ChangeNotifier {
   /// pas encore migrée. Jamais un texte destiné à l'affichage.
   Object? _error;
 
+  /// Anomalies de stock acceptées lors du dernier envoi réussi (mode
+  /// warningOnly). Vide en strict / disabled ou si tout était correct.
+  List<StockAnomaly> _lastStockWarnings = const [];
+
   List<OrderItemModel> get items => List.unmodifiable(_items);
   bool get isSubmitting => _isSubmitting;
 
   bool get hasError => _error != null;
+
+  List<StockAnomaly> get lastStockWarnings => _lastStockWarnings;
+
+  bool get hasStockWarnings => _lastStockWarnings.isNotEmpty;
+
+  /// Message de confirmation du dernier envoi : succès simple, ou succès
+  /// avec le détail des anomalies de stock (jamais masquées).
+  String submittedMessage(AppLocalizations l10n) {
+    if (_lastStockWarnings.isEmpty) return l10n.orderSentSuccess;
+
+    final details = _lastStockWarnings
+        .map((anomaly) => localizedError(l10n, anomaly.toAppError()))
+        .join('\n');
+
+    return l10n.orderSentWithStockWarning(details);
+  }
 
   /// Message traduit dans la langue active, ou `null` s'il n'y a pas
   /// d'erreur. Appelé par l'UI, seule à disposer d'un `BuildContext`.
@@ -234,6 +255,7 @@ class OrderController extends ChangeNotifier {
 
     _isSubmitting = true;
     _error = null;
+    _lastStockWarnings = const [];
     notifyListeners();
 
     try {
@@ -242,7 +264,7 @@ class OrderController extends ChangeNotifier {
           .map((item) => item.copyWith(establishmentId: establishmentId))
           .toList();
 
-      await _orderService.createOrder(
+      final result = await _orderService.createOrder(
         establishmentId: establishmentId,
 
         clientType: clientType,
@@ -256,6 +278,8 @@ class OrderController extends ChangeNotifier {
         total: total,
         items: itemsToSend,
       );
+
+      _lastStockWarnings = result.stockWarnings;
 
       _items.clear();
 

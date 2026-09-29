@@ -1350,6 +1350,12 @@ abstract class AppLocalizations {
   /// **'Commande envoyée avec succès.'**
   String get orderSentSuccess;
 
+  /// No description provided for @orderSentWithStockWarning.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande envoyée, mais avec des anomalies de stock (non bloquantes) :\n{details}\nLes ingrédients concernés n\'ont pas été déduits du stock.'**
+  String orderSentWithStockWarning(String details);
+
   /// No description provided for @newOrderTitle.
   ///
   /// In fr, this message translates to:

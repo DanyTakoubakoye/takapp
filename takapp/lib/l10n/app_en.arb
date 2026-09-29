@@ -550,6 +550,14 @@
   "attachClientOptional": "Attach a client (optional)",
   "detachClient": "Detach client",
   "orderSentSuccess": "Order sent successfully.",
+  "orderSentWithStockWarning": "Order sent, but with stock anomalies (non-blocking):\n{details}\nThe affected ingredients were not deducted from stock.",
+  "@orderSentWithStockWarning": {
+    "placeholders": {
+      "details": {
+        "type": "String"
+      }
+    }
+  },
   "newOrderTitle": "New order",
   "labelRestaurantClient": "Restaurant client",
   "labelHotelClient": "Hotel client",
