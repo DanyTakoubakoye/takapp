@@ -126,6 +126,8 @@ class ShiftService {
     required DateTime startsAt,
     required DateTime endsAt,
     required String createdBy,
+    String createdByName = '',
+    String createdByRole = '',
   }) async {
     final error = ShiftPolicy.validateDraft(
       establishmentId: establishmentId,
@@ -149,6 +151,8 @@ class ShiftService {
       'serverIds': servers.map((s) => s.uid).toList(),
       'createdAt': FieldValue.serverTimestamp(),
       'createdBy': createdBy,
+      'createdByName': createdByName,
+      'createdByRole': createdByRole,
       'updatedAt': FieldValue.serverTimestamp(),
     });
 
@@ -216,7 +220,10 @@ class ShiftService {
 
       final shift = ShiftModel.fromMap(shiftSnap.data()!, shiftSnap.id);
 
-      if (!ShiftPolicy.canTransition(shift.status, ShiftStatus.open)) {
+      // Un service clôturé financièrement (13B) ne rouvre jamais : aucune
+      // nouvelle vente ne peut plus lui être rattachée.
+      if (!ShiftPolicy.canTransition(shift.status, ShiftStatus.open) ||
+          shift.isFinanciallyReconciled) {
         failure = const AppError(AppErrorCode.shiftInvalidTransition);
         return;
       }
@@ -404,6 +411,8 @@ class ShiftService {
         serverIds: newIds.toList(),
         createdAt: shift.createdAt,
         createdBy: shift.createdBy,
+        createdByName: shift.createdByName,
+        createdByRole: shift.createdByRole,
         updatedAt: shift.updatedAt,
       );
 

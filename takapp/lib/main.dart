@@ -36,6 +36,8 @@ import 'package:takapp/services/owner_dashboard_service.dart';
 import 'package:takapp/services/payment_service.dart';
 import 'package:takapp/services/pdf_service.dart';
 import 'package:takapp/services/printer_service.dart';
+import 'package:takapp/services/shift_closure_service.dart';
+import 'package:takapp/services/shift_handover_service.dart';
 import 'package:takapp/services/shift_service.dart';
 
 import 'package:takapp/vues/commun/home_router.dart';
@@ -137,6 +139,16 @@ class MyApp extends StatelessWidget {
         Provider<ComptabiliteService>(create: (_) => ComptabiliteService()),
         Provider<OwnerDashboardService>(create: (_) => OwnerDashboardService()),
         Provider<ShiftService>(create: (_) => ShiftService()),
+        Provider<ShiftHandoverService>(
+          create: (context) => ShiftHandoverService(
+            validationService: context.read<GeranteHandoverService>(),
+          ),
+        ),
+        Provider<ShiftClosureService>(
+          create: (context) => ShiftClosureService(
+            handoverService: context.read<ShiftHandoverService>(),
+          ),
+        ),
 
         ChangeNotifierProvider(create: (_) => FiscalizationController()),
         ChangeNotifierProvider(create: (_) => StoreStockController()),

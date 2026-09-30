@@ -7802,13 +7802,13 @@ abstract class AppLocalizations {
   /// No description provided for @shiftStatusOpen.
   ///
   /// In fr, this message translates to:
-  /// **'Ouvert'**
+  /// **'En cours'**
   String get shiftStatusOpen;
 
   /// No description provided for @shiftStatusClosed.
   ///
   /// In fr, this message translates to:
-  /// **'Clôturé'**
+  /// **'Terminé'**
   String get shiftStatusClosed;
 
   /// No description provided for @shiftActionOpen.
@@ -8116,6 +8116,684 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Vente de {server} · encaissée par {cashier}'**
   String fmPaymentContext(String server, String cashier);
+
+  /// No description provided for @handoverFmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remise au Floor Manager'**
+  String get handoverFmTitle;
+
+  /// No description provided for @handoverFmSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remettre vos encaissements du service'**
+  String get handoverFmSubtitle;
+
+  /// No description provided for @handoverNoShift.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous n\'êtes rattaché à aucun service.'**
+  String get handoverNoShift;
+
+  /// No description provided for @handoverNothingToHand.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rien à remettre pour ce service.'**
+  String get handoverNothingToHand;
+
+  /// No description provided for @handoverShiftClosedNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Service clôturé : vous pouvez encore remettre ses encaissements.'**
+  String get handoverShiftClosedNote;
+
+  /// No description provided for @handoverCollected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaissé'**
+  String get handoverCollected;
+
+  /// No description provided for @handoverValidated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remis (validé)'**
+  String get handoverValidated;
+
+  /// No description provided for @handoverAwaitingValidation.
+  ///
+  /// In fr, this message translates to:
+  /// **'En attente de validation'**
+  String get handoverAwaitingValidation;
+
+  /// No description provided for @handoverRemaining.
+  ///
+  /// In fr, this message translates to:
+  /// **'Reste à remettre'**
+  String get handoverRemaining;
+
+  /// No description provided for @handoverSendTo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remettre {amount} FCFA à {name}'**
+  String handoverSendTo(String amount, String name);
+
+  /// No description provided for @handoverSent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remise envoyée.'**
+  String get handoverSent;
+
+  /// No description provided for @handoverAmountLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'{label} : {amount} FCFA'**
+  String handoverAmountLine(String label, String amount);
+
+  /// No description provided for @fmHandoversTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remises'**
+  String get fmHandoversTitle;
+
+  /// No description provided for @fmHandoversSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaissements de vos serveurs'**
+  String get fmHandoversSubtitle;
+
+  /// No description provided for @fmHandoversReport.
+  ///
+  /// In fr, this message translates to:
+  /// **'Situation par serveur'**
+  String get fmHandoversReport;
+
+  /// No description provided for @fmHandoversPendingTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remises à valider'**
+  String get fmHandoversPendingTitle;
+
+  /// No description provided for @fmHandoversNone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune remise en attente.'**
+  String get fmHandoversNone;
+
+  /// No description provided for @fmHandoverValidate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valider'**
+  String get fmHandoverValidate;
+
+  /// No description provided for @fmHandoverReject.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rejeter'**
+  String get fmHandoverReject;
+
+  /// No description provided for @fmHandoverValidated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remise validée.'**
+  String get fmHandoverValidated;
+
+  /// No description provided for @fmHandoverRejected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remise rejetée.'**
+  String get fmHandoverRejected;
+
+  /// No description provided for @errTransferExceedsAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant supérieur à ce qui reste à remettre.'**
+  String get errTransferExceedsAvailable;
+
+  /// No description provided for @errTransferNoReceiver.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune gérante désignée pour ce service : il doit être créé par la gérante ou le propriétaire.'**
+  String get errTransferNoReceiver;
+
+  /// No description provided for @errTransferAlreadyChanged.
+  ///
+  /// In fr, this message translates to:
+  /// **'La situation a changé (remise déjà enregistrée ?). Vérifiez puis réessayez.'**
+  String get errTransferAlreadyChanged;
+
+  /// No description provided for @fmCashTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ma caisse'**
+  String get fmCashTitle;
+
+  /// No description provided for @fmCashSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remettre vos fonds à la gérante'**
+  String get fmCashSubtitle;
+
+  /// No description provided for @fmCashShiftLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Service'**
+  String get fmCashShiftLabel;
+
+  /// No description provided for @fmCashDirect.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaissements directs'**
+  String get fmCashDirect;
+
+  /// No description provided for @fmCashFromServers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Reçu des serveurs'**
+  String get fmCashFromServers;
+
+  /// No description provided for @fmCashTransferred.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déjà remis (validé)'**
+  String get fmCashTransferred;
+
+  /// No description provided for @fmCashTransferPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remis, en attente de validation'**
+  String get fmCashTransferPending;
+
+  /// No description provided for @fmCashAmountsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant à remettre par moyen de paiement'**
+  String get fmCashAmountsTitle;
+
+  /// No description provided for @fmCashReceiverDefault.
+  ///
+  /// In fr, this message translates to:
+  /// **'la gérante'**
+  String get fmCashReceiverDefault;
+
+  /// No description provided for @fmCashComment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commentaire (facultatif)'**
+  String get fmCashComment;
+
+  /// No description provided for @fmCashSent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remise envoyée à la gérante.'**
+  String get fmCashSent;
+
+  /// No description provided for @fmCashHistory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mes remises'**
+  String get fmCashHistory;
+
+  /// No description provided for @transferStatusPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'En attente'**
+  String get transferStatusPending;
+
+  /// No description provided for @transferStatusValidated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Validée'**
+  String get transferStatusValidated;
+
+  /// No description provided for @transferStatusRejected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rejetée'**
+  String get transferStatusRejected;
+
+  /// No description provided for @fmTransfersTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remises des Floor Managers'**
+  String get fmTransfersTitle;
+
+  /// No description provided for @fmTransfersSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valider les fonds remis par les Floor Managers'**
+  String get fmTransfersSubtitle;
+
+  /// No description provided for @fmTransfersNone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune remise de Floor Manager.'**
+  String get fmTransfersNone;
+
+  /// No description provided for @fmTransferValidateTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valider la remise'**
+  String get fmTransferValidateTitle;
+
+  /// No description provided for @fmTransferCounted.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant compté (FCFA)'**
+  String get fmTransferCounted;
+
+  /// No description provided for @fmTransferDifference.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écart : {amount} FCFA'**
+  String fmTransferDifference(String amount);
+
+  /// No description provided for @fmTransferDecisionComment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commentaire'**
+  String get fmTransferDecisionComment;
+
+  /// No description provided for @fmTransferValidated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remise validée.'**
+  String get fmTransferValidated;
+
+  /// No description provided for @fmTransferRejected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remise rejetée.'**
+  String get fmTransferRejected;
+
+  /// No description provided for @reconTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rapprochement du service'**
+  String get reconTitle;
+
+  /// No description provided for @reconFloorManager.
+  ///
+  /// In fr, this message translates to:
+  /// **'Floor Manager : {name}'**
+  String reconFloorManager(String name);
+
+  /// No description provided for @reconShift.
+  ///
+  /// In fr, this message translates to:
+  /// **'Service : {range}'**
+  String reconShift(String range);
+
+  /// No description provided for @reconFmDirect.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaissements directs Floor Manager'**
+  String get reconFmDirect;
+
+  /// No description provided for @reconServersCollected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaissements serveurs'**
+  String get reconServersCollected;
+
+  /// No description provided for @reconServersHanded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remises serveurs reçues'**
+  String get reconServersHanded;
+
+  /// No description provided for @reconTransfersValidated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remises Floor Manager → gérante (validées)'**
+  String get reconTransfersValidated;
+
+  /// No description provided for @reconTransfersPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remises Floor Manager → gérante (en attente)'**
+  String get reconTransfersPending;
+
+  /// No description provided for @reconStillHeld.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant encore détenu'**
+  String get reconStillHeld;
+
+  /// No description provided for @reconTheoretical.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant théorique'**
+  String get reconTheoretical;
+
+  /// No description provided for @reconPhysical.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant physique reçu'**
+  String get reconPhysical;
+
+  /// No description provided for @reconCountingDifference.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écarts constatés au comptage'**
+  String get reconCountingDifference;
+
+  /// No description provided for @reconDifference.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écart (physique − théorique)'**
+  String get reconDifference;
+
+  /// No description provided for @reconPhysicalField.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant physique total (FCFA)'**
+  String get reconPhysicalField;
+
+  /// No description provided for @reconRecord.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer le rapprochement'**
+  String get reconRecord;
+
+  /// No description provided for @reconRecorded.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rapprochement enregistré.'**
+  String get reconRecorded;
+
+  /// No description provided for @reconOpenShiftNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Service encore ouvert : le rapprochement peut encore évoluer.'**
+  String get reconOpenShiftNote;
+
+  /// No description provided for @errShiftFinancialNotReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clôture impossible : des éléments restent à traiter.'**
+  String get errShiftFinancialNotReady;
+
+  /// No description provided for @errShiftFinancialChanged.
+  ///
+  /// In fr, this message translates to:
+  /// **'La situation du service a changé pendant la clôture. Relisez puis réessayez.'**
+  String get errShiftFinancialChanged;
+
+  /// No description provided for @errShiftFinancialAlreadyClosed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce service est déjà clôturé financièrement.'**
+  String get errShiftFinancialAlreadyClosed;
+
+  /// No description provided for @errDiscrepancyInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écart invalide : montant attendu positif, montant retrouvé entre 0 et l\'attendu, motif obligatoire.'**
+  String get errDiscrepancyInvalid;
+
+  /// No description provided for @finStatusPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'À rapprocher'**
+  String get finStatusPending;
+
+  /// No description provided for @finStatusReady.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prêt à clôturer'**
+  String get finStatusReady;
+
+  /// No description provided for @finStatusReconciled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clôturé'**
+  String get finStatusReconciled;
+
+  /// No description provided for @finStatusDisputed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écart à traiter'**
+  String get finStatusDisputed;
+
+  /// No description provided for @closureTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clôture du service'**
+  String get closureTitle;
+
+  /// No description provided for @closureSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Situation financière de vos services'**
+  String get closureSubtitle;
+
+  /// No description provided for @closureOperational.
+  ///
+  /// In fr, this message translates to:
+  /// **'Service : {status}'**
+  String closureOperational(String status);
+
+  /// No description provided for @closureFinancial.
+  ///
+  /// In fr, this message translates to:
+  /// **'Situation financière : {status}'**
+  String closureFinancial(String status);
+
+  /// No description provided for @closureServersTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Serveurs'**
+  String get closureServersTitle;
+
+  /// No description provided for @closureFmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Floor Manager'**
+  String get closureFmTitle;
+
+  /// No description provided for @closureHandedOver.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remis'**
+  String get closureHandedOver;
+
+  /// No description provided for @closurePending.
+  ///
+  /// In fr, this message translates to:
+  /// **'En attente'**
+  String get closurePending;
+
+  /// No description provided for @closureDocumented.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écart documenté'**
+  String get closureDocumented;
+
+  /// No description provided for @closureFmHeld.
+  ///
+  /// In fr, this message translates to:
+  /// **'Total détenu théorique'**
+  String get closureFmHeld;
+
+  /// No description provided for @closureDiscrepanciesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écarts'**
+  String get closureDiscrepanciesTitle;
+
+  /// No description provided for @closureRemainingActions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Actions restantes'**
+  String get closureRemainingActions;
+
+  /// No description provided for @closureAllSettled.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toutes les conditions sont réunies.'**
+  String get closureAllSettled;
+
+  /// No description provided for @closureBlockShiftNotClosed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le service n\'est pas encore terminé.'**
+  String get closureBlockShiftNotClosed;
+
+  /// No description provided for @closureBlockServerRemaining.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} doit encore remettre {amount} FCFA'**
+  String closureBlockServerRemaining(String name, String amount);
+
+  /// No description provided for @closureBlockServerPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une remise de {name} ({amount} FCFA) est encore en attente'**
+  String closureBlockServerPending(String name, String amount);
+
+  /// No description provided for @closureBlockFmRemaining.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le Floor Manager doit encore remettre {amount} FCFA'**
+  String closureBlockFmRemaining(String amount);
+
+  /// No description provided for @closureBlockFmPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une remise du Floor Manager ({amount} FCFA) attend la validation de la gérante'**
+  String closureBlockFmPending(String amount);
+
+  /// No description provided for @closureBlockDiscrepancyPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un écart de caisse doit être traité ({name} : {amount} FCFA)'**
+  String closureBlockDiscrepancyPending(String name, String amount);
+
+  /// No description provided for @closureBlockDiscrepancyMismatch.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'écart de {name} ne correspond plus au reste ({amount} FCFA de trop) : à traiter à nouveau'**
+  String closureBlockDiscrepancyMismatch(String name, String amount);
+
+  /// No description provided for @closureTotalRemaining.
+  ///
+  /// In fr, this message translates to:
+  /// **'Reste total non remis'**
+  String get closureTotalRemaining;
+
+  /// No description provided for @closureTotalDocumented.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écarts documentés'**
+  String get closureTotalDocumented;
+
+  /// No description provided for @closureTotalDifference.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écart total (physique − théorique)'**
+  String get closureTotalDifference;
+
+  /// No description provided for @closureDeclareDiscrepancy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déclarer un écart'**
+  String get closureDeclareDiscrepancy;
+
+  /// No description provided for @closureCloseAction.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clôturer financièrement'**
+  String get closureCloseAction;
+
+  /// No description provided for @closureClosed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Service clôturé financièrement.'**
+  String get closureClosed;
+
+  /// No description provided for @closureClosedBy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clôturé par {name} le {date}'**
+  String closureClosedBy(String name, String date);
+
+  /// No description provided for @closureFmNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'La clôture financière finale est faite par la gérante.'**
+  String get closureFmNote;
+
+  /// No description provided for @discrepancyExpected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant attendu (FCFA)'**
+  String get discrepancyExpected;
+
+  /// No description provided for @discrepancyPhysical.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant retrouvé (FCFA)'**
+  String get discrepancyPhysical;
+
+  /// No description provided for @discrepancyReason.
+  ///
+  /// In fr, this message translates to:
+  /// **'Motif'**
+  String get discrepancyReason;
+
+  /// No description provided for @discrepancyDeclared.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écart déclaré.'**
+  String get discrepancyDeclared;
+
+  /// No description provided for @discrepancyApprove.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approuver'**
+  String get discrepancyApprove;
+
+  /// No description provided for @discrepancyReject.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rejeter'**
+  String get discrepancyReject;
+
+  /// No description provided for @discrepancyApproved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écart approuvé.'**
+  String get discrepancyApproved;
+
+  /// No description provided for @discrepancyRejected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Écart rejeté.'**
+  String get discrepancyRejected;
+
+  /// No description provided for @discrepancyStatusPending.
+  ///
+  /// In fr, this message translates to:
+  /// **'En attente de décision'**
+  String get discrepancyStatusPending;
+
+  /// No description provided for @discrepancyStatusApproved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Approuvé'**
+  String get discrepancyStatusApproved;
+
+  /// No description provided for @discrepancyStatusRejected.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rejeté'**
+  String get discrepancyStatusRejected;
+
+  /// No description provided for @discrepancyLine.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} : attendu {expected}, retrouvé {physical} FCFA'**
+  String discrepancyLine(String name, String expected, String physical);
 }
 
 class _AppLocalizationsDelegate

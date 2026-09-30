@@ -21,6 +21,36 @@ enum ShiftStatus {
   }
 }
 
+/// Situation FINANCIÈRE d'un service (13B), distincte de son état
+/// opérationnel ([ShiftStatus]) : un service `closed` n'est PAS soldé.
+///
+/// Seules [pending] et [reconciled] sont stockées (`financialStatus`).
+/// [ready] et [disputed] sont calculées à la lecture (voir
+/// `ShiftClosurePolicy`) : stockées, elles deviendraient fausses à la
+/// moindre remise.
+enum ShiftFinancialStatus {
+  /// À rapprocher (valeur par défaut, et de tout ancien service).
+  pending('pending'),
+
+  /// Prêt à clôturer : toutes les conditions sont réunies.
+  ready('ready'),
+
+  /// Clôturé financièrement par la gérante : figé.
+  reconciled('reconciled'),
+
+  /// Écart de caisse en attente de décision.
+  disputed('disputed');
+
+  const ShiftFinancialStatus(this.value);
+
+  final String value;
+
+  /// Absent ou inconnu => [pending] : un ancien service n'est jamais
+  /// considéré comme soldé. Seule la valeur stockée `reconciled` compte.
+  static ShiftFinancialStatus fromStored(Object? value) =>
+      value == reconciled.value ? reconciled : pending;
+}
+
 /// Service de travail d'un Floor Manager : `establishments/{id}/shifts/{id}`.
 ///
 /// La présence d'un serveur est portée par sa participation
@@ -44,6 +74,32 @@ class ShiftModel {
 
   final DateTime? createdAt;
   final String createdBy;
+
+  /// Nom du créateur (gérante) : destinataire des remises du Floor
+  /// Manager (12B). Vide sur les services créés avant 12B.
+  final String createdByName;
+
+  /// Rôle du créateur (gerante | proprietaire) : rôle du destinataire.
+  final String createdByRole;
+
+  /// =========================
+  /// CLÔTURE FINANCIÈRE (13B)
+  /// =========================
+
+  /// Stocké : `pending` (ou absent) / `reconciled`.
+  final ShiftFinancialStatus financialStatus;
+
+  /// Incrémenté par chaque événement financier du service (remise,
+  /// validation, écart) dans le même lot : la clôture échoue s'il a bougé
+  /// depuis la lecture de la situation.
+  final int financialRevision;
+
+  final DateTime? financialClosedAt;
+  final String financialClosedBy;
+  final String financialClosedByName;
+
+  /// Montants figés à la clôture.
+  final Map<String, double> financialSummary;
   final DateTime? updatedAt;
 
   const ShiftModel({
@@ -58,10 +114,20 @@ class ShiftModel {
     required this.createdAt,
     required this.createdBy,
     required this.updatedAt,
+    this.createdByName = '',
+    this.createdByRole = '',
+    this.financialStatus = ShiftFinancialStatus.pending,
+    this.financialRevision = 0,
+    this.financialClosedAt,
+    this.financialClosedBy = '',
+    this.financialClosedByName = '',
+    this.financialSummary = const {},
   });
 
   bool get isOpen => status == ShiftStatus.open;
   bool get isClosed => status == ShiftStatus.closed;
+  bool get isFinanciallyReconciled =>
+      financialStatus == ShiftFinancialStatus.reconciled;
 
   static DateTime? _toDate(dynamic value) {
     if (value is Timestamp) return value.toDate();
@@ -85,6 +151,18 @@ class ShiftModel {
           .toList(),
       createdAt: _toDate(map['createdAt']),
       createdBy: (map['createdBy'] ?? '').toString(),
+      createdByName: (map['createdByName'] ?? '').toString(),
+      createdByRole: (map['createdByRole'] ?? '').toString(),
+      financialStatus: ShiftFinancialStatus.fromStored(map['financialStatus']),
+      financialRevision: (map['financialRevision'] as num?)?.toInt() ?? 0,
+      financialClosedAt: _toDate(map['financialClosedAt']),
+      financialClosedBy: (map['financialClosedBy'] ?? '').toString(),
+      financialClosedByName: (map['financialClosedByName'] ?? '').toString(),
+      financialSummary: {
+        for (final entry
+            in ((map['financialSummary'] as Map?) ?? const {}).entries)
+          entry.key.toString(): (entry.value as num?)?.toDouble() ?? 0,
+      },
       updatedAt: _toDate(map['updatedAt']),
     );
   }

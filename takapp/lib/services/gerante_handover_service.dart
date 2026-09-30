@@ -43,6 +43,14 @@ class GeranteHandoverService {
         .map(
           (snapshot) => snapshot.docs
               .map((doc) => ServerHandoverModel.fromMap(doc.data(), doc.id))
+              // Circuit gérante uniquement : les remises destinées à un
+              // Floor Manager sont validées par lui (11B).
+              // Les remises d'un Floor Manager (12B) ont leur propre écran :
+              // remise d'un montant, sans paiement à valider un par un.
+              .where(
+                (handover) =>
+                    !handover.isForFloorManager && !handover.isFromFloorManager,
+              )
               .toList(),
         );
   }
@@ -112,6 +120,10 @@ class GeranteHandoverService {
     required double validatedAmount,
     required String managerId,
     required String managerName,
+
+    /// Service à marquer d'un événement financier (remise Floor Manager,
+    /// 13B) : `financialRevision` + 1 dans le même lot.
+    DocumentReference<Map<String, dynamic>>? shiftRevisionRef,
   }) async {
     if (selectedPaymentIds.isEmpty) {
       throw const AppError(AppErrorCode.noOrderSelected);
@@ -181,6 +193,12 @@ class GeranteHandoverService {
       });
     }
 
+    if (shiftRevisionRef != null) {
+      batch.update(shiftRevisionRef, {
+        'financialRevision': FieldValue.increment(1),
+      });
+    }
+
     await batch.commit();
   }
 
@@ -195,6 +213,10 @@ class GeranteHandoverService {
     required double validatedAmount,
     required String managerId,
     required String managerName,
+
+    /// Service à marquer d'un événement financier (remise Floor Manager,
+    /// 13B) : `financialRevision` + 1 dans le même lot.
+    DocumentReference<Map<String, dynamic>>? shiftRevisionRef,
   }) async {
     if (selectedPaymentIds.isEmpty) {
       throw const AppError(AppErrorCode.noOrderSelected);
@@ -263,6 +285,12 @@ class GeranteHandoverService {
         'pendingSync': false,
 
         'syncError': false,
+      });
+    }
+
+    if (shiftRevisionRef != null) {
+      batch.update(shiftRevisionRef, {
+        'financialRevision': FieldValue.increment(1),
       });
     }
 

@@ -2993,8 +2993,8 @@
   "shiftStartsAtLabel": "Début",
   "shiftEndsAtLabel": "Fin",
   "shiftStatusPlanned": "Planifié",
-  "shiftStatusOpen": "Ouvert",
-  "shiftStatusClosed": "Clôturé",
+  "shiftStatusOpen": "En cours",
+  "shiftStatusClosed": "Terminé",
   "shiftActionOpen": "Ouvrir",
   "shiftActionReopen": "Rouvrir",
   "shiftActionClose": "Clôturer",
@@ -3135,5 +3135,169 @@
         "type": "String"
       }
     }
-  }
+  },
+"handoverFmTitle": "Remise au Floor Manager",
+  "handoverFmSubtitle": "Remettre vos encaissements du service",
+  "handoverNoShift": "Vous n'êtes rattaché à aucun service.",
+  "handoverNothingToHand": "Rien à remettre pour ce service.",
+  "handoverShiftClosedNote": "Service clôturé : vous pouvez encore remettre ses encaissements.",
+  "handoverCollected": "Encaissé",
+  "handoverValidated": "Remis (validé)",
+  "handoverAwaitingValidation": "En attente de validation",
+  "handoverRemaining": "Reste à remettre",
+  "handoverSendTo": "Remettre {amount} FCFA à {name}",
+  "@handoverSendTo": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "handoverSent": "Remise envoyée.",
+  "handoverAmountLine": "{label} : {amount} FCFA",
+  "@handoverAmountLine": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "fmHandoversTitle": "Remises",
+  "fmHandoversSubtitle": "Encaissements de vos serveurs",
+  "fmHandoversReport": "Situation par serveur",
+  "fmHandoversPendingTitle": "Remises à valider",
+  "fmHandoversNone": "Aucune remise en attente.",
+  "fmHandoverValidate": "Valider",
+  "fmHandoverReject": "Rejeter",
+  "fmHandoverValidated": "Remise validée.",
+  "fmHandoverRejected": "Remise rejetée.",
+"errTransferExceedsAvailable": "Montant supérieur à ce qui reste à remettre.",
+  "errTransferNoReceiver": "Aucune gérante désignée pour ce service : il doit être créé par la gérante ou le propriétaire.",
+  "errTransferAlreadyChanged": "La situation a changé (remise déjà enregistrée ?). Vérifiez puis réessayez.",
+  "fmCashTitle": "Ma caisse",
+  "fmCashSubtitle": "Remettre vos fonds à la gérante",
+  "fmCashShiftLabel": "Service",
+  "fmCashDirect": "Encaissements directs",
+  "fmCashFromServers": "Reçu des serveurs",
+  "fmCashTransferred": "Déjà remis (validé)",
+  "fmCashTransferPending": "Remis, en attente de validation",
+  "fmCashAmountsTitle": "Montant à remettre par moyen de paiement",
+  "fmCashReceiverDefault": "la gérante",
+  "fmCashComment": "Commentaire (facultatif)",
+  "fmCashSent": "Remise envoyée à la gérante.",
+  "fmCashHistory": "Mes remises",
+  "transferStatusPending": "En attente",
+  "transferStatusValidated": "Validée",
+  "transferStatusRejected": "Rejetée",
+  "fmTransfersTitle": "Remises des Floor Managers",
+  "fmTransfersSubtitle": "Valider les fonds remis par les Floor Managers",
+  "fmTransfersNone": "Aucune remise de Floor Manager.",
+  "fmTransferValidateTitle": "Valider la remise",
+  "fmTransferCounted": "Montant compté (FCFA)",
+  "fmTransferDifference": "Écart : {amount} FCFA",
+  "@fmTransferDifference": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "fmTransferDecisionComment": "Commentaire",
+  "fmTransferValidated": "Remise validée.",
+  "fmTransferRejected": "Remise rejetée.",
+  "reconTitle": "Rapprochement du service",
+  "reconFloorManager": "Floor Manager : {name}",
+  "@reconFloorManager": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "reconShift": "Service : {range}",
+  "@reconShift": {
+    "placeholders": {
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "reconFmDirect": "Encaissements directs Floor Manager",
+  "reconServersCollected": "Encaissements serveurs",
+  "reconServersHanded": "Remises serveurs reçues",
+  "reconTransfersValidated": "Remises Floor Manager → gérante (validées)",
+  "reconTransfersPending": "Remises Floor Manager → gérante (en attente)",
+  "reconStillHeld": "Montant encore détenu",
+  "reconTheoretical": "Montant théorique",
+  "reconPhysical": "Montant physique reçu",
+  "reconCountingDifference": "Écarts constatés au comptage",
+  "reconDifference": "Écart (physique − théorique)",
+  "reconPhysicalField": "Montant physique total (FCFA)",
+  "reconRecord": "Enregistrer le rapprochement",
+  "reconRecorded": "Rapprochement enregistré.",
+  "reconOpenShiftNote": "Service encore ouvert : le rapprochement peut encore évoluer.",
+"errShiftFinancialNotReady": "Clôture impossible : des éléments restent à traiter.",
+  "errShiftFinancialChanged": "La situation du service a changé pendant la clôture. Relisez puis réessayez.",
+  "errShiftFinancialAlreadyClosed": "Ce service est déjà clôturé financièrement.",
+  "errDiscrepancyInvalid": "Écart invalide : montant attendu positif, montant retrouvé entre 0 et l'attendu, motif obligatoire.",
+  "finStatusPending": "À rapprocher",
+  "finStatusReady": "Prêt à clôturer",
+  "finStatusReconciled": "Clôturé",
+  "finStatusDisputed": "Écart à traiter",
+  "closureTitle": "Clôture du service",
+  "closureSubtitle": "Situation financière de vos services",
+  "closureOperational": "Service : {status}",
+  "@closureOperational": { "placeholders": { "status": { "type": "String" } } },
+  "closureFinancial": "Situation financière : {status}",
+  "@closureFinancial": { "placeholders": { "status": { "type": "String" } } },
+  "closureServersTitle": "Serveurs",
+  "closureFmTitle": "Floor Manager",
+  "closureHandedOver": "Remis",
+  "closurePending": "En attente",
+  "closureDocumented": "Écart documenté",
+  "closureFmHeld": "Total détenu théorique",
+  "closureDiscrepanciesTitle": "Écarts",
+  "closureRemainingActions": "Actions restantes",
+  "closureAllSettled": "Toutes les conditions sont réunies.",
+  "closureBlockShiftNotClosed": "Le service n'est pas encore terminé.",
+  "closureBlockServerRemaining": "{name} doit encore remettre {amount} FCFA",
+  "@closureBlockServerRemaining": { "placeholders": { "name": { "type": "String" }, "amount": { "type": "String" } } },
+  "closureBlockServerPending": "Une remise de {name} ({amount} FCFA) est encore en attente",
+  "@closureBlockServerPending": { "placeholders": { "name": { "type": "String" }, "amount": { "type": "String" } } },
+  "closureBlockFmRemaining": "Le Floor Manager doit encore remettre {amount} FCFA",
+  "@closureBlockFmRemaining": { "placeholders": { "amount": { "type": "String" } } },
+  "closureBlockFmPending": "Une remise du Floor Manager ({amount} FCFA) attend la validation de la gérante",
+  "@closureBlockFmPending": { "placeholders": { "amount": { "type": "String" } } },
+  "closureBlockDiscrepancyPending": "Un écart de caisse doit être traité ({name} : {amount} FCFA)",
+  "@closureBlockDiscrepancyPending": { "placeholders": { "name": { "type": "String" }, "amount": { "type": "String" } } },
+  "closureBlockDiscrepancyMismatch": "L'écart de {name} ne correspond plus au reste ({amount} FCFA de trop) : à traiter à nouveau",
+  "@closureBlockDiscrepancyMismatch": { "placeholders": { "name": { "type": "String" }, "amount": { "type": "String" } } },
+  "closureTotalRemaining": "Reste total non remis",
+  "closureTotalDocumented": "Écarts documentés",
+  "closureTotalDifference": "Écart total (physique − théorique)",
+  "closureDeclareDiscrepancy": "Déclarer un écart",
+  "closureCloseAction": "Clôturer financièrement",
+  "closureClosed": "Service clôturé financièrement.",
+  "closureClosedBy": "Clôturé par {name} le {date}",
+  "@closureClosedBy": { "placeholders": { "name": { "type": "String" }, "date": { "type": "String" } } },
+  "closureFmNote": "La clôture financière finale est faite par la gérante.",
+  "discrepancyExpected": "Montant attendu (FCFA)",
+  "discrepancyPhysical": "Montant retrouvé (FCFA)",
+  "discrepancyReason": "Motif",
+  "discrepancyDeclared": "Écart déclaré.",
+  "discrepancyApprove": "Approuver",
+  "discrepancyReject": "Rejeter",
+  "discrepancyApproved": "Écart approuvé.",
+  "discrepancyRejected": "Écart rejeté.",
+  "discrepancyStatusPending": "En attente de décision",
+  "discrepancyStatusApproved": "Approuvé",
+  "discrepancyStatusRejected": "Rejeté",
+  "discrepancyLine": "{name} : attendu {expected}, retrouvé {physical} FCFA",
+  "@discrepancyLine": { "placeholders": { "name": { "type": "String" }, "expected": { "type": "String" }, "physical": { "type": "String" } } }
 }

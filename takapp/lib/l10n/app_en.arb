@@ -2987,8 +2987,8 @@
   "shiftStartsAtLabel": "Start",
   "shiftEndsAtLabel": "End",
   "shiftStatusPlanned": "Planned",
-  "shiftStatusOpen": "Open",
-  "shiftStatusClosed": "Closed",
+  "shiftStatusOpen": "In progress",
+  "shiftStatusClosed": "Finished",
   "shiftActionOpen": "Open",
   "shiftActionReopen": "Reopen",
   "shiftActionClose": "Close",
@@ -3129,5 +3129,169 @@
         "type": "String"
       }
     }
-  }
+  },
+"handoverFmTitle": "Hand over to the Floor Manager",
+  "handoverFmSubtitle": "Hand over your shift collections",
+  "handoverNoShift": "You are not attached to any shift.",
+  "handoverNothingToHand": "Nothing to hand over for this shift.",
+  "handoverShiftClosedNote": "Shift closed: you can still hand over its collections.",
+  "handoverCollected": "Collected",
+  "handoverValidated": "Handed over (validated)",
+  "handoverAwaitingValidation": "Awaiting validation",
+  "handoverRemaining": "Left to hand over",
+  "handoverSendTo": "Hand {amount} FCFA over to {name}",
+  "@handoverSendTo": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "handoverSent": "Handover sent.",
+  "handoverAmountLine": "{label}: {amount} FCFA",
+  "@handoverAmountLine": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "fmHandoversTitle": "Handovers",
+  "fmHandoversSubtitle": "Your servers' collections",
+  "fmHandoversReport": "Status per server",
+  "fmHandoversPendingTitle": "Handovers to validate",
+  "fmHandoversNone": "No pending handover.",
+  "fmHandoverValidate": "Validate",
+  "fmHandoverReject": "Reject",
+  "fmHandoverValidated": "Handover validated.",
+  "fmHandoverRejected": "Handover rejected.",
+"errTransferExceedsAvailable": "Amount exceeds what is left to hand over.",
+  "errTransferNoReceiver": "No manager assigned to this shift: it must be created by the manager or the owner.",
+  "errTransferAlreadyChanged": "The situation has changed (handover already recorded?). Check and try again.",
+  "fmCashTitle": "My cash",
+  "fmCashSubtitle": "Hand your funds over to the manager",
+  "fmCashShiftLabel": "Shift",
+  "fmCashDirect": "Direct collections",
+  "fmCashFromServers": "Received from servers",
+  "fmCashTransferred": "Already handed over (validated)",
+  "fmCashTransferPending": "Handed over, awaiting validation",
+  "fmCashAmountsTitle": "Amount to hand over per payment method",
+  "fmCashReceiverDefault": "the manager",
+  "fmCashComment": "Comment (optional)",
+  "fmCashSent": "Handover sent to the manager.",
+  "fmCashHistory": "My handovers",
+  "transferStatusPending": "Pending",
+  "transferStatusValidated": "Validated",
+  "transferStatusRejected": "Rejected",
+  "fmTransfersTitle": "Floor Manager handovers",
+  "fmTransfersSubtitle": "Validate funds handed over by Floor Managers",
+  "fmTransfersNone": "No Floor Manager handover.",
+  "fmTransferValidateTitle": "Validate handover",
+  "fmTransferCounted": "Counted amount (FCFA)",
+  "fmTransferDifference": "Difference: {amount} FCFA",
+  "@fmTransferDifference": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "fmTransferDecisionComment": "Comment",
+  "fmTransferValidated": "Handover validated.",
+  "fmTransferRejected": "Handover rejected.",
+  "reconTitle": "Shift reconciliation",
+  "reconFloorManager": "Floor Manager: {name}",
+  "@reconFloorManager": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "reconShift": "Shift: {range}",
+  "@reconShift": {
+    "placeholders": {
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "reconFmDirect": "Floor Manager direct collections",
+  "reconServersCollected": "Server collections",
+  "reconServersHanded": "Server handovers received",
+  "reconTransfersValidated": "Floor Manager → manager handovers (validated)",
+  "reconTransfersPending": "Floor Manager → manager handovers (pending)",
+  "reconStillHeld": "Amount still held",
+  "reconTheoretical": "Theoretical amount",
+  "reconPhysical": "Physical amount received",
+  "reconCountingDifference": "Counting differences",
+  "reconDifference": "Difference (physical − theoretical)",
+  "reconPhysicalField": "Total physical amount (FCFA)",
+  "reconRecord": "Record reconciliation",
+  "reconRecorded": "Reconciliation recorded.",
+  "reconOpenShiftNote": "Shift still open: the reconciliation may still change.",
+"errShiftFinancialNotReady": "Cannot close: some items are still outstanding.",
+  "errShiftFinancialChanged": "The shift's situation changed during closing. Reload and try again.",
+  "errShiftFinancialAlreadyClosed": "This shift is already financially closed.",
+  "errDiscrepancyInvalid": "Invalid discrepancy: expected amount must be positive, found amount between 0 and expected, reason required.",
+  "finStatusPending": "To reconcile",
+  "finStatusReady": "Ready to close",
+  "finStatusReconciled": "Closed",
+  "finStatusDisputed": "Discrepancy to handle",
+  "closureTitle": "Shift closing",
+  "closureSubtitle": "Financial status of your shifts",
+  "closureOperational": "Shift: {status}",
+  "@closureOperational": { "placeholders": { "status": { "type": "String" } } },
+  "closureFinancial": "Financial status: {status}",
+  "@closureFinancial": { "placeholders": { "status": { "type": "String" } } },
+  "closureServersTitle": "Servers",
+  "closureFmTitle": "Floor Manager",
+  "closureHandedOver": "Handed over",
+  "closurePending": "Pending",
+  "closureDocumented": "Documented discrepancy",
+  "closureFmHeld": "Theoretical total held",
+  "closureDiscrepanciesTitle": "Discrepancies",
+  "closureRemainingActions": "Remaining actions",
+  "closureAllSettled": "All conditions are met.",
+  "closureBlockShiftNotClosed": "The shift is not finished yet.",
+  "closureBlockServerRemaining": "{name} still has to hand over {amount} FCFA",
+  "@closureBlockServerRemaining": { "placeholders": { "name": { "type": "String" }, "amount": { "type": "String" } } },
+  "closureBlockServerPending": "A handover from {name} ({amount} FCFA) is still pending",
+  "@closureBlockServerPending": { "placeholders": { "name": { "type": "String" }, "amount": { "type": "String" } } },
+  "closureBlockFmRemaining": "The Floor Manager still has to hand over {amount} FCFA",
+  "@closureBlockFmRemaining": { "placeholders": { "amount": { "type": "String" } } },
+  "closureBlockFmPending": "A Floor Manager handover ({amount} FCFA) awaits the manager's validation",
+  "@closureBlockFmPending": { "placeholders": { "amount": { "type": "String" } } },
+  "closureBlockDiscrepancyPending": "A cash discrepancy must be handled ({name}: {amount} FCFA)",
+  "@closureBlockDiscrepancyPending": { "placeholders": { "name": { "type": "String" }, "amount": { "type": "String" } } },
+  "closureBlockDiscrepancyMismatch": "{name}'s discrepancy no longer matches the remaining amount ({amount} FCFA too much): handle it again",
+  "@closureBlockDiscrepancyMismatch": { "placeholders": { "name": { "type": "String" }, "amount": { "type": "String" } } },
+  "closureTotalRemaining": "Total not handed over",
+  "closureTotalDocumented": "Documented discrepancies",
+  "closureTotalDifference": "Total difference (physical − theoretical)",
+  "closureDeclareDiscrepancy": "Declare a discrepancy",
+  "closureCloseAction": "Close financially",
+  "closureClosed": "Shift financially closed.",
+  "closureClosedBy": "Closed by {name} on {date}",
+  "@closureClosedBy": { "placeholders": { "name": { "type": "String" }, "date": { "type": "String" } } },
+  "closureFmNote": "The final financial closing is done by the manager.",
+  "discrepancyExpected": "Expected amount (FCFA)",
+  "discrepancyPhysical": "Amount found (FCFA)",
+  "discrepancyReason": "Reason",
+  "discrepancyDeclared": "Discrepancy declared.",
+  "discrepancyApprove": "Approve",
+  "discrepancyReject": "Reject",
+  "discrepancyApproved": "Discrepancy approved.",
+  "discrepancyRejected": "Discrepancy rejected.",
+  "discrepancyStatusPending": "Awaiting decision",
+  "discrepancyStatusApproved": "Approved",
+  "discrepancyStatusRejected": "Rejected",
+  "discrepancyLine": "{name}: expected {expected}, found {physical} FCFA",
+  "@discrepancyLine": { "placeholders": { "name": { "type": "String" }, "expected": { "type": "String" }, "physical": { "type": "String" } } }
 }

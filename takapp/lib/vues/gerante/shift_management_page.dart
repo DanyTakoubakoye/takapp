@@ -8,6 +8,7 @@ import 'package:takapp/modeles/shift_model.dart';
 import 'package:takapp/modeles/user_model.dart';
 import 'package:takapp/services/shift_policy.dart';
 import 'package:takapp/services/shift_service.dart';
+import 'package:takapp/vues/gerante/shift_closure_page.dart';
 
 /// Gestion minimale des services (shifts) : création, choix du Floor
 /// Manager et des serveurs, ouverture, clôture, réouverture.
@@ -69,6 +70,8 @@ class _ShiftManagementPageState extends State<ShiftManagementPage> {
       startsAt: draft.startsAt,
       endsAt: draft.endsAt,
       createdBy: _userId,
+      createdByName: context.read<AuthController>().currentUser?.name ?? '',
+      createdByRole: context.read<AuthController>().currentUser?.role ?? '',
     );
     _report(ok);
   }
@@ -196,7 +199,9 @@ class _ShiftCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final canOpen = ShiftPolicy.canTransition(shift.status, ShiftStatus.open);
+    final canOpen =
+        ShiftPolicy.canTransition(shift.status, ShiftStatus.open) &&
+        !shift.isFinanciallyReconciled;
     final canClose = ShiftPolicy.canTransition(
       shift.status,
       ShiftStatus.closed,
@@ -217,6 +222,10 @@ class _ShiftCard extends StatelessWidget {
                   ),
                 ),
                 Chip(label: Text(_statusLabel(shift.status, l10n))),
+                if (shift.isFinanciallyReconciled) ...[
+                  const SizedBox(width: 4),
+                  Chip(label: Text(l10n.finStatusReconciled)),
+                ],
               ],
             ),
             Text(
@@ -248,6 +257,23 @@ class _ShiftCard extends StatelessWidget {
                     onPressed: enabled ? onClose : null,
                     icon: const Icon(Icons.stop),
                     label: Text(l10n.shiftActionClose),
+                  ),
+                // Clôture financière (13B), distincte de la fermeture.
+                if (shift.isClosed)
+                  TextButton.icon(
+                    key: ValueKey('shift-closure-${shift.id}'),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ShiftClosurePage(
+                          establishmentId: shift.establishmentId,
+                          shiftId: shift.id,
+                          asManager: true,
+                        ),
+                      ),
+                    ),
+                    icon: const Icon(Icons.fact_check_outlined),
+                    label: Text(l10n.closureTitle),
                   ),
               ],
             ),

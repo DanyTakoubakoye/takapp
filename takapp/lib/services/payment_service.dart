@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:takapp/core/constants/app_roles.dart';
 import 'package:takapp/core/errors/app_error.dart';
 
 import 'package:takapp/modeles/order_actor_context.dart';
 import 'package:takapp/modeles/order_model.dart';
+import 'package:takapp/modeles/shift_model.dart';
 import 'package:takapp/services/order_actor_verifier.dart';
 
 class PaymentService {
@@ -148,9 +150,14 @@ class PaymentService {
   ///   le serveur du contexte (lui-même en direct, Jean pour Jean). Autres
   ///   rôles : le serveur responsable de la commande principale.
   /// - `shiftId` : service de l'encaissement (Floor Manager), sinon null.
+  ///
+  /// [cashierShiftId] (11B) : service ouvert du SERVEUR qui encaisse, pour
+  /// que ses encaissements puissent être remis au Floor Manager de ce
+  /// service. Le Floor Manager, lui, porte déjà son service dans [actor].
   static Map<String, dynamic> paymentActorFields({
     required OrderActorContext actor,
     required OrderModel primaryOrder,
+    String? cashierShiftId,
   }) {
     return {
       'receivedBy': actor.performedByUserId,
@@ -161,8 +168,45 @@ class PaymentService {
       'responsibleServerName': actor.isFloorManager
           ? actor.assignedServerName
           : primaryOrder.effectiveAssignedServerName,
-      'shiftId': actor.shiftId,
+      'shiftId': actor.shiftId ?? cashierShiftId,
     };
+  }
+
+  /// Service OUVERT dont le serveur connecté fait partie, ou `null`
+  /// (hors système de shift, service clôturé, retiré du service).
+  Future<String?> _openShiftOfServer(
+    String establishmentId,
+    OrderActorContext actor,
+  ) async {
+    if (actor.performedByRole != AppRoles.serveur) return null;
+
+    final establishment = _firestore
+        .collection('establishments')
+        .doc(establishmentId);
+    try {
+      final pointer = await establishment
+          .collection('serverCurrentShift')
+          .doc(actor.performedByUserId)
+          .get();
+      final shiftId = pointer.data()?['openShiftId']?.toString() ?? '';
+      if (shiftId.isEmpty) return null;
+
+      final shiftSnap = await establishment
+          .collection('shifts')
+          .doc(shiftId)
+          .get();
+      final data = shiftSnap.data();
+      if (!shiftSnap.exists || data == null) return null;
+
+      final shift = ShiftModel.fromMap(data, shiftSnap.id);
+      return shift.isOpen && shift.serverIds.contains(actor.performedByUserId)
+          ? shift.id
+          : null;
+    } on FirebaseException catch (e) {
+      // Aucun service lisible : encaissement hors système de shift.
+      if (e.code == 'permission-denied') return null;
+      rethrow;
+    }
   }
 
   /// =========================
@@ -223,6 +267,10 @@ class PaymentService {
     if (actor.isFloorManager && method == 'room') {
       throw const AppError(AppErrorCode.orderAssignmentForbidden);
     }
+
+    // Serveur dans un service ouvert : le paiement porte ce service (base
+    // de sa remise au Floor Manager). Hors service : null, comme avant.
+    final cashierShiftId = await _openShiftOfServer(establishmentId, actor);
 
     final orderRefs = ids
         .map((id) => _ordersRef(establishmentId: establishmentId).doc(id))
@@ -325,6 +373,7 @@ class PaymentService {
       final actorFields = paymentActorFields(
         actor: actor,
         primaryOrder: primary,
+        cashierShiftId: cashierShiftId,
       );
 
       if (method == 'room') {

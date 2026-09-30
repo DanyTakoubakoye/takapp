@@ -8,6 +8,7 @@ import 'package:takapp/vues/gerante/facturation_chambre_page.dart';
 import 'package:takapp/vues/gerante/gestion_menu_page.dart';
 import 'package:takapp/vues/gerante/liste_factures_page.dart';
 import 'package:takapp/vues/gerante/suivi_encaissements_serveurs.dart';
+import 'package:takapp/vues/gerante/floor_manager_transfers_page.dart';
 import 'package:takapp/vues/gerante/versement_compta_page.dart';
 import 'package:takapp/vues/gerante/versements_serveurs_page.dart';
 import 'package:takapp/vues/gerante/shift_management_page.dart';
@@ -249,6 +250,12 @@ class _GeranteModulesGrid extends StatelessWidget {
             icon: Icons.fact_check_outlined,
             pageBuilder: (_) =>
                 VersementsServeursPage(establishmentId: establishmentId),
+          ),
+          _GeranteAction(
+            title: l10n.fmTransfersTitle,
+            icon: Icons.savings_outlined,
+            pageBuilder: (_) =>
+                FloorManagerTransfersPage(establishmentId: establishmentId),
           ),
           _GeranteAction(
             title: l10n.actionServerCollections,

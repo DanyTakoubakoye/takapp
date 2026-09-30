@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../controllers/auth_controller.dart';
 import '../../l10n/app_localizations.dart';
+import '../../modeles/server_handover_model.dart';
 
 class VersementComptaPage extends StatefulWidget {
   final String establishmentId;
@@ -322,6 +323,14 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
                   final docs = (snapshot.data?.docs ?? []).where((doc) {
                     final data = doc.data() as Map<String, dynamic>;
 
+                    // Remise validée par un Floor Manager : l'argent est
+                    // chez lui, pas chez la gérante. Elle ne part pas en
+                    // comptabilité par ce circuit (11B).
+                    if (data['receiverRole'] ==
+                        ServerHandoverModel.floorManagerReceiver) {
+                      return false;
+                    }
+
                     return (data['accountingTransferStatus'] ?? '') !=
                         'declared';
                   }).toList();
@@ -340,8 +349,14 @@ class _VersementComptaPageState extends State<VersementComptaPage> {
 
                       final data = doc.data() as Map<String, dynamic>;
 
-                      final amount = ((data['validatedAmount'] ?? 0) as num)
-                          .toDouble();
+                      // Remise d'un Floor Manager (12B) : la gérante détient
+                      // ce qu'elle a physiquement compté à la validation.
+                      final amount =
+                          ((data['physicalAmount'] ??
+                                      data['validatedAmount'] ??
+                                      0)
+                                  as num)
+                              .toDouble();
 
                       return Container(
                         decoration: BoxDecoration(

@@ -46,6 +46,9 @@ class HandoverService {
         .map(
           (snapshot) => snapshot.docs
               .map((doc) => PaymentModel.fromMap(doc.data(), doc.id))
+              // Encaissements d'un service : remis au Floor Manager du
+              // service (11B), jamais directement à la gérante.
+              .where((p) => (p.shiftId ?? '').isEmpty)
               .toList(),
         );
   }

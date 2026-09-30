@@ -278,6 +278,16 @@ void main() {
       expect(fields['responsibleServerId'], 'jean');
       expect(fields['shiftId'], isNull);
 
+      // 11B : Jean présent dans un service ouvert -> l'encaissement porte
+      // ce service (remis ensuite au Floor Manager du service).
+      final inShift = PaymentService.paymentActorFields(
+        actor: OrderActorContext.self(jeanUser),
+        primaryOrder: _orders[1],
+        cashierShiftId: 'sh1',
+      );
+      expect(inShift['receivedBy'], 'jean');
+      expect(inShift['shiftId'], 'sh1');
+
       // Gérante qui encaisse la table de Jean : vente attribuée à Jean.
       final gerante = UserModel.fromMap({
         'role': 'gerante',

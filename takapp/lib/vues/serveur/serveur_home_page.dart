@@ -12,6 +12,7 @@ import 'package:takapp/vues/serveur/mes_factures_serveur_page.dart';
 import 'package:takapp/vues/serveur/serveur_notifications_page.dart';
 import 'package:takapp/vues/serveur/suivi_bar_page.dart';
 import 'package:takapp/vues/serveur/suivi_cuisine_page.dart';
+import 'package:takapp/vues/serveur/shift_handover_page.dart';
 import 'package:takapp/vues/serveur/versement_gerante_page.dart';
 import 'package:takapp/vues/commun/unpaid_tickets_page.dart';
 import 'package:takapp/core/l10n/language_selector.dart';
@@ -384,6 +385,13 @@ class _ServeurModulesGrid extends StatelessWidget {
             subtitle: l10n.actionHandoverSubtitle,
             icon: Icons.account_balance_wallet_outlined,
             page: VersementGerantePage(establishmentId: establishmentId),
+          ),
+          // 11B : encaissements d'un service -> Floor Manager de ce service.
+          _ServeurAction(
+            title: l10n.handoverFmTitle,
+            subtitle: l10n.handoverFmSubtitle,
+            icon: Icons.supervisor_account,
+            page: ShiftHandoverPage(establishmentId: establishmentId),
           ),
         ],
       ),

@@ -7,7 +7,10 @@ import 'package:takapp/core/l10n/language_selector.dart';
 import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/shift_model.dart';
 import 'package:takapp/vues/floor_manager/floor_manager_action_page.dart';
+import 'package:takapp/vues/floor_manager/floor_manager_handovers_page.dart';
+import 'package:takapp/vues/floor_manager/floor_manager_cash_page.dart';
 import 'package:takapp/vues/floor_manager/floor_manager_widgets.dart';
+import 'package:takapp/vues/gerante/shift_closure_page.dart';
 
 /// Tableau de bord du Floor Manager : identité, service courant, et les deux
 /// sections Commandes / Encaissements (désactivées sans service ouvert).
@@ -80,6 +83,49 @@ class FloorManagerHomePage extends StatelessWidget {
               ),
               const SizedBox(height: 14),
             ],
+            // Remises (11B) : reste accessible après la clôture du service,
+            // pour finaliser les remises financières du service terminé.
+            FloorManagerTile(
+              key: const ValueKey('fm-handovers'),
+              title: l10n.fmHandoversTitle,
+              subtitle: l10n.fmHandoversSubtitle,
+              icon: Icons.account_balance_wallet_outlined,
+              color: Colors.deepPurple,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const FloorManagerHandoversPage(),
+                ),
+              ),
+            ),
+            // Ma caisse (12B) : fonds détenus et remise à la gérante,
+            // y compris pour un service clôturé.
+            FloorManagerTile(
+              key: const ValueKey('fm-cash'),
+              title: l10n.fmCashTitle,
+              subtitle: l10n.fmCashSubtitle,
+              icon: Icons.savings_outlined,
+              color: Colors.teal,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const FloorManagerCashPage()),
+              ),
+            ),
+            // Clôture du service (13B) : consultation et déclaration
+            // d'écarts ; la clôture finale revient à la gérante.
+            FloorManagerTile(
+              key: const ValueKey('fm-closure'),
+              title: l10n.closureTitle,
+              subtitle: l10n.closureSubtitle,
+              icon: Icons.fact_check_outlined,
+              color: Colors.indigo,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const FloorManagerClosureListPage(),
+                ),
+              ),
+            ),
           ],
         ),
       ),

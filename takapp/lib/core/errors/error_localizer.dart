@@ -312,5 +312,23 @@ String _messageFor(AppLocalizations l10n, AppError error) {
       return l10n.errOrderNotPayable(error.name ?? '');
     case AppErrorCode.ticketChanged:
       return l10n.errTicketChanged;
+    case AppErrorCode.handoverNothingToHand:
+      return l10n.handoverNothingToHand;
+    case AppErrorCode.handoverNoShift:
+      return l10n.handoverNoShift;
+    case AppErrorCode.transferExceedsAvailable:
+      return l10n.errTransferExceedsAvailable;
+    case AppErrorCode.transferNoReceiver:
+      return l10n.errTransferNoReceiver;
+    case AppErrorCode.transferAlreadyChanged:
+      return l10n.errTransferAlreadyChanged;
+    case AppErrorCode.shiftFinancialNotReady:
+      return l10n.errShiftFinancialNotReady;
+    case AppErrorCode.shiftFinancialChanged:
+      return l10n.errShiftFinancialChanged;
+    case AppErrorCode.shiftFinancialAlreadyClosed:
+      return l10n.errShiftFinancialAlreadyClosed;
+    case AppErrorCode.discrepancyInvalid:
+      return l10n.errDiscrepancyInvalid;
   }
 }

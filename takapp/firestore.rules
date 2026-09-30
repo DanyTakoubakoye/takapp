@@ -101,7 +101,10 @@ service cloud.firestore {
           'establishmentId', 'floorManagerId', 'floorManagerName',
           'startsAt', 'endsAt', 'status', 'serverIds',
           'createdAt', 'createdBy', 'updatedAt',
-          'openedAt', 'openedBy', 'closedAt', 'closedBy'
+          'openedAt', 'openedBy', 'closedAt', 'closedBy',
+          'createdByName', 'createdByRole',
+          'financialStatus', 'financialRevision', 'financialClosedAt',
+          'financialClosedBy', 'financialClosedByName', 'financialSummary'
         ]) &&
         d.establishmentId == establishmentId &&
         d.status in ['planned', 'open', 'closed'] &&
@@ -221,6 +224,199 @@ service cloud.firestore {
         existsAfter(/databases/$(database)/documents/establishments/$(establishmentId)/payments/$(paymentId)) &&
         getAfter(/databases/$(database)/documents/establishments/$(establishmentId)/payments/$(paymentId)).data.receivedBy == request.auth.uid &&
         orderId in getAfter(/databases/$(database)/documents/establishments/$(establishmentId)/payments/$(paymentId)).data.orderIds;
+    }
+
+    // ─────────────── CLÔTURE FINANCIÈRE D'UN SERVICE (13B) ───────────────
+    // État financier stocké, distinct de l'état opérationnel `status` :
+    // absent / 'pending' ou 'reconciled' (figé). Un ancien service sans ce
+    // champ n'est jamais considéré comme soldé.
+    function notFinanciallyClosed(data) {
+      return data.get('financialStatus', 'pending') != 'reconciled';
+    }
+    // Tout événement financier d'un service (remise, décision, écart) fait
+    // avancer son compteur de 1 dans le même lot. Conséquences :
+    // - une clôture lancée entre-temps échoue (compteur changé) ;
+    // - après clôture, l'incrément est refusé, donc l'événement aussi.
+    function shiftFinancialEventBumped(establishmentId, shiftId) {
+      return getAfter(shiftDoc(establishmentId, shiftId)).data.get('financialRevision', 0) ==
+        get(shiftDoc(establishmentId, shiftId)).data.get('financialRevision', 0) + 1;
+    }
+
+    // ─────────────── REMISES SERVEUR -> FLOOR MANAGER (11B) ───────────────
+    function participantDoc(establishmentId, shiftId, serverId) {
+      return /databases/$(database)/documents/establishments/$(establishmentId)/shifts/$(shiftId)/participants/$(serverId);
+    }
+    // Le serveur connecté est présent dans ce service OUVERT : seul cas où
+    // un paiement qu'il encaisse peut porter ce shiftId.
+    function serverActiveInOpenShift(establishmentId, shiftId) {
+      return shiftId is string &&
+        get(serverPointerDoc(establishmentId, request.auth.uid)).data.openShiftId == shiftId &&
+        get(shiftDoc(establishmentId, shiftId)).data.status == 'open' &&
+        request.auth.uid in get(shiftDoc(establishmentId, shiftId)).data.serverIds;
+    }
+    function isFmHandover(data) {
+      return data.get('receiverRole', '') == 'floor_manager';
+    }
+    // Remise serveur -> Floor Manager : émetteur = soi, destinataire = le
+    // Floor Manager du service (jamais un choix libre), service dont il est
+    // (ou a été) participant — ouvert OU clôturé, pour finaliser.
+    function validFmHandoverCreate(establishmentId, handoverId) {
+      let d = request.resource.data;
+      return isServeur() &&
+        d.serveurId == request.auth.uid &&
+        d.senderUserId == request.auth.uid &&
+        d.senderRole == 'serveur' &&
+        d.createdBy == request.auth.uid &&
+        d.shiftId is string &&
+        exists(participantDoc(establishmentId, d.shiftId, request.auth.uid)) &&
+        d.receiverUserId == get(shiftDoc(establishmentId, d.shiftId)).data.floorManagerId &&
+        d.status == 'pending' &&
+        d.paymentIds is list && d.paymentIds.size() > 0 &&
+        d.validatedPaymentIds.size() == 0 &&
+        d.rejectedPaymentIds.size() == 0 &&
+        d.declaredAmount is number && d.declaredAmount > 0 &&
+        d.get('validatedAmount', null) == null &&
+        shiftFinancialEventBumped(establishmentId, d.shiftId) &&
+        // Ancrage : le premier paiement listé bascule dans CETTE remise
+        // dans le même lot (les règles ne bouclent pas sur la liste ; chaque
+        // autre paiement est contrôlé par sa propre règle de mise à jour).
+        getAfter(/databases/$(database)/documents/establishments/$(establishmentId)/payments/$(d.paymentIds[0])).data.get('handoverId', '') == handoverId;
+    }
+
+    // ─────────────── REMISES FLOOR MANAGER -> GÉRANTE (12B) ───────────────
+    function isFmTransfer(data) {
+      return data.get('senderRole', '') == 'floor_manager';
+    }
+    // Détail par moyen de paiement : moyens connus, montants >= 0, et total
+    // égal au montant déclaré (même ordre d'addition que l'application).
+    function validBreakdown(b, amount) {
+      return b is map &&
+        b.keys().hasOnly(['cash', 'mobile_money', 'card', 'credit',
+                          'bank_transfer', 'mixed', 'benin_resto']) &&
+        b.get('cash', 0) >= 0 && b.get('mobile_money', 0) >= 0 &&
+        b.get('card', 0) >= 0 && b.get('credit', 0) >= 0 &&
+        b.get('bank_transfer', 0) >= 0 && b.get('mixed', 0) >= 0 &&
+        b.get('benin_resto', 0) >= 0 &&
+        b.get('cash', 0) + b.get('mobile_money', 0) + b.get('card', 0) +
+          b.get('credit', 0) + b.get('bank_transfer', 0) + b.get('mixed', 0) +
+          b.get('benin_resto', 0) == amount;
+    }
+    // Remise créée par le Floor Manager du service (ouvert OU clôturé),
+    // adressée au créateur du service (gérante / propriétaire actif de cet
+    // établissement), jamais à un destinataire libre. Identifiant imposé
+    // par le rang : deux remises calculées sur la même situation visent le
+    // même document, la seconde échoue (création sur document existant).
+    function validFmTransferCreate(establishmentId, handoverId) {
+      let d = request.resource.data;
+      let shift = get(shiftDoc(establishmentId, d.shiftId)).data;
+      return isFloorManager() &&
+        d.keys().hasOnly([
+          'establishmentId', 'serveurId', 'serveurName', 'declaredAmount',
+          'amount', 'validatedAmount', 'status', 'receivedByManagerId',
+          'receivedByManagerName', 'paymentIds', 'validatedPaymentIds',
+          'rejectedPaymentIds', 'shiftId', 'senderUserId', 'senderUserName',
+          'senderRole', 'receiverUserId', 'receiverUserName', 'receiverRole',
+          'paymentBreakdown', 'transferSequence', 'comment', 'createdBy',
+          'createdAt', 'updatedAt', 'validatedAt', 'validatedBy',
+          'physicalAmount', 'difference', 'rejectedAt', 'rejectedBy',
+          'rejectedByName', 'decisionComment', 'pendingSync', 'syncError'
+        ]) &&
+        d.establishmentId == establishmentId &&
+        d.senderUserId == request.auth.uid &&
+        d.serveurId == request.auth.uid &&
+        d.createdBy == request.auth.uid &&
+        d.shiftId is string &&
+        shift.floorManagerId == request.auth.uid &&
+        d.receiverUserId == shift.createdBy &&
+        d.receiverRole in ['gerante', 'proprietaire'] &&
+        isEstablishmentUser(d.receiverUserId, establishmentId, d.receiverRole) &&
+        d.status == 'pending' &&
+        d.declaredAmount is number && d.declaredAmount > 0 &&
+        d.amount == d.declaredAmount &&
+        validBreakdown(d.paymentBreakdown, d.declaredAmount) &&
+        d.paymentIds.size() == 0 &&
+        d.validatedPaymentIds.size() == 0 &&
+        d.rejectedPaymentIds.size() == 0 &&
+        d.get('validatedAmount', null) == null &&
+        d.get('physicalAmount', null) == null &&
+        d.get('difference', null) == null &&
+        d.get('validatedBy', null) == null &&
+        d.get('rejectedBy', null) == null &&
+        d.get('receivedByManagerId', null) == null &&
+        d.transferSequence is int && d.transferSequence >= 0 &&
+        shiftFinancialEventBumped(establishmentId, d.shiftId) &&
+        handoverId == 'fmt_' + d.shiftId + '_' + request.auth.uid + '_' + string(d.transferSequence) &&
+        (
+          d.transferSequence == 0 ||
+          exists(/databases/$(database)/documents/establishments/$(establishmentId)/serverHandovers/$('fmt_' + d.shiftId + '_' + request.auth.uid + '_' + string(d.transferSequence - 1)))
+        );
+    }
+    // Décision du destinataire sur une remise en attente. Le montant déclaré,
+    // l'émetteur, le destinataire, le service et le détail sont figés ;
+    // l'écart de caisse est tracé (physique − déclaré), jamais absorbé.
+    function validFmTransferDecision(establishmentId) {
+      let before = resource.data;
+      let after = request.resource.data;
+      return before.receiverUserId == request.auth.uid &&
+        shiftFinancialEventBumped(establishmentId, before.shiftId) &&
+        before.status == 'pending' &&
+        (
+          (
+            after.status == 'validated' &&
+            after.validatedAmount == before.declaredAmount &&
+            after.physicalAmount is number && after.physicalAmount >= 0 &&
+            after.difference == after.physicalAmount - before.declaredAmount &&
+            after.validatedBy == request.auth.uid &&
+            after.receivedByManagerId == request.auth.uid &&
+            after.diff(before).affectedKeys().hasOnly([
+              'status', 'validatedAmount', 'physicalAmount', 'difference',
+              'validatedBy', 'receivedByManagerId', 'receivedByManagerName',
+              'validatedAt', 'decisionComment', 'updatedAt',
+              'pendingSync', 'syncError'
+            ])
+          ) ||
+          (
+            after.status == 'rejected' &&
+            after.rejectedBy == request.auth.uid &&
+            after.diff(before).affectedKeys().hasOnly([
+              'status', 'rejectedBy', 'rejectedByName', 'rejectedAt',
+              'decisionComment', 'updatedAt', 'pendingSync', 'syncError'
+            ])
+          )
+        );
+    }
+
+    // Écart : sujet = Floor Manager du service ou serveur participant ;
+    // manquant uniquement (0 <= physique <= attendu), écart = physique −
+    // attendu, horodatage serveur, statut initial 'pending'.
+    function validDiscrepancyCreate(establishmentId) {
+      let d = request.resource.data;
+      let shift = get(shiftDoc(establishmentId, d.shiftId)).data;
+      return d.keys().hasOnly([
+          'establishmentId', 'shiftId', 'subjectUserId', 'subjectName',
+          'subjectRole', 'expectedAmount', 'physicalAmount', 'difference',
+          'reason', 'recordedBy', 'recordedByName', 'recordedByRole',
+          'recordedAt', 'status', 'approvedBy', 'approvedAt', 'rejectedBy',
+          'rejectedAt', 'decidedByName', 'decisionComment'
+        ]) &&
+        d.establishmentId == establishmentId &&
+        d.shiftId is string &&
+        (
+          (d.subjectRole == 'floor_manager' && d.subjectUserId == shift.floorManagerId) ||
+          (d.subjectRole == 'serveur' && exists(participantDoc(establishmentId, d.shiftId, d.subjectUserId)))
+        ) &&
+        d.expectedAmount is number && d.expectedAmount > 0 &&
+        d.physicalAmount is number && d.physicalAmount >= 0 &&
+        d.physicalAmount <= d.expectedAmount &&
+        d.difference == d.physicalAmount - d.expectedAmount &&
+        d.reason is string && d.reason.size() > 0 &&
+        d.recordedBy == request.auth.uid &&
+        d.recordedByRole == userRole() &&
+        
+        d.status == 'pending' &&
+        d.get('approvedBy', null) == null &&
+        d.get('rejectedBy', null) == null &&
+        shiftFinancialEventBumped(establishmentId, d.shiftId);
     }
 
     // Service ouvert désigné par le pointeur du Floor Manager connecté.
@@ -557,10 +753,23 @@ service cloud.firestore {
       }
 
       match /payments/{paymentId} {
-        allow read: if tenantReader(establishmentId);
+        // Floor Manager (11B) : uniquement les encaissements de SES services
+        // (remises et situation par serveur), jamais un accès général.
+        allow read: if tenantReader(establishmentId) || (
+          isFloorManager() &&
+          sameEstablishment(establishmentId) &&
+          resource.data.get('shiftId', '') != '' &&
+          get(shiftDoc(establishmentId, resource.data.shiftId)).data.floorManagerId == request.auth.uid
+        );
         allow create: if (
           sameEstablishment(establishmentId) && (
             isServeur() || isGerante() || isAdminOrOwner()
+          ) &&
+          // Un paiement ne porte un service que si l'encaisseur est un
+          // serveur présent dans ce service OUVERT (11B).
+          (
+            request.resource.data.get('shiftId', null) == null ||
+            (isServeur() && serverActiveInOpenShift(establishmentId, request.resource.data.shiftId))
           )
         ) || (
           // Floor Manager (10B) : encaisseur réel = lui ; vente attribuée à
@@ -585,6 +794,18 @@ service cloud.firestore {
             request.resource.data.handoverStatus == 'declared' &&
             handoverAfterContainsPayment(establishmentId, request.resource.data.handoverId, paymentId) &&
             getAfter(/databases/$(database)/documents/establishments/$(establishmentId)/serverHandovers/$(request.resource.data.handoverId)).data.serveurId == request.auth.uid &&
+            // Circuit gérante : paiements hors service uniquement. Remise
+            // vers un Floor Manager : uniquement des paiements de CE service
+            // (jamais un paiement historique sans shiftId).
+            (
+              (
+                !isFmHandover(getAfter(/databases/$(database)/documents/establishments/$(establishmentId)/serverHandovers/$(request.resource.data.handoverId)).data) &&
+                resource.data.get('shiftId', null) in [null, '']
+              ) || (
+                isFmHandover(getAfter(/databases/$(database)/documents/establishments/$(establishmentId)/serverHandovers/$(request.resource.data.handoverId)).data) &&
+                resource.data.get('shiftId', '') == getAfter(/databases/$(database)/documents/establishments/$(establishmentId)/serverHandovers/$(request.resource.data.handoverId)).data.shiftId
+              )
+            ) &&
             request.resource.data.diff(resource.data).affectedKeys()
               .hasOnly([
                 'handoverStatus', 'handoverId', 'updatedAt',
@@ -594,7 +815,20 @@ service cloud.firestore {
             request.resource.data.syncError == false
           ) ||
           (
-            (isGerante() || isAdminOrOwner()) &&
+            // Validation / rejet d'une remise : par la gérante pour le
+            // circuit historique, par SON destinataire pour une remise
+            // destinée à un Floor Manager (11B).
+            (
+              (
+                (isGerante() || isAdminOrOwner()) &&
+                !isFmHandover(get(/databases/$(database)/documents/establishments/$(establishmentId)/serverHandovers/$(resource.data.handoverId)).data)
+              ) ||
+              (
+                isFloorManager() &&
+                isFmHandover(get(/databases/$(database)/documents/establishments/$(establishmentId)/serverHandovers/$(resource.data.handoverId)).data) &&
+                get(/databases/$(database)/documents/establishments/$(establishmentId)/serverHandovers/$(resource.data.handoverId)).data.receiverUserId == request.auth.uid
+              )
+            ) &&
             resource.data.handoverStatus == 'declared' &&
             resource.data.handoverId is string &&
             (
@@ -633,15 +867,88 @@ service cloud.firestore {
       }
 
       match /serverHandovers/{handoverId} {
-        allow read: if tenantReader(establishmentId);
-        allow create: if sameEstablishment(establishmentId) && (
-          isServeur() || isGerante() || isAdminOrOwner()
+        // Floor Manager : uniquement les remises qui lui sont destinées, et
+        // les siennes à la gérante (12B). Une remise Floor Manager -> gérante
+        // n'est lue que par les rôles financiers (et son émetteur).
+        allow read: if (
+          tenantReader(establishmentId) && (
+            isGerante() || isAccounting() || isAdminOrOwner() ||
+            resource.data.get('serveurId', '') == request.auth.uid ||
+            !isFmTransfer(resource.data)
+          )
+        ) || (
+          isFloorManager() &&
+          sameEstablishment(establishmentId) && (
+            resource.data.get('receiverUserId', '') == request.auth.uid ||
+            resource.data.get('senderUserId', '') == request.auth.uid
+          )
         );
-        allow update: if sameEstablishment(establishmentId) && (
-          isGerante() || isAccounting() || isAdminOrOwner()
+        allow create: if (
+          // Circuit historique serveur -> gérante (inchangé).
+          sameEstablishment(establishmentId) && (
+            isServeur() || isGerante() || isAdminOrOwner()
+          ) &&
+          !isFmHandover(request.resource.data) &&
+          !isFmTransfer(request.resource.data)
+        ) || (
+          // Floor Manager -> gérante (12B).
+          sameEstablishment(establishmentId) &&
+          isFmTransfer(request.resource.data) &&
+          validFmTransferCreate(establishmentId, handoverId)
+        ) || (
+          // Serveur -> Floor Manager de son service (11B).
+          sameEstablishment(establishmentId) &&
+          isFmHandover(request.resource.data) &&
+          validFmHandoverCreate(establishmentId, handoverId)
         );
+        allow update: if (
+          sameEstablishment(establishmentId) && (
+            isGerante() || isAccounting() || isAdminOrOwner()
+          ) &&
+          // Une remise destinée à un Floor Manager n'est pas traitée par
+          // le circuit gérante / comptabilité, ni une remise d'un Floor
+          // Manager (12B, règles dédiées ci-dessous).
+          !isFmHandover(resource.data) &&
+          !isFmTransfer(resource.data)
+        ) || (
+          // Remise Floor Manager -> gérante : décision de SON destinataire.
+          sameEstablishment(establishmentId) &&
+          isFmTransfer(resource.data) &&
+          validFmTransferDecision(establishmentId)
+        ) || (
+          // Remise Floor Manager validée : suivi de son versement en
+          // comptabilité (circuit gérante -> comptabilité existant). Les
+          // champs financiers restent figés.
+          sameEstablishment(establishmentId) &&
+          (isGerante() || isAccounting() || isAdminOrOwner()) &&
+          isFmTransfer(resource.data) &&
+          resource.data.status == 'validated' &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'accountingTransferStatus', 'accountingTransferId', 'updatedAt'
+          ])
+        ) || (
+          // Floor Manager destinataire : valide / rejette une remise
+          // ouverte. Émetteur, destinataire, service, paiements et montant
+          // déclaré sont figés ; une remise validée ne bouge plus.
+          isFloorManager() &&
+          sameEstablishment(establishmentId) &&
+          isFmHandover(resource.data) &&
+          resource.data.receiverUserId == request.auth.uid &&
+          resource.data.status in ['pending', 'partially_validated'] &&
+          shiftFinancialEventBumped(establishmentId, resource.data.shiftId) &&
+          request.resource.data.status in ['partially_validated', 'validated'] &&
+          request.resource.data.receivedByManagerId == request.auth.uid &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'validatedPaymentIds', 'rejectedPaymentIds', 'validatedAmount',
+            'status', 'receivedByManagerId', 'receivedByManagerName',
+            'validatedAt', 'updatedAt', 'pendingSync', 'syncError'
+          ])
+        );
+        // Historique des remises vers un Floor Manager conservé.
         allow delete: if sameEstablishment(establishmentId) &&
-          (isAdminOrOwner() || isGerante());
+          (isAdminOrOwner() || isGerante()) &&
+          !isFmHandover(resource.data) &&
+          !isFmTransfer(resource.data);
       }
 
       match /managerToAccountingTransfers/{transferId} {
@@ -820,26 +1127,113 @@ service cloud.firestore {
         allow delete: if sameEstablishment(establishmentId) && isAdminOrOwner();
       }
 
+      // ─────────────── ÉCARTS DE CAISSE D'UN SERVICE (13B) ───────────────
+      // Document à part : un écart ne modifie jamais un paiement ou une
+      // remise. Déclaré par la gérante ou le Floor Manager du service,
+      // décidé UNIQUEMENT par la gérante / le propriétaire.
+      match /shiftDiscrepancies/{discrepancyId} {
+        allow read: if sameEstablishment(establishmentId) && (
+          isShiftManager() || isAccounting() ||
+          (
+            isFloorManager() &&
+            get(shiftDoc(establishmentId, resource.data.shiftId)).data.floorManagerId == request.auth.uid
+          ) ||
+          (isServeur() && resource.data.subjectUserId == request.auth.uid)
+        );
+        allow create: if sameEstablishment(establishmentId) && (
+          isShiftManager() ||
+          (
+            isFloorManager() &&
+            get(shiftDoc(establishmentId, request.resource.data.shiftId)).data.floorManagerId == request.auth.uid
+          )
+        ) && validDiscrepancyCreate(establishmentId);
+        allow update: if sameEstablishment(establishmentId) &&
+          isShiftManager() &&
+          resource.data.status == 'pending' &&
+          shiftFinancialEventBumped(establishmentId, resource.data.shiftId) &&
+          (
+            (
+              request.resource.data.status == 'approved' &&
+              request.resource.data.approvedBy == request.auth.uid &&
+              request.resource.data.approvedAt == request.time &&
+              request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+                'status', 'approvedBy', 'approvedAt', 'decidedByName', 'decisionComment'
+              ])
+            ) ||
+            (
+              request.resource.data.status == 'rejected' &&
+              request.resource.data.rejectedBy == request.auth.uid &&
+              request.resource.data.rejectedAt == request.time &&
+              request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+                'status', 'rejectedBy', 'rejectedAt', 'decidedByName', 'decisionComment'
+              ])
+            )
+          );
+        // Historique conservé.
+        allow delete: if false;
+      }
+
       // ─────────────── SERVICES (SHIFTS) ───────────────
       match /shifts/{shiftId} {
         allow read: if sameEstablishment(establishmentId) && (
           isShiftManager() ||
           (isFloorManager() && resource.data.floorManagerId == request.auth.uid) ||
-          (isServeur() && request.auth.uid in resource.data.serverIds)
+          (isServeur() && request.auth.uid in resource.data.serverIds) ||
+          // Serveur retiré en cours de service : il doit encore pouvoir
+          // remettre les encaissements de ce service (11B).
+          (isServeur() && exists(participantDoc(establishmentId, shiftId, request.auth.uid)))
         );
         allow create: if sameEstablishment(establishmentId) && isShiftManager() &&
           validShiftData(establishmentId) &&
           validShiftFloorManager(establishmentId) &&
           request.resource.data.status == 'planned' &&
-          request.resource.data.createdBy == request.auth.uid;
-        allow update: if sameEstablishment(establishmentId) && isShiftManager() &&
+          request.resource.data.createdBy == request.auth.uid &&
+          request.resource.data.get('createdByRole', userRole()) == userRole() &&
+          request.resource.data.get('financialStatus', 'pending') == 'pending' &&
+          request.resource.data.get('financialRevision', 0) == 0;
+        allow update: if (
+          sameEstablishment(establishmentId) && isShiftManager() &&
+          // Service clôturé financièrement : plus aucune modification
+          // (ni réouverture, ni affectation).
+          notFinanciallyClosed(resource.data) &&
           validShiftData(establishmentId) &&
           validShiftFloorManager(establishmentId) &&
           unchangedFields([
             'establishmentId', 'floorManagerId', 'floorManagerName',
-            'createdAt', 'createdBy'
+            'createdAt', 'createdBy', 'createdByName', 'createdByRole',
+            'financialStatus', 'financialRevision', 'financialClosedAt',
+            'financialClosedBy', 'financialClosedByName', 'financialSummary'
           ]) &&
-          validShiftTransition(establishmentId, shiftId);
+          validShiftTransition(establishmentId, shiftId)
+        ) || (
+          // Événement financier (13B) : +1 sur le compteur, rien d'autre, par
+          // un acteur du service, tant qu'il n'est pas clôturé.
+          sameEstablishment(establishmentId) &&
+          notFinanciallyClosed(resource.data) &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['financialRevision']) &&
+          request.resource.data.financialRevision == resource.data.get('financialRevision', 0) + 1 &&
+          (
+            isShiftManager() ||
+            (isFloorManager() && resource.data.floorManagerId == request.auth.uid) ||
+            (isServeur() && exists(participantDoc(establishmentId, shiftId, request.auth.uid)))
+          )
+        ) || (
+          // Clôture financière (13B) : gérante / propriétaire, service
+          // TERMINÉ, compteur inchangé depuis la lecture (aucun événement
+          // concurrent), une seule fois. Les montants sont figés.
+          sameEstablishment(establishmentId) && isShiftManager() &&
+          resource.data.status == 'closed' &&
+          notFinanciallyClosed(resource.data) &&
+          request.resource.data.financialStatus == 'reconciled' &&
+          request.resource.data.financialClosedBy == request.auth.uid &&
+          request.resource.data.financialClosedAt == request.time &&
+          request.resource.data.financialSummary is map &&
+          request.resource.data.get('financialRevision', 0) == resource.data.get('financialRevision', 0) &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'financialStatus', 'financialClosedAt', 'financialClosedBy',
+            'financialClosedByName', 'financialSummary', 'updatedAt'
+          ])
+        );
         // Historique conservé.
         allow delete: if false;
 

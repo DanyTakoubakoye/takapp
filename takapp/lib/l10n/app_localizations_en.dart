@@ -4431,10 +4431,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get shiftStatusPlanned => 'Planned';
 
   @override
-  String get shiftStatusOpen => 'Open';
+  String get shiftStatusOpen => 'In progress';
 
   @override
-  String get shiftStatusClosed => 'Closed';
+  String get shiftStatusClosed => 'Finished';
 
   @override
   String get shiftActionOpen => 'Open';
@@ -4624,5 +4624,388 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String fmPaymentContext(String server, String cashier) {
     return 'Sale by $server · collected by $cashier';
+  }
+
+  @override
+  String get handoverFmTitle => 'Hand over to the Floor Manager';
+
+  @override
+  String get handoverFmSubtitle => 'Hand over your shift collections';
+
+  @override
+  String get handoverNoShift => 'You are not attached to any shift.';
+
+  @override
+  String get handoverNothingToHand => 'Nothing to hand over for this shift.';
+
+  @override
+  String get handoverShiftClosedNote =>
+      'Shift closed: you can still hand over its collections.';
+
+  @override
+  String get handoverCollected => 'Collected';
+
+  @override
+  String get handoverValidated => 'Handed over (validated)';
+
+  @override
+  String get handoverAwaitingValidation => 'Awaiting validation';
+
+  @override
+  String get handoverRemaining => 'Left to hand over';
+
+  @override
+  String handoverSendTo(String amount, String name) {
+    return 'Hand $amount FCFA over to $name';
+  }
+
+  @override
+  String get handoverSent => 'Handover sent.';
+
+  @override
+  String handoverAmountLine(String label, String amount) {
+    return '$label: $amount FCFA';
+  }
+
+  @override
+  String get fmHandoversTitle => 'Handovers';
+
+  @override
+  String get fmHandoversSubtitle => 'Your servers\' collections';
+
+  @override
+  String get fmHandoversReport => 'Status per server';
+
+  @override
+  String get fmHandoversPendingTitle => 'Handovers to validate';
+
+  @override
+  String get fmHandoversNone => 'No pending handover.';
+
+  @override
+  String get fmHandoverValidate => 'Validate';
+
+  @override
+  String get fmHandoverReject => 'Reject';
+
+  @override
+  String get fmHandoverValidated => 'Handover validated.';
+
+  @override
+  String get fmHandoverRejected => 'Handover rejected.';
+
+  @override
+  String get errTransferExceedsAvailable =>
+      'Amount exceeds what is left to hand over.';
+
+  @override
+  String get errTransferNoReceiver =>
+      'No manager assigned to this shift: it must be created by the manager or the owner.';
+
+  @override
+  String get errTransferAlreadyChanged =>
+      'The situation has changed (handover already recorded?). Check and try again.';
+
+  @override
+  String get fmCashTitle => 'My cash';
+
+  @override
+  String get fmCashSubtitle => 'Hand your funds over to the manager';
+
+  @override
+  String get fmCashShiftLabel => 'Shift';
+
+  @override
+  String get fmCashDirect => 'Direct collections';
+
+  @override
+  String get fmCashFromServers => 'Received from servers';
+
+  @override
+  String get fmCashTransferred => 'Already handed over (validated)';
+
+  @override
+  String get fmCashTransferPending => 'Handed over, awaiting validation';
+
+  @override
+  String get fmCashAmountsTitle => 'Amount to hand over per payment method';
+
+  @override
+  String get fmCashReceiverDefault => 'the manager';
+
+  @override
+  String get fmCashComment => 'Comment (optional)';
+
+  @override
+  String get fmCashSent => 'Handover sent to the manager.';
+
+  @override
+  String get fmCashHistory => 'My handovers';
+
+  @override
+  String get transferStatusPending => 'Pending';
+
+  @override
+  String get transferStatusValidated => 'Validated';
+
+  @override
+  String get transferStatusRejected => 'Rejected';
+
+  @override
+  String get fmTransfersTitle => 'Floor Manager handovers';
+
+  @override
+  String get fmTransfersSubtitle =>
+      'Validate funds handed over by Floor Managers';
+
+  @override
+  String get fmTransfersNone => 'No Floor Manager handover.';
+
+  @override
+  String get fmTransferValidateTitle => 'Validate handover';
+
+  @override
+  String get fmTransferCounted => 'Counted amount (FCFA)';
+
+  @override
+  String fmTransferDifference(String amount) {
+    return 'Difference: $amount FCFA';
+  }
+
+  @override
+  String get fmTransferDecisionComment => 'Comment';
+
+  @override
+  String get fmTransferValidated => 'Handover validated.';
+
+  @override
+  String get fmTransferRejected => 'Handover rejected.';
+
+  @override
+  String get reconTitle => 'Shift reconciliation';
+
+  @override
+  String reconFloorManager(String name) {
+    return 'Floor Manager: $name';
+  }
+
+  @override
+  String reconShift(String range) {
+    return 'Shift: $range';
+  }
+
+  @override
+  String get reconFmDirect => 'Floor Manager direct collections';
+
+  @override
+  String get reconServersCollected => 'Server collections';
+
+  @override
+  String get reconServersHanded => 'Server handovers received';
+
+  @override
+  String get reconTransfersValidated =>
+      'Floor Manager → manager handovers (validated)';
+
+  @override
+  String get reconTransfersPending =>
+      'Floor Manager → manager handovers (pending)';
+
+  @override
+  String get reconStillHeld => 'Amount still held';
+
+  @override
+  String get reconTheoretical => 'Theoretical amount';
+
+  @override
+  String get reconPhysical => 'Physical amount received';
+
+  @override
+  String get reconCountingDifference => 'Counting differences';
+
+  @override
+  String get reconDifference => 'Difference (physical − theoretical)';
+
+  @override
+  String get reconPhysicalField => 'Total physical amount (FCFA)';
+
+  @override
+  String get reconRecord => 'Record reconciliation';
+
+  @override
+  String get reconRecorded => 'Reconciliation recorded.';
+
+  @override
+  String get reconOpenShiftNote =>
+      'Shift still open: the reconciliation may still change.';
+
+  @override
+  String get errShiftFinancialNotReady =>
+      'Cannot close: some items are still outstanding.';
+
+  @override
+  String get errShiftFinancialChanged =>
+      'The shift\'s situation changed during closing. Reload and try again.';
+
+  @override
+  String get errShiftFinancialAlreadyClosed =>
+      'This shift is already financially closed.';
+
+  @override
+  String get errDiscrepancyInvalid =>
+      'Invalid discrepancy: expected amount must be positive, found amount between 0 and expected, reason required.';
+
+  @override
+  String get finStatusPending => 'To reconcile';
+
+  @override
+  String get finStatusReady => 'Ready to close';
+
+  @override
+  String get finStatusReconciled => 'Closed';
+
+  @override
+  String get finStatusDisputed => 'Discrepancy to handle';
+
+  @override
+  String get closureTitle => 'Shift closing';
+
+  @override
+  String get closureSubtitle => 'Financial status of your shifts';
+
+  @override
+  String closureOperational(String status) {
+    return 'Shift: $status';
+  }
+
+  @override
+  String closureFinancial(String status) {
+    return 'Financial status: $status';
+  }
+
+  @override
+  String get closureServersTitle => 'Servers';
+
+  @override
+  String get closureFmTitle => 'Floor Manager';
+
+  @override
+  String get closureHandedOver => 'Handed over';
+
+  @override
+  String get closurePending => 'Pending';
+
+  @override
+  String get closureDocumented => 'Documented discrepancy';
+
+  @override
+  String get closureFmHeld => 'Theoretical total held';
+
+  @override
+  String get closureDiscrepanciesTitle => 'Discrepancies';
+
+  @override
+  String get closureRemainingActions => 'Remaining actions';
+
+  @override
+  String get closureAllSettled => 'All conditions are met.';
+
+  @override
+  String get closureBlockShiftNotClosed => 'The shift is not finished yet.';
+
+  @override
+  String closureBlockServerRemaining(String name, String amount) {
+    return '$name still has to hand over $amount FCFA';
+  }
+
+  @override
+  String closureBlockServerPending(String name, String amount) {
+    return 'A handover from $name ($amount FCFA) is still pending';
+  }
+
+  @override
+  String closureBlockFmRemaining(String amount) {
+    return 'The Floor Manager still has to hand over $amount FCFA';
+  }
+
+  @override
+  String closureBlockFmPending(String amount) {
+    return 'A Floor Manager handover ($amount FCFA) awaits the manager\'s validation';
+  }
+
+  @override
+  String closureBlockDiscrepancyPending(String name, String amount) {
+    return 'A cash discrepancy must be handled ($name: $amount FCFA)';
+  }
+
+  @override
+  String closureBlockDiscrepancyMismatch(String name, String amount) {
+    return '$name\'s discrepancy no longer matches the remaining amount ($amount FCFA too much): handle it again';
+  }
+
+  @override
+  String get closureTotalRemaining => 'Total not handed over';
+
+  @override
+  String get closureTotalDocumented => 'Documented discrepancies';
+
+  @override
+  String get closureTotalDifference =>
+      'Total difference (physical − theoretical)';
+
+  @override
+  String get closureDeclareDiscrepancy => 'Declare a discrepancy';
+
+  @override
+  String get closureCloseAction => 'Close financially';
+
+  @override
+  String get closureClosed => 'Shift financially closed.';
+
+  @override
+  String closureClosedBy(String name, String date) {
+    return 'Closed by $name on $date';
+  }
+
+  @override
+  String get closureFmNote =>
+      'The final financial closing is done by the manager.';
+
+  @override
+  String get discrepancyExpected => 'Expected amount (FCFA)';
+
+  @override
+  String get discrepancyPhysical => 'Amount found (FCFA)';
+
+  @override
+  String get discrepancyReason => 'Reason';
+
+  @override
+  String get discrepancyDeclared => 'Discrepancy declared.';
+
+  @override
+  String get discrepancyApprove => 'Approve';
+
+  @override
+  String get discrepancyReject => 'Reject';
+
+  @override
+  String get discrepancyApproved => 'Discrepancy approved.';
+
+  @override
+  String get discrepancyRejected => 'Discrepancy rejected.';
+
+  @override
+  String get discrepancyStatusPending => 'Awaiting decision';
+
+  @override
+  String get discrepancyStatusApproved => 'Approved';
+
+  @override
+  String get discrepancyStatusRejected => 'Rejected';
+
+  @override
+  String discrepancyLine(String name, String expected, String physical) {
+    return '$name: expected $expected, found $physical FCFA';
   }
 }

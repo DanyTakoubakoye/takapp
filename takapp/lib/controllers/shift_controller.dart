@@ -50,6 +50,8 @@ class ShiftController extends ChangeNotifier {
     required DateTime startsAt,
     required DateTime endsAt,
     required String createdBy,
+    String createdByName = '',
+    String createdByRole = '',
   }) {
     return _run(
       () => _service.createShift(
@@ -59,6 +61,8 @@ class ShiftController extends ChangeNotifier {
         startsAt: startsAt,
         endsAt: endsAt,
         createdBy: createdBy,
+        createdByName: createdByName,
+        createdByRole: createdByRole,
       ),
     );
   }

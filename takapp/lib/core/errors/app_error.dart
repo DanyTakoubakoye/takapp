@@ -255,6 +255,27 @@ enum AppErrorCode {
   orderAlreadyPaid,
   orderNotPayable,
   ticketChanged,
+
+  /// =========================
+  /// REMISES AU FLOOR MANAGER
+  /// =========================
+  handoverNothingToHand,
+  handoverNoShift,
+
+  /// =========================
+  /// REMISES FLOOR MANAGER -> GÉRANTE
+  /// =========================
+  transferExceedsAvailable,
+  transferNoReceiver,
+  transferAlreadyChanged,
+
+  /// =========================
+  /// CLÔTURE FINANCIÈRE D'UN SERVICE
+  /// =========================
+  shiftFinancialNotReady,
+  shiftFinancialChanged,
+  shiftFinancialAlreadyClosed,
+  discrepancyInvalid,
 }
 
 /// Exception traduisible à l'affichage.

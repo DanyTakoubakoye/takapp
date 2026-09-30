@@ -9,6 +9,7 @@ import {
 import {
   doc, getDoc, setDoc, updateDoc, deleteDoc, writeBatch,
   collection, query, where, orderBy, getDocs, serverTimestamp,
+  increment, runTransaction,
 } from 'firebase/firestore';
 
 let testEnv;
@@ -1680,4 +1681,852 @@ test('✅ Floor Manager : liste des additions ouvertes (lecture des non encaiss�
 test('✅ non-régression : encaissement classique d’un serveur', async () => {
   await seedPaymentWorld();
   await assertSucceeds(payBatch(SRV_A1, ESTAB_A, 'srvp', ['jean1'], { shiftId: null }));
+});
+
+// ─────────── 11B : REMISES SERVEUR -> FLOOR MANAGER ───────────
+
+const payRef = (db, e, id) => doc(db, 'establishments', e, 'payments', id);
+const hoRef = (db, e, id) => doc(db, 'establishments', e, 'serverHandovers', id);
+
+function shiftPayment(receivedBy, amount, extra = {}) {
+  return {
+    establishmentId: ESTAB_A, receivedBy, receivedByName: receivedBy,
+    responsibleServerId: receivedBy, amount, method: 'cash', type: 'restaurant',
+    status: 'confirmed', handoverStatus: 'pending', handoverId: null,
+    shiftId: 'sh1', pendingSync: false, syncError: false, createdAt: new Date(),
+    ...extra,
+  };
+}
+
+// sh1 : Floor Manager FM_A, serveur SRV_A1 (Jean). shA2 : FM_A2, SRV_A3.
+async function seedHandoverWorld() {
+  await seedPaymentWorld();
+  await testEnv.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    const put = (id, data, e = ESTAB_A) => setDoc(payRef(db, e, id), data);
+    await put('jp1', shiftPayment(SRV_A1, 30000));
+    await put('jp2', shiftPayment(SRV_A1, 20000, { method: 'mobile_money' }));
+    await put('jold', shiftPayment(SRV_A1, 5000, { shiftId: null }));
+    // Vente de Jean encaissée par le Floor Manager : Paul détient l'argent.
+    await put('fmp', shiftPayment(FM_A, 12000, { responsibleServerId: SRV_A1 }));
+    await put('a3p', shiftPayment(SRV_A3, 7000, { shiftId: 'shA2' }));
+    // Donnée incohérente (service dont Jean n'a jamais fait partie).
+    await put('jx', shiftPayment(SRV_A1, 4000, { shiftId: 'shA2' }));
+  });
+}
+
+// Même lot que ShiftHandoverService.handOverToFloorManager.
+function fmHandoverBatch(uid, e, id, paymentIds, over = {}, declare = paymentIds, bump = true) {
+  const db = asUser(uid);
+  const batch = writeBatch(db);
+  batch.set(hoRef(db, e, id), {
+    establishmentId: e, serveurId: uid, serveurName: uid,
+    declaredAmount: 1000 * paymentIds.length, validatedAmount: null, status: 'pending',
+    receivedByManagerId: null, receivedByManagerName: null,
+    paymentIds, validatedPaymentIds: [], rejectedPaymentIds: [],
+    shiftId: 'sh1', senderUserId: uid, senderUserName: uid, senderRole: 'serveur',
+    receiverUserId: FM_A, receiverUserName: FM_A, receiverRole: 'floor_manager',
+    paymentBreakdown: { cash: 1000 }, comment: '', createdBy: uid,
+    createdAt: serverTimestamp(), updatedAt: serverTimestamp(), validatedAt: null,
+    pendingSync: false, syncError: false,
+    ...over,
+  });
+  for (const p of declare) {
+    batch.update(payRef(db, e, p), {
+      handoverStatus: 'declared', handoverId: id, updatedAt: serverTimestamp(),
+      pendingSync: false, syncError: false,
+    });
+  }
+  // 13B : remise Floor Manager = événement financier du service.
+  if ((over.receiverRole === undefined ? 'floor_manager' : over.receiverRole) === 'floor_manager' && bump) {
+    batch.update(shiftRef(db, e, over.shiftId ?? 'sh1'), { financialRevision: increment(1) });
+  }
+  return batch.commit();
+}
+
+// Même lot que GeranteHandoverService.validateSelectedPayments /
+// rejectSelectedPayments (réutilisés par le Floor Manager).
+function processBatch(uid, e, id, paymentIds, reject = false, over = {}, bumpShift = 'sh1') {
+  const db = asUser(uid);
+  const batch = writeBatch(db);
+  batch.update(hoRef(db, e, id), {
+    [reject ? 'rejectedPaymentIds' : 'validatedPaymentIds']: paymentIds,
+    validatedAmount: reject ? 0 : 50000, status: 'validated',
+    receivedByManagerId: uid, receivedByManagerName: uid,
+    validatedAt: serverTimestamp(), updatedAt: serverTimestamp(),
+    pendingSync: false, syncError: false,
+    ...over,
+  });
+  for (const p of paymentIds) {
+    batch.update(payRef(db, e, p), reject
+      ? { handoverStatus: 'pending', handoverId: null, updatedAt: serverTimestamp(), pendingSync: false, syncError: false }
+      : { handoverStatus: 'validated', updatedAt: serverTimestamp(), pendingSync: false, syncError: false });
+  }
+  if (bumpShift) batch.update(shiftRef(db, e, bumpShift), { financialRevision: increment(1) });
+  return batch.commit();
+}
+
+async function readPayment(id) {
+  let data;
+  await testEnv.withSecurityRulesDisabled(async (ctx) => {
+    data = (await getDoc(payRef(ctx.firestore(), ESTAB_A, id))).data();
+  });
+  return data;
+}
+
+// ── Rattachement d'un encaissement serveur à son service ──
+test('✅ serveur présent dans un service ouvert : son encaissement porte le shiftId', async () => {
+  await seedPaymentWorld();
+  await assertSucceeds(payBatch(SRV_A1, ESTAB_A, 'sp1', ['jean1'], { responsibleServerId: SRV_A1 }));
+});
+
+test('🔒 shiftId d’un autre service, service clôturé ou non-serveur : refusé', async () => {
+  await seedPaymentWorld();
+  await assertFails(payBatch(SRV_A1, ESTAB_A, 'sx1', ['jean1'], { shiftId: 'shA2' }));
+  await assertFails(payBatch(SRV_A2, ESTAB_A, 'sx2', ['other1'], { responsibleServerId: SRV_A2 }));
+  await assertFails(payBatch(GERANTE_A, ESTAB_A, 'sx3', ['jean1']));
+  await closeShift(GERANTE_A, ESTAB_A, 'sh1');
+  await assertFails(payBatch(SRV_A1, ESTAB_A, 'sx4', ['jean1']));
+  // Service clôturé : l'encaissement hors service reste possible (historique).
+  await assertSucceeds(payBatch(SRV_A1, ESTAB_A, 'sx5', ['jean1'], { shiftId: null }));
+});
+
+// ── Création d'une remise ──
+test('✅ Jean remet ses encaissements du service à SON Floor Manager', async () => {
+  await seedHandoverWorld();
+  await assertSucceeds(fmHandoverBatch(SRV_A1, ESTAB_A, 'h1', ['jp1', 'jp2']));
+  const p = await readPayment('jp1');
+  assert.strictEqual(p.handoverStatus, 'declared');
+  assert.strictEqual(p.handoverId, 'h1');
+  // Le paiement client n'est pas réécrit (montant, encaisseur, service).
+  assert.strictEqual(p.amount, 30000);
+  assert.strictEqual(p.receivedBy, SRV_A1);
+});
+
+test('🔒 destinataire libre, autre service, autre établissement, émetteur falsifié', async () => {
+  await seedHandoverWorld();
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'x1', ['jp1'], { receiverUserId: FM_A2 }));
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'x2', ['jp1'], { receiverUserId: GERANTE_A }));
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'x3', ['jp1'], { shiftId: 'shA2', receiverUserId: FM_A2 }));
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'x4', ['jp1'], { serveurId: SRV_A3, senderUserId: SRV_A3 }));
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'x5', ['jp1'], { senderRole: 'gerante' }));
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'x6', ['jp1'], { status: 'validated' }));
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'x7', ['jp1'], { validatedPaymentIds: ['jp1'] }));
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'x8', ['jp1'], { declaredAmount: 0 }));
+  await assertFails(fmHandoverBatch(SRV_B, ESTAB_B, 'x9', ['jp1'], {}, []));
+  await assertFails(fmHandoverBatch('barmanA', ESTAB_A, 'x10', ['jp1']));
+  await assertFails(fmHandoverBatch(FM_A, ESTAB_A, 'x11', ['fmp']));
+});
+
+test('🔒 pas de paiement historique, d’un autre encaisseur ou d’un autre service', async () => {
+  await seedHandoverWorld();
+  // Paiement historique sans shiftId : jamais rattaché à un service.
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'y1', ['jp1', 'jold']));
+  // Encaissé par Paul : Jean ne remet pas ce que Paul détient déjà.
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'y2', ['jp1', 'fmp']));
+  // Paiement d'un autre serveur, d'un autre service.
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'y3', ['jp1', 'a3p']));
+  // Service dont il n'est pas participant, même avec un paiement qui le porte.
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'y4', ['jx'], { shiftId: 'shA2', receiverUserId: FM_A2 }));
+});
+
+test('🔒 remise « fantôme » : le document sans bascule des paiements est refusé', async () => {
+  await seedHandoverWorld();
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'g1', ['jp1', 'jp2'], {}, []));
+});
+
+test('🔒 double remise : le même encaissement ne peut être remis deux fois', async () => {
+  await seedHandoverWorld();
+  await assertSucceeds(fmHandoverBatch(SRV_A1, ESTAB_A, 'd1', ['jp1']));
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'd2', ['jp1']));
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'd3', ['jp2', 'jp1']));
+  // Ni vers la gérante par le circuit historique.
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'd4', ['jp1'], {
+    receiverRole: null, receiverUserId: null, shiftId: null,
+  }));
+});
+
+test('🔒 circuit gérante : les encaissements d’un service passent par le Floor Manager', async () => {
+  await seedHandoverWorld();
+  const legacy = { receiverRole: null, receiverUserId: null, shiftId: null };
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'l1', ['jp1'], legacy));
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'l2', ['jp1'], { ...legacy, shiftId: 'sh1' }));
+  // Non-régression : paiement hors service -> gérante, validé par elle.
+  await assertSucceeds(fmHandoverBatch(SRV_A1, ESTAB_A, 'l3', ['jold'], legacy));
+  await assertSucceeds(processBatch(GERANTE_A, ESTAB_A, 'l3', ['jold'], false, {}, null));
+});
+
+// ── Lecture côté Floor Manager ──
+test('✅🔒 le Floor Manager lit ses remises et les encaissements de SES services seulement', async () => {
+  await seedHandoverWorld();
+  await fmHandoverBatch(SRV_A1, ESTAB_A, 'h1', ['jp1']);
+  const fm = asUser(FM_A);
+  const fm2 = asUser(FM_A2);
+  await assertSucceeds(getDoc(hoRef(fm, ESTAB_A, 'h1')));
+  await assertSucceeds(getDocs(query(
+    collection(fm, 'establishments', ESTAB_A, 'serverHandovers'),
+    where('receiverUserId', '==', FM_A),
+  )));
+  await assertSucceeds(getDoc(payRef(fm, ESTAB_A, 'jp1')));
+  await assertSucceeds(getDocs(query(
+    collection(fm, 'establishments', ESTAB_A, 'payments'),
+    where('shiftId', '==', 'sh1'),
+  )));
+  // Pas les remises / paiements d'un autre service, ni l'historique.
+  await assertFails(getDoc(hoRef(fm2, ESTAB_A, 'h1')));
+  await assertFails(getDocs(collection(fm2, 'establishments', ESTAB_A, 'serverHandovers')));
+  await assertFails(getDoc(payRef(fm2, ESTAB_A, 'jp1')));
+  await assertFails(getDocs(query(
+    collection(fm2, 'establishments', ESTAB_A, 'payments'),
+    where('shiftId', '==', 'sh1'),
+  )));
+  await assertFails(getDoc(payRef(fm, ESTAB_A, 'jold')));
+  await assertFails(getDoc(payRef(fm, ESTAB_A, 'a3p')));
+  await assertFails(getDoc(hoRef(fm, ESTAB_A, 'handover1')));
+});
+
+// ── Validation / rejet ──
+test('✅ le Floor Manager destinataire valide la remise', async () => {
+  await seedHandoverWorld();
+  await fmHandoverBatch(SRV_A1, ESTAB_A, 'h1', ['jp1', 'jp2']);
+  await assertSucceeds(processBatch(FM_A, ESTAB_A, 'h1', ['jp1', 'jp2']));
+  assert.strictEqual((await readPayment('jp2')).handoverStatus, 'validated');
+});
+
+test('🔒 autre Floor Manager, gérante ou serveur ne valident pas une remise Floor Manager', async () => {
+  await seedHandoverWorld();
+  await fmHandoverBatch(SRV_A1, ESTAB_A, 'h1', ['jp1']);
+  await assertFails(processBatch(FM_A2, ESTAB_A, 'h1', ['jp1']));
+  await assertFails(processBatch(GERANTE_A, ESTAB_A, 'h1', ['jp1']));
+  await assertFails(processBatch(SRV_A1, ESTAB_A, 'h1', ['jp1']));
+  await assertFails(processBatch(FM_A, ESTAB_A, 'h1', ['jp1'], false, { receivedByManagerId: GERANTE_A }));
+  // Le Floor Manager ne valide pas une remise du circuit gérante.
+  await assertFails(processBatch(FM_A, ESTAB_A, 'handover1', ['payment1']));
+});
+
+test('🔒 remise validée : champs financiers figés, plus de rejet ni de retour arrière', async () => {
+  await seedHandoverWorld();
+  await fmHandoverBatch(SRV_A1, ESTAB_A, 'h1', ['jp1']);
+  await processBatch(FM_A, ESTAB_A, 'h1', ['jp1']);
+  const fm = asUser(FM_A);
+  await assertFails(updateDoc(hoRef(fm, ESTAB_A, 'h1'), { validatedAmount: 1, updatedAt: serverTimestamp() }));
+  await assertFails(processBatch(FM_A, ESTAB_A, 'h1', ['jp1'], true));
+  await assertFails(updateDoc(payRef(fm, ESTAB_A, 'jp1'), { handoverStatus: 'pending', handoverId: null }));
+  await assertFails(updateDoc(hoRef(asUser(GERANTE_A), ESTAB_A, 'h1'), { status: 'pending' }));
+  await assertFails(deleteDoc(hoRef(asUser(GERANTE_A), ESTAB_A, 'h1')));
+});
+
+test('🔒 remise ouverte : paiements, montant déclaré, émetteur et service figés', async () => {
+  await seedHandoverWorld();
+  await fmHandoverBatch(SRV_A1, ESTAB_A, 'h1', ['jp1']);
+  const fm = asUser(FM_A);
+  const base = { status: 'partially_validated', receivedByManagerId: FM_A };
+  // Contrôle : la même écriture sans champ interdit passe.
+  for (const change of [
+    { declaredAmount: 1 }, { paymentIds: ['jp1', 'jp2'] }, { serveurId: SRV_A3 },
+    { senderUserId: SRV_A3 }, { shiftId: 'shA2' }, { receiverUserId: FM_A2 },
+  ]) {
+    const bad = writeBatch(fm);
+    bad.update(hoRef(fm, ESTAB_A, 'h1'), { ...base, ...change });
+    bad.update(shiftRef(fm, ESTAB_A, 'sh1'), { financialRevision: increment(1) });
+    await assertFails(bad.commit());
+  }
+  await assertFails(updateDoc(hoRef(asUser(SRV_A1), ESTAB_A, 'h1'), { declaredAmount: 1 }));
+  // 13B : la même écriture passe avec l'incrément du compteur du service.
+  const ok = writeBatch(fm);
+  ok.update(hoRef(fm, ESTAB_A, 'h1'), base);
+  ok.update(shiftRef(fm, ESTAB_A, 'sh1'), { financialRevision: increment(1) });
+  await assertSucceeds(ok.commit());
+});
+
+test('✅ remise rejetée : les paiements redeviennent à remettre, puis remise à nouveau', async () => {
+  await seedHandoverWorld();
+  await fmHandoverBatch(SRV_A1, ESTAB_A, 'h1', ['jp1']);
+  await assertSucceeds(processBatch(FM_A, ESTAB_A, 'h1', ['jp1'], true));
+  const p = await readPayment('jp1');
+  assert.strictEqual(p.handoverStatus, 'pending');
+  assert.strictEqual(p.handoverId, null);
+  await assertSucceeds(fmHandoverBatch(SRV_A1, ESTAB_A, 'h2', ['jp1']));
+});
+
+// ── Service clôturé / serveur retiré ──
+test('✅ service clôturé : la remise et sa validation restent possibles', async () => {
+  await seedHandoverWorld();
+  await closeShift(GERANTE_A, ESTAB_A, 'sh1');
+  await assertSucceeds(getDoc(shiftRef(asUser(SRV_A1), ESTAB_A, 'sh1')));
+  await assertSucceeds(fmHandoverBatch(SRV_A1, ESTAB_A, 'c1', ['jp1', 'jp2']));
+  await assertSucceeds(processBatch(FM_A, ESTAB_A, 'c1', ['jp1', 'jp2']));
+});
+
+test('✅ serveur retiré du service : il remet quand même ce qu’il a encaissé', async () => {
+  await seedHandoverWorld();
+  const g = asUser(GERANTE_A);
+  const batch = writeBatch(g);
+  batch.update(shiftRef(g, ESTAB_A, 'sh1'), { serverIds: [], updatedAt: serverTimestamp() });
+  batch.set(participantRef(g, ESTAB_A, 'sh1', SRV_A1), participantData(ESTAB_A, 'sh1', SRV_A1, GERANTE_A, false));
+  await assertSucceeds(batch.commit());
+  await assertSucceeds(getDoc(shiftRef(asUser(SRV_A1), ESTAB_A, 'sh1')));
+  await assertSucceeds(fmHandoverBatch(SRV_A1, ESTAB_A, 'r1', ['jp1']));
+  // Un serveur jamais affecté à ce service : ni lecture, ni remise.
+  await assertFails(getDoc(shiftRef(asUser(SRV_A2), ESTAB_A, 'sh1')));
+});
+
+// ─────────── 12B : REMISES FLOOR MANAGER -> GÉRANTE ───────────
+
+const GERANTE_A2 = 'geranteA2';
+const fmtId = (shiftId, fm, seq) => `fmt_${shiftId}_${fm}_${seq}`;
+
+// sh1 : Floor Manager FM_A, créé par GERANTE_A. Paul détient 12 000
+// (encaissement direct) + 20 000 (remise de Jean validée).
+async function seedTransferWorld() {
+  await seedHandoverWorld();
+  await testEnv.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    await setDoc(doc(db, 'users', GERANTE_A2), { role: 'gerante', establishmentId: ESTAB_A });
+    await setDoc(payRef(db, ESTAB_A, 'jv'), shiftPayment(SRV_A1, 20000, { handoverStatus: 'validated', handoverId: 'hx' }));
+    // Service clôturé créé par le propriétaire (caisse centrale).
+    await setDoc(shiftRef(db, ESTAB_A, 'shOwner'), {
+      ...shiftData(ESTAB_A, FM_A, [], PROPRIETAIRE_A), status: 'closed',
+      createdAt: new Date(), updatedAt: new Date(),
+    });
+    // Service (incohérent) créé par la comptable : pas un destinataire.
+    await setDoc(shiftRef(db, ESTAB_A, 'shCompta'), {
+      ...shiftData(ESTAB_A, FM_A, [], COMPTABLE_A), status: 'closed',
+      createdAt: new Date(), updatedAt: new Date(),
+    });
+  });
+}
+
+function transferData(uid, seq, over = {}) {
+  const shiftId = over.shiftId ?? 'sh1';
+  return {
+    establishmentId: ESTAB_A, serveurId: uid, serveurName: uid,
+    declaredAmount: 10000, amount: 10000, validatedAmount: null, status: 'pending',
+    receivedByManagerId: null, receivedByManagerName: null,
+    paymentIds: [], validatedPaymentIds: [], rejectedPaymentIds: [],
+    shiftId, senderUserId: uid, senderUserName: uid, senderRole: 'floor_manager',
+    receiverUserId: GERANTE_A, receiverUserName: 'Awa', receiverRole: 'gerante',
+    paymentBreakdown: { cash: 7000, mobile_money: 3000 }, transferSequence: seq,
+    comment: '', createdBy: uid, createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+    validatedAt: null, validatedBy: null, physicalAmount: null, difference: null,
+    rejectedAt: null, rejectedBy: null, rejectedByName: null, decisionComment: null,
+    pendingSync: false, syncError: false,
+    ...over,
+  };
+}
+
+// Même écriture que ShiftHandoverService.transferToReceiver.
+function sendTransfer(uid, seq, over = {}, { e = ESTAB_A, id, bump = true } = {}) {
+  const data = transferData(uid, seq, over);
+  const db = asUser(uid);
+  const batch = writeBatch(db);
+  batch.set(hoRef(db, e, id ?? fmtId(data.shiftId, uid, seq)), data);
+  if (bump) batch.update(shiftRef(db, e, data.shiftId), { financialRevision: increment(1) });
+  return batch.commit();
+}
+
+// Même écriture que ShiftHandoverService.validateTransfer.
+function validateTransfer(uid, id, physical = 10000, over = {}, bump = true) {
+  const db = asUser(uid);
+  const batch = writeBatch(db);
+  if (bump) batch.update(shiftRef(db, ESTAB_A, 'sh1'), { financialRevision: increment(1) });
+  batch.update(hoRef(db, ESTAB_A, id), {
+    status: 'validated', validatedAmount: 10000, physicalAmount: physical,
+    difference: physical - 10000, validatedBy: uid, receivedByManagerId: uid,
+    receivedByManagerName: uid, validatedAt: serverTimestamp(), decisionComment: '',
+    updatedAt: serverTimestamp(),
+    ...over,
+  });
+  return batch.commit();
+}
+
+function rejectTransfer(uid, id, over = {}, bump = true) {
+  const db = asUser(uid);
+  const batch = writeBatch(db);
+  if (bump) batch.update(shiftRef(db, ESTAB_A, 'sh1'), { financialRevision: increment(1) });
+  batch.update(hoRef(db, ESTAB_A, id), {
+    status: 'rejected', rejectedBy: uid, rejectedByName: uid,
+    rejectedAt: serverTimestamp(), decisionComment: 'manque', updatedAt: serverTimestamp(),
+    ...over,
+  });
+  return batch.commit();
+}
+
+// ── Création ──
+test('✅ Floor Manager : remises partielles successives à la gérante du service', async () => {
+  await seedTransferWorld();
+  await assertSucceeds(sendTransfer(FM_A, 0));
+  await assertSucceeds(sendTransfer(FM_A, 1, { declaredAmount: 5000, amount: 5000, paymentBreakdown: { cash: 5000 } }));
+  // Ni le paiement client ni la remise serveur ne sont modifiés.
+  assert.strictEqual((await readPayment('fmp')).handoverStatus, 'pending');
+});
+
+test('✅ service créé par le propriétaire : remise à la caisse centrale (propriétaire)', async () => {
+  await seedTransferWorld();
+  await assertSucceeds(sendTransfer(FM_A, 0, {
+    shiftId: 'shOwner', receiverUserId: PROPRIETAIRE_A, receiverRole: 'proprietaire',
+  }));
+});
+
+test('🔒 double remise : même rang refusé, rang sauté ou identifiant libre refusés', async () => {
+  await seedTransferWorld();
+  await assertSucceeds(sendTransfer(FM_A, 0));
+  await assertFails(sendTransfer(FM_A, 0));
+  await assertFails(sendTransfer(FM_A, 2));
+  await assertFails(sendTransfer(FM_A, 1, {}, { id: 'libre' }));
+  await assertFails(sendTransfer(FM_A, 1, {}, { id: fmtId('sh1', FM_A, 5) }));
+});
+
+test('🔒 destinataire imposé : ni autre gérante, ni autre établissement, ni autre rôle', async () => {
+  await seedTransferWorld();
+  await assertFails(sendTransfer(FM_A, 0, { receiverUserId: GERANTE_A2 }));
+  await assertFails(sendTransfer(FM_A, 0, { receiverUserId: 'geranteB' }));
+  await assertFails(sendTransfer(FM_A, 0, { receiverUserId: COMPTABLE_A, receiverRole: 'comptable' }));
+  await assertFails(sendTransfer(FM_A, 0, { receiverRole: 'proprietaire' }));
+  await assertFails(sendTransfer(FM_A, 0, { receiverUserId: SRV_A1, receiverRole: 'serveur' }));
+  // Même le créateur du service, s'il n'est ni gérante ni propriétaire.
+  await assertFails(sendTransfer(FM_A, 0, {
+    shiftId: 'shCompta', receiverUserId: COMPTABLE_A, receiverRole: 'comptable',
+  }));
+});
+
+test('🔒 émetteur : autre Floor Manager, autre établissement, serveur ou gérante', async () => {
+  await seedTransferWorld();
+  // FM_A2 n'est pas le Floor Manager de sh1.
+  await assertFails(sendTransfer(FM_A2, 0));
+  await assertFails(sendTransfer(FM_A2, 0, { senderUserId: FM_A, serveurId: FM_A, createdBy: FM_A }, { id: fmtId('sh1', FM_A, 0) }));
+  await assertFails(sendTransfer(FM_B, 0, { establishmentId: ESTAB_B }, { e: ESTAB_B }));
+  await assertFails(sendTransfer(FM_A, 0, { establishmentId: ESTAB_B }, { e: ESTAB_B }));
+  await assertFails(sendTransfer(SRV_A1, 0));
+  // La gérante ne fabrique pas une remise de Floor Manager (circuit historique).
+  await assertFails(setDoc(hoRef(asUser(GERANTE_A), ESTAB_A, fmtId('sh1', FM_A, 0)), transferData(FM_A, 0)));
+});
+
+test('🔒 montant incohérent ou champs de décision pré-remplis', async () => {
+  await seedTransferWorld();
+  for (const over of [
+    { paymentBreakdown: { cash: 9000 } },
+    { amount: 9000 },
+    { paymentBreakdown: { cash: 11000, mobile_money: -1000 } },
+    { paymentBreakdown: { cash: 7000, bitcoin: 3000 } },
+    { paymentBreakdown: { cash: 10000, bitcoin: 3000 } },
+    { declaredAmount: 0, amount: 0, paymentBreakdown: {} },
+    { status: 'validated' },
+    { physicalAmount: 10000 },
+    { validatedAmount: 10000 },
+    { paymentIds: ['fmp'] },
+    { transferSequence: -1 },
+    { extra: true },
+  ]) {
+    await assertFails(sendTransfer(FM_A, 0, over));
+  }
+});
+
+// ── Lecture ──
+test('✅🔒 lecture : émetteur, gérante, comptabilité ; ni autres rôles ni autre tenant', async () => {
+  await seedTransferWorld();
+  await sendTransfer(FM_A, 0);
+  const id = fmtId('sh1', FM_A, 0);
+  await assertSucceeds(getDoc(hoRef(asUser(FM_A), ESTAB_A, id)));
+  await assertSucceeds(getDocs(query(
+    collection(asUser(FM_A), 'establishments', ESTAB_A, 'serverHandovers'),
+    where('senderUserId', '==', FM_A),
+  )));
+  await assertSucceeds(getDoc(hoRef(asUser(GERANTE_A), ESTAB_A, id)));
+  await assertSucceeds(getDoc(hoRef(asUser(COMPTABLE_A), ESTAB_A, id)));
+  await assertFails(getDoc(hoRef(asUser(FM_A2), ESTAB_A, id)));
+  await assertFails(getDoc(hoRef(asUser(SRV_A1), ESTAB_A, id)));
+  await assertFails(getDoc(hoRef(asUser('barmanA'), ESTAB_A, id)));
+  await assertFails(getDoc(hoRef(asUser('geranteB'), ESTAB_A, id)));
+  // Non-régression : un serveur lit toujours ses remises, un barman une
+  // remise historique.
+  await assertSucceeds(getDocs(query(
+    collection(asUser(SERVEUR_A), 'establishments', ESTAB_A, 'serverHandovers'),
+    where('serveurId', '==', SERVEUR_A),
+  )));
+  await assertSucceeds(getDoc(hoRef(asUser('barmanA'), ESTAB_A, 'handover1')));
+});
+
+// ── Validation / rejet ──
+test('✅ la gérante destinataire valide avec le montant compté et l’écart', async () => {
+  await seedTransferWorld();
+  await sendTransfer(FM_A, 0);
+  await assertSucceeds(validateTransfer(GERANTE_A, fmtId('sh1', FM_A, 0), 9500));
+});
+
+test('🔒 validation : autre gérante, autre tenant, Floor Manager, montant ou écart falsifié', async () => {
+  await seedTransferWorld();
+  await sendTransfer(FM_A, 0);
+  const id = fmtId('sh1', FM_A, 0);
+  await assertFails(validateTransfer(GERANTE_A2, id));
+  await assertFails(validateTransfer('geranteB', id));
+  await assertFails(validateTransfer(FM_A, id));
+  await assertFails(validateTransfer(COMPTABLE_A, id));
+  await assertFails(validateTransfer(GERANTE_A, id, 9500, { difference: 0 }));
+  await assertFails(validateTransfer(GERANTE_A, id, 9500, { validatedAmount: 9500 }));
+  await assertFails(validateTransfer(GERANTE_A, id, 10000, { declaredAmount: 9000 }));
+  await assertFails(validateTransfer(GERANTE_A, id, 10000, { paymentBreakdown: { cash: 10000 } }));
+  await assertFails(validateTransfer(GERANTE_A, id, -1));
+  await assertFails(validateTransfer(GERANTE_A, id, 10000, { validatedBy: GERANTE_A2 }));
+  await assertFails(rejectTransfer(GERANTE_A2, id));
+  // Pas par le circuit historique de validation non plus.
+  await assertFails(updateDoc(hoRef(asUser(GERANTE_A), ESTAB_A, id), { declaredAmount: 1 }));
+});
+
+test('🔒 remise validée : immuable, ni rejet ni suppression', async () => {
+  await seedTransferWorld();
+  await sendTransfer(FM_A, 0);
+  const id = fmtId('sh1', FM_A, 0);
+  await validateTransfer(GERANTE_A, id);
+  const g = asUser(GERANTE_A);
+  await assertFails(rejectTransfer(GERANTE_A, id));
+  await assertFails(validateTransfer(GERANTE_A, id, 9000));
+  for (const change of [
+    { declaredAmount: 1 }, { amount: 1 }, { paymentBreakdown: { cash: 10000 } },
+    { senderUserId: FM_A2 }, { receiverUserId: GERANTE_A2 }, { shiftId: 'shA2' },
+    { establishmentId: ESTAB_B }, { status: 'pending' }, { physicalAmount: 1 },
+  ]) {
+    await assertFails(updateDoc(hoRef(g, ESTAB_A, id), change));
+  }
+  await assertFails(deleteDoc(hoRef(g, ESTAB_A, id)));
+  await assertFails(deleteDoc(hoRef(asUser(PROPRIETAIRE_A), ESTAB_A, id)));
+  // Suivi du versement en comptabilité (circuit existant) : autorisé.
+  await assertSucceeds(updateDoc(hoRef(g, ESTAB_A, id), {
+    accountingTransferStatus: 'declared', accountingTransferId: 't1',
+  }));
+  await assertSucceeds(updateDoc(hoRef(asUser(COMPTABLE_A), ESTAB_A, id), {
+    accountingTransferStatus: 'received', updatedAt: serverTimestamp(),
+  }));
+});
+
+test('✅ remise rejetée : figée, puis nouvelle remise au rang suivant', async () => {
+  await seedTransferWorld();
+  await sendTransfer(FM_A, 0);
+  const id = fmtId('sh1', FM_A, 0);
+  await assertSucceeds(rejectTransfer(GERANTE_A, id));
+  await assertFails(validateTransfer(GERANTE_A, id));
+  await assertFails(rejectTransfer(GERANTE_A, id, { decisionComment: 'autre' }));
+  await assertSucceeds(sendTransfer(FM_A, 1));
+});
+
+test('🔒 remise en attente : ni avant accord ni annulation par le Floor Manager', async () => {
+  await seedTransferWorld();
+  await sendTransfer(FM_A, 0);
+  const id = fmtId('sh1', FM_A, 0);
+  await assertFails(updateDoc(hoRef(asUser(FM_A), ESTAB_A, id), { declaredAmount: 20000, amount: 20000 }));
+  await assertFails(deleteDoc(hoRef(asUser(FM_A), ESTAB_A, id)));
+  await assertFails(updateDoc(hoRef(asUser(GERANTE_A), ESTAB_A, id), {
+    accountingTransferStatus: 'declared', accountingTransferId: 't1',
+  }));
+});
+
+// ── Service clôturé ──
+test('✅ service clôturé : remise et validation possibles, aucune nouvelle vente', async () => {
+  await seedTransferWorld();
+  await closeShift(GERANTE_A, ESTAB_A, 'sh1');
+  await assertFails(payBatch(FM_A, ESTAB_A, 'late', ['paul1'], { responsibleServerId: FM_A }));
+  await assertSucceeds(sendTransfer(FM_A, 0));
+  await assertSucceeds(validateTransfer(GERANTE_A, fmtId('sh1', FM_A, 0)));
+});
+
+// ── Rapprochement ──
+test('✅🔒 rapprochement du service dans accountClosures : gérante oui, Floor Manager non', async () => {
+  await seedTransferWorld();
+  const closure = {
+    establishmentId: ESTAB_A, scope: 'shift', accountType: 'shift', shiftId: 'sh1',
+    floorManagerId: FM_A, theoreticalAmount: 62000, physicalAmount: 60000, difference: -2000,
+    validatedById: GERANTE_A, validatedByName: 'Awa', comment: '', date: serverTimestamp(),
+    createdAt: serverTimestamp(), pendingSync: false, syncError: false,
+  };
+  await assertSucceeds(setDoc(doc(asUser(GERANTE_A), 'establishments', ESTAB_A, 'accountClosures', 'r1'), closure));
+  await assertFails(setDoc(doc(asUser(FM_A), 'establishments', ESTAB_A, 'accountClosures', 'r2'), closure));
+  await assertFails(getDoc(doc(asUser(FM_A), 'establishments', ESTAB_A, 'accountClosures', 'r1')));
+});
+
+// ── Service : créateur ──
+test('🔒 service : le rôle du créateur ne peut pas être falsifié ni modifié', async () => {
+  await seedShiftWorld();
+  await assertFails(createShiftBatch(GERANTE_A, ESTAB_A, 'c1', FM_A, [SRV_A1], { createdByRole: 'proprietaire' }));
+  await assertSucceeds(createShiftBatch(GERANTE_A, ESTAB_A, 'c2', FM_A, [SRV_A1], { createdByRole: 'gerante', createdByName: 'Awa' }));
+  await assertFails(updateDoc(shiftRef(asUser(GERANTE_A), ESTAB_A, 'c2'), { createdByRole: 'proprietaire', updatedAt: serverTimestamp() }));
+});
+
+// ─────────── 13B : CLÔTURE FINANCIÈRE DU SERVICE ───────────
+
+const discRef = (db, e, id) => doc(db, 'establishments', e, 'shiftDiscrepancies', id);
+
+// Même écriture que ShiftClosureService.closeFinancially (dans sa transaction).
+function closeFinancially(uid, over = {}, { e = ESTAB_A, shiftId = 'sh1' } = {}) {
+  return updateDoc(shiftRef(asUser(uid), e, shiftId), {
+    financialStatus: 'reconciled', financialClosedAt: serverTimestamp(),
+    financialClosedBy: uid, financialClosedByName: uid,
+    financialSummary: { theoreticalAmount: 62000, difference: 0 },
+    updatedAt: serverTimestamp(),
+    ...over,
+  });
+}
+
+function discrepancyData(uid, over = {}) {
+  return {
+    establishmentId: ESTAB_A, shiftId: 'sh1',
+    subjectUserId: SRV_A1, subjectName: 'Jean', subjectRole: 'serveur',
+    expectedAmount: 5000, physicalAmount: 0, difference: -5000, reason: 'billet manquant',
+    recordedBy: uid, recordedByName: uid, recordedByRole: 'floor_manager',
+    recordedAt: serverTimestamp(), status: 'pending',
+    approvedBy: null, approvedAt: null, rejectedBy: null, rejectedAt: null,
+    decidedByName: null, decisionComment: null,
+    ...over,
+  };
+}
+
+// Même lot que ShiftClosureService.declareDiscrepancy.
+function declareDiscrepancy(uid, id, over = {}, bump = true) {
+  const db = asUser(uid);
+  const batch = writeBatch(db);
+  const data = discrepancyData(uid, over);
+  batch.set(discRef(db, ESTAB_A, id), data);
+  if (bump) batch.update(shiftRef(db, ESTAB_A, data.shiftId), { financialRevision: increment(1) });
+  return batch.commit();
+}
+
+// Même lot que ShiftClosureService.decideDiscrepancy.
+function decideDiscrepancy(uid, id, approve = true, over = {}, bump = true) {
+  const db = asUser(uid);
+  const batch = writeBatch(db);
+  batch.update(discRef(db, ESTAB_A, id), {
+    status: approve ? 'approved' : 'rejected',
+    ...(approve
+      ? { approvedBy: uid, approvedAt: serverTimestamp() }
+      : { rejectedBy: uid, rejectedAt: serverTimestamp() }),
+    decidedByName: uid, decisionComment: '',
+    ...over,
+  });
+  if (bump) batch.update(shiftRef(db, ESTAB_A, 'sh1'), { financialRevision: increment(1) });
+  return batch.commit();
+}
+
+async function readShift(id = 'sh1') {
+  let data;
+  await testEnv.withSecurityRulesDisabled(async (ctx) => {
+    data = (await getDoc(shiftRef(ctx.firestore(), ESTAB_A, id))).data();
+  });
+  return data;
+}
+
+// ── Clôture ──
+test('🔒 service en cours : pas de clôture financière', async () => {
+  await seedTransferWorld();
+  await assertFails(closeFinancially(GERANTE_A));
+});
+
+test('✅ service terminé : la gérante clôture une seule fois, montants figés', async () => {
+  await seedTransferWorld();
+  await closeShift(GERANTE_A, ESTAB_A, 'sh1');
+  await assertSucceeds(closeFinancially(GERANTE_A));
+  const s = await readShift();
+  assert.strictEqual(s.status, 'closed');
+  assert.strictEqual(s.financialStatus, 'reconciled');
+  // Double clôture : refusée.
+  await assertFails(closeFinancially(GERANTE_A));
+  await assertFails(closeFinancially(PROPRIETAIRE_A));
+});
+
+test('🔒 clôture : ni Floor Manager, ni serveur, ni comptable, ni autre établissement', async () => {
+  await seedTransferWorld();
+  await closeShift(GERANTE_A, ESTAB_A, 'sh1');
+  for (const uid of [FM_A, SRV_A1, COMPTABLE_A, 'geranteB', 'barmanA']) {
+    await assertFails(closeFinancially(uid));
+  }
+  // Le propriétaire (caisse centrale) peut clôturer.
+  await assertSucceeds(closeFinancially(PROPRIETAIRE_A));
+});
+
+test('🔒 clôture falsifiée : auteur, date, compteur ou champs hors clôture', async () => {
+  await seedTransferWorld();
+  await closeShift(GERANTE_A, ESTAB_A, 'sh1');
+  await assertFails(closeFinancially(GERANTE_A, { financialClosedBy: GERANTE_A2 }));
+  await assertFails(closeFinancially(GERANTE_A, { financialClosedAt: new Date('2026-01-01') }));
+  await assertFails(closeFinancially(GERANTE_A, { financialRevision: 99 }));
+  await assertFails(closeFinancially(GERANTE_A, { status: 'open' }));
+  await assertFails(closeFinancially(GERANTE_A, { financialSummary: 'ok' }));
+  await assertFails(closeFinancially(GERANTE_A, { financialStatus: 'ready' }));
+});
+
+test('🔒 après clôture : rien ne bouge (montants, réouverture, remises, écarts, affectations)', async () => {
+  await seedTransferWorld();
+  await sendTransfer(FM_A, 0);
+  await fmHandoverBatch(SRV_A1, ESTAB_A, 'h1', ['jp1']);
+  await declareDiscrepancy(FM_A, 'd1');
+  await closeShift(GERANTE_A, ESTAB_A, 'sh1');
+  await assertSucceeds(closeFinancially(GERANTE_A));
+
+  const g = asUser(GERANTE_A);
+  await assertFails(updateDoc(shiftRef(g, ESTAB_A, 'sh1'), { financialSummary: { theoreticalAmount: 1 } }));
+  await assertFails(updateDoc(shiftRef(g, ESTAB_A, 'sh1'), { financialStatus: 'pending' }));
+  await assertFails(openShiftBatch(GERANTE_A, ESTAB_A, 'sh1', FM_A, [SRV_A1], { serverPointers: [] }));
+  await assertFails(updateDoc(shiftRef(g, ESTAB_A, 'sh1'), { financialRevision: increment(1) }));
+  // Aucun nouvel événement financier.
+  await assertFails(sendTransfer(FM_A, 1));
+  await assertFails(validateTransfer(GERANTE_A, fmtId('sh1', FM_A, 0)));
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'h2', ['jp2']));
+  await assertFails(processBatch(FM_A, ESTAB_A, 'h1', ['jp1']));
+  await assertFails(declareDiscrepancy(FM_A, 'd2'));
+  await assertFails(decideDiscrepancy(GERANTE_A, 'd1'));
+  // Aucune nouvelle participation.
+  await assertFails(setDoc(participantRef(g, ESTAB_A, 'sh1', SRV_A2), participantData(ESTAB_A, 'sh1', SRV_A2, GERANTE_A, false)));
+});
+
+test('✅ ancien service sans champs financiers : lisible, « à rapprocher », clôturable', async () => {
+  await seedTransferWorld();
+  const s = await readShift();
+  assert.strictEqual(s.financialStatus, undefined);
+  await assertSucceeds(getDoc(shiftRef(asUser(GERANTE_A), ESTAB_A, 'sh1')));
+  await closeShift(GERANTE_A, ESTAB_A, 'sh1');
+  await assertSucceeds(closeFinancially(GERANTE_A));
+});
+
+test('🔒 création de service : jamais déjà clôturé financièrement', async () => {
+  await seedShiftWorld();
+  await assertFails(createShiftBatch(GERANTE_A, ESTAB_A, 'n1', FM_A, [SRV_A1], { financialStatus: 'reconciled' }));
+  await assertFails(createShiftBatch(GERANTE_A, ESTAB_A, 'n2', FM_A, [SRV_A1], { financialRevision: 5 }));
+  await assertSucceeds(createShiftBatch(GERANTE_A, ESTAB_A, 'n3', FM_A, [SRV_A1]));
+});
+
+// ── Compteur d'événements financiers ──
+test('🔒 tout événement financier doit faire avancer le compteur du service', async () => {
+  await seedTransferWorld();
+  await assertFails(fmHandoverBatch(SRV_A1, ESTAB_A, 'h1', ['jp1'], {}, ['jp1'], false));
+  await assertFails(sendTransfer(FM_A, 0, {}, { bump: false }));
+  await assertSucceeds(sendTransfer(FM_A, 0));
+  await assertFails(validateTransfer(GERANTE_A, fmtId('sh1', FM_A, 0), 10000, {}, false));
+  await assertFails(rejectTransfer(GERANTE_A, fmtId('sh1', FM_A, 0), {}, false));
+  await assertFails(declareDiscrepancy(FM_A, 'd1', {}, false));
+  await assertSucceeds(fmHandoverBatch(SRV_A1, ESTAB_A, 'h1', ['jp1']));
+  await assertFails(processBatch(FM_A, ESTAB_A, 'h1', ['jp1'], false, {}, null));
+});
+
+test('🔒 compteur : +1 seulement, par un acteur du service', async () => {
+  await seedTransferWorld();
+  const bump = (uid, by = 1) => updateDoc(shiftRef(asUser(uid), ESTAB_A, 'sh1'), { financialRevision: increment(by) });
+  for (const uid of ['barmanA', SRV_A2, FM_A2, COMPTABLE_A, 'geranteB']) {
+    await assertFails(bump(uid));
+  }
+  await assertFails(bump(GERANTE_A, 2));
+  await assertFails(updateDoc(shiftRef(asUser(FM_A), ESTAB_A, 'sh1'), { financialRevision: increment(1), status: 'closed' }));
+  await assertSucceeds(bump(SRV_A1));
+  await assertSucceeds(bump(FM_A));
+});
+
+test('🔒 concurrence : une remise pendant la clôture fait échouer la clôture', async () => {
+  await seedTransferWorld();
+  await closeShift(GERANTE_A, ESTAB_A, 'sh1');
+  const g = asUser(GERANTE_A);
+  const ref = shiftRef(g, ESTAB_A, 'sh1');
+  // 1. La gérante lit la situation (compteur r0)...
+  const r0 = (await getDoc(ref)).data().financialRevision ?? 0;
+  // 2. ... Jean remet ses encaissements au même moment...
+  await assertSucceeds(fmHandoverBatch(SRV_A1, ESTAB_A, 'late', ['jp1']));
+  // 3. ... la transaction de clôture relit le compteur : il a bougé.
+  await assert.rejects(
+    runTransaction(g, async (tx) => {
+      const snap = await tx.get(ref);
+      if ((snap.data().financialRevision ?? 0) !== r0) throw new Error('shiftFinancialChanged');
+      tx.update(ref, {
+        financialStatus: 'reconciled', financialClosedAt: serverTimestamp(),
+        financialClosedBy: GERANTE_A, financialSummary: {}, updatedAt: serverTimestamp(),
+      });
+    }),
+    /shiftFinancialChanged/,
+  );
+  assert.notStrictEqual((await readShift()).financialStatus, 'reconciled');
+});
+
+// ── Écarts ──
+test('✅ Floor Manager : déclare un écart sur sa caisse ou celle d’un serveur du service', async () => {
+  await seedTransferWorld();
+  await assertSucceeds(declareDiscrepancy(FM_A, 'd1'));
+  await assertSucceeds(declareDiscrepancy(FM_A, 'd2', {
+    subjectUserId: FM_A, subjectName: 'Paul', subjectRole: 'floor_manager',
+  }));
+  await assertSucceeds(declareDiscrepancy(GERANTE_A, 'd3', { recordedByRole: 'gerante' }));
+  // Aucun paiement ni aucune remise n'est modifié.
+  assert.strictEqual((await readPayment('jp1')).handoverStatus, 'pending');
+});
+
+test('🔒 déclaration d’écart invalide ou hors périmètre', async () => {
+  await seedTransferWorld();
+  for (const over of [
+    { subjectUserId: SRV_A2 },
+    { subjectUserId: FM_A2, subjectRole: 'floor_manager' },
+    { subjectRole: 'gerante', subjectUserId: GERANTE_A },
+    { physicalAmount: 6000, difference: 1000 },
+    { difference: 0 },
+    { expectedAmount: 0, physicalAmount: 0, difference: 0 },
+    { reason: '' },
+    { recordedAt: new Date('2026-01-01') },
+    { recordedBy: GERANTE_A },
+    { recordedByRole: 'gerante' },
+    { status: 'approved' },
+    { approvedBy: FM_A },
+    { establishmentId: ESTAB_B },
+    { extra: 1 },
+  ]) {
+    await assertFails(declareDiscrepancy(FM_A, 'bad', over));
+  }
+  await assertFails(declareDiscrepancy(FM_A2, 'x1'));
+  await assertFails(declareDiscrepancy(SRV_A1, 'x2', { recordedByRole: 'serveur' }));
+  await assertFails(declareDiscrepancy('geranteB', 'x3', { recordedByRole: 'gerante' }));
+});
+
+test('✅🔒 décision : la gérante seulement ; jamais le Floor Manager sur son propre écart', async () => {
+  await seedTransferWorld();
+  await declareDiscrepancy(FM_A, 'd1', {
+    subjectUserId: FM_A, subjectName: 'Paul', subjectRole: 'floor_manager',
+  });
+  for (const uid of [FM_A, SRV_A1, COMPTABLE_A, 'geranteB', FM_A2]) {
+    await assertFails(decideDiscrepancy(uid, 'd1'));
+  }
+  await assertFails(decideDiscrepancy(GERANTE_A, 'd1', true, { approvedBy: FM_A }));
+  await assertFails(decideDiscrepancy(GERANTE_A, 'd1', true, { expectedAmount: 1 }));
+  await assertSucceeds(decideDiscrepancy(GERANTE_A, 'd1'));
+  // Décidé : figé, jamais supprimé.
+  await assertFails(decideDiscrepancy(GERANTE_A, 'd1', false));
+  await assertFails(deleteDoc(discRef(asUser(GERANTE_A), ESTAB_A, 'd1')));
+  await assertFails(deleteDoc(discRef(asUser(PROPRIETAIRE_A), ESTAB_A, 'd1')));
+});
+
+test('✅ écart rejeté par la gérante', async () => {
+  await seedTransferWorld();
+  await declareDiscrepancy(FM_A, 'd1');
+  await assertSucceeds(decideDiscrepancy(GERANTE_A, 'd1', false));
+});
+
+test('✅🔒 lecture des écarts : gérante, Floor Manager du service, serveur concerné', async () => {
+  await seedTransferWorld();
+  await declareDiscrepancy(FM_A, 'd1');
+  const byShift = (uid) => getDocs(query(
+    collection(asUser(uid), 'establishments', ESTAB_A, 'shiftDiscrepancies'),
+    where('shiftId', '==', 'sh1'),
+  ));
+  await assertSucceeds(byShift(FM_A));
+  await assertSucceeds(byShift(GERANTE_A));
+  await assertSucceeds(byShift(COMPTABLE_A));
+  await assertFails(byShift(FM_A2));
+  await assertFails(byShift('barmanA'));
+  await assertFails(byShift('geranteB'));
+  await assertSucceeds(getDocs(query(
+    collection(asUser(SRV_A1), 'establishments', ESTAB_A, 'shiftDiscrepancies'),
+    where('subjectUserId', '==', SRV_A1),
+  )));
+  await assertFails(byShift(SRV_A1));
+  await assertFails(getDoc(discRef(asUser(SRV_A3), ESTAB_A, 'd1')));
+});
+
+test('🔒 la mise à jour ordinaire d’un service ne touche pas aux champs financiers', async () => {
+  await seedTransferWorld();
+  const ref = shiftRef(asUser(GERANTE_A), ESTAB_A, 'sh1');
+  await assertFails(updateDoc(ref, { financialStatus: 'reconciled', updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(ref, { financialRevision: 0, updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(ref, { financialSummary: {}, updatedAt: serverTimestamp() }));
+  await assertSucceeds(updateDoc(ref, { updatedAt: serverTimestamp() }));
 });

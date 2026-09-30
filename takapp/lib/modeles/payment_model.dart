@@ -42,6 +42,13 @@ class PaymentModel {
 
   final DateTime? createdAt;
 
+  /// Service (shift) de l'encaissement. `null` : paiement historique ou hors
+  /// système de shift — jamais rattaché après coup à un service.
+  final String? shiftId;
+
+  /// Serveur responsable de la vente (10B). `null` sur les anciens paiements.
+  final String? responsibleServerId;
+
   const PaymentModel({
     required this.id,
     required this.establishmentId,
@@ -70,6 +77,9 @@ class PaymentModel {
     required this.syncError,
 
     required this.createdAt,
+
+    this.shiftId,
+    this.responsibleServerId,
   });
 
   factory PaymentModel.fromMap(Map<String, dynamic> map, String documentId) {
@@ -131,7 +141,15 @@ class PaymentModel {
       syncError: map['syncError'] == true,
 
       createdAt: ts is Timestamp ? ts.toDate() : null,
+
+      shiftId: _optionalString(map['shiftId']),
+      responsibleServerId: _optionalString(map['responsibleServerId']),
     );
+  }
+
+  static String? _optionalString(dynamic value) {
+    final text = value?.toString().trim() ?? '';
+    return text.isEmpty ? null : text;
   }
 
   Map<String, dynamic> toMap() {
