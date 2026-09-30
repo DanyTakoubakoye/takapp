@@ -10,6 +10,7 @@ import 'package:takapp/vues/gerante/liste_factures_page.dart';
 import 'package:takapp/vues/gerante/suivi_encaissements_serveurs.dart';
 import 'package:takapp/vues/gerante/versement_compta_page.dart';
 import 'package:takapp/vues/gerante/versements_serveurs_page.dart';
+import 'package:takapp/vues/gerante/shift_management_page.dart';
 import 'package:takapp/vues/gerante/create_store_stock_page.dart';
 import 'package:takapp/vues/gerante/stock_management_page.dart';
 import 'package:takapp/vues/gerante/stock_request_list_page.dart';
@@ -236,6 +237,12 @@ class _GeranteModulesGrid extends StatelessWidget {
             title: l10n.registerServerTitle,
             icon: Icons.person_add,
             pageBuilder: (_) => const EnregistrerServeurPage(),
+          ),
+          _GeranteAction(
+            title: l10n.shiftsTitle,
+            icon: Icons.schedule_outlined,
+            pageBuilder: (_) =>
+                ShiftManagementPage(establishmentId: establishmentId),
           ),
           _GeranteAction(
             title: l10n.actionValidateHandovers,

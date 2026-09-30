@@ -194,4 +194,17 @@ class AppRoles {
     final normalized = normalizeRole(role);
     return normalized == globalAdmin || normalized == superAdmin;
   }
+
+  /// Créer, ouvrir, clôturer un service et y affecter des serveurs.
+  /// Miroir de `isShiftManager()` dans firestore.rules (l'autorité réelle).
+  ///
+  /// Le Floor Manager en est volontairement exclu : il ne crée pas son
+  /// propre service et ne s'affecte pas de serveurs.
+  static bool canManageShifts(String role) {
+    final normalized = normalizeRole(role);
+    return normalized == gerante ||
+        normalized == proprietaire ||
+        normalized == superAdmin ||
+        normalized == globalAdmin;
+  }
 }

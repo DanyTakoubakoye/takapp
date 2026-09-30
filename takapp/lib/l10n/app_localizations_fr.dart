@@ -4451,4 +4451,156 @@ class AppLocalizationsFr extends AppLocalizations {
   String currentStockLine(String quantity, String unit) {
     return 'Stock actuel : $quantity $unit';
   }
+
+  @override
+  String get shiftsTitle => 'Services (shifts)';
+
+  @override
+  String get shiftCreateTitle => 'Nouveau service';
+
+  @override
+  String get shiftEditServersTitle => 'Serveurs du service';
+
+  @override
+  String get shiftFloorManagerLabel => 'Floor Manager';
+
+  @override
+  String get shiftServersLabel => 'Serveurs affectés';
+
+  @override
+  String get shiftStartsAtLabel => 'Début';
+
+  @override
+  String get shiftEndsAtLabel => 'Fin';
+
+  @override
+  String get shiftStatusPlanned => 'Planifié';
+
+  @override
+  String get shiftStatusOpen => 'Ouvert';
+
+  @override
+  String get shiftStatusClosed => 'Clôturé';
+
+  @override
+  String get shiftActionOpen => 'Ouvrir';
+
+  @override
+  String get shiftActionReopen => 'Rouvrir';
+
+  @override
+  String get shiftActionClose => 'Clôturer';
+
+  @override
+  String get shiftActionEditServers => 'Serveurs';
+
+  @override
+  String get shiftNoShifts => 'Aucun service pour le moment.';
+
+  @override
+  String get shiftNoFloorManagerAvailable =>
+      'Aucun Floor Manager actif dans l\'établissement.';
+
+  @override
+  String get shiftNoServerAvailable =>
+      'Aucun serveur actif dans l\'établissement.';
+
+  @override
+  String shiftServersCount(int count) {
+    return '$count serveur(s)';
+  }
+
+  @override
+  String get shiftSaved => 'Service enregistré.';
+
+  @override
+  String get errShiftInvalidDates =>
+      'La fin du service doit être postérieure à son début.';
+
+  @override
+  String get errShiftInvalidFloorManager =>
+      'Le Floor Manager choisi n\'est pas un Floor Manager actif de cet établissement.';
+
+  @override
+  String errShiftInvalidServer(String name) {
+    return '« $name » n\'est pas un serveur actif de cet établissement.';
+  }
+
+  @override
+  String errShiftTooManyServers(String max) {
+    return 'Un service ne peut pas compter plus de $max serveurs.';
+  }
+
+  @override
+  String get errShiftClosed =>
+      'Ce service est clôturé : rouvrez-le avant de modifier ses serveurs.';
+
+  @override
+  String get errShiftInvalidTransition =>
+      'Ce changement de statut n\'est pas autorisé.';
+
+  @override
+  String get errShiftNotFound => 'Service introuvable.';
+
+  @override
+  String get errShiftFloorManagerAlreadyOpen =>
+      'Ce Floor Manager a déjà un service ouvert. Clôturez-le d\'abord.';
+
+  @override
+  String errShiftServerAlreadyInOpenShift(String name) {
+    return '« $name » est déjà affecté à un autre service ouvert.';
+  }
+
+  @override
+  String get fmCurrentShiftTitle => 'Service en cours';
+
+  @override
+  String fmActiveServersCount(int count) {
+    return 'Serveurs actifs : $count';
+  }
+
+  @override
+  String get fmNoShiftTitle => 'Aucun service en cours';
+
+  @override
+  String get fmNoShiftMessage =>
+      'Vous n\'êtes actuellement affecté à aucun service ouvert.';
+
+  @override
+  String get fmLoadError => 'Impossible de charger votre service.';
+
+  @override
+  String get fmActionOrders => 'Commandes';
+
+  @override
+  String get fmActionOrdersSubtitle =>
+      'Commande directe ou pour un serveur du service';
+
+  @override
+  String get fmActionPayments => 'Encaissements';
+
+  @override
+  String get fmActionPaymentsSubtitle =>
+      'Encaissement direct ou pour un serveur du service';
+
+  @override
+  String get fmDirectOrder => 'Commande directe';
+
+  @override
+  String get fmDirectPayment => 'Encaissement direct';
+
+  @override
+  String get fmServers => 'Serveurs';
+
+  @override
+  String get fmServersSubtitle => 'Serveurs actifs de votre service';
+
+  @override
+  String get fmComingSoon => 'Bientôt disponible';
+
+  @override
+  String get fmNoActiveServer => 'Aucun serveur actif dans ce service.';
+
+  @override
+  String get fmServerOnDuty => 'En service';
 }

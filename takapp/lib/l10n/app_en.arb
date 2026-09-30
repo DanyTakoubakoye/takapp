@@ -2978,5 +2978,84 @@
         "type": "String"
       }
     }
-  }
+  },
+  "shiftsTitle": "Shifts",
+  "shiftCreateTitle": "New shift",
+  "shiftEditServersTitle": "Shift servers",
+  "shiftFloorManagerLabel": "Floor Manager",
+  "shiftServersLabel": "Assigned servers",
+  "shiftStartsAtLabel": "Start",
+  "shiftEndsAtLabel": "End",
+  "shiftStatusPlanned": "Planned",
+  "shiftStatusOpen": "Open",
+  "shiftStatusClosed": "Closed",
+  "shiftActionOpen": "Open",
+  "shiftActionReopen": "Reopen",
+  "shiftActionClose": "Close",
+  "shiftActionEditServers": "Servers",
+  "shiftNoShifts": "No shifts yet.",
+  "shiftNoFloorManagerAvailable": "No active Floor Manager in this establishment.",
+  "shiftNoServerAvailable": "No active server in this establishment.",
+  "shiftServersCount": "{count} server(s)",
+  "@shiftServersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shiftSaved": "Shift saved.",
+  "errShiftInvalidDates": "The shift must end after it starts.",
+  "errShiftInvalidFloorManager": "The selected Floor Manager is not an active Floor Manager of this establishment.",
+  "errShiftInvalidServer": "\"{name}\" is not an active server of this establishment.",
+  "@errShiftInvalidServer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errShiftTooManyServers": "A shift cannot have more than {max} servers.",
+  "@errShiftTooManyServers": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "errShiftClosed": "This shift is closed: reopen it before changing its servers.",
+  "errShiftInvalidTransition": "This status change is not allowed.",
+  "errShiftNotFound": "Shift not found.",
+  "errShiftFloorManagerAlreadyOpen": "This Floor Manager already has an open shift. Close it first.",
+  "errShiftServerAlreadyInOpenShift": "\"{name}\" is already assigned to another open shift.",
+  "@errShiftServerAlreadyInOpenShift": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "fmCurrentShiftTitle": "Current shift",
+  "fmActiveServersCount": "Active servers: {count}",
+  "@fmActiveServersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fmNoShiftTitle": "No shift in progress",
+  "fmNoShiftMessage": "You are not currently assigned to any open shift.",
+  "fmLoadError": "Unable to load your shift.",
+  "fmActionOrders": "Orders",
+  "fmActionOrdersSubtitle": "Direct order or for a server of the shift",
+  "fmActionPayments": "Payments",
+  "fmActionPaymentsSubtitle": "Direct payment or for a server of the shift",
+  "fmDirectOrder": "Direct order",
+  "fmDirectPayment": "Direct payment",
+  "fmServers": "Servers",
+  "fmServersSubtitle": "Active servers of your shift",
+  "fmComingSoon": "Coming soon",
+  "fmNoActiveServer": "No active server in this shift.",
+  "fmServerOnDuty": "On duty"
 }

@@ -218,6 +218,22 @@ enum AppErrorCode {
   certilinkConfigIncomplete,
   certilinkConfigMissingKeys,
   invoiceNeedsOneItem,
+
+  /// =========================
+  /// SERVICES (SHIFTS)
+  /// =========================
+  ///
+  /// [AppError.name] : nom du serveur concerné pour `shiftInvalidServer` et
+  /// `shiftServerAlreadyInOpenShift`.
+  shiftInvalidDates,
+  shiftInvalidFloorManager,
+  shiftInvalidServer,
+  shiftTooManyServers,
+  shiftClosed,
+  shiftInvalidTransition,
+  shiftNotFound,
+  shiftFloorManagerAlreadyOpen,
+  shiftServerAlreadyInOpenShift,
 }
 
 /// Exception traduisible à l'affichage.

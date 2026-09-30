@@ -276,5 +276,24 @@ String _messageFor(AppLocalizations l10n, AppError error) {
         error.param('available'),
         error.param('required'),
       );
+
+    case AppErrorCode.shiftInvalidDates:
+      return l10n.errShiftInvalidDates;
+    case AppErrorCode.shiftInvalidFloorManager:
+      return l10n.errShiftInvalidFloorManager;
+    case AppErrorCode.shiftInvalidServer:
+      return l10n.errShiftInvalidServer(error.name ?? '');
+    case AppErrorCode.shiftTooManyServers:
+      return l10n.errShiftTooManyServers(error.param('max'));
+    case AppErrorCode.shiftClosed:
+      return l10n.errShiftClosed;
+    case AppErrorCode.shiftInvalidTransition:
+      return l10n.errShiftInvalidTransition;
+    case AppErrorCode.shiftNotFound:
+      return l10n.errShiftNotFound;
+    case AppErrorCode.shiftFloorManagerAlreadyOpen:
+      return l10n.errShiftFloorManagerAlreadyOpen;
+    case AppErrorCode.shiftServerAlreadyInOpenShift:
+      return l10n.errShiftServerAlreadyInOpenShift(error.name ?? '');
   }
 }

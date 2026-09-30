@@ -4405,4 +4405,154 @@ class AppLocalizationsEn extends AppLocalizations {
   String currentStockLine(String quantity, String unit) {
     return 'Current stock: $quantity $unit';
   }
+
+  @override
+  String get shiftsTitle => 'Shifts';
+
+  @override
+  String get shiftCreateTitle => 'New shift';
+
+  @override
+  String get shiftEditServersTitle => 'Shift servers';
+
+  @override
+  String get shiftFloorManagerLabel => 'Floor Manager';
+
+  @override
+  String get shiftServersLabel => 'Assigned servers';
+
+  @override
+  String get shiftStartsAtLabel => 'Start';
+
+  @override
+  String get shiftEndsAtLabel => 'End';
+
+  @override
+  String get shiftStatusPlanned => 'Planned';
+
+  @override
+  String get shiftStatusOpen => 'Open';
+
+  @override
+  String get shiftStatusClosed => 'Closed';
+
+  @override
+  String get shiftActionOpen => 'Open';
+
+  @override
+  String get shiftActionReopen => 'Reopen';
+
+  @override
+  String get shiftActionClose => 'Close';
+
+  @override
+  String get shiftActionEditServers => 'Servers';
+
+  @override
+  String get shiftNoShifts => 'No shifts yet.';
+
+  @override
+  String get shiftNoFloorManagerAvailable =>
+      'No active Floor Manager in this establishment.';
+
+  @override
+  String get shiftNoServerAvailable =>
+      'No active server in this establishment.';
+
+  @override
+  String shiftServersCount(int count) {
+    return '$count server(s)';
+  }
+
+  @override
+  String get shiftSaved => 'Shift saved.';
+
+  @override
+  String get errShiftInvalidDates => 'The shift must end after it starts.';
+
+  @override
+  String get errShiftInvalidFloorManager =>
+      'The selected Floor Manager is not an active Floor Manager of this establishment.';
+
+  @override
+  String errShiftInvalidServer(String name) {
+    return '\"$name\" is not an active server of this establishment.';
+  }
+
+  @override
+  String errShiftTooManyServers(String max) {
+    return 'A shift cannot have more than $max servers.';
+  }
+
+  @override
+  String get errShiftClosed =>
+      'This shift is closed: reopen it before changing its servers.';
+
+  @override
+  String get errShiftInvalidTransition => 'This status change is not allowed.';
+
+  @override
+  String get errShiftNotFound => 'Shift not found.';
+
+  @override
+  String get errShiftFloorManagerAlreadyOpen =>
+      'This Floor Manager already has an open shift. Close it first.';
+
+  @override
+  String errShiftServerAlreadyInOpenShift(String name) {
+    return '\"$name\" is already assigned to another open shift.';
+  }
+
+  @override
+  String get fmCurrentShiftTitle => 'Current shift';
+
+  @override
+  String fmActiveServersCount(int count) {
+    return 'Active servers: $count';
+  }
+
+  @override
+  String get fmNoShiftTitle => 'No shift in progress';
+
+  @override
+  String get fmNoShiftMessage =>
+      'You are not currently assigned to any open shift.';
+
+  @override
+  String get fmLoadError => 'Unable to load your shift.';
+
+  @override
+  String get fmActionOrders => 'Orders';
+
+  @override
+  String get fmActionOrdersSubtitle =>
+      'Direct order or for a server of the shift';
+
+  @override
+  String get fmActionPayments => 'Payments';
+
+  @override
+  String get fmActionPaymentsSubtitle =>
+      'Direct payment or for a server of the shift';
+
+  @override
+  String get fmDirectOrder => 'Direct order';
+
+  @override
+  String get fmDirectPayment => 'Direct payment';
+
+  @override
+  String get fmServers => 'Servers';
+
+  @override
+  String get fmServersSubtitle => 'Active servers of your shift';
+
+  @override
+  String get fmComingSoon => 'Coming soon';
+
+  @override
+  String get fmNoActiveServer => 'No active server in this shift.';
+
+  @override
+  String get fmServerOnDuty => 'On duty';
 }

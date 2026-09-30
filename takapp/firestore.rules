@@ -69,6 +69,107 @@ service cloud.firestore {
     function tenantReader(establishmentId) {
       return sameEstablishment(establishmentId) && !isFloorManager();
     }
+
+    // ─────────────── SERVICES (SHIFTS) : helpers ───────────────
+    // Créer / ouvrir / clôturer un service et y affecter des serveurs.
+    // Le Floor Manager n'en fait PAS partie.
+    function isShiftManager() {
+      return isGerante() || isAdminOrOwner();
+    }
+    function shiftDoc(establishmentId, shiftId) {
+      return /databases/$(database)/documents/establishments/$(establishmentId)/shifts/$(shiftId);
+    }
+    function fmPointerDoc(establishmentId, floorManagerId) {
+      return /databases/$(database)/documents/establishments/$(establishmentId)/floorManagerCurrentShift/$(floorManagerId);
+    }
+    function serverPointerDoc(establishmentId, serverId) {
+      return /databases/$(database)/documents/establishments/$(establishmentId)/serverCurrentShift/$(serverId);
+    }
+    // Compte existant, actif, du rôle attendu, dans CET établissement.
+    function isEstablishmentUser(uid, establishmentId, role) {
+      let u = get(/databases/$(database)/documents/users/$(uid)).data;
+      return u.get('role', '') == role &&
+        u.get('establishmentId', '') == establishmentId &&
+        u.get('isActive', true) != false;
+    }
+    function unchangedFields(fields) {
+      return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+    function validShiftData(establishmentId) {
+      let d = request.resource.data;
+      return d.keys().hasOnly([
+          'establishmentId', 'floorManagerId', 'floorManagerName',
+          'startsAt', 'endsAt', 'status', 'serverIds',
+          'createdAt', 'createdBy', 'updatedAt',
+          'openedAt', 'openedBy', 'closedAt', 'closedBy'
+        ]) &&
+        d.establishmentId == establishmentId &&
+        d.status in ['planned', 'open', 'closed'] &&
+        d.startsAt is timestamp && d.endsAt is timestamp &&
+        d.endsAt > d.startsAt &&
+        d.serverIds is list && d.serverIds.size() <= 12 &&
+        !(d.floorManagerId in d.serverIds);
+    }
+    // Floor Manager actif de cet établissement : exigé pour créer, ouvrir ou
+    // modifier un service, PAS pour le clôturer (un compte désactivé ne doit
+    // pas empêcher la clôture).
+    function validShiftFloorManager(establishmentId) {
+      return request.resource.data.status == 'closed' ||
+        isEstablishmentUser(request.resource.data.floorManagerId, establishmentId, 'floor_manager');
+    }
+    // planned -> open | closed ; open -> closed ; closed -> open (réouverture
+    // explicite). Un service clôturé n'est plus modifiable autrement.
+    // Ouvrir exige que le pointeur du Floor Manager désigne CE service dans le
+    // même lot : c'est ce qui interdit deux services ouverts simultanés.
+    function validShiftTransition(establishmentId, shiftId) {
+      let before = resource.data.status;
+      let after = request.resource.data.status;
+      let sameServers = request.resource.data.serverIds == resource.data.serverIds;
+      return (before == after && before != 'closed') ||
+        (
+          after == 'open' && before in ['planned', 'closed'] && sameServers &&
+          existsAfter(fmPointerDoc(establishmentId, request.resource.data.floorManagerId)) &&
+          getAfter(fmPointerDoc(establishmentId, request.resource.data.floorManagerId)).data.openShiftId == shiftId
+        ) ||
+        (after == 'closed' && before in ['planned', 'open'] && sameServers);
+    }
+    function validParticipant(establishmentId, shiftId, serverId) {
+      let d = request.resource.data;
+      let shift = getAfter(shiftDoc(establishmentId, shiftId)).data;
+      return d.keys().hasOnly([
+          'shiftId', 'establishmentId', 'serverId', 'serverName',
+          'assignedAt', 'assignedBy', 'activeInShift', 'removedAt', 'removedBy'
+        ]) &&
+        d.shiftId == shiftId &&
+        d.establishmentId == establishmentId &&
+        d.serverId == serverId &&
+        d.activeInShift is bool &&
+        d.activeInShift == (serverId in shift.serverIds) &&
+        shift.status != 'closed' &&
+        (d.activeInShift == false || isEstablishmentUser(serverId, establishmentId, 'serveur'));
+    }
+    // Un pointeur « service courant » ne peut quitter un service encore
+    // ouvert (pour un serveur : un service ouvert dont il fait partie).
+    function fmPointerReleased(establishmentId, previousShiftId, nextShiftId) {
+      return previousShiftId == nextShiftId ||
+        getAfter(shiftDoc(establishmentId, previousShiftId)).data.status != 'open';
+    }
+    function serverPointerReleased(establishmentId, previousShiftId, nextShiftId, serverId) {
+      return previousShiftId == nextShiftId ||
+        getAfter(shiftDoc(establishmentId, previousShiftId)).data.status != 'open' ||
+        !(serverId in getAfter(shiftDoc(establishmentId, previousShiftId)).data.serverIds);
+    }
+    // Le Floor Manager lit le profil d'un serveur UNIQUEMENT s'il est présent
+    // dans son service actuellement ouvert.
+    function isServerOfMyOpenShift(serverId) {
+      let e = userEstablishmentId();
+      let pointer = serverPointerDoc(e, serverId);
+      return exists(pointer) &&
+        get(pointer).data.floorManagerId == request.auth.uid &&
+        get(shiftDoc(e, get(pointer).data.openShiftId)).data.status == 'open' &&
+        get(shiftDoc(e, get(pointer).data.openShiftId)).data.floorManagerId == request.auth.uid &&
+        serverId in get(shiftDoc(e, get(pointer).data.openShiftId)).data.serverIds;
+    }
     function sameEstablishment(establishmentId) {
       return isSignedIn() && (
         isSuperAdmin() ||
@@ -132,6 +233,12 @@ service cloud.firestore {
         (
           (isAdminOrOwner() || isGerante()) &&
           resource.data.establishmentId == userEstablishmentId()
+        ) ||
+        (
+          isFloorManager() &&
+          resource.data.establishmentId == userEstablishmentId() &&
+          resource.data.role == 'serveur' &&
+          isServerOfMyOpenShift(userId)
         )
       );
       // Root profiles are created by the authenticated Admin SDK callables.
@@ -525,6 +632,90 @@ service cloud.firestore {
           isGerante() || isAccounting() || isAdminOrOwner()
         );
         allow delete: if sameEstablishment(establishmentId) && isAdminOrOwner();
+      }
+
+      // ─────────────── SERVICES (SHIFTS) ───────────────
+      match /shifts/{shiftId} {
+        allow read: if sameEstablishment(establishmentId) && (
+          isShiftManager() ||
+          (isFloorManager() && resource.data.floorManagerId == request.auth.uid) ||
+          (isServeur() && request.auth.uid in resource.data.serverIds)
+        );
+        allow create: if sameEstablishment(establishmentId) && isShiftManager() &&
+          validShiftData(establishmentId) &&
+          validShiftFloorManager(establishmentId) &&
+          request.resource.data.status == 'planned' &&
+          request.resource.data.createdBy == request.auth.uid;
+        allow update: if sameEstablishment(establishmentId) && isShiftManager() &&
+          validShiftData(establishmentId) &&
+          validShiftFloorManager(establishmentId) &&
+          unchangedFields([
+            'establishmentId', 'floorManagerId', 'floorManagerName',
+            'createdAt', 'createdBy'
+          ]) &&
+          validShiftTransition(establishmentId, shiftId);
+        // Historique conservé.
+        allow delete: if false;
+
+        match /participants/{serverId} {
+          allow read: if sameEstablishment(establishmentId) && (
+            isShiftManager() ||
+            (
+              isFloorManager() &&
+              get(shiftDoc(establishmentId, shiftId)).data.floorManagerId == request.auth.uid
+            ) ||
+            (isServeur() && serverId == request.auth.uid)
+          );
+          allow create, update: if sameEstablishment(establishmentId) &&
+            isShiftManager() &&
+            validParticipant(establishmentId, shiftId, serverId);
+          allow delete: if false;
+        }
+      }
+
+      // Pointeur vers le dernier service OUVERT d'un Floor Manager.
+      match /floorManagerCurrentShift/{floorManagerId} {
+        allow read: if sameEstablishment(establishmentId) && (
+          isShiftManager() || request.auth.uid == floorManagerId
+        );
+        allow create, update: if sameEstablishment(establishmentId) &&
+          isShiftManager() &&
+          request.resource.data.keys().hasOnly([
+            'floorManagerId', 'openShiftId', 'updatedAt', 'updatedBy'
+          ]) &&
+          request.resource.data.floorManagerId == floorManagerId &&
+          request.resource.data.openShiftId is string &&
+          getAfter(shiftDoc(establishmentId, request.resource.data.openShiftId)).data.status == 'open' &&
+          getAfter(shiftDoc(establishmentId, request.resource.data.openShiftId)).data.floorManagerId == floorManagerId &&
+          (
+            resource == null ||
+            fmPointerReleased(establishmentId, resource.data.openShiftId, request.resource.data.openShiftId)
+          );
+        allow delete: if false;
+      }
+
+      // Pointeur vers le dernier service OUVERT d'un serveur.
+      match /serverCurrentShift/{serverId} {
+        allow read: if sameEstablishment(establishmentId) && (
+          isShiftManager() ||
+          request.auth.uid == serverId ||
+          (isFloorManager() && resource.data.floorManagerId == request.auth.uid)
+        );
+        allow create, update: if sameEstablishment(establishmentId) &&
+          isShiftManager() &&
+          request.resource.data.keys().hasOnly([
+            'serverId', 'openShiftId', 'floorManagerId', 'updatedAt', 'updatedBy'
+          ]) &&
+          request.resource.data.serverId == serverId &&
+          request.resource.data.openShiftId is string &&
+          getAfter(shiftDoc(establishmentId, request.resource.data.openShiftId)).data.status == 'open' &&
+          getAfter(shiftDoc(establishmentId, request.resource.data.openShiftId)).data.floorManagerId == request.resource.data.floorManagerId &&
+          serverId in getAfter(shiftDoc(establishmentId, request.resource.data.openShiftId)).data.serverIds &&
+          (
+            resource == null ||
+            serverPointerReleased(establishmentId, resource.data.openShiftId, request.resource.data.openShiftId, serverId)
+          );
+        allow delete: if false;
       }
 
       // PAS de filet de lecture « tout le tenant » ici : les règles Firestore

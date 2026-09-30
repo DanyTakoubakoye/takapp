@@ -2984,5 +2984,84 @@
         "type": "String"
       }
     }
-  }
+  },
+  "shiftsTitle": "Services (shifts)",
+  "shiftCreateTitle": "Nouveau service",
+  "shiftEditServersTitle": "Serveurs du service",
+  "shiftFloorManagerLabel": "Floor Manager",
+  "shiftServersLabel": "Serveurs affectés",
+  "shiftStartsAtLabel": "Début",
+  "shiftEndsAtLabel": "Fin",
+  "shiftStatusPlanned": "Planifié",
+  "shiftStatusOpen": "Ouvert",
+  "shiftStatusClosed": "Clôturé",
+  "shiftActionOpen": "Ouvrir",
+  "shiftActionReopen": "Rouvrir",
+  "shiftActionClose": "Clôturer",
+  "shiftActionEditServers": "Serveurs",
+  "shiftNoShifts": "Aucun service pour le moment.",
+  "shiftNoFloorManagerAvailable": "Aucun Floor Manager actif dans l'établissement.",
+  "shiftNoServerAvailable": "Aucun serveur actif dans l'établissement.",
+  "shiftServersCount": "{count} serveur(s)",
+  "@shiftServersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "shiftSaved": "Service enregistré.",
+  "errShiftInvalidDates": "La fin du service doit être postérieure à son début.",
+  "errShiftInvalidFloorManager": "Le Floor Manager choisi n'est pas un Floor Manager actif de cet établissement.",
+  "errShiftInvalidServer": "« {name} » n'est pas un serveur actif de cet établissement.",
+  "@errShiftInvalidServer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errShiftTooManyServers": "Un service ne peut pas compter plus de {max} serveurs.",
+  "@errShiftTooManyServers": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "errShiftClosed": "Ce service est clôturé : rouvrez-le avant de modifier ses serveurs.",
+  "errShiftInvalidTransition": "Ce changement de statut n'est pas autorisé.",
+  "errShiftNotFound": "Service introuvable.",
+  "errShiftFloorManagerAlreadyOpen": "Ce Floor Manager a déjà un service ouvert. Clôturez-le d'abord.",
+  "errShiftServerAlreadyInOpenShift": "« {name} » est déjà affecté à un autre service ouvert.",
+  "@errShiftServerAlreadyInOpenShift": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "fmCurrentShiftTitle": "Service en cours",
+  "fmActiveServersCount": "Serveurs actifs : {count}",
+  "@fmActiveServersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fmNoShiftTitle": "Aucun service en cours",
+  "fmNoShiftMessage": "Vous n'êtes actuellement affecté à aucun service ouvert.",
+  "fmLoadError": "Impossible de charger votre service.",
+  "fmActionOrders": "Commandes",
+  "fmActionOrdersSubtitle": "Commande directe ou pour un serveur du service",
+  "fmActionPayments": "Encaissements",
+  "fmActionPaymentsSubtitle": "Encaissement direct ou pour un serveur du service",
+  "fmDirectOrder": "Commande directe",
+  "fmDirectPayment": "Encaissement direct",
+  "fmServers": "Serveurs",
+  "fmServersSubtitle": "Serveurs actifs de votre service",
+  "fmComingSoon": "Bientôt disponible",
+  "fmNoActiveServer": "Aucun serveur actif dans ce service.",
+  "fmServerOnDuty": "En service"
 }

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/core/constants/app_roles.dart';
-import 'package:takapp/core/l10n/locale_controller.dart';
-import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/l10n/app_localizations_en.dart';
 import 'package:takapp/l10n/app_localizations_fr.dart';
 import 'package:takapp/modeles/user_model.dart';
@@ -212,35 +209,6 @@ void main() {
     });
   });
 
-  testWidgets('FloorManagerHomePage shows only the placeholder', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider<AuthController>.value(
-            value: _FakeAuthController(_user('floor_manager')),
-          ),
-          ChangeNotifierProvider<LocaleController>(
-            create: (_) => LocaleController(),
-          ),
-        ],
-        child: const MaterialApp(
-          locale: Locale('fr'),
-          localizationsDelegates: [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: LocaleController.supportedLocales,
-          home: FloorManagerHomePage(),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.text('Floor Manager'), findsOneWidget);
-    expect(find.text('Espace Floor Manager'), findsOneWidget);
-  });
+  // L'affichage de FloorManagerHomePage est couvert par
+  // floor_manager_dashboard_test.dart.
 }

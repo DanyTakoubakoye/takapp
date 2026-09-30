@@ -7750,6 +7750,270 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Stock actuel : {quantity} {unit}'**
   String currentStockLine(String quantity, String unit);
+
+  /// No description provided for @shiftsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Services (shifts)'**
+  String get shiftsTitle;
+
+  /// No description provided for @shiftCreateTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouveau service'**
+  String get shiftCreateTitle;
+
+  /// No description provided for @shiftEditServersTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Serveurs du service'**
+  String get shiftEditServersTitle;
+
+  /// No description provided for @shiftFloorManagerLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Floor Manager'**
+  String get shiftFloorManagerLabel;
+
+  /// No description provided for @shiftServersLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Serveurs affectés'**
+  String get shiftServersLabel;
+
+  /// No description provided for @shiftStartsAtLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Début'**
+  String get shiftStartsAtLabel;
+
+  /// No description provided for @shiftEndsAtLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fin'**
+  String get shiftEndsAtLabel;
+
+  /// No description provided for @shiftStatusPlanned.
+  ///
+  /// In fr, this message translates to:
+  /// **'Planifié'**
+  String get shiftStatusPlanned;
+
+  /// No description provided for @shiftStatusOpen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouvert'**
+  String get shiftStatusOpen;
+
+  /// No description provided for @shiftStatusClosed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clôturé'**
+  String get shiftStatusClosed;
+
+  /// No description provided for @shiftActionOpen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ouvrir'**
+  String get shiftActionOpen;
+
+  /// No description provided for @shiftActionReopen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rouvrir'**
+  String get shiftActionReopen;
+
+  /// No description provided for @shiftActionClose.
+  ///
+  /// In fr, this message translates to:
+  /// **'Clôturer'**
+  String get shiftActionClose;
+
+  /// No description provided for @shiftActionEditServers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Serveurs'**
+  String get shiftActionEditServers;
+
+  /// No description provided for @shiftNoShifts.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun service pour le moment.'**
+  String get shiftNoShifts;
+
+  /// No description provided for @shiftNoFloorManagerAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun Floor Manager actif dans l\'établissement.'**
+  String get shiftNoFloorManagerAvailable;
+
+  /// No description provided for @shiftNoServerAvailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun serveur actif dans l\'établissement.'**
+  String get shiftNoServerAvailable;
+
+  /// No description provided for @shiftServersCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count} serveur(s)'**
+  String shiftServersCount(int count);
+
+  /// No description provided for @shiftSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Service enregistré.'**
+  String get shiftSaved;
+
+  /// No description provided for @errShiftInvalidDates.
+  ///
+  /// In fr, this message translates to:
+  /// **'La fin du service doit être postérieure à son début.'**
+  String get errShiftInvalidDates;
+
+  /// No description provided for @errShiftInvalidFloorManager.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le Floor Manager choisi n\'est pas un Floor Manager actif de cet établissement.'**
+  String get errShiftInvalidFloorManager;
+
+  /// No description provided for @errShiftInvalidServer.
+  ///
+  /// In fr, this message translates to:
+  /// **'« {name} » n\'est pas un serveur actif de cet établissement.'**
+  String errShiftInvalidServer(String name);
+
+  /// No description provided for @errShiftTooManyServers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un service ne peut pas compter plus de {max} serveurs.'**
+  String errShiftTooManyServers(String max);
+
+  /// No description provided for @errShiftClosed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce service est clôturé : rouvrez-le avant de modifier ses serveurs.'**
+  String get errShiftClosed;
+
+  /// No description provided for @errShiftInvalidTransition.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce changement de statut n\'est pas autorisé.'**
+  String get errShiftInvalidTransition;
+
+  /// No description provided for @errShiftNotFound.
+  ///
+  /// In fr, this message translates to:
+  /// **'Service introuvable.'**
+  String get errShiftNotFound;
+
+  /// No description provided for @errShiftFloorManagerAlreadyOpen.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce Floor Manager a déjà un service ouvert. Clôturez-le d\'abord.'**
+  String get errShiftFloorManagerAlreadyOpen;
+
+  /// No description provided for @errShiftServerAlreadyInOpenShift.
+  ///
+  /// In fr, this message translates to:
+  /// **'« {name} » est déjà affecté à un autre service ouvert.'**
+  String errShiftServerAlreadyInOpenShift(String name);
+
+  /// No description provided for @fmCurrentShiftTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Service en cours'**
+  String get fmCurrentShiftTitle;
+
+  /// No description provided for @fmActiveServersCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Serveurs actifs : {count}'**
+  String fmActiveServersCount(int count);
+
+  /// No description provided for @fmNoShiftTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun service en cours'**
+  String get fmNoShiftTitle;
+
+  /// No description provided for @fmNoShiftMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous n\'êtes actuellement affecté à aucun service ouvert.'**
+  String get fmNoShiftMessage;
+
+  /// No description provided for @fmLoadError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de charger votre service.'**
+  String get fmLoadError;
+
+  /// No description provided for @fmActionOrders.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commandes'**
+  String get fmActionOrders;
+
+  /// No description provided for @fmActionOrdersSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande directe ou pour un serveur du service'**
+  String get fmActionOrdersSubtitle;
+
+  /// No description provided for @fmActionPayments.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaissements'**
+  String get fmActionPayments;
+
+  /// No description provided for @fmActionPaymentsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaissement direct ou pour un serveur du service'**
+  String get fmActionPaymentsSubtitle;
+
+  /// No description provided for @fmDirectOrder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande directe'**
+  String get fmDirectOrder;
+
+  /// No description provided for @fmDirectPayment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Encaissement direct'**
+  String get fmDirectPayment;
+
+  /// No description provided for @fmServers.
+  ///
+  /// In fr, this message translates to:
+  /// **'Serveurs'**
+  String get fmServers;
+
+  /// No description provided for @fmServersSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Serveurs actifs de votre service'**
+  String get fmServersSubtitle;
+
+  /// No description provided for @fmComingSoon.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bientôt disponible'**
+  String get fmComingSoon;
+
+  /// No description provided for @fmNoActiveServer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun serveur actif dans ce service.'**
+  String get fmNoActiveServer;
+
+  /// No description provided for @fmServerOnDuty.
+  ///
+  /// In fr, this message translates to:
+  /// **'En service'**
+  String get fmServerOnDuty;
 }
 
 class _AppLocalizationsDelegate

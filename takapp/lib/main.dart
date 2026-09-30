@@ -7,6 +7,7 @@ import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/comptabilite_controller.dart';
 import 'package:takapp/controllers/establishment_config_controller.dart';
 import 'package:takapp/controllers/fiscalization_controller.dart';
+import 'package:takapp/controllers/floor_manager_shift_controller.dart';
 import 'package:takapp/controllers/gerante_handover_controller.dart';
 import 'package:takapp/controllers/handover_controller.dart';
 import 'package:takapp/controllers/hygiene_daily_controller.dart';
@@ -15,6 +16,7 @@ import 'package:takapp/controllers/owner_dashboard_controller.dart';
 import 'package:takapp/controllers/payment_controller.dart';
 import 'package:takapp/controllers/room_consumption_controller.dart';
 import 'package:takapp/controllers/serveur_controller.dart';
+import 'package:takapp/controllers/shift_controller.dart';
 import 'package:takapp/controllers/stock_request_controller.dart';
 import 'package:takapp/controllers/store_stock_controller.dart';
 
@@ -34,6 +36,7 @@ import 'package:takapp/services/owner_dashboard_service.dart';
 import 'package:takapp/services/payment_service.dart';
 import 'package:takapp/services/pdf_service.dart';
 import 'package:takapp/services/printer_service.dart';
+import 'package:takapp/services/shift_service.dart';
 
 import 'package:takapp/vues/commun/home_router.dart';
 
@@ -133,6 +136,7 @@ class MyApp extends StatelessWidget {
         ),
         Provider<ComptabiliteService>(create: (_) => ComptabiliteService()),
         Provider<OwnerDashboardService>(create: (_) => OwnerDashboardService()),
+        Provider<ShiftService>(create: (_) => ShiftService()),
 
         ChangeNotifierProvider(create: (_) => FiscalizationController()),
         ChangeNotifierProvider(create: (_) => StoreStockController()),
@@ -189,6 +193,28 @@ class MyApp extends StatelessWidget {
               OwnerDashboardController(context.read<OwnerDashboardService>()),
           update: (context, service, previous) =>
               previous ?? OwnerDashboardController(service),
+        ),
+
+        ChangeNotifierProxyProvider<ShiftService, ShiftController>(
+          create: (context) => ShiftController(context.read<ShiftService>()),
+          update: (context, service, previous) =>
+              previous ?? ShiftController(service),
+        ),
+
+        // Service courant du Floor Manager connecté (temps réel).
+        ChangeNotifierProxyProvider<
+          AuthController,
+          FloorManagerShiftController
+        >(
+          create: (context) =>
+              FloorManagerShiftController(context.read<ShiftService>()),
+          update: (context, auth, previous) {
+            final controller =
+                previous ??
+                FloorManagerShiftController(context.read<ShiftService>());
+            controller.setCurrentUser(auth.currentUser);
+            return controller;
+          },
         ),
       ],
       child: Consumer<LocaleController>(
