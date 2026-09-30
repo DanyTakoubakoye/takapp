@@ -336,6 +336,8 @@ class SuiviBarPage extends StatelessWidget {
             .collection('establishments')
             .doc(safeEstablishmentId)
             .collection('orders')
+            // Serveur responsable (createdBy = assignedServerId, anciennes
+            // commandes comprises).
             .where('createdBy', isEqualTo: serveurId)
             .where('isForBar', isEqualTo: true)
             .snapshots(),

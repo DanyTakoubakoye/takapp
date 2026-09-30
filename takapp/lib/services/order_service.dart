@@ -1,9 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:takapp/core/errors/app_error.dart';
+import 'package:takapp/modeles/order_actor_context.dart';
 import 'package:takapp/modeles/order_item_model.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
 import 'package:takapp/modeles/order_model.dart';
+import 'package:takapp/modeles/shift_model.dart';
 import 'package:takapp/modeles/stock_mode.dart';
+import 'package:takapp/modeles/user_model.dart';
+import 'package:takapp/services/order_actor_policy.dart';
 import 'package:takapp/services/order_stock_policy.dart';
 import 'package:takapp/services/store_stock_service.dart';
 
@@ -43,6 +48,13 @@ class _TicketResolution {
 class OrderService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final StoreStockService _storeStockService = StoreStockService();
+
+  /// UID Firebase Auth de la session : seule source de l'auteur réel.
+  final String? Function() _currentUserId;
+
+  OrderService({String? Function()? currentUserId})
+    : _currentUserId =
+          currentUserId ?? (() => FirebaseAuth.instance.currentUser?.uid);
 
   CollectionReference<Map<String, dynamic>> _ordersRef(String establishmentId) {
     return _firestore
@@ -233,13 +245,17 @@ class OrderService {
 
     /// Fiche client rattachée. Optionnel : chaîne vide = non rattachée.
     String clientId = '',
-    required String createdBy,
-    required String createdByName,
+
+    /// Qui saisit, et pour quel serveur (voir [OrderActorContext]).
+    required OrderActorContext actor,
     required double subtotal,
     required double tax,
     required double total,
     required List<OrderItemModel> items,
   }) async {
+    // 0. L'acteur avant tout : rien n'est lu ni écrit pour un acteur refusé.
+    await _validateActor(establishmentId, actor);
+
     final now = DateTime.now();
 
     final orderNumber =
@@ -358,8 +374,9 @@ class OrderService {
         'tableNumber': tableNumber,
         'roomNumber': roomNumber,
         'clientId': clientId.trim(),
-        'createdBy': createdBy,
-        'createdByName': createdByName,
+        // createdBy (= serveur responsable pendant la transition),
+        // performedBy*, assignedServer*, shiftId.
+        ...actor.toOrderFields(),
         'status': 'sent',
         'subtotal': subtotal,
         'tax': tax,
@@ -401,8 +418,9 @@ class OrderService {
         establishmentId: establishmentId,
         orderId: docRef.id,
         orderNumber: orderNumber,
-        performedBy: createdBy,
-        performedByName: createdByName,
+        // Audit du stock : l'auteur RÉEL de la saisie.
+        performedBy: actor.performedByUserId,
+        performedByName: actor.performedByUserName,
         deductions: plan.deductions,
         stockRefs: stockRefs,
       );
@@ -422,6 +440,67 @@ class OrderService {
       stockMode: stockMode,
       stockWarnings: plan.anomalies,
     );
+  }
+
+  /// Défense côté client de l'acteur (voir [OrderActorPolicy]) : l'auteur
+  /// réel doit être l'UID authentifié, et un Floor Manager ne peut saisir
+  /// que dans SON service ouvert, pour lui-même ou pour un serveur présent.
+  /// L'autorité reste firestore.rules (`validOrderActor`).
+  Future<void> _validateActor(
+    String establishmentId,
+    OrderActorContext actor,
+  ) async {
+    ShiftModel? shift;
+    String? serverPointer;
+    UserModel? assignedServer;
+
+    final shiftId = actor.shiftId;
+    if (actor.isFloorManager && shiftId != null && shiftId.isNotEmpty) {
+      final establishment = _firestore
+          .collection('establishments')
+          .doc(establishmentId);
+      try {
+        final shiftSnap = await establishment
+            .collection('shifts')
+            .doc(shiftId)
+            .get();
+        final shiftData = shiftSnap.data();
+        if (shiftSnap.exists && shiftData != null) {
+          shift = ShiftModel.fromMap(shiftData, shiftSnap.id);
+        }
+
+        if (actor.isDelegated) {
+          final pointer = await establishment
+              .collection('serverCurrentShift')
+              .doc(actor.assignedServerId)
+              .get();
+          serverPointer = pointer.data()?['openShiftId']?.toString();
+
+          final userSnap = await _firestore
+              .collection('users')
+              .doc(actor.assignedServerId)
+              .get();
+          final userData = userSnap.data();
+          if (userSnap.exists && userData != null) {
+            assignedServer = UserModel.fromMap(userData, userSnap.id);
+          }
+        }
+      } on FirebaseException catch (e) {
+        // Lecture refusée par les règles = hors de son service : la
+        // politique le refusera avec un message clair.
+        if (e.code != 'permission-denied') rethrow;
+      }
+    }
+
+    final error = OrderActorPolicy.validate(
+      actor: actor,
+      authenticatedUid: _currentUserId(),
+      establishmentId: establishmentId,
+      shift: shift,
+      assignedServerPointer: serverPointer,
+      assignedServer: assignedServer,
+    );
+    if (error != null) throw error;
   }
 
   /// =========================

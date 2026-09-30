@@ -3,6 +3,7 @@ import 'package:takapp/core/errors/app_error.dart';
 import 'package:takapp/core/errors/error_localizer.dart';
 import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
+import 'package:takapp/modeles/order_actor_context.dart';
 import 'package:takapp/modeles/order_item_model.dart';
 import 'package:takapp/services/order_service.dart';
 import 'package:takapp/services/order_stock_policy.dart';
@@ -219,8 +220,11 @@ class OrderController extends ChangeNotifier {
     required String clientType,
     required String? tableNumber,
     required String? roomNumber,
-    required String createdBy,
-    required String createdByName,
+
+    /// Auteur réel et serveur responsable. Construit à partir de
+    /// l'utilisateur connecté (`OrderActorContext.self(user)` pour une
+    /// commande classique), jamais de valeurs libres.
+    required OrderActorContext actor,
     required String establishmentId,
 
     /// Fiche client rattachée. Optionnel : chaîne vide = non rattachée.
@@ -271,8 +275,7 @@ class OrderController extends ChangeNotifier {
         tableNumber: tableNumber?.trim(),
         roomNumber: roomNumber?.trim(),
         clientId: clientId.trim(),
-        createdBy: createdBy,
-        createdByName: createdByName,
+        actor: actor,
         subtotal: subtotal,
         tax: tax,
         total: total,

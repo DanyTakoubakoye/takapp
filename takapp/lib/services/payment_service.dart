@@ -53,6 +53,9 @@ class PaymentService {
   }) {
     _validateEstablishmentId(establishmentId);
 
+    // Serveur RESPONSABLE : pendant la transition, createdBy vaut
+    // assignedServerId pour toutes les commandes, anciennes comprises.
+    // Filtrer sur assignedServerId ferait disparaître les anciennes.
     return _ordersRef(establishmentId: establishmentId)
         .where('createdBy', isEqualTo: serveurId)
         .where('paymentStatus', isEqualTo: 'unpaid')
@@ -105,6 +108,7 @@ class PaymentService {
     final startOfDay = DateTime(day.year, day.month, day.day);
     final endOfDay = startOfDay.add(const Duration(days: 1));
 
+    // Serveur RESPONSABLE (createdBy = assignedServerId, anciennes incluses).
     return _ordersRef(establishmentId: establishmentId)
         .where('createdBy', isEqualTo: serveurId)
         .where(

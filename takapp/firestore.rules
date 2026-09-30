@@ -159,6 +159,42 @@ service cloud.firestore {
         getAfter(shiftDoc(establishmentId, previousShiftId)).data.status != 'open' ||
         !(serverId in getAfter(shiftDoc(establishmentId, previousShiftId)).data.serverIds);
     }
+    // ─────────────── COMMANDES : acteur ───────────────
+    // Auteur réel (performedByUserId) = TOUJOURS l'utilisateur authentifié.
+    // Serveur responsable (assignedServerId, miroir de createdBy pendant la
+    // transition) :
+    // - serveur, gérante, propriétaire, admin : soi-même uniquement ;
+    // - floor_manager : soi-même ou un serveur présent dans SON service
+    //   ouvert (shiftId obligatoire).
+    // Anciens clients (sans performedBy / assignedServer) : createdBy doit
+    // alors être l'utilisateur authentifié.
+    function fmOpenShift(establishmentId, shiftId) {
+      return shiftId is string && shiftId != '' &&
+        exists(shiftDoc(establishmentId, shiftId)) &&
+        get(shiftDoc(establishmentId, shiftId)).data.status == 'open' &&
+        get(shiftDoc(establishmentId, shiftId)).data.floorManagerId == request.auth.uid;
+    }
+    function fmCanAssign(establishmentId, shiftId, serverId) {
+      return serverId in get(shiftDoc(establishmentId, shiftId)).data.serverIds &&
+        exists(serverPointerDoc(establishmentId, serverId)) &&
+        get(serverPointerDoc(establishmentId, serverId)).data.openShiftId == shiftId &&
+        isEstablishmentUser(serverId, establishmentId, 'serveur');
+    }
+    function validOrderActor(establishmentId) {
+      let d = request.resource.data;
+      let assigned = d.get('assignedServerId', d.get('createdBy', ''));
+      let shiftId = d.get('shiftId', null);
+      return d.get('performedByUserId', request.auth.uid) == request.auth.uid &&
+        d.get('createdBy', '') == assigned &&
+        (
+          (!isFloorManager() && assigned == request.auth.uid && shiftId == null) ||
+          (
+            isFloorManager() && fmOpenShift(establishmentId, shiftId) &&
+            (assigned == request.auth.uid || fmCanAssign(establishmentId, shiftId, assigned))
+          )
+        );
+    }
+
     // Le Floor Manager lit le profil d'un serveur UNIQUEMENT s'il est présent
     // dans son service actuellement ouvert.
     function isServerOfMyOpenShift(serverId) {
@@ -396,18 +432,30 @@ service cloud.firestore {
         }
       match /orders/{orderId} {
         allow read: if tenantReader(establishmentId);
+        // Acteur validé (auteur réel = auth.uid, serveur responsable
+        // autorisé) : voir validOrderActor.
         allow create: if sameEstablishment(establishmentId) && (
-          isServeur() || isGerante() || isAdminOrOwner()
-        );
+          isServeur() || isGerante() || isAdminOrOwner() || isFloorManager()
+        ) && validOrderActor(establishmentId);
+        // Les acteurs sont figés à la création.
         allow update: if sameEstablishment(establishmentId) && (
           isServeur() || isGerante() || isChefCuisine() || isBarman() || isAdminOrOwner()
-        );
+        ) && unchangedFields([
+          'createdBy', 'createdByName',
+          'performedByUserId', 'performedByUserName',
+          'assignedServerId', 'assignedServerName', 'shiftId'
+        ]);
         allow delete: if sameEstablishment(establishmentId) &&
           (isAdminOrOwner() || isGerante());
         match /items/{itemId} {
           allow read: if tenantReader(establishmentId);
           allow create: if sameEstablishment(establishmentId) && (
-            isServeur() || isGerante() || isAdminOrOwner()
+            isServeur() || isGerante() || isAdminOrOwner() ||
+            // Floor Manager : lignes de SA commande uniquement.
+            (
+              isFloorManager() &&
+              getAfter(/databases/$(database)/documents/establishments/$(establishmentId)/orders/$(orderId)).data.get('performedByUserId', '') == request.auth.uid
+            )
           );
           allow update: if sameEstablishment(establishmentId) && (
             isServeur() || isGerante() || isChefCuisine() || isBarman() || isAdminOrOwner()

@@ -3063,5 +3063,16 @@
   "fmServersSubtitle": "Serveurs actifs de votre service",
   "fmComingSoon": "Bientôt disponible",
   "fmNoActiveServer": "Aucun serveur actif dans ce service.",
-  "fmServerOnDuty": "En service"
+  "fmServerOnDuty": "En service",
+  "errOrderActorMismatch": "La commande doit être saisie au nom de l'utilisateur connecté. Reconnectez-vous.",
+  "errOrderAssignmentForbidden": "Vous ne pouvez pas attribuer une commande à un autre serveur.",
+  "errOrderNoOpenShift": "Aucun service ouvert : impossible de saisir une commande.",
+  "errOrderServerNotInShift": "« {name} » n'est pas un serveur actif de votre service.",
+  "@errOrderServerNotInShift": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

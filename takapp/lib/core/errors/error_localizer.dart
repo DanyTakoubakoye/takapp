@@ -295,5 +295,14 @@ String _messageFor(AppLocalizations l10n, AppError error) {
       return l10n.errShiftFloorManagerAlreadyOpen;
     case AppErrorCode.shiftServerAlreadyInOpenShift:
       return l10n.errShiftServerAlreadyInOpenShift(error.name ?? '');
+
+    case AppErrorCode.orderActorMismatch:
+      return l10n.errOrderActorMismatch;
+    case AppErrorCode.orderAssignmentForbidden:
+      return l10n.errOrderAssignmentForbidden;
+    case AppErrorCode.orderNoOpenShift:
+      return l10n.errOrderNoOpenShift;
+    case AppErrorCode.orderServerNotInShift:
+      return l10n.errOrderServerNotInShift(error.name ?? '');
   }
 }

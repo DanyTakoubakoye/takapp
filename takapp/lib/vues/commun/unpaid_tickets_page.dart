@@ -49,7 +49,7 @@ class UnpaidTicketsPage extends StatelessWidget {
               : allTickets
                     .where(
                       (ticket) => ticket.orders.any(
-                        (order) => order.createdBy == serveurId,
+                        (order) => order.effectiveAssignedServerId == serveurId,
                       ),
                     )
                     .toList();
@@ -206,7 +206,7 @@ class _TicketCard extends StatelessWidget {
               Text(
                 ticket.isMultiOrder
                     ? l10n.ordersCount('${ticket.orders.length}')
-                    : primary.createdByName,
+                    : primary.effectiveAssignedServerName,
                 style: TextStyle(color: Colors.grey.shade600),
               ),
               const SizedBox(height: 5),

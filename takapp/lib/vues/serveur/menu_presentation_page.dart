@@ -12,6 +12,7 @@ import 'package:takapp/services/menu_service.dart';
 import 'package:takapp/vues/commun/client_picker_sheet.dart';
 import 'package:takapp/vues/commun/module_visibility.dart';
 import 'package:takapp/vues/serveur/order_submitted_feedback.dart';
+import 'package:takapp/modeles/order_actor_context.dart';
 
 class MenuPresentationPage extends StatefulWidget {
   const MenuPresentationPage({super.key});
@@ -1318,8 +1319,8 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
       clientType: clientType,
       tableNumber: tableController.text.trim(),
       roomNumber: roomController.text.trim(),
-      createdBy: user.uid,
-      createdByName: user.name,
+      // Commande classique : auteur réel = serveur responsable = connecté.
+      actor: OrderActorContext.self(user),
       clientId: _selectedClientId,
     );
 

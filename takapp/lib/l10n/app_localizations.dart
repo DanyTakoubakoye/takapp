@@ -8014,6 +8014,30 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'En service'**
   String get fmServerOnDuty;
+
+  /// No description provided for @errOrderActorMismatch.
+  ///
+  /// In fr, this message translates to:
+  /// **'La commande doit être saisie au nom de l\'utilisateur connecté. Reconnectez-vous.'**
+  String get errOrderActorMismatch;
+
+  /// No description provided for @errOrderAssignmentForbidden.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous ne pouvez pas attribuer une commande à un autre serveur.'**
+  String get errOrderAssignmentForbidden;
+
+  /// No description provided for @errOrderNoOpenShift.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun service ouvert : impossible de saisir une commande.'**
+  String get errOrderNoOpenShift;
+
+  /// No description provided for @errOrderServerNotInShift.
+  ///
+  /// In fr, this message translates to:
+  /// **'« {name} » n\'est pas un serveur actif de votre service.'**
+  String errOrderServerNotInShift(String name);
 }
 
 class _AppLocalizationsDelegate

@@ -3057,5 +3057,16 @@
   "fmServersSubtitle": "Active servers of your shift",
   "fmComingSoon": "Coming soon",
   "fmNoActiveServer": "No active server in this shift.",
-  "fmServerOnDuty": "On duty"
+  "fmServerOnDuty": "On duty",
+  "errOrderActorMismatch": "The order must be entered as the signed-in user. Please sign in again.",
+  "errOrderAssignmentForbidden": "You cannot assign an order to another server.",
+  "errOrderNoOpenShift": "No open shift: the order cannot be entered.",
+  "errOrderServerNotInShift": "\"{name}\" is not an active server of your shift.",
+  "@errOrderServerNotInShift": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

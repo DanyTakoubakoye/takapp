@@ -104,7 +104,7 @@ test('🔒 serveur A ne peut PAS lire une commande de B', async () => {
 test('🔒 serveur A ne peut PAS écrire dans B', async () => {
   const db = asUser(SERVEUR_A);
   await assertFails(
-    setDoc(doc(db, 'establishments', ESTAB_B, 'orders', 'hack'), { total: 999 })
+    setDoc(doc(db, 'establishments', ESTAB_B, 'orders', 'hack'), { total: 999, createdBy: SERVEUR_A })
   );
 });
 
@@ -124,7 +124,7 @@ test('🔒 serveur A ne peut PAS supprimer une clôture de caisse', async () => 
 test('✅ gerante A crée une commande dans A', async () => {
   const db = asUser(GERANTE_A);
   await assertSucceeds(
-    setDoc(doc(db, 'establishments', ESTAB_A, 'orders', 'order2'), { total: 500 })
+    setDoc(doc(db, 'establishments', ESTAB_A, 'orders', 'order2'), { total: 500, createdBy: GERANTE_A })
   );
 });
 
@@ -545,7 +545,7 @@ test('🔒 floor_manager ne peut RIEN lire ni écrire dans un autre établisseme
   const db = asUser(FLOOR_MANAGER_A);
   await assertFails(getDoc(doc(db, 'establishments', ESTAB_B)));
   await assertFails(getDoc(doc(db, 'establishments', ESTAB_B, 'orders', 'order1')));
-  await assertFails(setDoc(doc(db, 'establishments', ESTAB_B, 'orders', 'x'), { total: 1 }));
+  await assertFails(setDoc(doc(db, 'establishments', ESTAB_B, 'orders', 'x'), { total: 1, createdBy: FLOOR_MANAGER_A }));
   await assertFails(updateDoc(doc(db, 'establishments', ESTAB_B), { name: 'X' }));
 });
 
@@ -589,7 +589,7 @@ test('✅ non-régression : serveur et gérante gardent leurs lectures du tenant
   await seedFloorManager();
   await assertSucceeds(getDoc(doc(asUser(SERVEUR_A), 'establishments', ESTAB_A, 'orders', 'order1')));
   await assertSucceeds(getDoc(doc(asUser(SERVEUR_A), 'establishments', ESTAB_A, 'menuItems', 'm1')));
-  await assertSucceeds(setDoc(doc(asUser(SERVEUR_A), 'establishments', ESTAB_A, 'orders', 'o3'), { total: 5 }));
+  await assertSucceeds(setDoc(doc(asUser(SERVEUR_A), 'establishments', ESTAB_A, 'orders', 'o3'), { total: 5, createdBy: SERVEUR_A }));
   await assertSucceeds(getDoc(doc(asUser(GERANTE_A), 'establishments', ESTAB_A, 'expenses', 'exp1')));
   await assertSucceeds(getDoc(doc(asUser(GERANTE_A), 'establishments', ESTAB_A, 'payments', 'payment1')));
   await assertSucceeds(updateDoc(doc(asUser(GERANTE_A), 'establishments', ESTAB_A), { name: 'Renommé' }));
@@ -744,7 +744,7 @@ test('✅ serveur : commandes, menu, clients, stock, paiements et notifications 
   await assertSucceeds(getDocs(query(col('payments'), where('receivedBy', '==', SERVEUR_A))));
   await assertSucceeds(getDocs(query(col('serverHandovers'), where('serveurId', '==', SERVEUR_A))));
   await assertSucceeds(getDocs(query(col('serverNotifications'), where('serveurId', '==', SERVEUR_A))));
-  await assertSucceeds(setDoc(doc(db, 'establishments', ESTAB_A, 'orders', 'o5c'), { total: 1 }));
+  await assertSucceeds(setDoc(doc(db, 'establishments', ESTAB_A, 'orders', 'o5c'), { total: 1, createdBy: SERVEUR_A }));
 });
 
 test('✅ chef, barman, majordhomme, hygiène : stocks de leur magasin et historiques', async () => {
@@ -1137,4 +1137,165 @@ test('🔒 service clôturé : même une participation seule ne peut plus être 
   await closeShift(GERANTE_A, ESTAB_A, 'sh1');
   const db = asUser(GERANTE_A);
   await assertFails(setDoc(participantRef(db, ESTAB_A, 'sh1', SRV_A1), participantData(ESTAB_A, 'sh1', SRV_A1, GERANTE_A)));
+});
+
+// ─────────── 8B : AUTEUR RÉEL VS SERVEUR RESPONSABLE ───────────
+
+// Champs d'acteur, comme OrderActorContext.toOrderFields().
+function actorFields({ performer, assigned, shiftId = null }) {
+  return {
+    createdBy: assigned, createdByName: assigned,
+    performedByUserId: performer, performedByUserName: performer,
+    assignedServerId: assigned, assignedServerName: assigned,
+    shiftId,
+  };
+}
+
+function createOrderAs(uid, e, id, fields) {
+  return setDoc(doc(asUser(uid), 'establishments', e, 'orders', id), {
+    establishmentId: e, total: 1000, status: 'sent', paymentStatus: 'unpaid', ...fields,
+  });
+}
+
+// Cas 1
+test('✅ cas 1 : serveur Jean crée sa propre commande (performedBy = assigned = Jean)', async () => {
+  await seedShiftWorld();
+  await assertSucceeds(createOrderAs(SRV_A1, ESTAB_A, 'c1', actorFields({ performer: SRV_A1, assigned: SRV_A1 })));
+});
+
+test('✅ ancien client (sans nouveaux champs) : accepté si createdBy = soi', async () => {
+  await seedShiftWorld();
+  await assertSucceeds(createOrderAs(SRV_A1, ESTAB_A, 'old', { createdBy: SRV_A1, createdByName: 'Jean' }));
+  await assertFails(createOrderAs(SRV_A1, ESTAB_A, 'old2', { createdBy: SRV_A2, createdByName: 'Autre' }));
+  await assertFails(createOrderAs(SRV_A1, ESTAB_A, 'old3', { total: 1 }));
+});
+
+test('🔒 serveur : ni autre serveur responsable, ni faux auteur, ni shift', async () => {
+  await seedShiftWorld();
+  // Attribuer à un autre serveur.
+  await assertFails(createOrderAs(SRV_A1, ESTAB_A, 'x1', actorFields({ performer: SRV_A1, assigned: SRV_A2 })));
+  // Falsifier l'auteur réel.
+  await assertFails(createOrderAs(SRV_A1, ESTAB_A, 'x2', actorFields({ performer: SRV_A2, assigned: SRV_A1 })));
+  // createdBy incohérent avec assignedServerId.
+  await assertFails(createOrderAs(SRV_A1, ESTAB_A, 'x3', {
+    ...actorFields({ performer: SRV_A1, assigned: SRV_A1 }), createdBy: SRV_A2,
+  }));
+  // Un serveur ne rattache pas sa commande à un shift.
+  await assertFails(createOrderAs(SRV_A1, ESTAB_A, 'x4', actorFields({ performer: SRV_A1, assigned: SRV_A1, shiftId: 'sh1' })));
+});
+
+test('✅ gérante : pour elle-même ; 🔒 pas pour un serveur', async () => {
+  await seedShiftWorld();
+  await assertSucceeds(createOrderAs(GERANTE_A, ESTAB_A, 'g1', actorFields({ performer: GERANTE_A, assigned: GERANTE_A })));
+  await assertFails(createOrderAs(GERANTE_A, ESTAB_A, 'g2', actorFields({ performer: GERANTE_A, assigned: SRV_A1 })));
+});
+
+// Cas 2
+test('✅ cas 2 : Floor Manager en direct dans son service ouvert (performedBy = assigned = FM)', async () => {
+  await seedShiftWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  await assertSucceeds(createOrderAs(FM_A, ESTAB_A, 'fm1', actorFields({ performer: FM_A, assigned: FM_A, shiftId: 'sh1' })));
+});
+
+test('🔒 Floor Manager direct : sans service, service clôturé ou service d’un autre', async () => {
+  await seedShiftWorld();
+  await openShiftAsAdmin('shA2', FM_A2, [SRV_A2]);
+  await assertFails(createOrderAs(FM_A, ESTAB_A, 'f1', actorFields({ performer: FM_A, assigned: FM_A })));
+  await assertFails(createOrderAs(FM_A, ESTAB_A, 'f2', actorFields({ performer: FM_A, assigned: FM_A, shiftId: 'shA2' })));
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  await closeShift(GERANTE_A, ESTAB_A, 'sh1');
+  await assertFails(createOrderAs(FM_A, ESTAB_A, 'f3', actorFields({ performer: FM_A, assigned: FM_A, shiftId: 'sh1' })));
+});
+
+// Cas 3
+test('✅ cas 3 : Floor Manager Paul pour Jean (performedBy = Paul, assigned = Jean)', async () => {
+  await seedShiftWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  await assertSucceeds(createOrderAs(FM_A, ESTAB_A, 'd1', actorFields({ performer: FM_A, assigned: SRV_A1, shiftId: 'sh1' })));
+});
+
+test('🔒 Floor Manager : pas pour un serveur hors de son service', async () => {
+  await seedShiftWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  await openShiftAsAdmin('shA2', FM_A2, [SRV_A2]);
+  // Serveur actif mais non affecté.
+  await assertFails(createOrderAs(FM_A, ESTAB_A, 'h1', actorFields({ performer: FM_A, assigned: SRV_A3, shiftId: 'sh1' })));
+  // Serveur du service d'un autre Floor Manager.
+  await assertFails(createOrderAs(FM_A, ESTAB_A, 'h2', actorFields({ performer: FM_A, assigned: SRV_A2, shiftId: 'sh1' })));
+  await assertFails(createOrderAs(FM_A, ESTAB_A, 'h3', actorFields({ performer: FM_A, assigned: SRV_A2, shiftId: 'shA2' })));
+  // Serveur d'un autre établissement.
+  await assertFails(createOrderAs(FM_A, ESTAB_A, 'h4', actorFields({ performer: FM_A, assigned: SRV_B, shiftId: 'sh1' })));
+  // Rôle non serveur.
+  await assertFails(createOrderAs(FM_A, ESTAB_A, 'h5', actorFields({ performer: FM_A, assigned: GERANTE_A, shiftId: 'sh1' })));
+});
+
+test('🔒 Floor Manager : serveur retiré ou dont le pointeur désigne un autre service', async () => {
+  await seedShiftWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  await testEnv.withSecurityRulesDisabled(async (ctx) => {
+    await updateDoc(serverPointerRef(ctx.firestore(), ESTAB_A, SRV_A1), { openShiftId: 'autre' });
+  });
+  await assertFails(createOrderAs(FM_A, ESTAB_A, 'r1', actorFields({ performer: FM_A, assigned: SRV_A1, shiftId: 'sh1' })));
+});
+
+test('🔒 Floor Manager : serveur désactivé', async () => {
+  await seedShiftWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  await testEnv.withSecurityRulesDisabled(async (ctx) => {
+    await updateDoc(doc(ctx.firestore(), 'users', SRV_A1), { isActive: false });
+  });
+  await assertFails(createOrderAs(FM_A, ESTAB_A, 'r2', actorFields({ performer: FM_A, assigned: SRV_A1, shiftId: 'sh1' })));
+});
+
+test('🔒 Floor Manager : faux auteur ou createdBy incohérent', async () => {
+  await seedShiftWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  await assertFails(createOrderAs(FM_A, ESTAB_A, 's1', actorFields({ performer: SRV_A1, assigned: SRV_A1, shiftId: 'sh1' })));
+  await assertFails(createOrderAs(FM_A, ESTAB_A, 's2', {
+    ...actorFields({ performer: FM_A, assigned: SRV_A1, shiftId: 'sh1' }), createdBy: FM_A,
+  }));
+});
+
+// Isolation
+test('🔒 isolation multi-tenant des commandes et de leurs acteurs', async () => {
+  await seedShiftWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  await openShiftAsAdmin('shB', FM_B, [SRV_B], ESTAB_B);
+  // FM B ne commande pas dans A, même avec un service de A.
+  await assertFails(createOrderAs(FM_B, ESTAB_A, 'i1', actorFields({ performer: FM_B, assigned: FM_B, shiftId: 'sh1' })));
+  // Serveur B ne commande pas dans A.
+  await assertFails(createOrderAs(SRV_B, ESTAB_A, 'i2', actorFields({ performer: SRV_B, assigned: SRV_B })));
+  // FM A ne commande pas dans B pour un serveur de B.
+  await assertFails(createOrderAs(FM_A, ESTAB_B, 'i3', actorFields({ performer: FM_A, assigned: SRV_B, shiftId: 'shB' })));
+  // Chacun chez soi : accepté.
+  await assertSucceeds(createOrderAs(FM_B, ESTAB_B, 'i4', actorFields({ performer: FM_B, assigned: SRV_B, shiftId: 'shB' })));
+});
+
+// Immuabilité
+test('🔒 les acteurs d’une commande ne sont plus modifiables ; ✅ le suivi cuisine si', async () => {
+  await seedShiftWorld();
+  await createOrderAs(SRV_A1, ESTAB_A, 'u1', actorFields({ performer: SRV_A1, assigned: SRV_A1 }));
+  const ref = doc(asUser(SRV_A1), 'establishments', ESTAB_A, 'orders', 'u1');
+  await assertFails(updateDoc(ref, { createdBy: SRV_A2 }));
+  await assertFails(updateDoc(ref, { assignedServerId: SRV_A2 }));
+  await assertFails(updateDoc(ref, { performedByUserId: SRV_A2 }));
+  await assertFails(updateDoc(ref, { shiftId: 'sh1' }));
+  await assertFails(updateDoc(doc(asUser(GERANTE_A), 'establishments', ESTAB_A, 'orders', 'u1'), { createdByName: 'X' }));
+  await assertSucceeds(updateDoc(doc(asUser('chefA'), 'establishments', ESTAB_A, 'orders', 'u1'), { kitchenStatus: 'ready' }));
+});
+
+// Lignes de commande
+test('✅ Floor Manager crée les lignes de SA commande ; 🔒 pas celles d’une autre', async () => {
+  await seedShiftWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  const db = asUser(FM_A);
+  const batch = writeBatch(db);
+  batch.set(doc(db, 'establishments', ESTAB_A, 'orders', 'l1'), {
+    establishmentId: ESTAB_A, total: 1, ...actorFields({ performer: FM_A, assigned: SRV_A1, shiftId: 'sh1' }),
+  });
+  batch.set(doc(db, 'establishments', ESTAB_A, 'orders', 'l1', 'items', 'it1'), { name: 'Riz', quantity: 1 });
+  await assertSucceeds(batch.commit());
+
+  await createOrderAs(SRV_A1, ESTAB_A, 'l2', actorFields({ performer: SRV_A1, assigned: SRV_A1 }));
+  await assertFails(setDoc(doc(db, 'establishments', ESTAB_A, 'orders', 'l2', 'items', 'it9'), { name: 'X' }));
 });

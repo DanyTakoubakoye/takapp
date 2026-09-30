@@ -108,6 +108,8 @@ class SuiviCuisinePage extends StatelessWidget {
                   .collection('establishments')
                   .doc(establishmentId)
                   .collection('orders')
+                  // Serveur responsable (createdBy = assignedServerId,
+                  // anciennes commandes comprises).
                   .where('createdBy', isEqualTo: user.uid)
                   .where('isForKitchen', isEqualTo: true)
                   .snapshots(),

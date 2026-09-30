@@ -131,7 +131,8 @@ class EncaissementPage extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           l10n.createdByLine(
-                            ticket.primaryOrder.createdByName,
+                            // « Créée par » = auteur réel de la saisie.
+                            ticket.primaryOrder.effectivePerformedByUserName,
                           ),
                         ),
                         const SizedBox(height: 6),

@@ -4555,4 +4555,21 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fmServerOnDuty => 'On duty';
+
+  @override
+  String get errOrderActorMismatch =>
+      'The order must be entered as the signed-in user. Please sign in again.';
+
+  @override
+  String get errOrderAssignmentForbidden =>
+      'You cannot assign an order to another server.';
+
+  @override
+  String get errOrderNoOpenShift =>
+      'No open shift: the order cannot be entered.';
+
+  @override
+  String errOrderServerNotInShift(String name) {
+    return '\"$name\" is not an active server of your shift.';
+  }
 }

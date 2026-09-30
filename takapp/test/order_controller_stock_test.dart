@@ -3,7 +3,9 @@ import 'package:takapp/controllers/order_controller.dart';
 import 'package:takapp/core/errors/app_error.dart';
 import 'package:takapp/l10n/app_localizations_fr.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
+import 'package:takapp/modeles/order_actor_context.dart';
 import 'package:takapp/modeles/order_item_model.dart';
+import 'package:takapp/modeles/user_model.dart';
 import 'package:takapp/modeles/stock_mode.dart';
 import 'package:takapp/services/order_service.dart';
 import 'package:takapp/services/order_stock_policy.dart';
@@ -13,6 +15,7 @@ class _FakeOrderService implements OrderService {
   OrderCreationResult? result;
   Object? error;
   int createCalls = 0;
+  OrderActorContext? lastActor;
 
   @override
   Future<OrderCreationResult> createOrder({
@@ -21,14 +24,14 @@ class _FakeOrderService implements OrderService {
     required String? tableNumber,
     required String? roomNumber,
     String clientId = '',
-    required String createdBy,
-    required String createdByName,
+    required OrderActorContext actor,
     required double subtotal,
     required double tax,
     required double total,
     required List<OrderItemModel> items,
   }) async {
     createCalls++;
+    lastActor = actor;
     final failure = error;
     if (failure != null) throw failure;
     return result!;
@@ -44,13 +47,18 @@ final _menuItem = MenuItemModel.fromMap({
   'category': 'plat',
 }, 'menu-rice');
 
+final _serveur = UserModel.fromMap({
+  'role': 'serveur',
+  'establishmentId': 'est-1',
+  'name': 'Serveur',
+}, 'uid-1');
+
 Future<bool> _submit(OrderController controller) {
   return controller.submitOrder(
     clientType: 'bar',
     tableNumber: null,
     roomNumber: null,
-    createdBy: 'uid-1',
-    createdByName: 'Serveur',
+    actor: OrderActorContext.self(_serveur),
     establishmentId: 'est-1',
   );
 }
@@ -71,6 +79,11 @@ void main() {
     expect(controller.items, isEmpty);
     expect(controller.hasStockWarnings, isFalse);
     expect(controller.submittedMessage(l10n), l10n.orderSentSuccess);
+
+    // L'acteur est transmis tel quel au service (commande classique).
+    expect(service.lastActor?.performedByUserId, 'uid-1');
+    expect(service.lastActor?.assignedServerId, 'uid-1');
+    expect(service.lastActor?.shiftId, isNull);
   });
 
   test('refused order (strict) keeps the cart and exposes the error', () async {

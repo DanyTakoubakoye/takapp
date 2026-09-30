@@ -4603,4 +4603,21 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get fmServerOnDuty => 'En service';
+
+  @override
+  String get errOrderActorMismatch =>
+      'La commande doit être saisie au nom de l\'utilisateur connecté. Reconnectez-vous.';
+
+  @override
+  String get errOrderAssignmentForbidden =>
+      'Vous ne pouvez pas attribuer une commande à un autre serveur.';
+
+  @override
+  String get errOrderNoOpenShift =>
+      'Aucun service ouvert : impossible de saisir une commande.';
+
+  @override
+  String errOrderServerNotInShift(String name) {
+    return '« $name » n\'est pas un serveur actif de votre service.';
+  }
 }

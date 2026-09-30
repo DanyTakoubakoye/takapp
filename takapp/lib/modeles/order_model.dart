@@ -21,8 +21,23 @@ class OrderModel {
   /// Fiche client rattachée. Chaîne vide = commande non rattachée.
   final String clientId;
 
+  /// TRANSITION : SERVEUR RESPONSABLE de la vente (sens que lui donnent déjà
+  /// toutes les requêtes, index et notifications). Pour les anciennes
+  /// commandes, c'est aussi l'auteur (les deux se confondaient).
   final String createdBy;
   final String createdByName;
+
+  /// Auteur réel de la saisie. `null` sur les anciennes commandes.
+  final String? performedByUserId;
+  final String? performedByUserName;
+
+  /// Serveur responsable. `null` sur les anciennes commandes.
+  final String? assignedServerId;
+  final String? assignedServerName;
+
+  /// Service (shift) de saisie. `null` : ancienne commande ou serveur hors
+  /// système de shift.
+  final String? shiftId;
 
   /// sent | preparing | ready | served | cancelled
   final String status;
@@ -72,6 +87,11 @@ class OrderModel {
     required this.clientId,
     required this.createdBy,
     required this.createdByName,
+    this.performedByUserId,
+    this.performedByUserName,
+    this.assignedServerId,
+    this.assignedServerName,
+    this.shiftId,
     required this.status,
     required this.subtotal,
     required this.tax,
@@ -90,6 +110,33 @@ class OrderModel {
     this.isFiscalized = false,
     this.fiscalStatus = '',
   });
+
+  /// Chaîne vide ou absente => `null` (ancienne commande).
+  static String? _optionalString(dynamic value) {
+    final text = value?.toString().trim() ?? '';
+    return text.isEmpty ? null : text;
+  }
+
+  /// =========================
+  /// LECTURE RÉTROCOMPATIBLE
+  /// =========================
+  ///
+  /// À utiliser pour la RESPONSABILITÉ COMMERCIALE (listes du serveur,
+  /// impayés, destinataire « prêt ») : `assignedServerId ?? createdBy`.
+  String get effectiveAssignedServerId => assignedServerId ?? createdBy;
+
+  String get effectiveAssignedServerName => assignedServerName ?? createdByName;
+
+  /// À utiliser pour l'AUDIT (qui a réellement saisi) :
+  /// `performedByUserId ?? createdBy` (anciennes commandes : auteur = créateur).
+  String get effectivePerformedByUserId => performedByUserId ?? createdBy;
+
+  String get effectivePerformedByUserName =>
+      performedByUserName ?? createdByName;
+
+  /// Saisie par quelqu'un d'autre que le serveur responsable.
+  bool get isDelegated =>
+      effectivePerformedByUserId != effectiveAssignedServerId;
 
   factory OrderModel.fromMap(Map<String, dynamic> map, String documentId) {
     double toDouble(dynamic value) {
@@ -130,6 +177,12 @@ class OrderModel {
       createdBy: (map['createdBy'] ?? '').toString(),
 
       createdByName: (map['createdByName'] ?? '').toString(),
+
+      performedByUserId: _optionalString(map['performedByUserId']),
+      performedByUserName: _optionalString(map['performedByUserName']),
+      assignedServerId: _optionalString(map['assignedServerId']),
+      assignedServerName: _optionalString(map['assignedServerName']),
+      shiftId: _optionalString(map['shiftId']),
 
       status: (map['status'] ?? '').toString(),
 
@@ -183,6 +236,14 @@ class OrderModel {
 
       'createdBy': createdBy,
       'createdByName': createdByName,
+
+      // Absents des anciennes commandes : jamais réécrits à vide.
+      if (performedByUserId != null) 'performedByUserId': performedByUserId,
+      if (performedByUserName != null)
+        'performedByUserName': performedByUserName,
+      if (assignedServerId != null) 'assignedServerId': assignedServerId,
+      if (assignedServerName != null) 'assignedServerName': assignedServerName,
+      if (shiftId != null) 'shiftId': shiftId,
 
       'status': status,
 
@@ -263,6 +324,13 @@ class OrderModel {
       createdBy: createdBy ?? this.createdBy,
 
       createdByName: createdByName ?? this.createdByName,
+
+      // Acteurs figés à la création : jamais modifiés par copyWith.
+      performedByUserId: performedByUserId,
+      performedByUserName: performedByUserName,
+      assignedServerId: assignedServerId,
+      assignedServerName: assignedServerName,
+      shiftId: shiftId,
 
       status: status ?? this.status,
 

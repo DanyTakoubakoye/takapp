@@ -234,6 +234,16 @@ enum AppErrorCode {
   shiftNotFound,
   shiftFloorManagerAlreadyOpen,
   shiftServerAlreadyInOpenShift,
+
+  /// =========================
+  /// ACTEUR D'UNE COMMANDE
+  /// =========================
+  ///
+  /// [AppError.name] : nom du serveur pour `orderServerNotInShift`.
+  orderActorMismatch,
+  orderAssignmentForbidden,
+  orderNoOpenShift,
+  orderServerNotInShift,
 }
 
 /// Exception traduisible à l'affichage.
