@@ -74,6 +74,11 @@ class OrderActorContext {
 
   bool get isDelegated => assignedServerId != performedByUserId;
 
+  /// Identité du contexte (auteur, serveur responsable, service). Le panier
+  /// d'`OrderController` y est lié : changer de contexte vide le panier, il
+  /// ne peut jamais être attribué à un autre serveur par accident.
+  String get cartKey => '$performedByUserId|$assignedServerId|${shiftId ?? ''}';
+
   bool get isFloorManager => performedByRole == AppRoles.floorManager;
 
   /// Champs d'acteur écrits sur la commande.

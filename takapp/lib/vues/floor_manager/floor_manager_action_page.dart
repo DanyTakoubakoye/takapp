@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/floor_manager_shift_controller.dart';
 import 'package:takapp/l10n/app_localizations.dart';
+import 'package:takapp/modeles/order_actor_context.dart';
+import 'package:takapp/vues/serveur/menu_presentation_page.dart';
 import 'package:takapp/vues/floor_manager/floor_manager_servers_page.dart';
 import 'package:takapp/vues/floor_manager/floor_manager_widgets.dart';
 
@@ -36,20 +39,49 @@ extension FloorManagerSectionLabels on FloorManagerSection {
   };
 }
 
-/// Page intermédiaire : action directe (préparée, pas encore active) ou
-/// passage par un serveur du service.
+/// Ouvre le parcours de prise de commande pour un contexte d'acteur.
+typedef OrderPageBuilder = Widget Function(OrderActorContext actor);
+
+/// Parcours standard des serveurs, réutilisé tel quel (aucune copie).
+Widget defaultOrderPage(OrderActorContext actor) =>
+    MenuPresentationPage(actor: actor);
+
+/// Page intermédiaire : action directe, ou passage par un serveur du service.
+///
+/// Commandes : actives (9B). Encaissements : préparés, pas encore actifs.
 class FloorManagerActionPage extends StatelessWidget {
   final FloorManagerSection section;
 
-  const FloorManagerActionPage({super.key, required this.section});
+  /// Page de commande ouverte (injectable pour les tests).
+  final OrderPageBuilder orderPageBuilder;
+
+  const FloorManagerActionPage({
+    super.key,
+    required this.section,
+    this.orderPageBuilder = defaultOrderPage,
+  });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final hasOpenShift = context
-        .watch<FloorManagerShiftController>()
-        .state
-        .hasOpenShift;
+    final state = context.watch<FloorManagerShiftController>().state;
+    final hasOpenShift = state.hasOpenShift;
+    final user = context.watch<AuthController>().currentUser;
+    final shift = state.openShift;
+
+    // Commande directe : le Floor Manager commande pour lui-même, dans SON
+    // service ouvert (auteur réel = serveur responsable = lui).
+    final VoidCallback? onDirect =
+        section == FloorManagerSection.orders && user != null && shift != null
+        ? () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => orderPageBuilder(
+                OrderActorContext.self(user, shiftId: shift.id),
+              ),
+            ),
+          )
+        : null;
 
     return Scaffold(
       appBar: AppBar(title: Text(section.title(l10n))),
@@ -65,11 +97,13 @@ class FloorManagerActionPage extends StatelessWidget {
             FloorManagerTile(
               key: ValueKey('fm-direct-${section.name}'),
               title: section.directLabel(l10n),
-              subtitle: l10n.fmComingSoon,
+              subtitle: section == FloorManagerSection.orders
+                  ? l10n.fmDirectOrderSubtitle
+                  // Encaissement direct : préparé, pas encore implémenté.
+                  : l10n.fmComingSoon,
               icon: section.icon,
               color: section.color,
-              // Préparé : l'action métier n'est pas encore implémentée.
-              onTap: null,
+              onTap: onDirect,
             ),
             const SizedBox(height: 14),
             FloorManagerTile(
@@ -82,8 +116,10 @@ class FloorManagerActionPage extends StatelessWidget {
                   ? () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) =>
-                            FloorManagerServersPage(section: section),
+                        builder: (_) => FloorManagerServersPage(
+                          section: section,
+                          orderPageBuilder: orderPageBuilder,
+                        ),
                       ),
                     )
                   : null,

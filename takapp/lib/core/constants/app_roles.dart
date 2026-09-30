@@ -92,9 +92,9 @@ class AppRoles {
     barman: ['bar', 'stock'],
     majordhomme: ['hotel', 'stock'],
     receptionniste: ['hotel', 'fiscalization'],
-    // Moindre privilège : aucun module tant que ses fonctions (services,
-    // affectations, encaissements délégués…) ne sont pas implémentées.
-    floorManager: <String>[],
+    // La salle : prise de commande restaurant et bar (9B). Pas d'hôtel, de
+    // stock ni de fiscalisation.
+    floorManager: ['restaurant', 'bar'],
   };
 
   /// =========================

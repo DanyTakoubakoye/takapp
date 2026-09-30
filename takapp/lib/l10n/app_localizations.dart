@@ -8038,6 +8038,30 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'« {name} » n\'est pas un serveur actif de votre service.'**
   String errOrderServerNotInShift(String name);
+
+  /// No description provided for @errOrderCartContextChanged.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le panier appartenait à une autre commande (autre serveur ou autre service) : il a été vidé.'**
+  String get errOrderCartContextChanged;
+
+  /// No description provided for @fmOrderContextDirect.
+  ///
+  /// In fr, this message translates to:
+  /// **'Commande directe — {name}'**
+  String fmOrderContextDirect(String name);
+
+  /// No description provided for @fmOrderContextForServer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour {server} · saisie par {author}'**
+  String fmOrderContextForServer(String server, String author);
+
+  /// No description provided for @fmDirectOrderSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pour vous-même, dans votre service en cours'**
+  String get fmDirectOrderSubtitle;
 }
 
 class _AppLocalizationsDelegate

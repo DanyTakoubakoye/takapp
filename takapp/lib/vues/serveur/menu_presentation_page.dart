@@ -13,9 +13,15 @@ import 'package:takapp/vues/commun/client_picker_sheet.dart';
 import 'package:takapp/vues/commun/module_visibility.dart';
 import 'package:takapp/vues/serveur/order_submitted_feedback.dart';
 import 'package:takapp/modeles/order_actor_context.dart';
+import 'package:takapp/vues/serveur/order_actor_banner.dart';
 
 class MenuPresentationPage extends StatefulWidget {
-  const MenuPresentationPage({super.key});
+  /// Qui saisit, et pour quel serveur. `null` : commande classique de
+  /// l'utilisateur connecté (`OrderActorContext.self(user)`).
+  /// Floor Manager : `self(fm, shiftId:)` (direct) ou `forShiftServer(...)`.
+  final OrderActorContext? actor;
+
+  const MenuPresentationPage({super.key, this.actor});
 
   @override
   State<MenuPresentationPage> createState() => _MenuPresentationPageState();
@@ -311,6 +317,12 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
           foregroundColor: _navy,
           elevation: 0,
           surfaceTintColor: Colors.transparent,
+          bottom: widget.actor?.isFloorManager == true
+              ? PreferredSize(
+                  preferredSize: const Size.fromHeight(40),
+                  child: OrderActorBanner(actor: widget.actor),
+                )
+              : null,
         ),
         body: SafeArea(
           child: StreamBuilder<List<MenuItemModel>>(
@@ -893,6 +905,7 @@ class _MenuPresentationPageState extends State<MenuPresentationPage> {
               builder: (_) => _OrderRecapPage(
                 establishmentId: establishmentId,
                 lines: lines,
+                actor: widget.actor,
               ),
             ),
           );
@@ -1171,8 +1184,13 @@ class _AccompanimentSheetState extends State<_AccompanimentSheet> {
 class _OrderRecapPage extends StatefulWidget {
   final String establishmentId;
   final List<_SelectedMenuLine> lines;
+  final OrderActorContext? actor;
 
-  const _OrderRecapPage({required this.establishmentId, required this.lines});
+  const _OrderRecapPage({
+    required this.establishmentId,
+    required this.lines,
+    this.actor,
+  });
 
   @override
   State<_OrderRecapPage> createState() => _OrderRecapPageState();
@@ -1298,6 +1316,14 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
       return;
     }
 
+    // Contexte d'acteur : celui reçu (Floor Manager), sinon commande
+    // classique de l'utilisateur connecté.
+    final actor = widget.actor ?? OrderActorContext.self(user);
+
+    // Le panier partagé est lié à CE contexte : s'il contenait les articles
+    // d'un autre (autre serveur, commande directe…), il est vidé.
+    orderController.bindActor(actor);
+
     final existingItems = List.of(orderController.items);
     for (final item in existingItems) {
       for (int i = 0; i < item.quantity; i++) {
@@ -1319,8 +1345,7 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
       clientType: clientType,
       tableNumber: tableController.text.trim(),
       roomNumber: roomController.text.trim(),
-      // Commande classique : auteur réel = serveur responsable = connecté.
-      actor: OrderActorContext.self(user),
+      actor: actor,
       clientId: _selectedClientId,
     );
 
@@ -1361,7 +1386,15 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.orderRecapTitle)),
+      appBar: AppBar(
+        title: Text(l10n.orderRecapTitle),
+        bottom: widget.actor?.isFloorManager == true
+            ? PreferredSize(
+                preferredSize: const Size.fromHeight(40),
+                child: OrderActorBanner(actor: widget.actor),
+              )
+            : null,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Card(
@@ -1474,7 +1507,10 @@ class _OrderRecapPageState extends State<_OrderRecapPage> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                _buildClientSelector(orderController.isSubmitting),
+                // Le Floor Manager n'a pas accès aux fiches clients (règles
+                // Firestore) : pas de rattachement proposé.
+                if (widget.actor?.isFloorManager != true)
+                  _buildClientSelector(orderController.isSubmitting),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,

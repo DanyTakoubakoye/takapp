@@ -244,6 +244,7 @@ enum AppErrorCode {
   orderAssignmentForbidden,
   orderNoOpenShift,
   orderServerNotInShift,
+  orderCartContextChanged,
 }
 
 /// Exception traduisible à l'affichage.

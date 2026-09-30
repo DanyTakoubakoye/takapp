@@ -1299,3 +1299,219 @@ test('✅ Floor Manager crée les lignes de SA commande ; 🔒 pas celles d’un
   await createOrderAs(SRV_A1, ESTAB_A, 'l2', actorFields({ performer: SRV_A1, assigned: SRV_A1 }));
   await assertFails(setDoc(doc(db, 'establishments', ESTAB_A, 'orders', 'l2', 'items', 'it9'), { name: 'X' }));
 });
+
+// ─────────── 9B : COMMANDES FLOOR MANAGER (moteur réutilisé) ───────────
+
+async function seedOrderingWorld() {
+  await seedShiftWorld();
+  await testEnv.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    await setDoc(doc(db, 'establishments', ESTAB_A), { name: 'A', stockMode: 'strict' });
+    await setDoc(doc(db, 'establishments', ESTAB_B), { name: 'B', stockMode: 'strict' });
+    for (const e of [ESTAB_A, ESTAB_B]) {
+      await setDoc(doc(db, 'establishments', e, 'menuItems', 'riz'), { name: 'Riz', price: 1000 });
+      await setDoc(doc(db, 'establishments', e, 'store_stocks', 'st_riz'), {
+        store: 'restaurant', itemId: 'riz', unit: 'kg', quantity: 10, minimumQuantity: 1,
+      });
+    }
+    // Ancienne commande non encaissée sans addition (table 7) : le moteur la
+    // rattache à l'addition de la nouvelle commande.
+    await setDoc(doc(db, 'establishments', ESTAB_A, 'orders', 'legacy7'), {
+      createdBy: SRV_A2, createdByName: 'Ancien', paymentStatus: 'unpaid',
+      clientType: 'restaurant', tableNumber: '7', total: 500,
+    });
+    await setDoc(doc(db, 'establishments', ESTAB_A, 'orders', 'paid1'), {
+      createdBy: SRV_A2, paymentStatus: 'paid', total: 900,
+    });
+  });
+}
+
+// Même lot que OrderService.createOrder (transaction) + StoreStockService.
+function orderBatch(uid, e, orderId, actor, {
+  newQuantity = 9.6, movement = {}, stockUpdate = {}, orphans = ['legacy7'],
+} = {}) {
+  const db = asUser(uid);
+  const batch = writeBatch(db);
+  batch.set(doc(db, 'establishments', e, 'orders', orderId), {
+    establishmentId: e, orderNumber: `CMD-${orderId}`, ticketId: `TCK-7-${orderId}`,
+    clientType: 'restaurant', tableNumber: '7', status: 'sent',
+    paymentStatus: 'unpaid', total: 1000, stockMode: 'strict', ...actor,
+  });
+  batch.set(doc(db, 'establishments', e, 'orders', orderId, 'items', 'l1'), {
+    menuItemId: 'riz', name: 'Riz', quantity: 1,
+  });
+  for (const orphan of orphans) {
+    batch.update(doc(db, 'establishments', e, 'orders', orphan), { ticketId: `TCK-7-${orderId}` });
+  }
+  batch.update(doc(db, 'establishments', e, 'store_stocks', 'st_riz'), {
+    quantity: newQuantity, isLowStock: false, lastOrderId: orderId, updatedAt: serverTimestamp(),
+    pendingSync: false, syncError: false, ...stockUpdate,
+  });
+  batch.set(doc(db, 'establishments', e, 'stock_movements', `mv_${orderId}`), {
+    establishmentId: e, store: 'restaurant', itemId: 'riz', itemName: 'Riz', unit: 'kg',
+    quantity: 0.4, movementType: 'out', performedBy: actor.performedByUserId,
+    orderId, orderNumber: `CMD-${orderId}`, createdAt: serverTimestamp(), ...movement,
+  });
+  return batch.commit();
+}
+
+const fmDirect = () => actorFields({ performer: FM_A, assigned: FM_A, shiftId: 'sh1' });
+const fmForJean = () => actorFields({ performer: FM_A, assigned: SRV_A1, shiftId: 'sh1' });
+
+test('✅ Floor Manager en service : menu, additions ouvertes, stock (lectures du moteur)', async () => {
+  await seedOrderingWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  const db = asUser(FM_A);
+  await assertSucceeds(getDocs(collection(db, 'establishments', ESTAB_A, 'menuItems')));
+  await assertSucceeds(getDoc(doc(db, 'establishments', ESTAB_A)));
+  await assertSucceeds(getDocs(query(
+    collection(db, 'establishments', ESTAB_A, 'orders'), where('paymentStatus', '==', 'unpaid'),
+  )));
+  await assertSucceeds(getDocs(query(
+    collection(db, 'establishments', ESTAB_A, 'store_stocks'),
+    where('store', '==', 'restaurant'), where('itemId', '==', 'riz'),
+  )));
+});
+
+test('🔒 Floor Manager en service : pas l’historique encaissé ni toutes les commandes', async () => {
+  await seedOrderingWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  const db = asUser(FM_A);
+  await assertFails(getDoc(doc(db, 'establishments', ESTAB_A, 'orders', 'paid1')));
+  await assertFails(getDocs(collection(db, 'establishments', ESTAB_A, 'orders')));
+  await assertFails(getDocs(collection(db, 'establishments', ESTAB_A, 'clients')));
+});
+
+test('✅ commande directe Floor Manager (lot complet du moteur)', async () => {
+  await seedOrderingWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  await assertSucceeds(orderBatch(FM_A, ESTAB_A, 'direct1', fmDirect()));
+});
+
+test('✅ commande Floor Manager → Jean (lot complet du moteur)', async () => {
+  await seedOrderingWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  await assertSucceeds(orderBatch(FM_A, ESTAB_A, 'jean1', fmForJean()));
+  // La commande appartient bien à Jean (lecture par un rôle d'établissement).
+  const snap = await getDoc(doc(asUser(GERANTE_A), 'establishments', ESTAB_A, 'orders', 'jean1'));
+  assert.strictEqual(snap.data().createdBy, SRV_A1);
+  assert.strictEqual(snap.data().assignedServerId, SRV_A1);
+  assert.strictEqual(snap.data().performedByUserId, FM_A);
+  assert.strictEqual(snap.data().shiftId, 'sh1');
+});
+
+test('🔒 service clôturé avant validation : commande refusée (et plus de menu)', async () => {
+  await seedOrderingWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  await closeShift(GERANTE_A, ESTAB_A, 'sh1');
+  await assertFails(orderBatch(FM_A, ESTAB_A, 'c1', fmDirect()));
+  await assertFails(orderBatch(FM_A, ESTAB_A, 'c2', fmForJean()));
+  await assertFails(getDocs(collection(asUser(FM_A), 'establishments', ESTAB_A, 'menuItems')));
+});
+
+test('🔒 Jean retiré du service avant validation : commande pour Jean refusée', async () => {
+  await seedOrderingWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1, SRV_A2]);
+  // La gérante retire Jean (même lot que ShiftService.updateServers).
+  const g = asUser(GERANTE_A);
+  const batch = writeBatch(g);
+  batch.update(shiftRef(g, ESTAB_A, 'sh1'), { serverIds: [SRV_A2], updatedAt: serverTimestamp() });
+  batch.set(participantRef(g, ESTAB_A, 'sh1', SRV_A1), {
+    ...participantData(ESTAB_A, 'sh1', SRV_A1, GERANTE_A, false), removedBy: GERANTE_A,
+  });
+  await assertSucceeds(batch.commit());
+
+  await assertFails(orderBatch(FM_A, ESTAB_A, 'r1', fmForJean()));
+  // Le Floor Manager peut toujours commander en direct.
+  await assertSucceeds(orderBatch(FM_A, ESTAB_A, 'r2', fmDirect()));
+});
+
+test('🔒 serveur hors service et autre établissement refusés', async () => {
+  await seedOrderingWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  await assertFails(orderBatch(FM_A, ESTAB_A, 'h1', actorFields({ performer: FM_A, assigned: SRV_A3, shiftId: 'sh1' })));
+  await assertFails(orderBatch(FM_A, ESTAB_B, 'b1', fmDirect(), { orphans: [] }));
+  await assertFails(getDocs(collection(asUser(FM_A), 'establishments', ESTAB_B, 'menuItems')));
+  await assertFails(getDocs(query(
+    collection(asUser(FM_A), 'establishments', ESTAB_B, 'store_stocks'), where('store', '==', 'restaurant'),
+  )));
+});
+
+test('🔒 stock : le Floor Manager ne fait que DÉDUIRE pour SA commande', async () => {
+  await seedOrderingWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  // Hausse de stock.
+  await assertFails(orderBatch(FM_A, ESTAB_A, 's1', fmDirect(), { newQuantity: 11 }));
+  // Stock négatif.
+  await assertFails(orderBatch(FM_A, ESTAB_A, 's2', fmDirect(), { newQuantity: -1 }));
+  // Autre champ du stock.
+  await assertFails(orderBatch(FM_A, ESTAB_A, 's3', fmDirect(), { stockUpdate: { minimumQuantity: 0 } }));
+  // Mouvement d'entrée.
+  await assertFails(orderBatch(FM_A, ESTAB_A, 's4', fmDirect(), { movement: { movementType: 'in' } }));
+  // Mouvement signé par quelqu'un d'autre.
+  await assertFails(orderBatch(FM_A, ESTAB_A, 's5', fmDirect(), { movement: { performedBy: SRV_A1 } }));
+  // Déduction isolée, sans commande.
+  await assertFails(updateDoc(doc(asUser(FM_A), 'establishments', ESTAB_A, 'store_stocks', 'st_riz'), { quantity: 5 }));
+  // Déduction citant une commande jamais créée.
+  await assertFails(updateDoc(doc(asUser(FM_A), 'establishments', ESTAB_A, 'store_stocks', 'st_riz'), {
+    quantity: 5, lastOrderId: 'fantome',
+  }));
+  // Rejeu : déduction citant SA commande déjà existante.
+  await assertSucceeds(orderBatch(FM_A, ESTAB_A, 'mine', fmDirect()));
+  await assertFails(updateDoc(doc(asUser(FM_A), 'establishments', ESTAB_A, 'store_stocks', 'st_riz'), {
+    quantity: 5, lastOrderId: 'mine',
+  }));
+  // Mouvement pour la commande d'un autre.
+  await assertFails(setDoc(doc(asUser(FM_A), 'establishments', ESTAB_A, 'stock_movements', 'mvx'), {
+    store: 'restaurant', movementType: 'out', performedBy: FM_A, orderId: 'legacy7', quantity: 1,
+  }));
+});
+
+test('🔒 commandes existantes : le Floor Manager ne fait que rattacher une addition', async () => {
+  await seedOrderingWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  const db = asUser(FM_A);
+  await assertFails(updateDoc(doc(db, 'establishments', ESTAB_A, 'orders', 'legacy7'), { status: 'cancelled' }));
+  await assertFails(updateDoc(doc(db, 'establishments', ESTAB_A, 'orders', 'legacy7'), { ticketId: 'T', total: 0 }));
+  await assertFails(updateDoc(doc(db, 'establishments', ESTAB_A, 'orders', 'paid1'), { ticketId: 'T' }));
+  await assertSucceeds(updateDoc(doc(db, 'establishments', ESTAB_A, 'orders', 'legacy7'), { ticketId: 'T' }));
+  // Addition déjà posée : plus modifiable.
+  await assertFails(updateDoc(doc(db, 'establishments', ESTAB_A, 'orders', 'legacy7'), { ticketId: 'T2' }));
+});
+
+test('🔒 Floor Manager hors service : aucune lecture ni écriture de commande', async () => {
+  await seedOrderingWorld();
+  const db = asUser(FM_A);
+  await assertFails(getDocs(collection(db, 'establishments', ESTAB_A, 'menuItems')));
+  await assertFails(getDocs(query(collection(db, 'establishments', ESTAB_A, 'orders'), where('paymentStatus', '==', 'unpaid'))));
+  await assertFails(getDocs(query(collection(db, 'establishments', ESTAB_A, 'store_stocks'), where('store', '==', 'restaurant'))));
+  await assertFails(orderBatch(FM_A, ESTAB_A, 'x1', fmDirect()));
+});
+
+test('✅ non-régression : serveur classique (lot complet) et anciennes commandes lisibles', async () => {
+  await seedOrderingWorld();
+  await assertSucceeds(orderBatch(SRV_A1, ESTAB_A, 'srv1', actorFields({ performer: SRV_A1, assigned: SRV_A1 })));
+  const legacy = await getDoc(doc(asUser(SRV_A1), 'establishments', ESTAB_A, 'orders', 'legacy7'));
+  assert.strictEqual(legacy.data().createdBy, SRV_A2);
+  assert.strictEqual(legacy.data().assignedServerId, undefined);
+});
+
+test('✅ Floor Manager lit SES notifications « prêt » (commandes directes), pas celles des autres', async () => {
+  await seedOrderingWorld();
+  await testEnv.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    await setDoc(doc(db, 'establishments', ESTAB_A, 'serverNotifications', 'kitchen_direct_ready'), {
+      serveurId: FM_A, isRead: false, createdAt: new Date(),
+    });
+    await setDoc(doc(db, 'establishments', ESTAB_A, 'serverNotifications', 'kitchen_jean_ready'), {
+      serveurId: SRV_A1, isRead: false, createdAt: new Date(),
+    });
+  });
+  const db = asUser(FM_A);
+  await assertSucceeds(getDocs(query(
+    collection(db, 'establishments', ESTAB_A, 'serverNotifications'),
+    where('serveurId', '==', FM_A), where('isRead', '==', false),
+  )));
+  await assertSucceeds(getDoc(doc(db, 'establishments', ESTAB_A, 'serverNotifications', 'kitchen_direct_ready')));
+  await assertFails(getDoc(doc(db, 'establishments', ESTAB_A, 'serverNotifications', 'kitchen_jean_ready')));
+});

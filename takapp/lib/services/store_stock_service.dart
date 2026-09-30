@@ -172,6 +172,10 @@ class StoreStockService {
       transaction.update(ref, {
         'quantity': deduction.newQuantity,
         'isLowStock': deduction.isLowStock,
+        // Traçabilité : commande à l'origine de la dernière déduction. Les
+        // règles s'en servent pour n'autoriser une déduction du Floor
+        // Manager que liée à une commande créée dans le même lot.
+        'lastOrderId': orderId,
         'updatedAt': FieldValue.serverTimestamp(),
         'pendingSync': false,
         'syncError': false,

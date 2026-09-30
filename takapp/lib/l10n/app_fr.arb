@@ -3074,5 +3074,26 @@
         "type": "String"
       }
     }
-  }
+  },
+"errOrderCartContextChanged": "Le panier appartenait à une autre commande (autre serveur ou autre service) : il a été vidé.",
+  "fmOrderContextDirect": "Commande directe — {name}",
+  "@fmOrderContextDirect": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "fmOrderContextForServer": "Pour {server} · saisie par {author}",
+  "@fmOrderContextForServer": {
+    "placeholders": {
+      "server": {
+        "type": "String"
+      },
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+"fmDirectOrderSubtitle": "Pour vous-même, dans votre service en cours"
 }

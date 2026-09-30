@@ -4620,4 +4620,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String errOrderServerNotInShift(String name) {
     return '« $name » n\'est pas un serveur actif de votre service.';
   }
+
+  @override
+  String get errOrderCartContextChanged =>
+      'Le panier appartenait à une autre commande (autre serveur ou autre service) : il a été vidé.';
+
+  @override
+  String fmOrderContextDirect(String name) {
+    return 'Commande directe — $name';
+  }
+
+  @override
+  String fmOrderContextForServer(String server, String author) {
+    return 'Pour $server · saisie par $author';
+  }
+
+  @override
+  String get fmDirectOrderSubtitle =>
+      'Pour vous-même, dans votre service en cours';
 }

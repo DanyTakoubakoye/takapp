@@ -82,11 +82,10 @@ void main() {
       expect(AppRoles.getLabel('floor_manager'), 'Floor Manager');
     });
 
-    test('least privilege: no module, no admin or stock helper', () {
-      expect(AppRoles.getModules('floor_manager'), isEmpty);
+    test('least privilege: the floor only, no admin or stock helper', () {
+      // 9B : la salle (restaurant, bar) pour prendre les commandes.
+      expect(AppRoles.getModules('floor_manager'), ['restaurant', 'bar']);
       for (final module in [
-        'restaurant',
-        'bar',
         'hotel',
         'stock',
         'fiscalization',
@@ -151,19 +150,37 @@ void main() {
       expect(user.role, 'floor_manager');
       expect(user.establishmentId, 'est-a');
       expect(user.isActive, isTrue);
-      expect(user.canAccessRestaurant, isFalse);
-      expect(user.canAccessBar, isFalse);
+      // Les modules d'attente (tout à false) stockés à la création ne font
+      // pas foi : accès = rôle (salle) ∩ abonnement.
+      expect(user.canAccessRestaurant, isTrue);
+      expect(user.canAccessBar, isTrue);
       expect(user.canAccessHotel, isFalse);
       expect(user.canAccessStock, isFalse);
       expect(user.canAccessFiscalization, isFalse);
     });
 
-    test('profile without modules falls back to the (empty) role defaults', () {
+    test('the establishment subscription still caps the floor manager', () {
+      final user = UserModel.fromMap(
+        {'role': 'floor_manager', 'establishmentId': 'est-a'},
+        'fm-1',
+        establishmentModules: {'restaurant': true, 'bar': false},
+      );
+      expect(user.canAccessRestaurant, isTrue);
+      expect(user.canAccessBar, isFalse);
+    });
+
+    test('profile without modules falls back to the role defaults', () {
       final user = _user(' Floor_Manager ');
 
       expect(user.role, 'floor_manager');
-      expect(user.canAccessRestaurant, isFalse);
+      expect(user.canAccessRestaurant, isTrue);
+      expect(user.canAccessBar, isTrue);
       expect(user.canAccessStock, isFalse);
+    });
+
+    test('other roles keep their stored modules', () {
+      final serveur = _user('serveur', modules: {'restaurant': false});
+      expect(serveur.canAccessRestaurant, isFalse);
     });
 
     test('serialization keeps the canonical value', () {

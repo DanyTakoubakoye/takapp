@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/floor_manager_shift_controller.dart';
 import 'package:takapp/l10n/app_localizations.dart';
+import 'package:takapp/modeles/order_actor_context.dart';
+import 'package:takapp/modeles/shift_model.dart';
 import 'package:takapp/modeles/shift_participant_model.dart';
 import 'package:takapp/vues/floor_manager/floor_manager_action_page.dart';
 import 'package:takapp/vues/floor_manager/floor_manager_widgets.dart';
@@ -15,11 +18,42 @@ import 'package:takapp/vues/floor_manager/floor_manager_widgets.dart';
 class FloorManagerServersPage extends StatelessWidget {
   final FloorManagerSection section;
 
-  const FloorManagerServersPage({super.key, required this.section});
+  /// Page de commande ouverte (injectable pour les tests).
+  final OrderPageBuilder orderPageBuilder;
 
-  void _onServerTap(BuildContext context, ShiftParticipantModel server) {
-    // Les actions pour un serveur (commande, encaissement) viendront dans une
-    // prochaine étape : aucune action métier ici.
+  const FloorManagerServersPage({
+    super.key,
+    required this.section,
+    this.orderPageBuilder = defaultOrderPage,
+  });
+
+  void _onServerTap(
+    BuildContext context,
+    ShiftModel shift,
+    ShiftParticipantModel server,
+  ) {
+    final floorManager = context.read<AuthController>().currentUser;
+
+    if (section == FloorManagerSection.orders && floorManager != null) {
+      // Commande pour ce serveur : la vente lui appartient, le Floor Manager
+      // reste l'auteur réel. La présence du serveur est revérifiée à la
+      // validation (service + règles Firestore), pas seulement ici.
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => orderPageBuilder(
+            OrderActorContext.forShiftServer(
+              floorManager: floorManager,
+              shift: shift,
+              server: server,
+            ),
+          ),
+        ),
+      );
+      return;
+    }
+
+    // Encaissement pour un serveur : prochaine étape.
     final l10n = AppLocalizations.of(context);
     ScaffoldMessenger.of(
       context,
@@ -57,7 +91,7 @@ class FloorManagerServersPage extends StatelessWidget {
           return ActiveServerCard(
             key: ValueKey('fm-server-${server.serverId}'),
             server: server,
-            onTap: () => _onServerTap(context, server),
+            onTap: () => _onServerTap(context, state.openShift!, server),
           );
         },
       );

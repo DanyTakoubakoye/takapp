@@ -12,6 +12,7 @@ import 'package:takapp/vues/commun/client_picker_sheet.dart';
 import 'package:takapp/vues/commun/module_visibility.dart';
 import 'package:takapp/vues/serveur/order_submitted_feedback.dart';
 import 'package:takapp/modeles/order_actor_context.dart';
+import 'package:takapp/vues/serveur/order_actor_banner.dart';
 
 class NouvelleCommandePage extends StatefulWidget {
   final String initialClientType;
@@ -19,12 +20,17 @@ class NouvelleCommandePage extends StatefulWidget {
   final String? initialRoomNumber;
   final bool returnAfterSubmit;
 
+  /// Qui saisit, et pour quel serveur. `null` : commande classique de
+  /// l'utilisateur connecté (`OrderActorContext.self(user)`).
+  final OrderActorContext? actor;
+
   const NouvelleCommandePage({
     super.key,
     this.initialClientType = 'restaurant',
     this.initialTableNumber,
     this.initialRoomNumber,
     this.returnAfterSubmit = false,
+    this.actor,
   });
 
   @override
@@ -59,6 +65,20 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
     clientType = widget.initialClientType;
     tableController.text = widget.initialTableNumber ?? '';
     roomController.text = widget.initialRoomNumber ?? '';
+
+    // Cette page remplit directement le panier partagé : on le lie au
+    // contexte dès l'ouverture (un panier d'un autre contexte est vidé).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final actor = _resolveActor();
+      if (actor != null) context.read<OrderController>().bindActor(actor);
+    });
+  }
+
+  OrderActorContext? _resolveActor() {
+    final user = context.read<AuthController>().currentUser;
+    if (user == null) return widget.actor;
+    return widget.actor ?? OrderActorContext.self(user);
   }
 
   Stream<List<MenuItemModel>> _menuStreamFor(String establishmentId) {
@@ -179,8 +199,8 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
       clientType: clientType,
       tableNumber: tableController.text.trim(),
       roomNumber: roomController.text.trim(),
-      // Commande classique : auteur réel = serveur responsable = connecté.
-      actor: OrderActorContext.self(user),
+      // Contexte reçu (Floor Manager), sinon commande classique.
+      actor: widget.actor ?? OrderActorContext.self(user),
       clientId: _selectedClientId,
     );
 
@@ -230,7 +250,15 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
     final orderController = context.watch<OrderController>();
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.newOrderTitle)),
+      appBar: AppBar(
+        title: Text(l10n.newOrderTitle),
+        bottom: widget.actor?.isFloorManager == true
+            ? PreferredSize(
+                preferredSize: const Size.fromHeight(40),
+                child: OrderActorBanner(actor: widget.actor),
+              )
+            : null,
+      ),
       body: LayoutBuilder(
         builder: (context, constraints) {
           final bool isMobile = constraints.maxWidth < 900;
@@ -546,7 +574,9 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
             const SizedBox(height: 6),
-            _buildClientSelector(establishmentId),
+            // Pas de fiches clients pour le Floor Manager (règles Firestore).
+            if (widget.actor?.isFloorManager != true)
+              _buildClientSelector(establishmentId),
             const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
@@ -654,7 +684,9 @@ class _NouvelleCommandePageState extends State<NouvelleCommandePage> {
               ),
             ),
             const SizedBox(height: 10),
-            _buildClientSelector(establishmentId),
+            // Pas de fiches clients pour le Floor Manager (règles Firestore).
+            if (widget.actor?.isFloorManager != true)
+              _buildClientSelector(establishmentId),
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,

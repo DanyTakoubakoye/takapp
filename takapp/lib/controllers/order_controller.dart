@@ -187,6 +187,31 @@ class OrderController extends ChangeNotifier {
   }
 
   // =========================
+  // CONTEXTE DU PANIER
+  // =========================
+
+  /// Contexte d'acteur auquel appartient le panier ([OrderActorContext.cartKey]).
+  String? _cartActorKey;
+
+  String? get cartActorKey => _cartActorKey;
+
+  /// Lie le panier à un contexte de commande. Changer de contexte (ex. le
+  /// Floor Manager passe de sa commande directe à une commande pour Jean)
+  /// VIDE le panier : il n'est jamais transféré à un autre serveur.
+  /// Même contexte : le panier est conservé (comportement historique).
+  void bindActor(OrderActorContext actor) {
+    final key = actor.cartKey;
+    if (key == _cartActorKey) return;
+
+    _cartActorKey = key;
+    final hadState = _items.isNotEmpty || _error != null;
+    _items.clear();
+    _error = null;
+    _lastStockWarnings = const [];
+    if (hadState) notifyListeners();
+  }
+
+  // =========================
   // INCREMENT / DECREMENT PAR LIGNE (lignes individuelles avec accompagnement)
   // =========================
   void removeLineById(String lineId) {
@@ -230,6 +255,16 @@ class OrderController extends ChangeNotifier {
     /// Fiche client rattachée. Optionnel : chaîne vide = non rattachée.
     String clientId = '',
   }) async {
+    // Le panier rempli dans un autre contexte ne part jamais sous celui-ci.
+    if (_cartActorKey != null && _cartActorKey != actor.cartKey) {
+      _items.clear();
+      _cartActorKey = actor.cartKey;
+      _error = const AppError(AppErrorCode.orderCartContextChanged);
+      notifyListeners();
+      return false;
+    }
+    _cartActorKey = actor.cartKey;
+
     if (_items.isEmpty) {
       _error = const AppError(AppErrorCode.addAtLeastOneItem);
       notifyListeners();

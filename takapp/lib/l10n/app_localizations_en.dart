@@ -4572,4 +4572,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String errOrderServerNotInShift(String name) {
     return '\"$name\" is not an active server of your shift.';
   }
+
+  @override
+  String get errOrderCartContextChanged =>
+      'The cart belonged to another order (another server or shift): it has been emptied.';
+
+  @override
+  String fmOrderContextDirect(String name) {
+    return 'Direct order — $name';
+  }
+
+  @override
+  String fmOrderContextForServer(String server, String author) {
+    return 'For $server · entered by $author';
+  }
+
+  @override
+  String get fmDirectOrderSubtitle => 'For yourself, within your current shift';
 }

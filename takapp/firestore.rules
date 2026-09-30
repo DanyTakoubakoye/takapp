@@ -195,6 +195,27 @@ service cloud.firestore {
         );
     }
 
+    // Floor Manager actuellement DANS un service ouvert de cet établissement
+    // (son pointeur désigne un service ouvert ; les règles des pointeurs
+    // garantissent que ce service est bien le sien). Condition de TOUS ses
+    // droits de prise de commande : hors service, il ne lit ni n'écrit rien.
+    function fmOnOpenShift(establishmentId) {
+      return isFloorManager() &&
+        userEstablishmentId() == establishmentId &&
+        exists(fmPointerDoc(establishmentId, request.auth.uid)) &&
+        get(shiftDoc(establishmentId, get(fmPointerDoc(establishmentId, request.auth.uid)).data.openShiftId)).data.status == 'open';
+    }
+
+    // La commande [orderId] n'existait pas avant ce lot et y est créée par
+    // l'utilisateur (auteur réel) : lie une écriture de stock à UNE nouvelle
+    // commande, sans rejeu possible.
+    function fmCreatesOrderInThisBatch(establishmentId, orderId) {
+      return orderId is string && orderId != '' &&
+        !exists(/databases/$(database)/documents/establishments/$(establishmentId)/orders/$(orderId)) &&
+        existsAfter(/databases/$(database)/documents/establishments/$(establishmentId)/orders/$(orderId)) &&
+        getAfter(/databases/$(database)/documents/establishments/$(establishmentId)/orders/$(orderId)).data.get('performedByUserId', '') == request.auth.uid;
+    }
+
     // Le Floor Manager lit le profil d'un serveur UNIQUEMENT s'il est présent
     // dans son service actuellement ouvert.
     function isServerOfMyOpenShift(serverId) {
@@ -389,7 +410,9 @@ service cloud.firestore {
       }
 
     match /menuItems/{itemId} {
-          allow read: if tenantReader(establishmentId);
+          // Floor Manager : le menu, pendant son service uniquement.
+          allow read: if tenantReader(establishmentId) ||
+            fmOnOpenShift(establishmentId);
 
           // Création : gérante/admin sans restriction.
           // Le chef peut créer un plat CUISINE uniquement, sans prix (0).
@@ -431,29 +454,44 @@ service cloud.firestore {
           );
         }
       match /orders/{orderId} {
-        allow read: if tenantReader(establishmentId);
+        // Floor Manager, pendant son service : uniquement les commandes NON
+        // ENCAISSÉES (le moteur y cherche l'addition ouverte de la table pour
+        // y rattacher la nouvelle commande). Jamais l'historique encaissé.
+        allow read: if tenantReader(establishmentId) || (
+          fmOnOpenShift(establishmentId) &&
+          resource.data.paymentStatus == 'unpaid'
+        );
         // Acteur validé (auteur réel = auth.uid, serveur responsable
         // autorisé) : voir validOrderActor.
         allow create: if sameEstablishment(establishmentId) && (
           isServeur() || isGerante() || isAdminOrOwner() || isFloorManager()
         ) && validOrderActor(establishmentId);
         // Les acteurs sont figés à la création.
-        allow update: if sameEstablishment(establishmentId) && (
-          isServeur() || isGerante() || isChefCuisine() || isBarman() || isAdminOrOwner()
-        ) && unchangedFields([
-          'createdBy', 'createdByName',
-          'performedByUserId', 'performedByUserName',
-          'assignedServerId', 'assignedServerName', 'shiftId'
-        ]);
+        allow update: if (
+          sameEstablishment(establishmentId) && (
+            isServeur() || isGerante() || isChefCuisine() || isBarman() || isAdminOrOwner()
+          ) && unchangedFields([
+            'createdBy', 'createdByName',
+            'performedByUserId', 'performedByUserName',
+            'assignedServerId', 'assignedServerName', 'shiftId'
+          ])
+        ) || (
+          // Floor Manager : seulement rattacher une ancienne commande non
+          // encaissée, sans addition, à l'addition de la table (moteur).
+          fmOnOpenShift(establishmentId) &&
+          resource.data.paymentStatus == 'unpaid' &&
+          resource.data.get('ticketId', '') == '' &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ticketId'])
+        );
         allow delete: if sameEstablishment(establishmentId) &&
           (isAdminOrOwner() || isGerante());
         match /items/{itemId} {
           allow read: if tenantReader(establishmentId);
           allow create: if sameEstablishment(establishmentId) && (
             isServeur() || isGerante() || isAdminOrOwner() ||
-            // Floor Manager : lignes de SA commande uniquement.
+            // Floor Manager : lignes de SA commande, pendant son service.
             (
-              isFloorManager() &&
+              fmOnOpenShift(establishmentId) &&
               getAfter(/databases/$(database)/documents/establishments/$(establishmentId)/orders/$(orderId)).data.get('performedByUserId', '') == request.auth.uid
             )
           );
@@ -562,15 +600,34 @@ service cloud.firestore {
       }
 
       match /store_stocks/{stockId} {
-        allow read: if sameEstablishment(establishmentId) &&
-          canReadStore(resource.data.store);
+        // Floor Manager : comme un serveur pour la prise de commande
+        // (lecture des magasins), pendant son service uniquement.
+        allow read: if (
+          sameEstablishment(establishmentId) &&
+          canReadStore(resource.data.store)
+        ) || fmOnOpenShift(establishmentId);
         allow create: if sameEstablishment(establishmentId)
           && validStore(request.resource.data.store)
           && canManageStore(request.resource.data.store);
-        allow update: if sameEstablishment(establishmentId)
+        allow update: if (
+          sameEstablishment(establishmentId)
           && validStore(request.resource.data.store)
           && resource.data.store == request.resource.data.store
-          && canManageStore(resource.data.store);
+          && canManageStore(resource.data.store)
+        ) || (
+          // Floor Manager : DÉDUCTION de commande uniquement (quantité en
+          // baisse, jamais négative, champs de déduction seulement), dans les
+          // mêmes magasins qu'un serveur, LIÉE à une commande qu'il crée dans
+          // ce même lot (lastOrderId) : pas de déduction isolée ni rejouée.
+          fmOnOpenShift(establishmentId)
+          && resource.data.store in ['restaurant', 'bar', 'hotel']
+          && request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['quantity', 'isLowStock', 'lastOrderId', 'updatedAt', 'pendingSync', 'syncError'])
+          && request.resource.data.quantity is number
+          && request.resource.data.quantity >= 0
+          && request.resource.data.quantity < resource.data.quantity
+          && fmCreatesOrderInThisBatch(establishmentId, request.resource.data.get('lastOrderId', ''))
+        );
         allow delete: if sameEstablishment(establishmentId) &&
           (isAdminOrOwner() || isGerante());
       }
@@ -578,9 +635,19 @@ service cloud.firestore {
       match /stock_movements/{movementId} {
         allow read: if sameEstablishment(establishmentId) &&
           canReadStore(resource.data.store);
-        allow create: if sameEstablishment(establishmentId)
+        allow create: if (
+          sameEstablishment(establishmentId)
           && validStore(request.resource.data.store)
-          && canManageStore(request.resource.data.store);
+          && canManageStore(request.resource.data.store)
+        ) || (
+          // Floor Manager : sortie liée à SA commande, écrite dans le même
+          // lot que la commande (getAfter), pendant son service.
+          fmOnOpenShift(establishmentId)
+          && request.resource.data.store in ['restaurant', 'bar', 'hotel']
+          && request.resource.data.movementType == 'out'
+          && request.resource.data.performedBy == request.auth.uid
+          && fmCreatesOrderInThisBatch(establishmentId, request.resource.data.get('orderId', ''))
+        );
         allow update, delete: if sameEstablishment(establishmentId) &&
           (isAdminOrOwner() || isGerante());
       }
@@ -637,9 +704,11 @@ service cloud.firestore {
             resource.data.serveurId == request.auth.uid
           ) ||
           // Tout membre lit SES notifications : AuthService écoute
-          // `serveurId == uid` à la connexion, quel que soit le rôle.
+          // `serveurId == uid` à la connexion, quel que soit le rôle. Le
+          // Floor Manager compris : il est destinataire des « prêt » de ses
+          // commandes directes (9B) — les siennes seulement.
           (
-            tenantReader(establishmentId) &&
+            sameEstablishment(establishmentId) &&
             resource.data.serveurId == request.auth.uid
           )
         );

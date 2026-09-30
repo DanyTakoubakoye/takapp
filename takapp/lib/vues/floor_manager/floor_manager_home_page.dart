@@ -15,7 +15,13 @@ import 'package:takapp/vues/floor_manager/floor_manager_widgets.dart';
 /// Données : `FloorManagerShiftController` (temps réel). Les règles Firestore
 /// limitent de toute façon le Floor Manager à SON service et SES serveurs.
 class FloorManagerHomePage extends StatelessWidget {
-  const FloorManagerHomePage({super.key});
+  /// Page de commande ouverte (injectable pour les tests).
+  final OrderPageBuilder orderPageBuilder;
+
+  const FloorManagerHomePage({
+    super.key,
+    this.orderPageBuilder = defaultOrderPage,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +34,10 @@ class FloorManagerHomePage extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => FloorManagerActionPage(section: section),
+          builder: (_) => FloorManagerActionPage(
+            section: section,
+            orderPageBuilder: orderPageBuilder,
+          ),
         ),
       );
     }

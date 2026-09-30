@@ -3068,5 +3068,26 @@
         "type": "String"
       }
     }
-  }
+  },
+"errOrderCartContextChanged": "The cart belonged to another order (another server or shift): it has been emptied.",
+  "fmOrderContextDirect": "Direct order — {name}",
+  "@fmOrderContextDirect": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "fmOrderContextForServer": "For {server} · entered by {author}",
+  "@fmOrderContextForServer": {
+    "placeholders": {
+      "server": {
+        "type": "String"
+      },
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+"fmDirectOrderSubtitle": "For yourself, within your current shift"
 }

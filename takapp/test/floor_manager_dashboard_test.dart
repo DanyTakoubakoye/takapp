@@ -8,6 +8,7 @@ import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/floor_manager_shift_controller.dart';
 import 'package:takapp/core/l10n/locale_controller.dart';
 import 'package:takapp/l10n/app_localizations.dart';
+import 'package:takapp/modeles/order_actor_context.dart';
 import 'package:takapp/modeles/shift_model.dart';
 import 'package:takapp/modeles/shift_participant_model.dart';
 import 'package:takapp/modeles/user_model.dart';
@@ -96,11 +97,20 @@ final _twoServers = _stateWith([
   _server('s2', 'Koffi'),
 ]);
 
+/// Page de commande factice : enregistre le contexte d'acteur reçu (le vrai
+/// parcours, MenuPresentationPage, dépend de Firebase).
+Widget _fakeOrderPage(List<OrderActorContext> opened, OrderActorContext actor) {
+  opened.add(actor);
+  return Scaffold(body: Text('ORDER:${actor.assignedServerId}'));
+}
+
 Future<_FakeShiftService> _pumpDashboard(
   WidgetTester tester, {
   FloorManagerShiftState? initial,
   UserModel? user,
+  List<OrderActorContext>? openedActors,
 }) async {
+  final opened = openedActors ?? <OrderActorContext>[];
   final service = _FakeShiftService();
   final controller = FloorManagerShiftController(service)
     ..setCurrentUser(user ?? _paul);
@@ -118,16 +128,18 @@ Future<_FakeShiftService> _pumpDashboard(
           value: controller,
         ),
       ],
-      child: const MaterialApp(
-        locale: Locale('fr'),
-        localizationsDelegates: [
+      child: MaterialApp(
+        locale: const Locale('fr'),
+        localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: LocaleController.supportedLocales,
-        home: FloorManagerHomePage(),
+        home: FloorManagerHomePage(
+          orderPageBuilder: (actor) => _fakeOrderPage(opened, actor),
+        ),
       ),
     ),
   );
@@ -187,19 +199,32 @@ void main() {
     expect(find.text('Aucun service en cours'), findsNothing);
   });
 
-  testWidgets('Commandes: direct order prepared, Serveurs lists the shift', (
+  testWidgets('Commandes → Commande directe : le Floor Manager pour lui-même', (
     tester,
   ) async {
-    await _pumpDashboard(tester, initial: _twoServers);
+    final opened = <OrderActorContext>[];
+    await _pumpDashboard(tester, initial: _twoServers, openedActors: opened);
 
     await _tap(tester, find.byKey(const ValueKey('fm-section-orders')));
     expect(find.text('COMMANDE DIRECTE'), findsOneWidget);
-    expect(find.text('Bientôt disponible'), findsOneWidget);
+    expect(
+      find.text('Pour vous-même, dans votre service en cours'),
+      findsOneWidget,
+    );
 
-    // Commande directe : préparée, pas encore active.
     await _tap(tester, find.byKey(const ValueKey('fm-direct-orders')));
-    expect(find.byType(ActiveServerCard), findsNothing);
+    expect(find.text('ORDER:fm-a'), findsOneWidget);
 
+    final actor = opened.single;
+    expect(actor.performedByUserId, 'fm-a');
+    expect(actor.assignedServerId, 'fm-a');
+    expect(actor.shiftId, 'shift-1');
+    expect(actor.isDelegated, isFalse);
+  });
+
+  testWidgets('Commandes → Serveurs : liste du service', (tester) async {
+    await _pumpDashboard(tester, initial: _twoServers);
+    await _tap(tester, find.byKey(const ValueKey('fm-section-orders')));
     await _tap(tester, find.byKey(const ValueKey('fm-servers-orders')));
     expect(find.byType(ActiveServerCard), findsNWidgets(2));
     expect(find.text('Awa Diallo'), findsOneWidget);
@@ -219,17 +244,43 @@ void main() {
     expect(find.byType(ActiveServerCard), findsNWidgets(2));
   });
 
-  testWidgets('tapping a server triggers no business action yet', (
+  testWidgets('Commandes → Serveurs → Awa : commande pour ce serveur', (
     tester,
   ) async {
-    await _pumpDashboard(tester, initial: _twoServers);
+    final opened = <OrderActorContext>[];
+    await _pumpDashboard(tester, initial: _twoServers, openedActors: opened);
     await _tap(tester, find.byKey(const ValueKey('fm-section-orders')));
     await _tap(tester, find.byKey(const ValueKey('fm-servers-orders')));
 
+    await _tap(tester, find.byKey(const ValueKey('fm-server-s1')));
+    expect(find.text('ORDER:s1'), findsOneWidget);
+
+    final actor = opened.single;
+    expect(actor.performedByUserId, 'fm-a', reason: 'auteur réel');
+    expect(actor.performedByUserName, 'Paul');
+    expect(actor.assignedServerId, 's1', reason: 'la vente appartient à Awa');
+    expect(actor.assignedServerName, 'Awa Diallo');
+    expect(actor.shiftId, 'shift-1');
+    expect(actor.isDelegated, isTrue);
+  });
+
+  testWidgets('Encaissements : toucher un serveur ne lance encore rien', (
+    tester,
+  ) async {
+    final opened = <OrderActorContext>[];
+    await _pumpDashboard(tester, initial: _twoServers, openedActors: opened);
+    await _tap(tester, find.byKey(const ValueKey('fm-section-payments')));
+
+    // Encaissement direct : préparé, inactif.
+    await _tap(tester, find.byKey(const ValueKey('fm-direct-payments')));
+    expect(opened, isEmpty);
+
+    await _tap(tester, find.byKey(const ValueKey('fm-servers-payments')));
     await tester.tap(find.byKey(const ValueKey('fm-server-s1')));
     await tester.pump();
     expect(find.text('Bientôt disponible'), findsWidgets);
     expect(find.byType(FloorManagerServersPage), findsOneWidget);
+    expect(opened, isEmpty);
   });
 
   testWidgets('open shift without active server: explicit message', (

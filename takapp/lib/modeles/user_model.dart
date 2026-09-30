@@ -76,7 +76,13 @@ class UserModel {
     Map<String, dynamic>? establishmentModules,
   }) {
     final role = _normalizeRole(map['role']);
-    final modules = Map<String, dynamic>.from(map['modules'] ?? {});
+    // floor_manager : accès définis par le RÔLE (AppRoles.modules), toujours
+    // plafonnés par l'abonnement. Les `modules` stockés sur ces profils sont
+    // les valeurs d'attente (tout à false) posées à la création avant que
+    // leurs fonctions n'existent : ils ne font pas foi.
+    final modules = role == AppRoles.floorManager
+        ? <String, dynamic>{}
+        : Map<String, dynamic>.from(map['modules'] ?? {});
 
     final bool applySubscription =
         establishmentModules != null &&

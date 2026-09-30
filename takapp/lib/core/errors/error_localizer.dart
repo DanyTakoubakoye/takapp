@@ -304,5 +304,7 @@ String _messageFor(AppLocalizations l10n, AppError error) {
       return l10n.errOrderNoOpenShift;
     case AppErrorCode.orderServerNotInShift:
       return l10n.errOrderServerNotInShift(error.name ?? '');
+    case AppErrorCode.orderCartContextChanged:
+      return l10n.errOrderCartContextChanged;
   }
 }
