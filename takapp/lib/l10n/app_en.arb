@@ -3089,5 +3089,45 @@
       }
     }
   },
-"fmDirectOrderSubtitle": "For yourself, within your current shift"
+"fmDirectOrderSubtitle": "For yourself, within your current shift",
+"errOrderAlreadyPaid": "Order {name} has already been paid.",
+  "@errOrderAlreadyPaid": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errOrderNotPayable": "Order {name} cannot be paid (cancelled).",
+  "@errOrderNotPayable": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errTicketChanged": "The bill has changed since it was displayed. Reopen it to collect the right amount.",
+  "fmDirectPaymentSubtitle": "Your unpaid bills",
+  "fmTicketsDirectTitle": "My bills",
+  "fmTicketsForServerTitle": "{name}'s bills",
+  "@fmTicketsForServerTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "fmActionAddOrder": "Add an order",
+  "fmPaymentConfirm": "Confirm payment",
+  "fmPaymentContext": "Sale by {server} · collected by {cashier}",
+  "@fmPaymentContext": {
+    "placeholders": {
+      "server": {
+        "type": "String"
+      },
+      "cashier": {
+        "type": "String"
+      }
+    }
+  }
 }

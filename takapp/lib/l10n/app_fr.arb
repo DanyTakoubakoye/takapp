@@ -3095,5 +3095,45 @@
       }
     }
   },
-"fmDirectOrderSubtitle": "Pour vous-même, dans votre service en cours"
+"fmDirectOrderSubtitle": "Pour vous-même, dans votre service en cours",
+"errOrderAlreadyPaid": "La commande {name} est déjà encaissée.",
+  "@errOrderAlreadyPaid": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errOrderNotPayable": "La commande {name} ne peut pas être encaissée (annulée).",
+  "@errOrderNotPayable": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errTicketChanged": "L'addition a changé depuis son affichage. Rouvrez-la pour encaisser le bon montant.",
+  "fmDirectPaymentSubtitle": "Vos additions non encaissées",
+  "fmTicketsDirectTitle": "Mes additions",
+  "fmTicketsForServerTitle": "Additions de {name}",
+  "@fmTicketsForServerTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "fmActionAddOrder": "Ajouter une commande",
+  "fmPaymentConfirm": "Confirmer l'encaissement",
+  "fmPaymentContext": "Vente de {server} · encaissée par {cashier}",
+  "@fmPaymentContext": {
+    "placeholders": {
+      "server": {
+        "type": "String"
+      },
+      "cashier": {
+        "type": "String"
+      }
+    }
+  }
 }

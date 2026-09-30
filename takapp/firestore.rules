@@ -206,6 +206,34 @@ service cloud.firestore {
         get(shiftDoc(establishmentId, get(fmPointerDoc(establishmentId, request.auth.uid)).data.openShiftId)).data.status == 'open';
     }
 
+    // Commande déjà payée : ses champs de paiement ne sont jamais réécrits
+    // (un second encaissement concurrent échoue ici, côté serveur).
+    function paymentNotRewritten() {
+      return resource.data.get('paymentStatus', '') != 'paid' ||
+        !request.resource.data.diff(resource.data).affectedKeys()
+          .hasAny(['paymentStatus', 'paymentId', 'paidAt']);
+    }
+    // Le paiement [paymentId] est créé dans ce lot par l'utilisateur, comme
+    // encaisseur réel, et couvre bien la commande [orderId].
+    function fmCreatesPaymentInThisBatch(establishmentId, paymentId, orderId) {
+      return paymentId is string && paymentId != '' &&
+        !exists(/databases/$(database)/documents/establishments/$(establishmentId)/payments/$(paymentId)) &&
+        existsAfter(/databases/$(database)/documents/establishments/$(establishmentId)/payments/$(paymentId)) &&
+        getAfter(/databases/$(database)/documents/establishments/$(establishmentId)/payments/$(paymentId)).data.receivedBy == request.auth.uid &&
+        orderId in getAfter(/databases/$(database)/documents/establishments/$(establishmentId)/payments/$(paymentId)).data.orderIds;
+    }
+
+    // Service ouvert désigné par le pointeur du Floor Manager connecté.
+    function fmOpenShiftId(establishmentId) {
+      return get(fmPointerDoc(establishmentId, request.auth.uid)).data.openShiftId;
+    }
+    // Le Floor Manager peut encaisser une vente attribuée à [serverId] :
+    // lui-même, ou un serveur présent dans SON service ouvert.
+    function fmMayCollectFor(establishmentId, serverId) {
+      return serverId == request.auth.uid ||
+        fmCanAssign(establishmentId, fmOpenShiftId(establishmentId), serverId);
+    }
+
     // La commande [orderId] n'existait pas avant ce lot et y est créée par
     // l'utilisateur (auteur réel) : lie une écriture de stock à UNE nouvelle
     // commande, sans rejeu possible.
@@ -474,7 +502,10 @@ service cloud.firestore {
             'createdBy', 'createdByName',
             'performedByUserId', 'performedByUserName',
             'assignedServerId', 'assignedServerName', 'shiftId'
-          ])
+          ]) &&
+          // Double encaissement : une commande payée ne l'est qu'une fois ;
+          // son paiement (paymentStatus, paymentId, paidAt) est figé.
+          paymentNotRewritten()
         ) || (
           // Floor Manager : seulement rattacher une ancienne commande non
           // encaissée, sans addition, à l'addition de la table (moteur).
@@ -482,6 +513,28 @@ service cloud.firestore {
           resource.data.paymentStatus == 'unpaid' &&
           resource.data.get('ticketId', '') == '' &&
           request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ticketId'])
+        ) || (
+          // Floor Manager (10B) : solder une commande non encaissée, prête,
+          // d'une vente attribuée à lui-même ou à un serveur de SON service,
+          // par un paiement qu'il crée dans ce même lot en tant
+          // qu'encaisseur réel.
+          fmOnOpenShift(establishmentId) &&
+          resource.data.paymentStatus == 'unpaid' &&
+          resource.data.get('status', '') != 'cancelled' &&
+          (resource.data.get('isForKitchen', false) != true ||
+            resource.data.get('kitchenStatus', '') in ['ready', 'served']) &&
+          (resource.data.get('isForBar', false) != true ||
+            resource.data.get('barStatus', '') in ['ready', 'served']) &&
+          fmMayCollectFor(
+            establishmentId,
+            resource.data.get('assignedServerId', resource.data.get('createdBy', ''))
+          ) &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'paymentStatus', 'status', 'paymentId', 'paidAt', 'updatedAt',
+            'pendingSync', 'syncError'
+          ]) &&
+          request.resource.data.paymentStatus == 'paid' &&
+          fmCreatesPaymentInThisBatch(establishmentId, request.resource.data.paymentId, orderId)
         );
         allow delete: if sameEstablishment(establishmentId) &&
           (isAdminOrOwner() || isGerante());
@@ -505,8 +558,24 @@ service cloud.firestore {
 
       match /payments/{paymentId} {
         allow read: if tenantReader(establishmentId);
-        allow create: if sameEstablishment(establishmentId) && (
-          isServeur() || isGerante() || isAdminOrOwner()
+        allow create: if (
+          sameEstablishment(establishmentId) && (
+            isServeur() || isGerante() || isAdminOrOwner()
+          )
+        ) || (
+          // Floor Manager (10B) : encaisseur réel = lui ; vente attribuée à
+          // lui-même ou à un serveur de SON service ouvert ; jamais de note
+          // « chambre » ; la commande principale est soldée par ce même lot.
+          fmOnOpenShift(establishmentId) &&
+          request.resource.data.receivedBy == request.auth.uid &&
+          request.resource.data.get('shiftId', '') == fmOpenShiftId(establishmentId) &&
+          fmMayCollectFor(establishmentId, request.resource.data.get('responsibleServerId', '')) &&
+          request.resource.data.method != 'room' &&
+          request.resource.data.status == 'confirmed' &&
+          request.resource.data.handoverStatus == 'pending' &&
+          request.resource.data.orderIds is list &&
+          request.resource.data.orderIds.size() > 0 &&
+          getAfter(/databases/$(database)/documents/establishments/$(establishmentId)/orders/$(request.resource.data.orderId)).data.get('paymentId', '') == paymentId
         );
         allow update: if sameEstablishment(establishmentId) && (
           (

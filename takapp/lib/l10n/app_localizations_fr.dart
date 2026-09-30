@@ -4638,4 +4638,40 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get fmDirectOrderSubtitle =>
       'Pour vous-même, dans votre service en cours';
+
+  @override
+  String errOrderAlreadyPaid(String name) {
+    return 'La commande $name est déjà encaissée.';
+  }
+
+  @override
+  String errOrderNotPayable(String name) {
+    return 'La commande $name ne peut pas être encaissée (annulée).';
+  }
+
+  @override
+  String get errTicketChanged =>
+      'L\'addition a changé depuis son affichage. Rouvrez-la pour encaisser le bon montant.';
+
+  @override
+  String get fmDirectPaymentSubtitle => 'Vos additions non encaissées';
+
+  @override
+  String get fmTicketsDirectTitle => 'Mes additions';
+
+  @override
+  String fmTicketsForServerTitle(String name) {
+    return 'Additions de $name';
+  }
+
+  @override
+  String get fmActionAddOrder => 'Ajouter une commande';
+
+  @override
+  String get fmPaymentConfirm => 'Confirmer l\'encaissement';
+
+  @override
+  String fmPaymentContext(String server, String cashier) {
+    return 'Vente de $server · encaissée par $cashier';
+  }
 }

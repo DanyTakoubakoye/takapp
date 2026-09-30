@@ -9,6 +9,7 @@ import 'package:takapp/modeles/order_model.dart';
 import 'package:takapp/modeles/order_ticket_model.dart';
 import 'package:takapp/services/payment_service.dart';
 import 'package:takapp/vues/serveur/detail_consommation_page.dart';
+import 'package:takapp/modeles/order_actor_context.dart';
 
 class EncaissementPage extends StatelessWidget {
   const EncaissementPage({super.key});
@@ -274,8 +275,8 @@ class _PaymentDialogState extends State<_PaymentDialog> {
       establishmentId: establishmentId,
       ticketId: widget.ticket.ticketId,
       orderIds: widget.ticket.orderIds,
-      receivedBy: user.uid,
-      receivedByName: user.name,
+      // Encaissement classique : l'utilisateur connecté encaisse.
+      actor: OrderActorContext.self(user),
       method: selectedMethod,
       amount: amount,
     );

@@ -1515,3 +1515,169 @@ test('✅ Floor Manager lit SES notifications « prêt » (commandes directes), 
   await assertSucceeds(getDoc(doc(db, 'establishments', ESTAB_A, 'serverNotifications', 'kitchen_direct_ready')));
   await assertFails(getDoc(doc(db, 'establishments', ESTAB_A, 'serverNotifications', 'kitchen_jean_ready')));
 });
+
+// ─────────── 10B : ENCAISSEMENTS FLOOR MANAGER ───────────
+
+function unpaidOrder(e, owner, extra = {}) {
+  return {
+    establishmentId: e, createdBy: owner, createdByName: owner,
+    assignedServerId: owner, assignedServerName: owner,
+    performedByUserId: owner, performedByUserName: owner,
+    paymentStatus: 'unpaid', status: 'ready', total: 3000,
+    isForKitchen: true, kitchenStatus: 'ready', isForBar: false,
+    clientType: 'restaurant', tableNumber: '8',
+    ...extra,
+  };
+}
+
+async function seedPaymentWorld() {
+  await seedOrderingWorld();
+  await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
+  await openShiftAsAdmin('shA2', FM_A2, [SRV_A3]);
+  await testEnv.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    const put = (e, id, data) => setDoc(doc(db, 'establishments', e, 'orders', id), data);
+    await put(ESTAB_A, 'jean1', unpaidOrder(ESTAB_A, SRV_A1));
+    await put(ESTAB_A, 'jean2', unpaidOrder(ESTAB_A, SRV_A1));
+    await put(ESTAB_A, 'paul1', unpaidOrder(ESTAB_A, FM_A, { tableNumber: '7' }));
+    await put(ESTAB_A, 'other1', unpaidOrder(ESTAB_A, SRV_A2, { tableNumber: '9' }));
+    await put(ESTAB_A, 'fm2direct', unpaidOrder(ESTAB_A, FM_A2, { tableNumber: '10' }));
+    await put(ESTAB_A, 'notReady', unpaidOrder(ESTAB_A, SRV_A1, { kitchenStatus: 'preparing' }));
+    await put(ESTAB_A, 'cancelled', unpaidOrder(ESTAB_A, SRV_A1, { status: 'cancelled' }));
+    await put(ESTAB_B, 'jeanB', unpaidOrder(ESTAB_B, SRV_B));
+  });
+}
+
+// Même lot que PaymentService.registerTicketPayment (transaction).
+function payBatch(uid, e, paymentId, orderIds, payment = {}) {
+  const db = asUser(uid);
+  const batch = writeBatch(db);
+  batch.set(doc(db, 'establishments', e, 'payments', paymentId), {
+    establishmentId: e, ticketId: 'TCK-8', orderId: orderIds[0],
+    orderNumber: 'CMD', orderIds, orderNumbers: orderIds, orderCount: orderIds.length,
+    clientType: 'restaurant', type: 'restaurant',
+    receivedBy: uid, receivedByName: uid,
+    responsibleServerId: SRV_A1, responsibleServerName: 'Jean',
+    shiftId: 'sh1', method: 'cash', amount: 3000 * orderIds.length,
+    status: 'confirmed', handoverStatus: 'pending', handoverId: null,
+    isFiscalized: false, fiscalUid: '', pendingSync: false, syncError: false,
+    createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+    ...payment,
+  });
+  for (const id of orderIds) {
+    batch.update(doc(db, 'establishments', e, 'orders', id), {
+      paymentStatus: 'paid', status: 'paid', paymentId, paidAt: serverTimestamp(),
+      updatedAt: serverTimestamp(), pendingSync: false, syncError: false,
+    });
+  }
+  return batch.commit();
+}
+
+test('✅ vente de Jean encaissée par le Floor Manager (responsable = Jean, encaisseur = FM)', async () => {
+  await seedPaymentWorld();
+  await assertSucceeds(payBatch(FM_A, ESTAB_A, 'p1', ['jean1', 'jean2']));
+  const snap = await getDoc(doc(asUser(GERANTE_A), 'establishments', ESTAB_A, 'payments', 'p1'));
+  assert.strictEqual(snap.data().responsibleServerId, SRV_A1);
+  assert.strictEqual(snap.data().receivedBy, FM_A);
+  assert.strictEqual(snap.data().shiftId, 'sh1');
+});
+
+test('✅ encaissement direct du Floor Manager (responsable = encaisseur = FM)', async () => {
+  await seedPaymentWorld();
+  await assertSucceeds(payBatch(FM_A, ESTAB_A, 'p2', ['paul1'], {
+    responsibleServerId: FM_A, responsibleServerName: 'Paul',
+  }));
+});
+
+test('🔒 pas la table d’un serveur hors service ni d’un autre Floor Manager', async () => {
+  await seedPaymentWorld();
+  // Serveur hors de son service (déclaré tel quel, ou maquillé en Jean).
+  await assertFails(payBatch(FM_A, ESTAB_A, 'x1', ['other1'], { responsibleServerId: SRV_A2 }));
+  await assertFails(payBatch(FM_A, ESTAB_A, 'x2', ['other1']));
+  // Commande directe d'un autre Floor Manager.
+  await assertFails(payBatch(FM_A, ESTAB_A, 'x3', ['fm2direct'], { responsibleServerId: FM_A2 }));
+  await assertFails(payBatch(FM_A, ESTAB_A, 'x4', ['fm2direct'], { responsibleServerId: FM_A }));
+  // Serveur d'un autre Floor Manager.
+  await assertFails(payBatch(FM_A, ESTAB_A, 'x5', ['jean1'], { responsibleServerId: SRV_A3 }));
+});
+
+test('🔒 Jean retiré du service avant le paiement : refusé', async () => {
+  await seedPaymentWorld();
+  const g = asUser(GERANTE_A);
+  const batch = writeBatch(g);
+  batch.update(shiftRef(g, ESTAB_A, 'sh1'), { serverIds: [], updatedAt: serverTimestamp() });
+  batch.set(participantRef(g, ESTAB_A, 'sh1', SRV_A1), participantData(ESTAB_A, 'sh1', SRV_A1, GERANTE_A, false));
+  await assertSucceeds(batch.commit());
+  await assertFails(payBatch(FM_A, ESTAB_A, 'r1', ['jean1']));
+});
+
+test('🔒 service clôturé avant le paiement : encaissement délégué et direct refusés', async () => {
+  await seedPaymentWorld();
+  await closeShift(GERANTE_A, ESTAB_A, 'sh1');
+  await assertFails(payBatch(FM_A, ESTAB_A, 'c1', ['jean1']));
+  await assertFails(payBatch(FM_A, ESTAB_A, 'c2', ['paul1'], { responsibleServerId: FM_A }));
+});
+
+test('🔒 autre établissement refusé', async () => {
+  await seedPaymentWorld();
+  await assertFails(payBatch(FM_A, ESTAB_B, 'b1', ['jeanB'], { responsibleServerId: SRV_B }));
+});
+
+test('🔒 encaisseur falsifié, note chambre, commande non prête ou annulée', async () => {
+  await seedPaymentWorld();
+  await assertFails(payBatch(FM_A, ESTAB_A, 'f1', ['jean1'], { receivedBy: SRV_A1 }));
+  await assertFails(payBatch(FM_A, ESTAB_A, 'f2', ['jean1'], { method: 'room', handoverStatus: 'none' }));
+  await assertFails(payBatch(FM_A, ESTAB_A, 'f3', ['notReady']));
+  await assertFails(payBatch(FM_A, ESTAB_A, 'f4', ['cancelled']));
+  await assertFails(payBatch(FM_A, ESTAB_A, 'f5', ['jean1'], { shiftId: 'shA2' }));
+});
+
+test('🔒 double encaissement : la seconde validation échoue (Floor Manager)', async () => {
+  await seedPaymentWorld();
+  await assertSucceeds(payBatch(FM_A, ESTAB_A, 'd1', ['jean1']));
+  await assertFails(payBatch(FM_A, ESTAB_A, 'd2', ['jean1']));
+});
+
+test('🔒 double encaissement : la seconde validation échoue aussi pour un serveur', async () => {
+  await seedPaymentWorld();
+  const serveurPay = (id) => payBatch(SRV_A1, ESTAB_A, id, ['jean2'], { shiftId: null });
+  await assertSucceeds(serveurPay('s1'));
+  await assertFails(serveurPay('s2'));
+  // Une commande payée ne peut pas non plus être « dé-payée » ni rattachée
+  // à un autre paiement.
+  const ref = doc(asUser(GERANTE_A), 'establishments', ESTAB_A, 'orders', 'jean2');
+  await assertFails(updateDoc(ref, { paymentStatus: 'unpaid' }));
+  await assertFails(updateDoc(ref, { paymentId: 'autre' }));
+  // Les autres champs restent modifiables (ex. fiscalisation).
+  await assertSucceeds(updateDoc(ref, { isFiscalized: true }));
+});
+
+test('🔒 pas de paiement « fantôme » ni d’accès général aux paiements', async () => {
+  await seedPaymentWorld();
+  const db = asUser(FM_A);
+  // Paiement sans solder la commande dans le même lot.
+  await assertFails(setDoc(doc(db, 'establishments', ESTAB_A, 'payments', 'g1'), {
+    orderId: 'jean1', orderIds: ['jean1'], receivedBy: FM_A, responsibleServerId: SRV_A1,
+    shiftId: 'sh1', method: 'cash', status: 'confirmed', handoverStatus: 'pending', amount: 1,
+  }));
+  // Commande soldée avec le paiement d'un autre.
+  await assertFails(updateDoc(doc(db, 'establishments', ESTAB_A, 'orders', 'jean1'), {
+    paymentStatus: 'paid', status: 'paid', paymentId: 'payment1',
+  }));
+  // Lecture des paiements : fermée.
+  await assertFails(getDoc(doc(db, 'establishments', ESTAB_A, 'payments', 'payment1')));
+  await assertFails(getDocs(collection(db, 'establishments', ESTAB_A, 'payments')));
+});
+
+test('✅ Floor Manager : liste des additions ouvertes (lecture des non encaissées)', async () => {
+  await seedPaymentWorld();
+  await assertSucceeds(getDocs(query(
+    collection(asUser(FM_A), 'establishments', ESTAB_A, 'orders'),
+    where('paymentStatus', '==', 'unpaid'),
+  )));
+});
+
+test('✅ non-régression : encaissement classique d’un serveur', async () => {
+  await seedPaymentWorld();
+  await assertSucceeds(payBatch(SRV_A1, ESTAB_A, 'srvp', ['jean1'], { shiftId: null }));
+});

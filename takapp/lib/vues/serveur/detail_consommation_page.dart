@@ -14,6 +14,7 @@ import 'package:takapp/modeles/emcf_invoice_request_model.dart';
 import 'package:takapp/modeles/order_ticket_model.dart';
 import 'package:takapp/services/pdf_service.dart';
 import 'package:takapp/services/printer_service.dart';
+import 'package:takapp/modeles/order_actor_context.dart';
 
 class DetailConsommationPage extends StatefulWidget {
   final String establishmentId;
@@ -225,8 +226,8 @@ class _DetailConsommationPageState extends State<DetailConsommationPage> {
       establishmentId: establishmentId,
       ticketId: _ticket.ticketId,
       orderIds: unpaidOrderIds.toList(),
-      receivedBy: user.uid,
-      receivedByName: user.name,
+      // Encaissement classique : l'utilisateur connecté encaisse.
+      actor: OrderActorContext.self(user),
       method: selectedPaymentMethod,
       amount: unpaidTotal,
     );

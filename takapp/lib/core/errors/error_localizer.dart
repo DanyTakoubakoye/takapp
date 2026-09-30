@@ -306,5 +306,11 @@ String _messageFor(AppLocalizations l10n, AppError error) {
       return l10n.errOrderServerNotInShift(error.name ?? '');
     case AppErrorCode.orderCartContextChanged:
       return l10n.errOrderCartContextChanged;
+    case AppErrorCode.orderAlreadyPaid:
+      return l10n.errOrderAlreadyPaid(error.name ?? '');
+    case AppErrorCode.orderNotPayable:
+      return l10n.errOrderNotPayable(error.name ?? '');
+    case AppErrorCode.ticketChanged:
+      return l10n.errTicketChanged;
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:takapp/core/errors/app_error.dart';
 import 'package:takapp/core/errors/error_localizer.dart';
 import 'package:takapp/l10n/app_localizations.dart';
+import 'package:takapp/modeles/order_actor_context.dart';
 import 'package:takapp/services/payment_service.dart';
 
 class PaymentController extends ChangeNotifier {
@@ -32,8 +33,11 @@ class PaymentController extends ChangeNotifier {
     required String establishmentId,
     required String ticketId,
     required List<String> orderIds,
-    required String receivedBy,
-    required String receivedByName,
+
+    /// Encaisseur réel (`performedBy*`) et serveur responsable
+    /// (`assignedServer*`). Construit depuis l'utilisateur connecté :
+    /// `OrderActorContext.self(user)` pour un encaissement classique.
+    required OrderActorContext actor,
     required String method,
     required double amount,
   }) async {
@@ -71,8 +75,7 @@ class PaymentController extends ChangeNotifier {
         establishmentId: establishmentId,
         ticketId: ticketId,
         orderIds: orderIds,
-        receivedBy: receivedBy,
-        receivedByName: receivedByName,
+        actor: actor,
         method: method,
         amount: amount,
       );

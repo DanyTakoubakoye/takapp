@@ -21,10 +21,14 @@ class FloorManagerServersPage extends StatelessWidget {
   /// Page de commande ouverte (injectable pour les tests).
   final OrderPageBuilder orderPageBuilder;
 
+  /// Page des additions ouverte (injectable pour les tests).
+  final ActorPageBuilder ticketsPageBuilder;
+
   const FloorManagerServersPage({
     super.key,
     required this.section,
     this.orderPageBuilder = defaultOrderPage,
+    this.ticketsPageBuilder = defaultTicketsPage,
   });
 
   void _onServerTap(
@@ -33,31 +37,27 @@ class FloorManagerServersPage extends StatelessWidget {
     ShiftParticipantModel server,
   ) {
     final floorManager = context.read<AuthController>().currentUser;
+    if (floorManager == null) return;
 
-    if (section == FloorManagerSection.orders && floorManager != null) {
-      // Commande pour ce serveur : la vente lui appartient, le Floor Manager
-      // reste l'auteur réel. La présence du serveur est revérifiée à la
-      // validation (service + règles Firestore), pas seulement ici.
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => orderPageBuilder(
-            OrderActorContext.forShiftServer(
-              floorManager: floorManager,
-              shift: shift,
-              server: server,
-            ),
-          ),
-        ),
-      );
-      return;
-    }
+    // Contexte « pour ce serveur » : la vente lui appartient ; le Floor
+    // Manager reste l'auteur / l'encaisseur réel. La présence du serveur est
+    // revérifiée à la validation (service + règles Firestore), jamais
+    // déduite du seul état de l'écran.
+    final actor = OrderActorContext.forShiftServer(
+      floorManager: floorManager,
+      shift: shift,
+      server: server,
+    );
 
-    // Encaissement pour un serveur : prochaine étape.
-    final l10n = AppLocalizations.of(context);
-    ScaffoldMessenger.of(
+    Navigator.push(
       context,
-    ).showSnackBar(SnackBar(content: Text(l10n.fmComingSoon)));
+      MaterialPageRoute(
+        builder: (_) => section == FloorManagerSection.orders
+            ? orderPageBuilder(actor)
+            // Encaissements : les additions non encaissées de ce serveur.
+            : ticketsPageBuilder(actor),
+      ),
+    );
   }
 
   @override

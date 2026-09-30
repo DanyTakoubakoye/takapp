@@ -18,9 +18,13 @@ class FloorManagerHomePage extends StatelessWidget {
   /// Page de commande ouverte (injectable pour les tests).
   final OrderPageBuilder orderPageBuilder;
 
+  /// Page des additions ouverte (injectable pour les tests).
+  final ActorPageBuilder ticketsPageBuilder;
+
   const FloorManagerHomePage({
     super.key,
     this.orderPageBuilder = defaultOrderPage,
+    this.ticketsPageBuilder = defaultTicketsPage,
   });
 
   @override
@@ -37,6 +41,7 @@ class FloorManagerHomePage extends StatelessWidget {
           builder: (_) => FloorManagerActionPage(
             section: section,
             orderPageBuilder: orderPageBuilder,
+            ticketsPageBuilder: ticketsPageBuilder,
           ),
         ),
       );

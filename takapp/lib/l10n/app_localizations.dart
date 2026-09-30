@@ -8062,6 +8062,60 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Pour vous-même, dans votre service en cours'**
   String get fmDirectOrderSubtitle;
+
+  /// No description provided for @errOrderAlreadyPaid.
+  ///
+  /// In fr, this message translates to:
+  /// **'La commande {name} est déjà encaissée.'**
+  String errOrderAlreadyPaid(String name);
+
+  /// No description provided for @errOrderNotPayable.
+  ///
+  /// In fr, this message translates to:
+  /// **'La commande {name} ne peut pas être encaissée (annulée).'**
+  String errOrderNotPayable(String name);
+
+  /// No description provided for @errTicketChanged.
+  ///
+  /// In fr, this message translates to:
+  /// **'L\'addition a changé depuis son affichage. Rouvrez-la pour encaisser le bon montant.'**
+  String get errTicketChanged;
+
+  /// No description provided for @fmDirectPaymentSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vos additions non encaissées'**
+  String get fmDirectPaymentSubtitle;
+
+  /// No description provided for @fmTicketsDirectTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mes additions'**
+  String get fmTicketsDirectTitle;
+
+  /// No description provided for @fmTicketsForServerTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Additions de {name}'**
+  String fmTicketsForServerTitle(String name);
+
+  /// No description provided for @fmActionAddOrder.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter une commande'**
+  String get fmActionAddOrder;
+
+  /// No description provided for @fmPaymentConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Confirmer l\'encaissement'**
+  String get fmPaymentConfirm;
+
+  /// No description provided for @fmPaymentContext.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vente de {server} · encaissée par {cashier}'**
+  String fmPaymentContext(String server, String cashier);
 }
 
 class _AppLocalizationsDelegate

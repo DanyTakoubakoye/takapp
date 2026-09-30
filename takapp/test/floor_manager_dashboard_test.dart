@@ -109,8 +109,10 @@ Future<_FakeShiftService> _pumpDashboard(
   FloorManagerShiftState? initial,
   UserModel? user,
   List<OrderActorContext>? openedActors,
+  List<OrderActorContext>? openedTickets,
 }) async {
   final opened = openedActors ?? <OrderActorContext>[];
+  final ticketsOpened = openedTickets ?? <OrderActorContext>[];
   final service = _FakeShiftService();
   final controller = FloorManagerShiftController(service)
     ..setCurrentUser(user ?? _paul);
@@ -139,6 +141,10 @@ Future<_FakeShiftService> _pumpDashboard(
         supportedLocales: LocaleController.supportedLocales,
         home: FloorManagerHomePage(
           orderPageBuilder: (actor) => _fakeOrderPage(opened, actor),
+          ticketsPageBuilder: (actor) {
+            ticketsOpened.add(actor);
+            return Scaffold(body: Text('TICKETS:${actor.assignedServerId}'));
+          },
         ),
       ),
     ),
@@ -264,23 +270,46 @@ void main() {
     expect(actor.isDelegated, isTrue);
   });
 
-  testWidgets('Encaissements : toucher un serveur ne lance encore rien', (
+  testWidgets('Encaissements → Encaissement direct : ses propres additions', (
     tester,
   ) async {
-    final opened = <OrderActorContext>[];
-    await _pumpDashboard(tester, initial: _twoServers, openedActors: opened);
+    final tickets = <OrderActorContext>[];
+    final orders = <OrderActorContext>[];
+    await _pumpDashboard(
+      tester,
+      initial: _twoServers,
+      openedActors: orders,
+      openedTickets: tickets,
+    );
     await _tap(tester, find.byKey(const ValueKey('fm-section-payments')));
+    expect(find.text('Vos additions non encaissées'), findsOneWidget);
 
-    // Encaissement direct : préparé, inactif.
     await _tap(tester, find.byKey(const ValueKey('fm-direct-payments')));
-    expect(opened, isEmpty);
+    expect(find.text('TICKETS:fm-a'), findsOneWidget);
 
+    final actor = tickets.single;
+    expect(actor.performedByUserId, 'fm-a', reason: 'encaisseur réel');
+    expect(actor.assignedServerId, 'fm-a', reason: 'responsable = lui-même');
+    expect(actor.shiftId, 'shift-1');
+    expect(orders, isEmpty);
+  });
+
+  testWidgets('Encaissements → Serveurs → Awa : les additions d’Awa', (
+    tester,
+  ) async {
+    final tickets = <OrderActorContext>[];
+    await _pumpDashboard(tester, initial: _twoServers, openedTickets: tickets);
+    await _tap(tester, find.byKey(const ValueKey('fm-section-payments')));
     await _tap(tester, find.byKey(const ValueKey('fm-servers-payments')));
-    await tester.tap(find.byKey(const ValueKey('fm-server-s1')));
-    await tester.pump();
-    expect(find.text('Bientôt disponible'), findsWidgets);
-    expect(find.byType(FloorManagerServersPage), findsOneWidget);
-    expect(opened, isEmpty);
+
+    await _tap(tester, find.byKey(const ValueKey('fm-server-s1')));
+    expect(find.text('TICKETS:s1'), findsOneWidget);
+
+    final actor = tickets.single;
+    expect(actor.performedByUserId, 'fm-a', reason: 'encaisseur réel');
+    expect(actor.assignedServerId, 's1', reason: 'responsable = Awa');
+    expect(actor.shiftId, 'shift-1');
+    expect(actor.isDelegated, isTrue);
   });
 
   testWidgets('open shift without active server: explicit message', (

@@ -4,6 +4,7 @@ import 'package:takapp/controllers/auth_controller.dart';
 import 'package:takapp/controllers/floor_manager_shift_controller.dart';
 import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/order_actor_context.dart';
+import 'package:takapp/vues/commun/unpaid_tickets_page.dart';
 import 'package:takapp/vues/serveur/menu_presentation_page.dart';
 import 'package:takapp/vues/floor_manager/floor_manager_servers_page.dart';
 import 'package:takapp/vues/floor_manager/floor_manager_widgets.dart';
@@ -39,27 +40,47 @@ extension FloorManagerSectionLabels on FloorManagerSection {
   };
 }
 
+/// Ouvre une page dans un contexte d'acteur (commande ou additions).
+typedef ActorPageBuilder = Widget Function(OrderActorContext actor);
+
 /// Ouvre le parcours de prise de commande pour un contexte d'acteur.
-typedef OrderPageBuilder = Widget Function(OrderActorContext actor);
+typedef OrderPageBuilder = ActorPageBuilder;
 
 /// Parcours standard des serveurs, réutilisé tel quel (aucune copie).
 Widget defaultOrderPage(OrderActorContext actor) =>
     MenuPresentationPage(actor: actor);
 
+/// Additions non encaissées du serveur responsable du contexte, avec
+/// « Ajouter une commande » et « Encaisser » (écran existant réutilisé).
+Widget defaultTicketsPage(OrderActorContext actor) => UnpaidTicketsPage(
+  establishmentId: actor.performedByEstablishmentId,
+  actor: actor,
+);
+
 /// Page intermédiaire : action directe, ou passage par un serveur du service.
 ///
-/// Commandes : actives (9B). Encaissements : préparés, pas encore actifs.
+/// Commandes (9B) et Encaissements (10B) : même structure, même contexte
+/// d'acteur ; seule la page ouverte change.
 class FloorManagerActionPage extends StatelessWidget {
   final FloorManagerSection section;
 
   /// Page de commande ouverte (injectable pour les tests).
   final OrderPageBuilder orderPageBuilder;
 
+  /// Page des additions ouverte (injectable pour les tests).
+  final ActorPageBuilder ticketsPageBuilder;
+
   const FloorManagerActionPage({
     super.key,
     required this.section,
     this.orderPageBuilder = defaultOrderPage,
+    this.ticketsPageBuilder = defaultTicketsPage,
   });
+
+  ActorPageBuilder get _sectionPageBuilder =>
+      section == FloorManagerSection.orders
+      ? orderPageBuilder
+      : ticketsPageBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -69,14 +90,13 @@ class FloorManagerActionPage extends StatelessWidget {
     final user = context.watch<AuthController>().currentUser;
     final shift = state.openShift;
 
-    // Commande directe : le Floor Manager commande pour lui-même, dans SON
-    // service ouvert (auteur réel = serveur responsable = lui).
-    final VoidCallback? onDirect =
-        section == FloorManagerSection.orders && user != null && shift != null
+    // Action directe : le Floor Manager agit pour lui-même, dans SON service
+    // ouvert (auteur/encaisseur réel = serveur responsable = lui).
+    final VoidCallback? onDirect = user != null && shift != null
         ? () => Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => orderPageBuilder(
+              builder: (_) => _sectionPageBuilder(
                 OrderActorContext.self(user, shiftId: shift.id),
               ),
             ),
@@ -99,8 +119,7 @@ class FloorManagerActionPage extends StatelessWidget {
               title: section.directLabel(l10n),
               subtitle: section == FloorManagerSection.orders
                   ? l10n.fmDirectOrderSubtitle
-                  // Encaissement direct : préparé, pas encore implémenté.
-                  : l10n.fmComingSoon,
+                  : l10n.fmDirectPaymentSubtitle,
               icon: section.icon,
               color: section.color,
               onTap: onDirect,
@@ -119,6 +138,7 @@ class FloorManagerActionPage extends StatelessWidget {
                         builder: (_) => FloorManagerServersPage(
                           section: section,
                           orderPageBuilder: orderPageBuilder,
+                          ticketsPageBuilder: ticketsPageBuilder,
                         ),
                       ),
                     )

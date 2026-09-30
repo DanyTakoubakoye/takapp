@@ -5,10 +5,8 @@ import 'package:takapp/modeles/order_actor_context.dart';
 import 'package:takapp/modeles/order_item_model.dart';
 import 'package:takapp/modeles/menu_item_model.dart';
 import 'package:takapp/modeles/order_model.dart';
-import 'package:takapp/modeles/shift_model.dart';
 import 'package:takapp/modeles/stock_mode.dart';
-import 'package:takapp/modeles/user_model.dart';
-import 'package:takapp/services/order_actor_policy.dart';
+import 'package:takapp/services/order_actor_verifier.dart';
 import 'package:takapp/services/order_stock_policy.dart';
 import 'package:takapp/services/store_stock_service.dart';
 
@@ -442,7 +440,7 @@ class OrderService {
     );
   }
 
-  /// Défense côté client de l'acteur (voir [OrderActorPolicy]) : l'auteur
+  /// Défense côté client de l'acteur (voir [OrderActorVerifier]) : l'auteur
   /// réel doit être l'UID authentifié, et un Floor Manager ne peut saisir
   /// que dans SON service ouvert, pour lui-même ou pour un serveur présent.
   /// L'autorité reste firestore.rules (`validOrderActor`).
@@ -450,57 +448,10 @@ class OrderService {
     String establishmentId,
     OrderActorContext actor,
   ) async {
-    ShiftModel? shift;
-    String? serverPointer;
-    UserModel? assignedServer;
-
-    final shiftId = actor.shiftId;
-    if (actor.isFloorManager && shiftId != null && shiftId.isNotEmpty) {
-      final establishment = _firestore
-          .collection('establishments')
-          .doc(establishmentId);
-      try {
-        final shiftSnap = await establishment
-            .collection('shifts')
-            .doc(shiftId)
-            .get();
-        final shiftData = shiftSnap.data();
-        if (shiftSnap.exists && shiftData != null) {
-          shift = ShiftModel.fromMap(shiftData, shiftSnap.id);
-        }
-
-        if (actor.isDelegated) {
-          final pointer = await establishment
-              .collection('serverCurrentShift')
-              .doc(actor.assignedServerId)
-              .get();
-          serverPointer = pointer.data()?['openShiftId']?.toString();
-
-          final userSnap = await _firestore
-              .collection('users')
-              .doc(actor.assignedServerId)
-              .get();
-          final userData = userSnap.data();
-          if (userSnap.exists && userData != null) {
-            assignedServer = UserModel.fromMap(userData, userSnap.id);
-          }
-        }
-      } on FirebaseException catch (e) {
-        // Lecture refusée par les règles = hors de son service : la
-        // politique le refusera avec un message clair.
-        if (e.code != 'permission-denied') rethrow;
-      }
-    }
-
-    final error = OrderActorPolicy.validate(
-      actor: actor,
-      authenticatedUid: _currentUserId(),
-      establishmentId: establishmentId,
-      shift: shift,
-      assignedServerPointer: serverPointer,
-      assignedServer: assignedServer,
-    );
-    if (error != null) throw error;
+    await OrderActorVerifier(
+      _firestore,
+      _currentUserId,
+    ).verify(establishmentId, actor);
   }
 
   /// =========================

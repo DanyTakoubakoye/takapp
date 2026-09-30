@@ -245,6 +245,16 @@ enum AppErrorCode {
   orderNoOpenShift,
   orderServerNotInShift,
   orderCartContextChanged,
+
+  /// =========================
+  /// ENCAISSEMENT
+  /// =========================
+  ///
+  /// [AppError.name] : numéro de commande pour `orderAlreadyPaid` et
+  /// `orderNotPayable`.
+  orderAlreadyPaid,
+  orderNotPayable,
+  ticketChanged,
 }
 
 /// Exception traduisible à l'affichage.

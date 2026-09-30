@@ -4589,4 +4589,40 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fmDirectOrderSubtitle => 'For yourself, within your current shift';
+
+  @override
+  String errOrderAlreadyPaid(String name) {
+    return 'Order $name has already been paid.';
+  }
+
+  @override
+  String errOrderNotPayable(String name) {
+    return 'Order $name cannot be paid (cancelled).';
+  }
+
+  @override
+  String get errTicketChanged =>
+      'The bill has changed since it was displayed. Reopen it to collect the right amount.';
+
+  @override
+  String get fmDirectPaymentSubtitle => 'Your unpaid bills';
+
+  @override
+  String get fmTicketsDirectTitle => 'My bills';
+
+  @override
+  String fmTicketsForServerTitle(String name) {
+    return '$name\'s bills';
+  }
+
+  @override
+  String get fmActionAddOrder => 'Add an order';
+
+  @override
+  String get fmPaymentConfirm => 'Confirm payment';
+
+  @override
+  String fmPaymentContext(String server, String cashier) {
+    return 'Sale by $server · collected by $cashier';
+  }
 }
