@@ -524,7 +524,9 @@ test('🔒 floor_manager ne peut PAS modifier son rôle, son établissement ni s
 test('🔒 floor_manager ne peut PAS gérer les autres utilisateurs', async () => {
   await seedFloorManager();
   const db = asUser(FLOOR_MANAGER_A);
-  await assertFails(getDoc(doc(db, 'users', SERVEUR_A)));
+  // 14A : il LIT les profils serveur / gérante (constitution de son
+  // service), jamais ceux des autres rôles ; il n'en modifie aucun.
+  await assertFails(getDoc(doc(db, 'users', COMPTABLE_A)));
   await assertFails(updateDoc(doc(db, 'users', SERVEUR_A), { role: 'barman' }));
   await assertFails(setDoc(doc(db, 'users', 'nouveau'), { role: 'serveur', establishmentId: ESTAB_A }));
   await assertFails(deleteDoc(doc(db, 'users', SERVEUR_A)));
@@ -958,8 +960,10 @@ test('🔒 un serveur ne peut pas être présent dans deux services ouverts', as
   // Contournement du service (pointeur du serveur non posé) : le second
   // Floor Manager n'obtient AUCUN accès au serveur.
   await assertSucceeds(openShiftBatch(GERANTE_A, ESTAB_A, 'sh2', FM_A2, [SRV_A1], { serverPointers: [] }));
-  await assertFails(getDoc(doc(asUser(FM_A2), 'users', SRV_A1)));
-  await assertSucceeds(getDoc(doc(asUser(FM_A), 'users', SRV_A1)));
+  // Le pointeur de Jean désigne toujours sh1 (FM_A) : FM_A2 n'a pas accès
+  // à sa présence dans sh1.
+  await assertFails(getDoc(participantRef(asUser(FM_A2), ESTAB_A, 'sh1', SRV_A1)));
+  await assertSucceeds(getDoc(participantRef(asUser(FM_A), ESTAB_A, 'sh1', SRV_A1)));
 });
 
 // ── Service clôturé ──
@@ -1024,12 +1028,15 @@ test('✅ Floor Manager : son service, ses participations, ses serveurs présent
   await assertSucceeds(getDoc(doc(db, 'users', SRV_A2)));
 });
 
-test('🔒 Floor Manager : pas de profil d’un serveur actif mais hors de son service', async () => {
+test('🔒 Floor Manager : profils serveur / gérante de son établissement seulement (14A)', async () => {
   await seedShiftWorld();
   await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
   const db = asUser(FM_A);
-  await assertFails(getDoc(doc(db, 'users', SRV_A3)));
-  await assertFails(getDoc(doc(db, 'users', GERANTE_A)));
+  await assertSucceeds(getDoc(doc(db, 'users', SRV_A3)));
+  await assertSucceeds(getDoc(doc(db, 'users', GERANTE_A)));
+  await assertFails(getDoc(doc(db, 'users', COMPTABLE_A)));
+  await assertFails(getDoc(doc(db, 'users', 'barmanA')));
+  await assertFails(getDoc(doc(db, 'users', SRV_B)));
   await assertFails(getDocs(query(collection(db, 'users'), where('establishmentId', '==', ESTAB_A))));
 });
 
@@ -1041,30 +1048,28 @@ test('🔒 Floor Manager A ne voit pas le service ni les serveurs du Floor Manag
   await assertFails(getDoc(shiftRef(db, ESTAB_A, 'shA2')));
   await assertFails(getDocs(collection(db, 'establishments', ESTAB_A, 'shifts', 'shA2', 'participants')));
   await assertFails(getDoc(fmPointerRef(db, ESTAB_A, FM_A2)));
-  await assertFails(getDoc(serverPointerRef(db, ESTAB_A, SRV_A2)));
-  await assertFails(getDoc(doc(db, 'users', SRV_A2)));
   await assertFails(getDocs(collection(db, 'establishments', ESTAB_A, 'shifts')));
 });
 
-test('🔒 service clôturé : le Floor Manager ne lit plus les profils de ses anciens serveurs', async () => {
+test('🔒 service clôturé : plus aucune affectation par son Floor Manager', async () => {
   await seedShiftWorld();
   await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
-  await assertSucceeds(getDoc(doc(asUser(FM_A), 'users', SRV_A1)));
   await closeShift(GERANTE_A, ESTAB_A, 'sh1');
-  await assertFails(getDoc(doc(asUser(FM_A), 'users', SRV_A1)));
+  const db = asUser(FM_A);
+  await assertFails(setDoc(participantRef(db, ESTAB_A, 'sh1', SRV_A3), participantData(ESTAB_A, 'sh1', SRV_A3, FM_A)));
+  await assertFails(updateDoc(shiftRef(db, ESTAB_A, 'sh1'), { serverIds: [SRV_A1, SRV_A3], updatedAt: serverTimestamp() }));
 });
 
-test('🔒 Floor Manager incapable de créer son service ou de s’ajouter un serveur', async () => {
+test('🔒 Floor Manager : jamais de service sans destinataire, ni de pointeur hors de son service', async () => {
   await seedShiftWorld();
   await openShiftAsAdmin('sh1', FM_A, [SRV_A1]);
   const db = asUser(FM_A);
-  await assertFails(createShiftBatch(FM_A, ESTAB_A, 'mine', FM_A, [SRV_A3]));
-  await assertFails(updateDoc(shiftRef(db, ESTAB_A, 'sh1'), { serverIds: [SRV_A1, SRV_A3] }));
-  await assertFails(setDoc(participantRef(db, ESTAB_A, 'sh1', SRV_A3), participantData(ESTAB_A, 'sh1', SRV_A3, FM_A)));
+  // 14A : création possible, mais seulement avec un destinataire désigné.
+  await assertFails(createShiftBatch(FM_A, ESTAB_A, 'mine', FM_A, [SRV_A3], { createdByRole: 'floor_manager' }));
+  // Pointeur d'un serveur absent de son service : refusé.
   await assertFails(setDoc(serverPointerRef(db, ESTAB_A, SRV_A3), {
     serverId: SRV_A3, openShiftId: 'sh1', floorManagerId: FM_A, updatedAt: serverTimestamp(), updatedBy: FM_A,
   }));
-  await assertFails(closeShift(FM_A, ESTAB_A, 'sh1'));
 });
 
 // ── Serveur ──
@@ -1909,7 +1914,11 @@ test('🔒 remise validée : champs financiers figés, plus de rejet ni de retou
   await fmHandoverBatch(SRV_A1, ESTAB_A, 'h1', ['jp1']);
   await processBatch(FM_A, ESTAB_A, 'h1', ['jp1']);
   const fm = asUser(FM_A);
-  await assertFails(updateDoc(hoRef(fm, ESTAB_A, 'h1'), { validatedAmount: 1, updatedAt: serverTimestamp() }));
+  // Même avec l'incrément du compteur (13B), la remise validée est figée.
+  const late = writeBatch(fm);
+  late.update(hoRef(fm, ESTAB_A, 'h1'), { validatedAmount: 1, status: 'validated', receivedByManagerId: FM_A, updatedAt: serverTimestamp() });
+  late.update(shiftRef(fm, ESTAB_A, 'sh1'), { financialRevision: increment(1) });
+  await assertFails(late.commit());
   await assertFails(processBatch(FM_A, ESTAB_A, 'h1', ['jp1'], true));
   await assertFails(updateDoc(payRef(fm, ESTAB_A, 'jp1'), { handoverStatus: 'pending', handoverId: null }));
   await assertFails(updateDoc(hoRef(asUser(GERANTE_A), ESTAB_A, 'h1'), { status: 'pending' }));
@@ -2529,4 +2538,202 @@ test('🔒 la mise à jour ordinaire d’un service ne touche pas aux champs fin
   await assertFails(updateDoc(ref, { financialRevision: 0, updatedAt: serverTimestamp() }));
   await assertFails(updateDoc(ref, { financialSummary: {}, updatedAt: serverTimestamp() }));
   await assertSucceeds(updateDoc(ref, { updatedAt: serverTimestamp() }));
+});
+
+// ─────────── 14A : SERVICE GÉRÉ PAR SON FLOOR MANAGER ───────────
+
+const FM_RECEIVER = {
+  createdByRole: 'floor_manager',
+  cashReceiverId: GERANTE_A, cashReceiverName: 'Awa', cashReceiverRole: 'gerante',
+};
+
+async function seedFmWorld() {
+  await seedShiftWorld();
+  await testEnv.withSecurityRulesDisabled(async (ctx) => {
+    const db = ctx.firestore();
+    await setDoc(doc(db, 'users', 'srvOff'), { role: 'serveur', establishmentId: ESTAB_A, isActive: false, name: 'off' });
+  });
+}
+
+// Même lot que ShiftService.createShift appelé par le Floor Manager.
+function fmCreateShift(uid, id, servers, extra = {}) {
+  return createShiftBatch(uid, ESTAB_A, id, extra.floorManagerId ?? uid, servers, { ...FM_RECEIVER, ...extra });
+}
+
+// Même lot que ShiftService.updateServers (ajout dans un service ouvert).
+function addServerBatch(uid, shiftId, current, added, { pointer = true } = {}) {
+  const db = asUser(uid);
+  const batch = writeBatch(db);
+  batch.update(shiftRef(db, ESTAB_A, shiftId), { serverIds: [...current, added], updatedAt: serverTimestamp() });
+  batch.set(participantRef(db, ESTAB_A, shiftId, added), participantData(ESTAB_A, shiftId, added, uid));
+  if (pointer) {
+    batch.set(serverPointerRef(db, ESTAB_A, added), {
+      serverId: added, openShiftId: shiftId, floorManagerId: uid, updatedAt: serverTimestamp(), updatedBy: uid,
+    });
+  }
+  return batch.commit();
+}
+
+// ── Création ──
+test('✅ Floor Manager : crée et ouvre SON service avec des serveurs de son établissement', async () => {
+  await seedFmWorld();
+  await assertSucceeds(fmCreateShift(FM_A, 'm1', [SRV_A1, SRV_A2]));
+  await assertSucceeds(openShiftBatch(FM_A, ESTAB_A, 'm1', FM_A, [SRV_A1, SRV_A2]));
+});
+
+test('🔒 Floor Manager : jamais pour un autre Floor Manager, ni avec un destinataire libre', async () => {
+  await seedFmWorld();
+  await assertFails(fmCreateShift(FM_A, 'x1', [SRV_A1], { floorManagerId: FM_A2 }));
+  await assertFails(fmCreateShift(FM_A, 'x2', [SRV_A1], { createdByRole: 'gerante' }));
+  await assertFails(fmCreateShift(FM_A, 'x3', [SRV_A1], { cashReceiverId: 'geranteB' }));
+  await assertFails(fmCreateShift(FM_A, 'x4', [SRV_A1], { cashReceiverId: COMPTABLE_A, cashReceiverRole: 'comptable' }));
+  await assertFails(fmCreateShift(FM_A, 'x5', [SRV_A1], { cashReceiverId: COMPTABLE_A }));
+  await assertFails(fmCreateShift(FM_A, 'x6', [SRV_A1], { cashReceiverId: FM_A, cashReceiverRole: 'floor_manager' }));
+  await assertFails(fmCreateShift(FM_OFF, 'x7', [SRV_A1]));
+  await assertFails(createShiftBatch(FM_B, ESTAB_A, 'x8', FM_B, [SRV_A1], FM_RECEIVER));
+  // Propriétaire comme caisse centrale : autorisé.
+  await assertSucceeds(fmCreateShift(FM_A, 'ok', [SRV_A1], { cashReceiverId: PROPRIETAIRE_A, cashReceiverRole: 'proprietaire' }));
+});
+
+test('🔒 serveurs : ni autre établissement, ni compte inactif, ni autre rôle', async () => {
+  await seedFmWorld();
+  await assertFails(fmCreateShift(FM_A, 'y1', [SRV_B]));
+  await assertFails(fmCreateShift(FM_A, 'y2', ['srvOff']));
+  await assertFails(fmCreateShift(FM_A, 'y3', ['barmanA']));
+  await assertFails(fmCreateShift(FM_A, 'y4', [FM_A2]));
+});
+
+test('✅ service passant minuit : 18:00 -> 02:00 le lendemain ; 🔒 fin avant début', async () => {
+  await seedFmWorld();
+  await assertSucceeds(fmCreateShift(FM_A, 'night', [SRV_A1], {
+    startsAt: new Date('2026-09-30T18:00:00Z'), endsAt: new Date('2026-10-01T02:00:00Z'),
+  }));
+  await assertFails(fmCreateShift(FM_A, 'bad', [SRV_A1], {
+    startsAt: new Date('2026-09-30T18:00:00Z'), endsAt: new Date('2026-09-30T02:00:00Z'),
+  }));
+});
+
+// ── Ouverture : protections conservées ──
+test('🔒 deux services ouverts pour le même Floor Manager : refusé', async () => {
+  await seedFmWorld();
+  await fmCreateShift(FM_A, 'a', [SRV_A1]);
+  await assertSucceeds(openShiftBatch(FM_A, ESTAB_A, 'a', FM_A, [SRV_A1]));
+  await fmCreateShift(FM_A, 'b', [SRV_A2]);
+  await assertFails(openShiftBatch(FM_A, ESTAB_A, 'b', FM_A, [SRV_A2]));
+});
+
+test('🔒 serveur déjà dans le service ouvert d’un autre Floor Manager : ni ouverture ni ajout', async () => {
+  await seedFmWorld();
+  await openShiftAsAdmin('shA2', FM_A2, [SRV_A3]);
+  // Planifier est permis (aucun pointeur) ; ouvrir « vole » le serveur : refusé.
+  await assertSucceeds(fmCreateShift(FM_A, 'c', [SRV_A3]));
+  await assertFails(openShiftBatch(FM_A, ESTAB_A, 'c', FM_A, [SRV_A3]));
+  // Ajout dans un service ouvert : même refus.
+  await fmCreateShift(FM_A, 'd', [SRV_A1]);
+  await openShiftBatch(FM_A, ESTAB_A, 'd', FM_A, [SRV_A1]);
+  await assertFails(addServerBatch(FM_A, 'd', [SRV_A1], SRV_A3));
+  // Le serveur est libéré quand son service est terminé.
+  await closeShift(GERANTE_A, ESTAB_A, 'shA2');
+  await assertSucceeds(addServerBatch(FM_A, 'd', [SRV_A1], SRV_A3));
+});
+
+// ── Modification ──
+test('✅ planifié : horaires et serveurs ; ouvert : serveurs seulement', async () => {
+  await seedFmWorld();
+  await fmCreateShift(FM_A, 'p', [SRV_A1]);
+  const db = asUser(FM_A);
+  await assertSucceeds(updateDoc(shiftRef(db, ESTAB_A, 'p'), {
+    startsAt: new Date('2026-09-30T19:00:00Z'), endsAt: new Date('2026-10-01T01:00:00Z'), updatedAt: serverTimestamp(),
+  }));
+  await openShiftBatch(FM_A, ESTAB_A, 'p', FM_A, [SRV_A1]);
+  await assertFails(updateDoc(shiftRef(db, ESTAB_A, 'p'), { endsAt: new Date('2026-10-01T03:00:00Z'), updatedAt: serverTimestamp() }));
+  await assertSucceeds(addServerBatch(FM_A, 'p', [SRV_A1], SRV_A2));
+  // Retrait transactionnel : participation conservée, inactive.
+  const batch = writeBatch(db);
+  batch.update(shiftRef(db, ESTAB_A, 'p'), { serverIds: [SRV_A1], updatedAt: serverTimestamp() });
+  batch.update(participantRef(db, ESTAB_A, 'p', SRV_A2), { activeInShift: false, removedAt: serverTimestamp(), removedBy: FM_A });
+  await assertSucceeds(batch.commit());
+});
+
+test('✅ clôture par le Floor Manager ; 🔒 terminé : ni réouverture ni modification', async () => {
+  await seedFmWorld();
+  await fmCreateShift(FM_A, 'z', [SRV_A1]);
+  await openShiftBatch(FM_A, ESTAB_A, 'z', FM_A, [SRV_A1]);
+  await assertSucceeds(closeShift(FM_A, ESTAB_A, 'z'));
+  const db = asUser(FM_A);
+  await assertFails(openShiftBatch(FM_A, ESTAB_A, 'z', FM_A, [SRV_A1]));
+  await assertFails(updateDoc(shiftRef(db, ESTAB_A, 'z'), { serverIds: [SRV_A1, SRV_A2], updatedAt: serverTimestamp() }));
+  await assertFails(updateDoc(shiftRef(db, ESTAB_A, 'z'), { endsAt: new Date('2026-10-01T05:00:00Z'), updatedAt: serverTimestamp() }));
+  // La gérante peut toujours rouvrir explicitement.
+  await assertSucceeds(openShiftBatch(GERANTE_A, ESTAB_A, 'z', FM_A, [SRV_A1]));
+});
+
+test('🔒 Floor Manager : ni le service d’un autre, ni les données financières, ni le destinataire', async () => {
+  await seedFmWorld();
+  await openShiftAsAdmin('shA2', FM_A2, [SRV_A3]);
+  const db = asUser(FM_A);
+  await assertFails(updateDoc(shiftRef(db, ESTAB_A, 'shA2'), { serverIds: [], updatedAt: serverTimestamp() }));
+  await assertFails(closeShift(FM_A, ESTAB_A, 'shA2'));
+  await assertFails(setDoc(participantRef(db, ESTAB_A, 'shA2', SRV_A1), participantData(ESTAB_A, 'shA2', SRV_A1, FM_A)));
+  await fmCreateShift(FM_A, 'f', [SRV_A1]);
+  for (const change of [
+    { financialStatus: 'reconciled' }, { financialRevision: 3 }, { financialSummary: {} },
+    { cashReceiverId: PROPRIETAIRE_A, cashReceiverRole: 'proprietaire' }, { floorManagerId: FM_A2 },
+    { createdBy: GERANTE_A },
+  ]) {
+    await assertFails(updateDoc(shiftRef(db, ESTAB_A, 'f'), { ...change, updatedAt: serverTimestamp() }));
+  }
+  await assertFails(closeFinancially(FM_A, {}, { shiftId: 'f' }));
+});
+
+test('✅ lectures nécessaires : ses services, pointeurs serveur, profils serveur / gérante', async () => {
+  await seedFmWorld();
+  await fmCreateShift(FM_A, 'r', [SRV_A1]);
+  const db = asUser(FM_A);
+  await assertSucceeds(getDocs(query(
+    collection(db, 'establishments', ESTAB_A, 'shifts'), where('floorManagerId', '==', FM_A),
+  )));
+  await assertSucceeds(getDoc(serverPointerRef(db, ESTAB_A, SRV_A3)));
+  await assertSucceeds(getDocs(query(collection(db, 'users'),
+    where('establishmentId', '==', ESTAB_A), where('role', '==', 'serveur'))));
+  await assertSucceeds(getDocs(query(collection(db, 'users'),
+    where('establishmentId', '==', ESTAB_A), where('role', '==', 'gerante'))));
+  await assertFails(getDocs(query(collection(db, 'users'),
+    where('establishmentId', '==', ESTAB_A), where('role', '==', 'comptable'))));
+  await assertFails(getDocs(query(collection(db, 'users'),
+    where('establishmentId', '==', ESTAB_B), where('role', '==', 'serveur'))));
+  await assertFails(getDoc(serverPointerRef(asUser(FM_B), ESTAB_A, SRV_A3)));
+});
+
+test('✅ remises du service créé par le Floor Manager : au destinataire désigné, jamais à lui-même', async () => {
+  await seedFmWorld();
+  await fmCreateShift(FM_A, 'own', [SRV_A1]);
+  await openShiftBatch(FM_A, ESTAB_A, 'own', FM_A, [SRV_A1]);
+  await testEnv.withSecurityRulesDisabled(async (ctx) => {
+    await setDoc(payRef(ctx.firestore(), ESTAB_A, 'pd'), shiftPayment(FM_A, 10000, { shiftId: 'own' }));
+  });
+  await assertFails(sendTransfer(FM_A, 0, { shiftId: 'own', receiverUserId: FM_A, receiverRole: 'gerante' }));
+  await assertSucceeds(sendTransfer(FM_A, 0, { shiftId: 'own' }));
+});
+
+test('🔒 Floor Manager : ni service, ni participation, ni pointeur au nom d’un autre', async () => {
+  await seedFmWorld();
+  await openShiftAsAdmin('shA2', FM_A2, [SRV_A3]);
+  const db = asUser(FM_A);
+  // Service sans serveur : seule la règle « pour lui-même » peut refuser.
+  await assertFails(fmCreateShift(FM_A, 'other', [], { floorManagerId: FM_A2 }));
+  await assertSucceeds(fmCreateShift(FM_A, 'mine', []));
+  // Participation (retirée, cohérente) dans le service d'un autre.
+  await assertFails(setDoc(participantRef(db, ESTAB_A, 'shA2', SRV_A1), participantData(ESTAB_A, 'shA2', SRV_A1, FM_A, false)));
+  // Pointeurs d'un autre Floor Manager ou de son serveur, même cohérents.
+  await assertFails(setDoc(fmPointerRef(db, ESTAB_A, FM_A2), {
+    floorManagerId: FM_A2, openShiftId: 'shA2', updatedAt: serverTimestamp(), updatedBy: FM_A,
+  }));
+  await assertFails(setDoc(serverPointerRef(db, ESTAB_A, SRV_A3), {
+    serverId: SRV_A3, openShiftId: 'shA2', floorManagerId: FM_A2, updatedAt: serverTimestamp(), updatedBy: FM_A,
+  }));
+  // La gérante garde ces droits.
+  await assertSucceeds(setDoc(fmPointerRef(asUser(GERANTE_A), ESTAB_A, FM_A2), {
+    floorManagerId: FM_A2, openShiftId: 'shA2', updatedAt: serverTimestamp(), updatedBy: GERANTE_A,
+  }));
 });

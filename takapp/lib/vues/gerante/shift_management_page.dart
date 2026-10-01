@@ -54,9 +54,9 @@ class _ShiftManagementPageState extends State<ShiftManagementPage> {
   }
 
   Future<void> _create(List<UserModel> staff) async {
-    final draft = await showDialog<_ShiftDraft>(
+    final draft = await showDialog<ShiftDraft>(
       context: context,
-      builder: (_) => _ShiftFormDialog(
+      builder: (_) => ShiftFormDialog(
         staff: staff,
         establishmentId: widget.establishmentId,
       ),
@@ -77,9 +77,9 @@ class _ShiftManagementPageState extends State<ShiftManagementPage> {
   }
 
   Future<void> _editServers(ShiftModel shift, List<UserModel> staff) async {
-    final draft = await showDialog<_ShiftDraft>(
+    final draft = await showDialog<ShiftDraft>(
       context: context,
-      builder: (_) => _ShiftFormDialog(
+      builder: (_) => ShiftFormDialog(
         staff: staff,
         establishmentId: widget.establishmentId,
         editing: shift,
@@ -87,12 +87,23 @@ class _ShiftManagementPageState extends State<ShiftManagementPage> {
     );
     if (draft == null || !mounted) return;
 
-    final ok = await context.read<ShiftController>().updateServers(
+    final controller = context.read<ShiftController>();
+    var ok = await controller.updateServers(
       establishmentId: widget.establishmentId,
       shiftId: shift.id,
       servers: draft.servers,
       userId: _userId,
     );
+    if (ok &&
+        ShiftPolicy.canEditSchedule(shift) &&
+        (draft.startsAt != shift.startsAt || draft.endsAt != shift.endsAt)) {
+      ok = await controller.updateSchedule(
+        establishmentId: widget.establishmentId,
+        shiftId: shift.id,
+        startsAt: draft.startsAt,
+        endsAt: draft.endsAt,
+      );
+    }
     _report(ok);
   }
 
@@ -154,7 +165,7 @@ class _ShiftManagementPageState extends State<ShiftManagementPage> {
                 separatorBuilder: (_, _) => const SizedBox(height: 8),
                 itemBuilder: (context, index) {
                   final shift = shifts[index];
-                  return _ShiftCard(
+                  return ShiftCard(
                     shift: shift,
                     enabled: !isSubmitting,
                     onOpen: () => _open(shift),
@@ -181,26 +192,38 @@ String _statusLabel(ShiftStatus status, AppLocalizations l10n) {
 
 final DateFormat _dateTimeFormat = DateFormat('dd/MM/yyyy HH:mm');
 
-class _ShiftCard extends StatelessWidget {
+class ShiftCard extends StatelessWidget {
   final ShiftModel shift;
   final bool enabled;
   final VoidCallback onOpen;
   final VoidCallback onClose;
   final VoidCallback onEditServers;
 
-  const _ShiftCard({
+  /// Gérante / propriétaire (true) ou Floor Manager de ce service (14A) :
+  /// le Floor Manager ne rouvre jamais un service terminé et consulte la
+  /// clôture financière sans la décider.
+  final bool asManager;
+
+  const ShiftCard({
+    super.key,
     required this.shift,
     required this.enabled,
     required this.onOpen,
     required this.onClose,
     required this.onEditServers,
+    this.asManager = true,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final canOpen =
-        ShiftPolicy.canTransition(shift.status, ShiftStatus.open) &&
+        (asManager
+            ? ShiftPolicy.canTransition(shift.status, ShiftStatus.open)
+            : ShiftPolicy.canFloorManagerTransition(
+                shift.status,
+                ShiftStatus.open,
+              )) &&
         !shift.isFinanciallyReconciled;
     final canClose = ShiftPolicy.canTransition(
       shift.status,
@@ -268,7 +291,7 @@ class _ShiftCard extends StatelessWidget {
                         builder: (_) => ShiftClosurePage(
                           establishmentId: shift.establishmentId,
                           shiftId: shift.id,
-                          asManager: true,
+                          asManager: asManager,
                         ),
                       ),
                     ),
@@ -284,47 +307,70 @@ class _ShiftCard extends StatelessWidget {
   }
 }
 
-class _ShiftDraft {
+class ShiftDraft {
   final UserModel? floorManager;
   final List<UserModel> servers;
   final DateTime startsAt;
   final DateTime endsAt;
 
-  const _ShiftDraft({
+  /// Destinataire des remises (service créé par un Floor Manager, 14A).
+  final UserModel? cashReceiver;
+
+  const ShiftDraft({
     required this.floorManager,
     required this.servers,
     required this.startsAt,
     required this.endsAt,
+    this.cashReceiver,
   });
 }
 
-/// Création d'un service, ou modification de ses serveurs ([editing]).
+/// Création d'un service, ou modification de ses serveurs ([editing]) et,
+/// tant qu'il est planifié, de ses horaires.
+///
+/// Réutilisé par le Floor Manager (14A) : [fixedFloorManager] remplace le
+/// choix du Floor Manager (toujours lui-même) et [cashReceivers] propose le
+/// destinataire de ses remises.
 /// Seuls les comptes éligibles (`ShiftPolicy`) sont proposés.
-class _ShiftFormDialog extends StatefulWidget {
+class ShiftFormDialog extends StatefulWidget {
   final List<UserModel> staff;
   final String establishmentId;
   final ShiftModel? editing;
+  final UserModel? fixedFloorManager;
+  final List<UserModel>? cashReceivers;
 
-  const _ShiftFormDialog({
+  const ShiftFormDialog({
+    super.key,
     required this.staff,
     required this.establishmentId,
     this.editing,
+    this.fixedFloorManager,
+    this.cashReceivers,
   });
 
   @override
-  State<_ShiftFormDialog> createState() => _ShiftFormDialogState();
+  State<ShiftFormDialog> createState() => _ShiftFormDialogState();
 }
 
-class _ShiftFormDialogState extends State<_ShiftFormDialog> {
+class _ShiftFormDialogState extends State<ShiftFormDialog> {
   late final List<UserModel> _floorManagers;
   late final List<UserModel> _servers;
 
   UserModel? _floorManager;
+  UserModel? _cashReceiver;
   final Set<String> _selectedServerIds = {};
   late DateTime _startsAt;
   late DateTime _endsAt;
 
   bool get _isEditing => widget.editing != null;
+
+  /// Horaires : à la création, ou tant que le service est planifié.
+  bool get _canEditSchedule {
+    final editing = widget.editing;
+    return editing == null || ShiftPolicy.canEditSchedule(editing);
+  }
+
+  bool get _needsReceiver => widget.cashReceivers != null && !_isEditing;
 
   @override
   void initState() {
@@ -349,6 +395,9 @@ class _ShiftFormDialogState extends State<_ShiftFormDialog> {
       _startsAt = DateTime(now.year, now.month, now.day, now.hour);
       _endsAt = _startsAt.add(const Duration(hours: 8));
       if (_floorManagers.length == 1) _floorManager = _floorManagers.first;
+      _floorManager = widget.fixedFloorManager ?? _floorManager;
+      final receivers = widget.cashReceivers ?? const <UserModel>[];
+      if (receivers.length == 1) _cashReceiver = receivers.first;
     }
   }
 
@@ -385,7 +434,7 @@ class _ShiftFormDialogState extends State<_ShiftFormDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (!_isEditing) ...[
+              if (!_isEditing && widget.fixedFloorManager == null) ...[
                 if (_floorManagers.isEmpty)
                   Text(l10n.shiftNoFloorManagerAvailable)
                 else
@@ -409,6 +458,34 @@ class _ShiftFormDialogState extends State<_ShiftFormDialog> {
                     }),
                   ),
                 const SizedBox(height: 12),
+              ],
+              if (_needsReceiver) ...[
+                if (widget.cashReceivers!.isEmpty)
+                  Text(l10n.shiftNoCashReceiver)
+                else
+                  DropdownButtonFormField<String>(
+                    key: const ValueKey('shift-cash-receiver'),
+                    initialValue: _cashReceiver?.uid,
+                    decoration: InputDecoration(
+                      labelText: l10n.shiftCashReceiverLabel,
+                    ),
+                    items: widget.cashReceivers!
+                        .map(
+                          (u) => DropdownMenuItem(
+                            value: u.uid,
+                            child: Text(u.name.isEmpty ? u.email : u.name),
+                          ),
+                        )
+                        .toList(),
+                    onChanged: (uid) => setState(() {
+                      _cashReceiver = widget.cashReceivers!
+                          .where((u) => u.uid == uid)
+                          .firstOrNull;
+                    }),
+                  ),
+                const SizedBox(height: 12),
+              ],
+              if (_canEditSchedule) ...[
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   title: Text(l10n.shiftStartsAtLabel),
@@ -416,7 +493,11 @@ class _ShiftFormDialogState extends State<_ShiftFormDialog> {
                   trailing: const Icon(Icons.schedule),
                   onTap: () async {
                     final picked = await _pickDateTime(_startsAt);
-                    if (picked != null) setState(() => _startsAt = picked);
+                    if (picked == null) return;
+                    setState(() {
+                      _startsAt = picked;
+                      _endsAt = ShiftPolicy.normalizeEnd(_startsAt, _endsAt);
+                    });
                   },
                 ),
                 ListTile(
@@ -426,7 +507,12 @@ class _ShiftFormDialogState extends State<_ShiftFormDialog> {
                   trailing: const Icon(Icons.schedule),
                   onTap: () async {
                     final picked = await _pickDateTime(_endsAt);
-                    if (picked != null) setState(() => _endsAt = picked);
+                    if (picked == null) return;
+                    // 18:00 -> 02:00 : fin le lendemain, jamais « avant ».
+                    setState(
+                      () =>
+                          _endsAt = ShiftPolicy.normalizeEnd(_startsAt, picked),
+                    );
                   },
                 ),
                 const Divider(),
@@ -460,17 +546,21 @@ class _ShiftFormDialogState extends State<_ShiftFormDialog> {
           child: Text(l10n.actionCancel),
         ),
         FilledButton(
-          onPressed: () => Navigator.pop(
-            context,
-            _ShiftDraft(
-              floorManager: _floorManager,
-              servers: _servers
-                  .where((s) => _selectedServerIds.contains(s.uid))
-                  .toList(),
-              startsAt: _startsAt,
-              endsAt: _endsAt,
-            ),
-          ),
+          key: const ValueKey('shift-form-submit'),
+          onPressed: _needsReceiver && _cashReceiver == null
+              ? null
+              : () => Navigator.pop(
+                  context,
+                  ShiftDraft(
+                    floorManager: _floorManager,
+                    servers: _servers
+                        .where((s) => _selectedServerIds.contains(s.uid))
+                        .toList(),
+                    startsAt: _startsAt,
+                    endsAt: _endsAt,
+                    cashReceiver: _cashReceiver,
+                  ),
+                ),
           child: Text(_isEditing ? l10n.actionSave : l10n.actionCreate),
         ),
       ],

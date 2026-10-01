@@ -211,8 +211,9 @@ class _FloorManagerCashPageState extends State<FloorManagerCashPage> {
     List<ServerHandoverModel> transfers,
   ) {
     String fcfa(double v) => v.toStringAsFixed(0);
-    final receiver = shift.createdByName.isNotEmpty
-        ? shift.createdByName
+    final receiverName = ShiftHandoverService.receiverNameOf(shift);
+    final receiver = receiverName.isNotEmpty
+        ? receiverName
         : l10n.fmCashReceiverDefault;
     final methods = cash.remainingByMethod.entries
         .where((e) => e.value > 0)

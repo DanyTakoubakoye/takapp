@@ -8,6 +8,7 @@ import 'package:takapp/l10n/app_localizations.dart';
 import 'package:takapp/modeles/shift_model.dart';
 import 'package:takapp/vues/floor_manager/floor_manager_action_page.dart';
 import 'package:takapp/vues/floor_manager/floor_manager_handovers_page.dart';
+import 'package:takapp/vues/floor_manager/floor_manager_shift_page.dart';
 import 'package:takapp/vues/floor_manager/floor_manager_cash_page.dart';
 import 'package:takapp/vues/floor_manager/floor_manager_widgets.dart';
 import 'package:takapp/vues/gerante/shift_closure_page.dart';
@@ -72,6 +73,22 @@ class FloorManagerHomePage extends StatelessWidget {
             const SizedBox(height: 16),
             _ShiftStatusCard(controller: controller),
             const SizedBox(height: 16),
+            // Gérer mon service (14A) : toujours accessible, c'est d'ici
+            // que le Floor Manager crée et ouvre son service.
+            FloorManagerTile(
+              key: const ValueKey('fm-manage-shift'),
+              title: l10n.fmShiftTitle,
+              subtitle: l10n.fmShiftSubtitle,
+              icon: Icons.schedule_outlined,
+              color: Colors.blueGrey,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const FloorManagerShiftPage(),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
             for (final section in FloorManagerSection.values) ...[
               FloorManagerTile(
                 key: ValueKey('fm-section-${section.name}'),

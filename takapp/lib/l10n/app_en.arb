@@ -3293,5 +3293,10 @@
   "discrepancyStatusApproved": "Approved",
   "discrepancyStatusRejected": "Rejected",
   "discrepancyLine": "{name}: expected {expected}, found {physical} FCFA",
-  "@discrepancyLine": { "placeholders": { "name": { "type": "String" }, "expected": { "type": "String" }, "physical": { "type": "String" } } }
+  "@discrepancyLine": { "placeholders": { "name": { "type": "String" }, "expected": { "type": "String" }, "physical": { "type": "String" } } },
+"errShiftServerUnavailable": "One of the selected servers is already in another open shift.",
+  "fmShiftTitle": "Manage my shift",
+  "fmShiftSubtitle": "Hours, servers, opening and closing",
+  "shiftCashReceiverLabel": "Hand over to (manager / central cash)",
+  "shiftNoCashReceiver": "No active manager: the handover recipient cannot be set."
 }

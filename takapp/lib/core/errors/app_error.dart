@@ -276,6 +276,11 @@ enum AppErrorCode {
   shiftFinancialChanged,
   shiftFinancialAlreadyClosed,
   discrepancyInvalid,
+
+  /// =========================
+  /// SERVICE GÉRÉ PAR LE FLOOR MANAGER
+  /// =========================
+  shiftServerUnavailable,
 }
 
 /// Exception traduisible à l'affichage.

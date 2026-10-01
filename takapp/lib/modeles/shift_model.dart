@@ -82,6 +82,13 @@ class ShiftModel {
   /// Rôle du créateur (gerante | proprietaire) : rôle du destinataire.
   final String createdByRole;
 
+  /// Destinataire des remises du Floor Manager (14A) quand le service est
+  /// créé par le Floor Manager lui-même : gérante ou propriétaire de
+  /// l'établissement, choisi à la création. Vide : le créateur (gérante).
+  final String cashReceiverId;
+  final String cashReceiverName;
+  final String cashReceiverRole;
+
   /// =========================
   /// CLÔTURE FINANCIÈRE (13B)
   /// =========================
@@ -116,6 +123,9 @@ class ShiftModel {
     required this.updatedAt,
     this.createdByName = '',
     this.createdByRole = '',
+    this.cashReceiverId = '',
+    this.cashReceiverName = '',
+    this.cashReceiverRole = '',
     this.financialStatus = ShiftFinancialStatus.pending,
     this.financialRevision = 0,
     this.financialClosedAt,
@@ -153,6 +163,9 @@ class ShiftModel {
       createdBy: (map['createdBy'] ?? '').toString(),
       createdByName: (map['createdByName'] ?? '').toString(),
       createdByRole: (map['createdByRole'] ?? '').toString(),
+      cashReceiverId: (map['cashReceiverId'] ?? '').toString(),
+      cashReceiverName: (map['cashReceiverName'] ?? '').toString(),
+      cashReceiverRole: (map['cashReceiverRole'] ?? '').toString(),
       financialStatus: ShiftFinancialStatus.fromStored(map['financialStatus']),
       financialRevision: (map['financialRevision'] as num?)?.toInt() ?? 0,
       financialClosedAt: _toDate(map['financialClosedAt']),

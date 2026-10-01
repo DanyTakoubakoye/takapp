@@ -330,5 +330,7 @@ String _messageFor(AppLocalizations l10n, AppError error) {
       return l10n.errShiftFinancialAlreadyClosed;
     case AppErrorCode.discrepancyInvalid:
       return l10n.errDiscrepancyInvalid;
+    case AppErrorCode.shiftServerUnavailable:
+      return l10n.errShiftServerUnavailable;
   }
 }

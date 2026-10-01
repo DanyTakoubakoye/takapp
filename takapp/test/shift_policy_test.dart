@@ -360,4 +360,112 @@ void main() {
       expect(result, ['s1']);
     });
   });
+
+  group('14A : service géré par son Floor Manager', () {
+    test('service passant minuit : 18:00 -> 02:00 = le lendemain', () {
+      final start = DateTime(2026, 9, 30, 18);
+      expect(
+        ShiftPolicy.normalizeEnd(start, DateTime(2026, 9, 30, 2)),
+        DateTime(2026, 10, 1, 2),
+      );
+      // Fin à la même heure : 24 h plus tard, jamais une durée nulle.
+      expect(
+        ShiftPolicy.normalizeEnd(start, DateTime(2026, 9, 30, 18)),
+        DateTime(2026, 10, 1, 18),
+      );
+      // Fin déjà postérieure : conservée.
+      expect(
+        ShiftPolicy.normalizeEnd(start, DateTime(2026, 9, 30, 23, 30)),
+        DateTime(2026, 9, 30, 23, 30),
+      );
+      expect(
+        ShiftPolicy.normalizeEnd(start, DateTime(2026, 10, 1, 1)),
+        DateTime(2026, 10, 1, 1),
+      );
+      // Fin de mois.
+      expect(
+        ShiftPolicy.normalizeEnd(
+          DateTime(2026, 12, 31, 20),
+          DateTime(2026, 12, 31, 3),
+        ),
+        DateTime(2027, 1, 1, 3),
+      );
+      // Le service normalisé passe la validation.
+      expect(
+        ShiftPolicy.validateDraft(
+          establishmentId: _estA,
+          floorManager: _user('fm-a', AppRoles.floorManager),
+          servers: [_user('s1', AppRoles.serveur)],
+          startsAt: start,
+          endsAt: ShiftPolicy.normalizeEnd(start, DateTime(2026, 9, 30, 2)),
+        ),
+        isNull,
+      );
+    });
+
+    test(
+      'planifié : horaires et serveurs ; en cours : serveurs ; terminé : rien',
+      () {
+        final planned = _shift(status: ShiftStatus.planned);
+        final open = _shift(status: ShiftStatus.open);
+        final closed = _shift(status: ShiftStatus.closed);
+        expect(ShiftPolicy.canEditSchedule(planned), isTrue);
+        expect(ShiftPolicy.canEditSchedule(open), isFalse);
+        expect(ShiftPolicy.canEditSchedule(closed), isFalse);
+        expect(ShiftPolicy.canEditServers(planned), isTrue);
+        expect(ShiftPolicy.canEditServers(open), isTrue);
+        expect(ShiftPolicy.canEditServers(closed), isFalse);
+      },
+    );
+
+    test('le Floor Manager ne rouvre jamais un service terminé', () {
+      expect(
+        ShiftPolicy.canFloorManagerTransition(
+          ShiftStatus.planned,
+          ShiftStatus.open,
+        ),
+        isTrue,
+      );
+      expect(
+        ShiftPolicy.canFloorManagerTransition(
+          ShiftStatus.open,
+          ShiftStatus.closed,
+        ),
+        isTrue,
+      );
+      expect(
+        ShiftPolicy.canFloorManagerTransition(
+          ShiftStatus.closed,
+          ShiftStatus.open,
+        ),
+        isFalse,
+      );
+      // La gérante garde la réouverture explicite.
+      expect(
+        ShiftPolicy.canTransition(ShiftStatus.closed, ShiftStatus.open),
+        isTrue,
+      );
+    });
+
+    test('sélection : serveurs actifs de son établissement uniquement', () {
+      bool eligible(UserModel u) => ShiftPolicy.isEligibleServer(u, _estA);
+      expect(eligible(_user('s1', AppRoles.serveur)), isTrue);
+      expect(
+        eligible(_user('s2', AppRoles.serveur, establishmentId: _estB)),
+        isFalse,
+      );
+      expect(eligible(_user('s3', AppRoles.serveur, isActive: false)), isFalse);
+      expect(eligible(_user('b1', AppRoles.barman)), isFalse);
+      expect(eligible(_user('g1', AppRoles.gerante)), isFalse);
+      // Jamais un autre Floor Manager comme serveur, ni lui-même.
+      expect(
+        ShiftPolicy.validateServers(
+          establishmentId: _estA,
+          floorManagerId: 'fm-a',
+          servers: [_user('fm-a', AppRoles.serveur)],
+        )?.code,
+        AppErrorCode.shiftInvalidServer,
+      );
+    });
+  });
 }

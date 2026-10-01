@@ -428,12 +428,24 @@ class ShiftHandoverService {
   /// Rôle du destinataire : celui du créateur du service. Un service créé
   /// avant 12B n'a pas ce champ : gérante supposée (seul rôle qui crée des
   /// services au quotidien), les règles vérifiant le vrai compte.
-  static String receiverRoleOf(ShiftModel shift) =>
-      shift.createdByRole.isEmpty ? AppRoles.gerante : shift.createdByRole;
+  /// Un service créé par le Floor Manager (14A) désigne explicitement son
+  /// destinataire (cashReceiver*).
+  static String receiverRoleOf(ShiftModel shift) {
+    if (shift.cashReceiverId.isNotEmpty) return shift.cashReceiverRole;
+    return shift.createdByRole.isEmpty ? AppRoles.gerante : shift.createdByRole;
+  }
+
+  static String receiverIdOf(ShiftModel shift) =>
+      shift.cashReceiverId.isNotEmpty ? shift.cashReceiverId : shift.createdBy;
+
+  static String receiverNameOf(ShiftModel shift) =>
+      shift.cashReceiverId.isNotEmpty
+      ? shift.cashReceiverName
+      : shift.createdByName;
 
   /// Destinataire autorisé : créateur du service, gérante ou propriétaire.
   static bool hasReceiver(ShiftModel shift) =>
-      shift.createdBy.isNotEmpty &&
+      receiverIdOf(shift).isNotEmpty &&
       (receiverRoleOf(shift) == AppRoles.gerante ||
           receiverRoleOf(shift) == AppRoles.proprietaire);
 
@@ -492,8 +504,8 @@ class ShiftHandoverService {
         'senderUserId': sender.uid,
         'senderUserName': sender.name,
         'senderRole': ServerHandoverModel.floorManagerSender,
-        'receiverUserId': shift.createdBy,
-        'receiverUserName': shift.createdByName,
+        'receiverUserId': receiverIdOf(shift),
+        'receiverUserName': receiverNameOf(shift),
         'receiverRole': receiverRoleOf(shift),
         'paymentBreakdown': cleaned,
         'transferSequence': seq,

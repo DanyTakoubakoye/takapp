@@ -104,7 +104,8 @@ service cloud.firestore {
           'openedAt', 'openedBy', 'closedAt', 'closedBy',
           'createdByName', 'createdByRole',
           'financialStatus', 'financialRevision', 'financialClosedAt',
-          'financialClosedBy', 'financialClosedByName', 'financialSummary'
+          'financialClosedBy', 'financialClosedByName', 'financialSummary',
+          'cashReceiverId', 'cashReceiverName', 'cashReceiverRole'
         ]) &&
         d.establishmentId == establishmentId &&
         d.status in ['planned', 'open', 'closed'] &&
@@ -113,6 +114,29 @@ service cloud.firestore {
         d.serverIds is list && d.serverIds.size() <= 12 &&
         !(d.floorManagerId in d.serverIds);
     }
+    // ─────────────── SERVICE GÉRÉ PAR SON FLOOR MANAGER (14A) ───────────────
+    // Destinataire des remises d'un service : gérante ou propriétaire ACTIF
+    // de l'établissement (absent : le créateur, comme avant 14A).
+    function validCashReceiver(establishmentId) {
+      let d = request.resource.data;
+      return !('cashReceiverId' in d) || (
+        d.cashReceiverRole in ['gerante', 'proprietaire'] &&
+        isEstablishmentUser(d.cashReceiverId, establishmentId, d.cashReceiverRole) &&
+        d.cashReceiverName is string
+      );
+    }
+    // Le Floor Manager gère SON service, tant qu'il n'est pas terminé :
+    // horaires seulement avant l'ouverture ; jamais de réouverture.
+    function fmManagesOwnShift() {
+      return isFloorManager() &&
+        resource.data.floorManagerId == request.auth.uid &&
+        resource.data.status != 'closed' &&
+        (
+          resource.data.status == 'planned' ||
+          unchangedFields(['startsAt', 'endsAt'])
+        );
+    }
+
     // Floor Manager actif de cet établissement : exigé pour créer, ouvrir ou
     // modifier un service, PAS pour le clôturer (un compte désactivé ne doit
     // pas empêcher la clôture).
@@ -327,7 +351,7 @@ service cloud.firestore {
         d.createdBy == request.auth.uid &&
         d.shiftId is string &&
         shift.floorManagerId == request.auth.uid &&
-        d.receiverUserId == shift.createdBy &&
+        d.receiverUserId == shift.get('cashReceiverId', shift.createdBy) &&
         d.receiverRole in ['gerante', 'proprietaire'] &&
         isEstablishmentUser(d.receiverUserId, establishmentId, d.receiverRole) &&
         d.status == 'pending' &&
@@ -412,7 +436,7 @@ service cloud.firestore {
         d.reason is string && d.reason.size() > 0 &&
         d.recordedBy == request.auth.uid &&
         d.recordedByRole == userRole() &&
-        
+        d.recordedAt == request.time &&
         d.status == 'pending' &&
         d.get('approvedBy', null) == null &&
         d.get('rejectedBy', null) == null &&
@@ -520,6 +544,12 @@ service cloud.firestore {
           resource.data.establishmentId == userEstablishmentId() &&
           resource.data.role == 'serveur' &&
           isServerOfMyOpenShift(userId)
+        ) ||
+        (
+          // 14A : constitution de son service.
+          isFloorManager() &&
+          resource.data.establishmentId == userEstablishmentId() &&
+          resource.data.role in ['serveur', 'gerante', 'proprietaire']
         )
       );
       // Root profiles are created by the authenticated Admin SDK callables.
@@ -1183,7 +1213,16 @@ service cloud.firestore {
           // remettre les encaissements de ce service (11B).
           (isServeur() && exists(participantDoc(establishmentId, shiftId, request.auth.uid)))
         );
-        allow create: if sameEstablishment(establishmentId) && isShiftManager() &&
+        allow create: if sameEstablishment(establishmentId) &&
+          (
+            isShiftManager() ||
+            (
+              isFloorManager() &&
+              request.resource.data.floorManagerId == request.auth.uid &&
+              'cashReceiverId' in request.resource.data
+            )
+          ) &&
+          validCashReceiver(establishmentId) &&
           validShiftData(establishmentId) &&
           validShiftFloorManager(establishmentId) &&
           request.resource.data.status == 'planned' &&
@@ -1192,7 +1231,8 @@ service cloud.firestore {
           request.resource.data.get('financialStatus', 'pending') == 'pending' &&
           request.resource.data.get('financialRevision', 0) == 0;
         allow update: if (
-          sameEstablishment(establishmentId) && isShiftManager() &&
+          sameEstablishment(establishmentId) &&
+          (isShiftManager() || fmManagesOwnShift()) &&
           // Service clôturé financièrement : plus aucune modification
           // (ni réouverture, ni affectation).
           notFinanciallyClosed(resource.data) &&
@@ -1202,7 +1242,8 @@ service cloud.firestore {
             'establishmentId', 'floorManagerId', 'floorManagerName',
             'createdAt', 'createdBy', 'createdByName', 'createdByRole',
             'financialStatus', 'financialRevision', 'financialClosedAt',
-            'financialClosedBy', 'financialClosedByName', 'financialSummary'
+            'financialClosedBy', 'financialClosedByName', 'financialSummary',
+            'cashReceiverId', 'cashReceiverName', 'cashReceiverRole'
           ]) &&
           validShiftTransition(establishmentId, shiftId)
         ) || (
@@ -1247,7 +1288,13 @@ service cloud.firestore {
             (isServeur() && serverId == request.auth.uid)
           );
           allow create, update: if sameEstablishment(establishmentId) &&
-            isShiftManager() &&
+            (
+              isShiftManager() ||
+              (
+                isFloorManager() &&
+                getAfter(shiftDoc(establishmentId, shiftId)).data.floorManagerId == request.auth.uid
+              )
+            ) &&
             validParticipant(establishmentId, shiftId, serverId);
           allow delete: if false;
         }
@@ -1259,7 +1306,7 @@ service cloud.firestore {
           isShiftManager() || request.auth.uid == floorManagerId
         );
         allow create, update: if sameEstablishment(establishmentId) &&
-          isShiftManager() &&
+          (isShiftManager() || (isFloorManager() && floorManagerId == request.auth.uid)) &&
           request.resource.data.keys().hasOnly([
             'floorManagerId', 'openShiftId', 'updatedAt', 'updatedBy'
           ]) &&
@@ -1276,13 +1323,18 @@ service cloud.firestore {
 
       // Pointeur vers le dernier service OUVERT d'un serveur.
       match /serverCurrentShift/{serverId} {
+        // Floor Manager : lit tous les pointeurs serveur de son établissement
+        // (aucune donnée sensible) pour vérifier une disponibilité.
         allow read: if sameEstablishment(establishmentId) && (
           isShiftManager() ||
           request.auth.uid == serverId ||
-          (isFloorManager() && resource.data.floorManagerId == request.auth.uid)
+          isFloorManager()
         );
         allow create, update: if sameEstablishment(establishmentId) &&
-          isShiftManager() &&
+          (
+            isShiftManager() ||
+            (isFloorManager() && request.resource.data.floorManagerId == request.auth.uid)
+          ) &&
           request.resource.data.keys().hasOnly([
             'serverId', 'openShiftId', 'floorManagerId', 'updatedAt', 'updatedBy'
           ]) &&

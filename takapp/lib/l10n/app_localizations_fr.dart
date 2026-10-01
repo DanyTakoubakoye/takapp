@@ -5057,4 +5057,21 @@ class AppLocalizationsFr extends AppLocalizations {
   String discrepancyLine(String name, String expected, String physical) {
     return '$name : attendu $expected, retrouvé $physical FCFA';
   }
+
+  @override
+  String get errShiftServerUnavailable =>
+      'Un des serveurs choisis est déjà engagé dans un autre service ouvert.';
+
+  @override
+  String get fmShiftTitle => 'Gérer mon service';
+
+  @override
+  String get fmShiftSubtitle => 'Horaires, serveurs, ouverture et clôture';
+
+  @override
+  String get shiftCashReceiverLabel => 'Remises à (gérante / caisse centrale)';
+
+  @override
+  String get shiftNoCashReceiver =>
+      'Aucune gérante active : impossible de désigner le destinataire des remises.';
 }

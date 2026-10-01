@@ -80,6 +80,36 @@ class ShiftPolicy {
         user.establishmentId == establishmentId;
   }
 
+  /// Service passant minuit (14A) : une fin saisie à une heure ANTÉRIEURE ou
+  /// égale au début, le même jour, désigne le lendemain (18:00 -> 02:00 =
+  /// 02:00 le jour suivant). Une fin déjà postérieure est conservée telle
+  /// quelle.
+  static DateTime normalizeEnd(DateTime startsAt, DateTime endsAt) {
+    if (endsAt.isAfter(startsAt)) return endsAt;
+    return DateTime(
+      startsAt.year,
+      startsAt.month,
+      startsAt.day + 1,
+      endsAt.hour,
+      endsAt.minute,
+    );
+  }
+
+  /// Horaires modifiables uniquement avant l'ouverture : un service en
+  /// cours a déjà des ventes et des affectations datées.
+  static bool canEditSchedule(ShiftModel shift) =>
+      shift.status == ShiftStatus.planned;
+
+  /// Serveurs modifiables tant que le service n'est pas terminé (en cours :
+  /// ajout/retrait transactionnel, avec contrôle de double présence).
+  static bool canEditServers(ShiftModel shift) =>
+      shift.status != ShiftStatus.closed;
+
+  /// Le Floor Manager ne rouvre jamais un service terminé : seule la
+  /// gérante le peut (réouverture explicite).
+  static bool canFloorManagerTransition(ShiftStatus from, ShiftStatus to) =>
+      from != ShiftStatus.closed && canTransition(from, to);
+
   /// Transitions autorisées. `closed -> open` est la réouverture explicite ;
   /// `planned -> closed` annule un service jamais ouvert.
   static bool canTransition(ShiftStatus from, ShiftStatus to) {

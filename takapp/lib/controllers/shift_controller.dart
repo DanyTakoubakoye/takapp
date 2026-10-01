@@ -52,6 +52,7 @@ class ShiftController extends ChangeNotifier {
     required String createdBy,
     String createdByName = '',
     String createdByRole = '',
+    UserModel? cashReceiver,
   }) {
     return _run(
       () => _service.createShift(
@@ -63,6 +64,7 @@ class ShiftController extends ChangeNotifier {
         createdBy: createdBy,
         createdByName: createdByName,
         createdByRole: createdByRole,
+        cashReceiver: cashReceiver,
       ),
     );
   }
@@ -71,12 +73,14 @@ class ShiftController extends ChangeNotifier {
     required String establishmentId,
     required String shiftId,
     required String userId,
+    String? actingFloorManagerId,
   }) {
     return _run(
       () => _service.openShift(
         establishmentId: establishmentId,
         shiftId: shiftId,
         openedBy: userId,
+        actingFloorManagerId: actingFloorManagerId,
       ),
     );
   }
@@ -100,6 +104,7 @@ class ShiftController extends ChangeNotifier {
     required String shiftId,
     required List<UserModel> servers,
     required String userId,
+    String? actingFloorManagerId,
   }) {
     return _run(
       () => _service.updateServers(
@@ -107,6 +112,23 @@ class ShiftController extends ChangeNotifier {
         shiftId: shiftId,
         servers: servers,
         updatedBy: userId,
+        actingFloorManagerId: actingFloorManagerId,
+      ),
+    );
+  }
+
+  Future<bool> updateSchedule({
+    required String establishmentId,
+    required String shiftId,
+    required DateTime startsAt,
+    required DateTime endsAt,
+  }) {
+    return _run(
+      () => _service.updateSchedule(
+        establishmentId: establishmentId,
+        shiftId: shiftId,
+        startsAt: startsAt,
+        endsAt: endsAt,
       ),
     );
   }

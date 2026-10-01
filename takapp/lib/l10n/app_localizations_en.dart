@@ -5008,4 +5008,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String discrepancyLine(String name, String expected, String physical) {
     return '$name: expected $expected, found $physical FCFA';
   }
+
+  @override
+  String get errShiftServerUnavailable =>
+      'One of the selected servers is already in another open shift.';
+
+  @override
+  String get fmShiftTitle => 'Manage my shift';
+
+  @override
+  String get fmShiftSubtitle => 'Hours, servers, opening and closing';
+
+  @override
+  String get shiftCashReceiverLabel => 'Hand over to (manager / central cash)';
+
+  @override
+  String get shiftNoCashReceiver =>
+      'No active manager: the handover recipient cannot be set.';
 }

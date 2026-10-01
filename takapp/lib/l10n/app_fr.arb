@@ -3299,5 +3299,10 @@
   "discrepancyStatusApproved": "Approuvé",
   "discrepancyStatusRejected": "Rejeté",
   "discrepancyLine": "{name} : attendu {expected}, retrouvé {physical} FCFA",
-  "@discrepancyLine": { "placeholders": { "name": { "type": "String" }, "expected": { "type": "String" }, "physical": { "type": "String" } } }
+  "@discrepancyLine": { "placeholders": { "name": { "type": "String" }, "expected": { "type": "String" }, "physical": { "type": "String" } } },
+"errShiftServerUnavailable": "Un des serveurs choisis est déjà engagé dans un autre service ouvert.",
+  "fmShiftTitle": "Gérer mon service",
+  "fmShiftSubtitle": "Horaires, serveurs, ouverture et clôture",
+  "shiftCashReceiverLabel": "Remises à (gérante / caisse centrale)",
+  "shiftNoCashReceiver": "Aucune gérante active : impossible de désigner le destinataire des remises."
 }

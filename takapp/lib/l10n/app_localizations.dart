@@ -8794,6 +8794,36 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'{name} : attendu {expected}, retrouvé {physical} FCFA'**
   String discrepancyLine(String name, String expected, String physical);
+
+  /// No description provided for @errShiftServerUnavailable.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un des serveurs choisis est déjà engagé dans un autre service ouvert.'**
+  String get errShiftServerUnavailable;
+
+  /// No description provided for @fmShiftTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gérer mon service'**
+  String get fmShiftTitle;
+
+  /// No description provided for @fmShiftSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Horaires, serveurs, ouverture et clôture'**
+  String get fmShiftSubtitle;
+
+  /// No description provided for @shiftCashReceiverLabel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remises à (gérante / caisse centrale)'**
+  String get shiftCashReceiverLabel;
+
+  /// No description provided for @shiftNoCashReceiver.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune gérante active : impossible de désigner le destinataire des remises.'**
+  String get shiftNoCashReceiver;
 }
 
 class _AppLocalizationsDelegate

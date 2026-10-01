@@ -102,6 +102,54 @@ class ShiftService {
         .toList();
   }
 
+  /// Serveurs affectables par un Floor Manager (14A) : il ne lit que les
+  /// profils serveur de son établissement (requête filtrée par rôle, seule
+  /// forme admise par les règles).
+  Future<List<UserModel>> fetchServers(String establishmentId) =>
+      _usersWithRole(establishmentId, AppRoles.serveur);
+
+  /// Destinataires possibles des remises d'un service créé par un Floor
+  /// Manager : gérantes et propriétaires actifs de l'établissement.
+  Future<List<UserModel>> fetchCashReceivers(String establishmentId) async {
+    final lists = await Future.wait([
+      _usersWithRole(establishmentId, AppRoles.gerante),
+      _usersWithRole(establishmentId, AppRoles.proprietaire),
+    ]);
+    return [...lists[0], ...lists[1]].where((u) => u.isActive).toList();
+  }
+
+  Future<List<UserModel>> _usersWithRole(
+    String establishmentId,
+    String role,
+  ) async {
+    final snapshot = await _firestore
+        .collection('users')
+        .where('establishmentId', isEqualTo: establishmentId)
+        .where('role', isEqualTo: role)
+        .get();
+    return snapshot.docs
+        .map((doc) => UserModel.fromMap(doc.data(), doc.id))
+        .toList();
+  }
+
+  /// Services d'un Floor Manager (les siens uniquement), plus récents
+  /// d'abord.
+  Stream<List<ShiftModel>> streamShiftsOfFloorManager({
+    required String establishmentId,
+    required String floorManagerId,
+  }) {
+    return _shifts(establishmentId)
+        .where('floorManagerId', isEqualTo: floorManagerId)
+        .snapshots()
+        .map(
+          (snapshot) =>
+              snapshot.docs
+                  .map((doc) => ShiftModel.fromMap(doc.data(), doc.id))
+                  .toList()
+                ..sort((a, b) => b.startsAt.compareTo(a.startsAt)),
+        );
+  }
+
   Stream<List<ShiftModel>> streamShifts(String establishmentId) {
     return _shifts(establishmentId)
         .orderBy('startsAt', descending: true)
@@ -128,6 +176,7 @@ class ShiftService {
     required String createdBy,
     String createdByName = '',
     String createdByRole = '',
+    UserModel? cashReceiver,
   }) async {
     final error = ShiftPolicy.validateDraft(
       establishmentId: establishmentId,
@@ -153,6 +202,11 @@ class ShiftService {
       'createdBy': createdBy,
       'createdByName': createdByName,
       'createdByRole': createdByRole,
+      if (cashReceiver != null) ...{
+        'cashReceiverId': cashReceiver.uid,
+        'cashReceiverName': cashReceiver.name,
+        'cashReceiverRole': cashReceiver.role,
+      },
       'updatedAt': FieldValue.serverTimestamp(),
     });
 
@@ -204,10 +258,11 @@ class ShiftService {
     required String establishmentId,
     required String shiftId,
     required String openedBy,
+    String? actingFloorManagerId,
   }) async {
     AppError? failure;
 
-    await _firestore.runTransaction((transaction) async {
+    final done = _firestore.runTransaction((transaction) async {
       failure = null; // la transaction peut être rejouée
 
       final shiftSnap = await transaction.get(
@@ -232,7 +287,11 @@ class ShiftService {
         establishmentId,
         shift.floorManagerId,
       );
-      final fmHeldBy = await _pointedShift(transaction, fmPointerRef);
+      final fmHeldBy = await _pointedShift(
+        transaction,
+        fmPointerRef,
+        actingFloorManagerId,
+      );
 
       if (ShiftPolicy.isHeldByAnotherOpenShift(
         shiftId: shiftId,
@@ -246,6 +305,7 @@ class ShiftService {
         final heldBy = await _pointedShift(
           transaction,
           _serverPointer(establishmentId, serverId),
+          actingFloorManagerId,
         );
 
         if (ShiftPolicy.isHeldByAnotherOpenShift(
@@ -287,6 +347,7 @@ class ShiftService {
         );
       }
     });
+    await _guardFloorManager(actingFloorManagerId, done);
 
     // Levée hors transaction : sur le web, une exception levée dedans perd
     // son message.
@@ -347,10 +408,11 @@ class ShiftService {
     required String shiftId,
     required List<UserModel> servers,
     required String updatedBy,
+    String? actingFloorManagerId,
   }) async {
     AppError? failure;
 
-    await _firestore.runTransaction((transaction) async {
+    final done = _firestore.runTransaction((transaction) async {
       failure = null;
 
       final shiftSnap = await transaction.get(
@@ -385,6 +447,7 @@ class ShiftService {
           final heldBy = await _pointedShift(
             transaction,
             _serverPointer(establishmentId, server.uid),
+            actingFloorManagerId,
           );
           if (ShiftPolicy.isHeldByAnotherOpenShift(
             shiftId: shiftId,
@@ -448,9 +511,66 @@ class ShiftService {
             });
       }
     });
+    await _guardFloorManager(actingFloorManagerId, done);
 
     final error = failure;
     if (error != null) throw error;
+  }
+
+  /// Horaires d'un service PLANIFIÉ (14A). Un service en cours ou terminé
+  /// garde ses horaires.
+  Future<void> updateSchedule({
+    required String establishmentId,
+    required String shiftId,
+    required DateTime startsAt,
+    required DateTime endsAt,
+  }) async {
+    AppError? failure;
+
+    await _firestore.runTransaction((transaction) async {
+      failure = null;
+      final shiftSnap = await transaction.get(
+        _shifts(establishmentId).doc(shiftId),
+      );
+      if (!shiftSnap.exists || shiftSnap.data() == null) {
+        failure = const AppError(AppErrorCode.shiftNotFound);
+        return;
+      }
+      final shift = ShiftModel.fromMap(shiftSnap.data()!, shiftSnap.id);
+      if (!ShiftPolicy.canEditSchedule(shift)) {
+        failure = const AppError(AppErrorCode.shiftInvalidTransition);
+        return;
+      }
+      if (!endsAt.isAfter(startsAt)) {
+        failure = const AppError(AppErrorCode.shiftInvalidDates);
+        return;
+      }
+      transaction.update(shiftSnap.reference, {
+        'startsAt': Timestamp.fromDate(startsAt),
+        'endsAt': Timestamp.fromDate(endsAt),
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    });
+
+    final error = failure;
+    if (error != null) throw error;
+  }
+
+  /// Floor Manager (14A) : il ne lit pas le service d'un autre Floor
+  /// Manager ; le contrôle « serveur déjà dans un service ouvert » est alors
+  /// fait par les règles (refus de l'écriture), traduit ici.
+  Future<void> _guardFloorManager(
+    String? actingFloorManagerId,
+    Future<void> transaction,
+  ) async {
+    try {
+      await transaction;
+    } on FirebaseException catch (e) {
+      if (actingFloorManagerId != null && e.code == 'permission-denied') {
+        throw const AppError(AppErrorCode.shiftServerUnavailable);
+      }
+      rethrow;
+    }
   }
 
   Map<String, dynamic> _serverPointerData(
@@ -471,11 +591,19 @@ class ShiftService {
   /// transaction ; `null` si aucun.
   Future<ShiftModel?> _pointedShift(
     Transaction transaction,
-    DocumentReference<Map<String, dynamic>> pointerRef,
-  ) async {
+    DocumentReference<Map<String, dynamic>> pointerRef, [
+    String? actingFloorManagerId,
+  ]) async {
     final pointer = await transaction.get(pointerRef);
     final openShiftId = pointer.data()?['openShiftId'];
     if (openShiftId is! String || openShiftId.isEmpty) return null;
+    // Floor Manager : le service d'un autre Floor Manager ne lui est pas
+    // lisible. Les règles refusent l'affectation s'il est encore ouvert
+    // (serverPointerReleased).
+    if (actingFloorManagerId != null &&
+        pointer.data()?['floorManagerId'] != actingFloorManagerId) {
+      return null;
+    }
 
     final establishmentRef = pointerRef.parent.parent!;
     final shiftSnap = await transaction.get(
